@@ -16,3 +16,8 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = ["127.0.0.1", "::1"]
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "config.storage.DevStaticFilesStorage"},
+}

@@ -1,0 +1,1765 @@
+{
+ "slug": "sifirdan-uctan-uca-projelerle-python-ve-django-ogren",
+ "curriculum": [
+  [
+   "Giriş",
+   [
+    [
+     "Kurs Tanıtıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407498-giris/7678350-kurs-tanititim-videosu",
+     1
+    ],
+    [
+     "Kaç Yazılım Dili Bilmeliyim?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407498-giris/7676950-kac-yazilim-dili-bilmeliyim",
+     0
+    ],
+    [
+     "Frameworkler ve Yazılım Dillerindeki Versiyon Değişiklikleri Hakkında Genel Bilgi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407498-giris/8277869-frameworkler-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     1
+    ],
+    [
+     "Yapay Zeka ve Biz",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407498-giris/8278314-yapay-zeka-ve-biz",
+     1
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407498-giris/8074710-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "HTML",
+   [
+    [
+     "HTML'e Hoşgeldiniz",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675157-html-e-hosgeldiniz",
+     0
+    ],
+    [
+     "HTML Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675164-html-nedir",
+     0
+    ],
+    [
+     "Kod(Text) Editörlerine Genel Bakış",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675150-kod-text-editorlerine-genel-bakis",
+     0
+    ],
+    [
+     "HTML - Demo -_- Arkanıza Yaslanın ;)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675146-html-demo-_-arkaniza-yaslanin",
+     0
+    ],
+    [
+     "Visual Studio Code - Arayüz ve Genel Kullanım",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675151-visual-studio-code-arayuz-ve-genel-kullanim",
+     0
+    ],
+    [
+     "En Çok Kullanılan HTML Etiketleri Nelerdir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675148-en-cok-kullanilan-html-etiketleri-nelerdir",
+     0
+    ],
+    [
+     "HTML'de Açıklama Satırı Eklemek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675149-html-de-aciklama-satiri-eklemek",
+     0
+    ],
+    [
+     "VS-Code İçerisinde Dosyaları Kaydetmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675152-vs-code-icerisinde-dosyalari-kaydetmek",
+     0
+    ],
+    [
+     "Başlıklar ve Paragraflarla Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675155-basliklar-ve-paragraflarla-calismak",
+     0
+    ],
+    [
+     "Listelerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675168-listelerle-calismak",
+     0
+    ],
+    [
+     "Emmet İle Çalışmak Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675153-emmet-ile-calismak-bolum-1",
+     0
+    ],
+    [
+     "Emmet İle Çalışmak Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675158-emmet-ile-calismak-bolum-2",
+     1
+    ],
+    [
+     "Emmet İle Çalışmak Bölüm-3",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675156-emmet-ile-calismak-bolum-3",
+     0
+    ],
+    [
+     "HTML Genel Yapısını Anlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675163-html-genel-yapisini-anlamak",
+     0
+    ],
+    [
+     "Linklerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675169-linklerle-calismak",
+     0
+    ],
+    [
+     "Motivasyon - Hergün Kendimizi Nasıl Geliştirebiliriz?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675170-motivasyon-hergun-kendimizi-nasil-gelistirebiliriz",
+     0
+    ],
+    [
+     "Görsellerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675174-gorsellerle-calismak",
+     0
+    ],
+    [
+     "HTML Etiketlerine Ekstra Özellikler Eklemek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675172-html-etiketlerine-ekstra-ozellikler-eklemek",
+     0
+    ],
+    [
+     "Block Ve Inline Elementlerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675178-block-ve-inline-elementlerle-calismak",
+     0
+    ],
+    [
+     "Indentation Girintili Yapi İle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675173-indentation-girintili-yapi-ile-calismak",
+     0
+    ],
+    [
+     "Semantic Etiketlerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675182-semantic-etiketlerle-calismak",
+     0
+    ],
+    [
+     "Bölüm Sonu Çalışması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675179-bolum-sonu-calismasi",
+     0
+    ],
+    [
+     "Bölüm Sonu Çalışmasını Yayına Almak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/7675181-bolum-sonu-calismasini-yayina-almak",
+     0
+    ],
+    [
+     "Classless CSS - İlham",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/9333533-classless-css-ilham",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407499-html/8074722-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Visual Studio Code Editör",
+   [
+    [
+     "VS Code ve Diğer Kod Editorleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675183-vs-code-ve-diger-kod-editorleri",
+     0
+    ],
+    [
+     "VSCode.dev Online Visual Studio Code ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675180-vscode-dev-online-visual-studio-code-ile-calismak",
+     0
+    ],
+    [
+     "VS Code Genel Görünümlerin Ayarlanması Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675184-vs-code-genel-gorunumlerin-ayarlanmasi-bolum-1",
+     0
+    ],
+    [
+     "VS Code Genel Görünümlerin Ayarlanması Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675191-vs-code-genel-gorunumlerin-ayarlanmasi-bolum-2",
+     1
+    ],
+    [
+     "Tema ve Icon Görünüm Ayarları",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675189-tema-ve-icon-gorunum-ayarlari",
+     0
+    ],
+    [
+     "VS Code Help Menüsünü İncelemek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675186-vs-code-help-menusunu-incelemek",
+     0
+    ],
+    [
+     "VS Code İçerisinde Birden Fazla Proje ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675187-vs-code-icerisinde-birden-fazla-proje-ile-calismak",
+     0
+    ],
+    [
+     "VS Code Ayarlar Menüsü",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675190-vs-code-ayarlar-menusu",
+     0
+    ],
+    [
+     "VS Code icerisinde Çoklu İmleç (Multi Cursor) özelliği",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675195-vs-code-icerisinde-coklu-imlec-multi-cursor-ozelligi",
+     0
+    ],
+    [
+     "VS Code Editor Playground İle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675192-vs-code-editor-playground-ile-calismak",
+     1
+    ],
+    [
+     "VS Code Klavye Kisayol Tuşları",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675200-vs-code-klavye-kisayol-tuslari",
+     0
+    ],
+    [
+     "VS Code İçerisinde Terminal ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675197-vs-code-icerisinde-terminal-ile-calismak",
+     0
+    ],
+    [
+     "Code Snippets İle İstediğiniz Yapıları Hızlıca Oluşturun",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675238-code-snippets-ile-istediginiz-yapilari-hizlica-olusturun",
+     0
+    ],
+    [
+     "Bölüm Sonu Özeti",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/7675194-bolum-sonu-ozeti",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407500-visual-studio-code-editor/8074725-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Git & GitHub",
+   [
+    [
+     "Versiyon Kontrol Sistemi Olmadan Projeleri Düzenleyebilir miyiz?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675237-versiyon-kontrol-sistemi-olmadan-projeleri-duzenleyebilir-miyiz",
+     0
+    ],
+    [
+     "Versiyon Kontrol Sisteminde İlk Ayarlar ve \"VS Code\" icinde \"Git Init\"",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675235-versiyon-kontrol-sisteminde-ilk-ayarlar-ve-vs-code-icinde-git-init",
+     0
+    ],
+    [
+     "Birden Fazla Projede \"Git\" Versiyon Kontrol Sisteminin Aktif Edilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675236-birden-fazla-projede-git-versiyon-kontrol-sisteminin-aktif-edilmesi",
+     0
+    ],
+    [
+     "Gitignore Versiyon Kontrol Sistemine Takip Edilmeyecek Dosyalarin Tanıtılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675247-gitignore-versiyon-kontrol-sistemine-takip-edilmeyecek-dosyalarin-tanitilmasi",
+     0
+    ],
+    [
+     "VS Code İçerisinden Dosyaların Eklenmesi ve Yapılan Değisikliklerin Gözlenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675242-vs-code-icerisinden-dosyalarin-eklenmesi-ve-yapilan-degisikliklerin-gozlenmesi",
+     0
+    ],
+    [
+     "Diğer Uygulamalar İle Projedeki Versiyon Kontrol Sistemini Yönetmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675240-diger-uygulamalar-ile-projedeki-versiyon-kontrol-sistemini-yonetmek",
+     0
+    ],
+    [
+     "VS Code İçerisinde Terminalden Git Komutlarının Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675245-vs-code-icerisinde-terminalden-git-komutlarinin-kullanimi",
+     0
+    ],
+    [
+     "GitHub İçerisinde Profil Oluşturulması Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675244-github-icerisinde-profil-olusturulmasi-bolum-1",
+     0
+    ],
+    [
+     "GitHub İçerisinde Profil Oluşturulması Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675249-github-icerisinde-profil-olusturulmasi-bolum-2",
+     0
+    ],
+    [
+     "MarkDown ile Çalışmak ve README Dosyasını Anlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675259-markdown-ile-calismak-ve-readme-dosyasini-anlamak",
+     0
+    ],
+    [
+     "Repo'nun GitHub'a Eklenmesi ve Düzenlenmesi Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675299-repo-nun-github-a-eklenmesi-ve-duzenlenmesi-bolum-1",
+     0
+    ],
+    [
+     "Repo'nun GitHub'a Eklenmesi ve Düzenlenmesi Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675253-repo-nun-github-a-eklenmesi-ve-duzenlenmesi-bolum-2",
+     1
+    ],
+    [
+     "GitExplorer ve Cheat.sh Sitesi Üzerinden Git Komutlarının İncelenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675251-gitexplorer-ve-cheat-sh-sitesi-uzerinden-git-komutlarinin-incelenmesi",
+     0
+    ],
+    [
+     "GitHub Student Developer Pack",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675254-github-student-developer-pack",
+     0
+    ],
+    [
+     "\"GitHub.io\" Üzerinde Kendi Web Sitemizi Oluşturmak Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675306-github-io-uzerinde-kendi-web-sitemizi-olusturmak-bolum-1",
+     0
+    ],
+    [
+     "\"GitHub.io\" Üzerinde Kendi Web Sitemizi Oluşturmak Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/7675257-github-io-uzerinde-kendi-web-sitemizi-olusturmak-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407501-git-github/8074729-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "CSS",
+   [
+    [
+     "CSS Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675295-css-nedir",
+     0
+    ],
+    [
+     "CSS Genel Yapısını Anlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675305-css-genel-yapisini-anlamak",
+     0
+    ],
+    [
+     "InlineCSS - InternalCSS - ExternalCSS - Yapılarının Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675310-inlinecss-internalcss-externalcss-yapilarinin-kullanimi",
+     0
+    ],
+    [
+     "Temel CSS Seçicilerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675312-temel-css-secicilerle-calismak",
+     0
+    ],
+    [
+     "Gelişmiş CSS Seçicilerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675315-gelismis-css-secicilerle-calismak",
+     0
+    ],
+    [
+     "CSS Text Özellikleriyle Çalışmak - Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675307-css-text-ozellikleriyle-calismak-bolum-1",
+     0
+    ],
+    [
+     "CSS Text Özellikleriyle Çalışmak - Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675323-css-text-ozellikleriyle-calismak-bolum-2",
+     1
+    ],
+    [
+     "CSS Kutu Özellikleri Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675327-css-kutu-ozellikleri-bolum-1",
+     0
+    ],
+    [
+     "CSS Kutu Özellikleri Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675326-css-kutu-ozellikleri-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu Çalışması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675331-bolum-sonu-calismasi",
+     0
+    ],
+    [
+     "Kopyalama Metodu ile CSS Konusunda Kendini Geliştir",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675324-kopyalama-metodu-ile-css-konusunda-kendini-gelistir",
+     0
+    ],
+    [
+     "CSS Yapılarıyla Bölüm Sonu Çalışmasının Güncellenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/7675330-css-yapilariyla-bolum-sonu-calismasinin-guncellenmesi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407503-css/8074737-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "BOOTSTRAP",
+   [
+    [
+     "Bootstrap Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675329-bootstrap-nedir",
+     0
+    ],
+    [
+     "Bootstrap DEMO -_- Arkana Yaslan",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675334-bootstrap-demo-_-arkana-yaslan",
+     0
+    ],
+    [
+     "12'lik Grid Sistemi Anlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675333-12-lik-grid-sistemi-anlamak",
+     0
+    ],
+    [
+     "Container Row ve Col ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675347-container-row-ve-col-ile-calismak",
+     0
+    ],
+    [
+     "Bölümlendirme ve Kolon Yapısını Anlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675342-bolumlendirme-ve-kolon-yapisini-anlamak",
+     0
+    ],
+    [
+     "\"Responsive\" Kolon Yapısı ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675340-responsive-kolon-yapisi-ile-calismak",
+     0
+    ],
+    [
+     "UI-UX Nedir? Neden Önemli?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675343-ui-ux-nedir-neden-onemli",
+     0
+    ],
+    [
+     "Bootstrap Web Sitesi Genel Bilgiler",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675339-bootstrap-web-sitesi-genel-bilgiler",
+     0
+    ],
+    [
+     "Bootstrap Web Sitesi Dökümantasyon İnceleme 1.Bölüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675346-bootstrap-web-sitesi-dokumantasyon-inceleme-1-bolum",
+     0
+    ],
+    [
+     "Bootstrap Web Sitesi Dökümantasyon İnceleme 2.Bölüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675351-bootstrap-web-sitesi-dokumantasyon-inceleme-2-bolum",
+     1
+    ],
+    [
+     "Bootstrap Web Sitesi Dökümantasyon İnceleme 3.Bölüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675355-bootstrap-web-sitesi-dokumantasyon-inceleme-3-bolum",
+     0
+    ],
+    [
+     "Bootstrap Renk Standartları Nelerdir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675353-bootstrap-renk-standartlari-nelerdir",
+     0
+    ],
+    [
+     "Bootstrap Margin ve Padding Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675357-bootstrap-margin-ve-padding-kullanimi",
+     0
+    ],
+    [
+     "Bootstrap Responsive Hiding Elements",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675354-bootstrap-responsive-hiding-elements",
+     0
+    ],
+    [
+     "Bootstrap Offset Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675352-bootstrap-offset-kullanimi",
+     0
+    ],
+    [
+     "Bootstrap ReOrdering Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675365-bootstrap-reordering-kullanimi",
+     0
+    ],
+    [
+     "Diğer CSS Kütüphaneleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675356-diger-css-kutuphaneleri",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675360-bolum-sonu-projesi-1-bolum-1",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675363-bolum-sonu-projesi-1-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-3",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675364-bolum-sonu-projesi-1-bolum-3",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-4",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675359-bolum-sonu-projesi-1-bolum-4",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-5",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675362-bolum-sonu-projesi-1-bolum-5",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-6",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675367-bolum-sonu-projesi-1-bolum-6",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 Bölüm-7",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675366-bolum-sonu-projesi-1-bolum-7",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-1 - Projeyi Yayınlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675368-bolum-sonu-projesi-1-projeyi-yayinlamak",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675376-bolum-sonu-projesi-2-bolum-1",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675374-bolum-sonu-projesi-2-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Bölüm-3",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675375-bolum-sonu-projesi-2-bolum-3",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Bölüm-4",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675370-bolum-sonu-projesi-2-bolum-4",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Bölüm-5",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675385-bolum-sonu-projesi-2-bolum-5",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-2 Projenin Yayınlanması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675373-bolum-sonu-projesi-2-projenin-yayinlanmasi",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675378-bolum-sonu-projesi-3-bolum-1",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675380-bolum-sonu-projesi-3-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-3",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675383-bolum-sonu-projesi-3-bolum-3",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-4",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675381-bolum-sonu-projesi-3-bolum-4",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-5",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675382-bolum-sonu-projesi-3-bolum-5",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-6",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675386-bolum-sonu-projesi-3-bolum-6",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-7",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675388-bolum-sonu-projesi-3-bolum-7",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Bölüm-8",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675391-bolum-sonu-projesi-3-bolum-8",
+     0
+    ],
+    [
+     "Bölüm Sonu Projesi-3 Projenin Yayınlanması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/7675387-bolum-sonu-projesi-3-projenin-yayinlanmasi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407504-bootstrap/8074744-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python Temelleri",
+   [
+    [
+     "Python Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675513-python-nedir",
+     0
+    ],
+    [
+     "Python Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675486-python-kurulumu",
+     0
+    ],
+    [
+     "Hello World' ün Önemi ve Birçok Ortamda Hello World",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675487-hello-world-un-onemi-ve-bircok-ortamda-hello-world",
+     0
+    ],
+    [
+     "Print Kullanımı ve Açıklama Satırı Eklemek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675502-print-kullanimi-ve-aciklama-satiri-eklemek",
+     0
+    ],
+    [
+     "Aritmetik İşlemler Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675511-aritmetik-islemler-bolum-1",
+     0
+    ],
+    [
+     "Aritmetik İşlemler Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675507-aritmetik-islemler-bolum-2",
+     0
+    ],
+    [
+     "Kesme İşaretleri ve Tırnak Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675506-kesme-isaretleri-ve-tirnak-kullanimi",
+     0
+    ],
+    [
+     "Değişken Tanımlama ve Değişken Tanımlama Kuralları",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675510-degisken-tanimlama-ve-degisken-tanimlama-kurallari",
+     0
+    ],
+    [
+     "Python'ı Anlamak (Zen Of Python)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675505-python-i-anlamak-zen-of-python",
+     0
+    ],
+    [
+     "'input' ile Kullanıcıdan Veri Almak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675512-input-ile-kullanicidan-veri-almak",
+     0
+    ],
+    [
+     "Temel Değişken Tipleri ve Tip Dönüşümleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675527-temel-degisken-tipleri-ve-tip-donusumleri",
+     0
+    ],
+    [
+     "Boolean'ı Anlamak, Karşılaştırma Operatörleri ve Mantıksal Operatörler",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675479-boolean-i-anlamak-karsilastirma-operatorleri-ve-mantiksal-operatorler",
+     0
+    ],
+    [
+     "Değişkenlerin İçindeki Bilgiyi Değiştirmek, Birleştirmek, Arttırmak ve Azaltmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675474-degiskenlerin-icindeki-bilgiyi-degistirmek-birlestirmek-arttirmak-ve-azaltmak",
+     0
+    ],
+    [
+     "Unutulmaması Gereken 5 Fonksiyon",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675481-unutulmamasi-gereken-5-fonksiyon",
+     0
+    ],
+    [
+     "Metinsel İşlemler, Metin Denetimleri ve Bilinmesi Gereken Metodlar Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675500-metinsel-islemler-metin-denetimleri-ve-bilinmesi-gereken-metodlar-bolum-1",
+     0
+    ],
+    [
+     "Metinsel İşlemler, Metin Denetimleri ve Bilinmesi Gereken Metodlar Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675477-metinsel-islemler-metin-denetimleri-ve-bilinmesi-gereken-metodlar-bolum-2",
+     1
+    ],
+    [
+     "'fString' ile Metin Biçimlendirme Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675482-fstring-ile-metin-bicimlendirme-bolum-1",
+     0
+    ],
+    [
+     "'fString' ile Metin Biçimlendirme Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675473-fstring-ile-metin-bicimlendirme-bolum-2",
+     0
+    ],
+    [
+     "Bölüm Sonu Çalışması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/7675484-bolum-sonu-calismasi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407505-python-temelleri/8074749-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: Karar Yapıları İle Çalışmak",
+   [
+    [
+     "İlk Karar Yapısı ve Indentation ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407506-python-karar-yapilari-ile-calismak/7675552-ilk-karar-yapisi-ve-indentation-ile-calismak",
+     0
+    ],
+    [
+     "'else' Kullanımı ve Kullanırken Dikkat Etmeniz Gerekenler",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407506-python-karar-yapilari-ile-calismak/7675529-else-kullanimi-ve-kullanirken-dikkat-etmeniz-gerekenler",
+     1
+    ],
+    [
+     "İçiçe 'if' Kullanımı ve 'elif' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407506-python-karar-yapilari-ile-calismak/7675532-icice-if-kullanimi-ve-elif-kullanimi",
+     0
+    ],
+    [
+     "Kısa (short) 'if' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407506-python-karar-yapilari-ile-calismak/7675531-kisa-short-if-kullanimi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407506-python-karar-yapilari-ile-calismak/8074750-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: list ile Calışmak",
+   [
+    [
+     "List Nedir? Nasıl Tanımlanır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/7675538-list-nedir-nasil-tanimlanir",
+     0
+    ],
+    [
+     "List İçine Öğe Eklemek, Çıkartmak ve Erişmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/7675544-list-icine-oge-eklemek-cikartmak-ve-erismek",
+     0
+    ],
+    [
+     "'list' leri Kopyalamak, Birleştirmek ve İçiçe Liste Tanımlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/7675537-list-leri-kopyalamak-birlestirmek-ve-icice-liste-tanimlamak",
+     0
+    ],
+    [
+     "Bilinmesi Gereken 'list' metodları",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/7675545-bilinmesi-gereken-list-metodlari",
+     0
+    ],
+    [
+     "İçiçe Listelerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/7675553-icice-listelerle-calismak",
+     1
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407507-python-list-ile-calismak/8074756-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: Döngülerle Calışmak",
+   [
+    [
+     "'for' Döngüsü ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675557-for-dongusu-ile-calismak",
+     0
+    ],
+    [
+     "'list' unpacking",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675554-list-unpacking",
+     0
+    ],
+    [
+     "İçiçe Listeleri 'for' ile Döndürmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675550-icice-listeleri-for-ile-dondurmek",
+     0
+    ],
+    [
+     "'while' Döngüsü İle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675558-while-dongusu-ile-calismak",
+     0
+    ],
+    [
+     "'continue' ve 'break' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675555-continue-ve-break-kullanimi",
+     0
+    ],
+    [
+     "Kısa (short) 'if' ve Kısa (short) 'for' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/7675793-kisa-short-if-ve-kisa-short-for-kullanimi",
+     1
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407508-python-dongulerle-calismak/8074760-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: Fonksiyon Kullanımı",
+   [
+    [
+     "Fonksiyon Tanımlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407510-python-fonksiyon-kullanimi/7675660-fonksiyon-tanimlamak",
+     1
+    ],
+    [
+     "Fonksiyonlara Değer Göndermek ve return ile Bilgi Almak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407510-python-fonksiyon-kullanimi/7675811-fonksiyonlara-deger-gondermek-ve-return-ile-bilgi-almak",
+     0
+    ],
+    [
+     "Kendi Kendini Çağıran fonksiyonlar Nasıl Kullanılır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407510-python-fonksiyon-kullanimi/7675837-kendi-kendini-cagiran-fonksiyonlar-nasil-kullanilir",
+     0
+    ],
+    [
+     "Fonksiyonlarda 'args' ve 'kwargs' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407510-python-fonksiyon-kullanimi/7675602-fonksiyonlarda-args-ve-kwargs-kullanimi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407510-python-fonksiyon-kullanimi/8074818-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: Kütüphaneler ve Modüller",
+   [
+    [
+     "Kütüphaneler ve Modüller ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407511-python-kutuphaneler-ve-moduller/7675777-kutuphaneler-ve-moduller-ile-calismak",
+     0
+    ],
+    [
+     "Kendi Modülümüzü Nasıl Oluştururuz?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407511-python-kutuphaneler-ve-moduller/7675970-kendi-modulumuzu-nasil-olustururuz",
+     0
+    ],
+    [
+     "Python Süpriz Yumurta",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407511-python-kutuphaneler-ve-moduller/7675987-python-supriz-yumurta",
+     1
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407511-python-kutuphaneler-ve-moduller/8074765-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: dict ile Çalışmak",
+   [
+    [
+     "'dict' Nedir? Nasıl Tanımlanır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407512-python-dict-ile-calismak/7675972-dict-nedir-nasil-tanimlanir",
+     0
+    ],
+    [
+     "'dict' - get Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407512-python-dict-ile-calismak/7675968-dict-get-kullanimi",
+     0
+    ],
+    [
+     "'dict' İçindeki Verilerin 'for' ile Kullanılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407512-python-dict-ile-calismak/7675969-dict-icindeki-verilerin-for-ile-kullanilmasi",
+     1
+    ],
+    [
+     "'dict' Tanımlamanın Alternatif Yolu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407512-python-dict-ile-calismak/7675955-dict-tanimlamanin-alternatif-yolu",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407512-python-dict-ile-calismak/8074768-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: tuple ile Çalışmak",
+   [
+    [
+     "'tuple' ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407515-python-tuple-ile-calismak/7675973-tuple-ile-calismak",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407515-python-tuple-ile-calismak/8074773-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python: set ile Çalışmak",
+   [
+    [
+     "'set' ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407518-python-set-ile-calismak/7675994-set-ile-calismak",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407518-python-set-ile-calismak/8074779-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django Kurulumu",
+   [
+    [
+     "Windows İşletim Sistemine Django Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/7675998-windows-isletim-sistemine-django-kurulumu",
+     0
+    ],
+    [
+     "macOS İşletim Sistemine Django Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/7675992-macos-isletim-sistemine-django-kurulumu",
+     0
+    ],
+    [
+     "Windows İşletim Sisteminde VirtualEnv ile Django Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/7675995-windows-isletim-sisteminde-virtualenv-ile-django-kurulumu",
+     0
+    ],
+    [
+     "Windows VirtualEnv İsimlendirmesi Neden Önemli?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/7675989-windows-virtualenv-isimlendirmesi-neden-onemli",
+     0
+    ],
+    [
+     "macOS virtualenv ile Django Projelerinin Kurulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/7676009-macos-virtualenv-ile-django-projelerinin-kurulmasi",
+     1
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407519-django-kurulumu/8074784-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django Version 5.x'e Genel Bakış",
+   [
+    [
+     "Django Version 5.x'e Genel Bakış",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2579509-django-version-5-x-e-genel-bakis/8278290-django-version-5-x-e-genel-bakis",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django: Proje1",
+   [
+    [
+     "Django'da ilk fonksiyonumuz",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676014-django-da-ilk-fonksiyonumuz",
+     0
+    ],
+    [
+     "startapp ile Yeni Bir App Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676002-startapp-ile-yeni-bir-app-olusturulmasi",
+     0
+    ],
+    [
+     "İlk HTML Sayfasının render ile Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676005-ilk-html-sayfasinin-render-ile-gosterilmesi",
+     0
+    ],
+    [
+     "MVT Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676007-mvt-nedir",
+     0
+    ],
+    [
+     "Anasayfayı Eski Projeden Alıp Hayata Geçirmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676012-anasayfayi-eski-projeden-alip-hayata-gecirmek",
+     0
+    ],
+    [
+     "'urls' ve 'view' ile Hakkımızda ve iletişim Sayfası Yapıya Nasıl Eklenir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676234-urls-ve-view-ile-hakkimizda-ve-iletisim-sayfasi-yapiya-nasil-eklenir",
+     0
+    ],
+    [
+     "Database Oluşturulması ve admin Panele Giriş",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676015-database-olusturulmasi-ve-admin-panele-giris",
+     0
+    ],
+    [
+     "Vizyonumuz Sayfasının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676013-vizyonumuz-sayfasinin-olusturulmasi",
+     1
+    ],
+    [
+     "'extends' ile 'base.html' Oluşturulması ve İletişim Sayfasına Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676237-extends-ile-base-html-olusturulmasi-ve-iletisim-sayfasina-eklenmesi",
+     0
+    ],
+    [
+     "Diğer Sayfaların 'Block' ile Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676235-diger-sayfalarin-block-ile-kullanimi",
+     0
+    ],
+    [
+     "Block Kısımlarının Optimize Edilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676238-block-kisimlarinin-optimize-edilmesi",
+     0
+    ],
+    [
+     "DTL 'url' ve 'if' kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676241-dtl-url-ve-if-kullanimi",
+     0
+    ],
+    [
+     "'include' ile Sayfaların Parçalanması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676244-include-ile-sayfalarin-parcalanmasi",
+     0
+    ],
+    [
+     "'include with' Kullanımı ile Sayfalarda Component Mantığının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676242-include-with-kullanimi-ile-sayfalarda-component-mantiginin-olusturulmasi",
+     0
+    ],
+    [
+     "DTL 'for' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676246-dtl-for-kullanimi",
+     0
+    ],
+    [
+     "Ana Sayfa' da Carouselin Component Olarak Dönüştürülmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676252-ana-sayfa-da-carouselin-component-olarak-donusturulmesi",
+     0
+    ],
+    [
+     "'url' 'include' ile 'page_application' İçine Yapıların Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676250-url-include-ile-page_application-icine-yapilarin-eklenmesi",
+     0
+    ],
+    [
+     "Static Dosyaların Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676262-static-dosyalarin-olusturulmasi",
+     0
+    ],
+    [
+     "'slug' ile Dinamik Sayfa Çağırılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676267-slug-ile-dinamik-sayfa-cagirilmasi",
+     0
+    ],
+    [
+     "Detay Sayfaların 'fakedb' ile Dinamikleştirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676266-detay-sayfalarin-fakedb-ile-dinamiklestirilmesi",
+     0
+    ],
+    [
+     "'product_detail' Sayfası ve Bilgilerin Getirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676265-product_detail-sayfasi-ve-bilgilerin-getirilmesi",
+     0
+    ],
+    [
+     "'product_detail' Sayfası ve Bilgilerin Getirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676274-product_detail-sayfasi-ve-bilgilerin-getirilmesi",
+     0
+    ],
+    [
+     "'context_processor' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676263-context_processor-kullanimi",
+     0
+    ],
+    [
+     "Proje Bazlı 'template' Klasorünün Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/7676271-proje-bazli-template-klasorunun-olusturulmasi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407520-django-proje1/8074789-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django: Proje 2",
+   [
+    [
+     "Todo App Genel Yapısının Tanıtımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676268-todo-app-genel-yapisinin-tanitimi",
+     0
+    ],
+    [
+     "TodoList Projesinin virtualenv ile Kurulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676275-todolist-projesinin-virtualenv-ile-kurulmasi",
+     0
+    ],
+    [
+     "Todo App ve 'superuser' Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676287-todo-app-ve-superuser-olusturulmasi",
+     0
+    ],
+    [
+     "Todo App İçine İlk Model Yapısının Oluşturulması ve Admin Panelde Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676285-todo-app-icine-ilk-model-yapisinin-olusturulmasi-ve-admin-panelde-gosterilmesi",
+     0
+    ],
+    [
+     "Todo Modeline 'created_at' ve 'updated_at' Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676283-todo-modeline-created_at-ve-updated_at-eklenmesi",
+     0
+    ],
+    [
+     "Database Nasıl Tekrar Oluşturulur ve 'migration' İşlemleri Nasıl Yapılır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676288-database-nasil-tekrar-olusturulur-ve-migration-islemleri-nasil-yapilir",
+     0
+    ],
+    [
+     "Django 'shell' İçerisinde Sorguları Kullanmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676292-django-shell-icerisinde-sorgulari-kullanmak",
+     0
+    ],
+    [
+     "Genel 'HTML' Yapısının Oluşturulması ve 'Bootstrap' Static Dosyaları Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676304-genel-html-yapisinin-olusturulmasi-ve-bootstrap-static-dosyalari-eklenmesi",
+     0
+    ],
+    [
+     "'navbar' ve 'footer' Eklendi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676295-navbar-ve-footer-eklendi",
+     1
+    ],
+    [
+     "Django 'ORM' 'Query' ile Todo'ların Ekranda Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676308-django-orm-query-ile-todo-larin-ekranda-gosterilmesi",
+     0
+    ],
+    [
+     "Django Models İçerisinde 'str' Tanımlanması ve 'query' 'exclude' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676312-django-models-icerisinde-str-tanimlanmasi-ve-query-exclude-kullanimi",
+     0
+    ],
+    [
+     "'Todo' Detay Sayfasının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676306-todo-detay-sayfasinin-olusturulmasi",
+     0
+    ],
+    [
+     "'get_object_or_404' Kullanımı ve 'todo' Yapısına Link Özelliğinin Atanması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676302-get_object_or_404-kullanimi-ve-todo-yapisina-link-ozelliginin-atanmasi",
+     0
+    ],
+    [
+     "Tablolar Arası İlişki Türleri 'OneToOne' 'ForeignKey' 'ManyToMany'",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676310-tablolar-arasi-iliski-turleri-onetoone-foreignkey-manytomany",
+     0
+    ],
+    [
+     "Category Modelinin Oluşturulması ve 'AutoSlug' Paketinin Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676313-category-modelinin-olusturulmasi-ve-autoslug-paketinin-eklenmesi",
+     0
+    ],
+    [
+     "'ForeignKey' ile Category' nin Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676311-foreignkey-ile-category-nin-eklenmesi",
+     0
+    ],
+    [
+     "'Context_Prossessor' ile Category'nin Her Yerde Gözükmesi ve DTL ile Todo Detail",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676416-context_prossessor-ile-category-nin-her-yerde-gozukmesi-ve-dtl-ile-todo-detail",
+     0
+    ],
+    [
+     "Todo Detail Sayfasının Düzenlenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676316-todo-detail-sayfasinin-duzenlenmesi",
+     0
+    ],
+    [
+     "Category İçerisindeki Todo'ların Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676414-category-icerisindeki-todo-larin-gosterilmesi",
+     0
+    ],
+    [
+     "Category 'get_absolute_url' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676412-category-get_absolute_url-kullanimi",
+     0
+    ],
+    [
+     "Todo Detay Sayfasının Düzenlemesi ve Todo'nun Category Altında Gozukmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676421-todo-detay-sayfasinin-duzenlemesi-ve-todo-nun-category-altinda-gozukmesi",
+     0
+    ],
+    [
+     "Todo İçerisine User' ın Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676422-todo-icerisine-user-in-eklenmesi",
+     0
+    ],
+    [
+     "Kullanıcının Eklediği Todoları Görmesini Sağlamak ve 'login_required' Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676418-kullanicinin-ekledigi-todolari-gormesini-saglamak-ve-login_required-kullanimi",
+     0
+    ],
+    [
+     "'logout' Yapısının Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676417-logout-yapisinin-eklenmesi",
+     0
+    ],
+    [
+     "'ManyToManyField' ile 'Tag' Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676428-manytomanyfield-ile-tag-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "'Tag' Yapısının 'URL' ile Kullanılabilir Hale Getirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/7676429-tag-yapisinin-url-ile-kullanilabilir-hale-getirilmesi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407521-django-proje-2/8074798-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django: Proje 3",
+   [
+    [
+     "DjangoMania Projesinin Altyapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676432-djangomania-projesinin-altyapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "Todo App Yapısının Proje Ayarlarına Eklenmesi ve Diğer Güncellemeler",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676430-todo-app-yapisinin-proje-ayarlarina-eklenmesi-ve-diger-guncellemeler",
+     0
+    ],
+    [
+     "Projeye Ana Sayfanın Adapte Edilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676431-projeye-ana-sayfanin-adapte-edilmesi",
+     0
+    ],
+    [
+     "NavBar Login Olan Kullanıcı Kontrolünün Eklenmesi.",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676424-navbar-login-olan-kullanici-kontrolunun-eklenmesi",
+     0
+    ],
+    [
+     "'TodoCategory' Yapısının 'Context Processors'e Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676467-todocategory-yapisinin-context-processors-e-eklenmesi",
+     0
+    ],
+    [
+     "Todo App İçin 'include' İçinde 'url namespace' Kullanımı ve 'get_absolute_url'",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676465-todo-app-icin-include-icinde-url-namespace-kullanimi-ve-get_absolute_url",
+     0
+    ],
+    [
+     "Page Modelinin Oluşturulması ve MEDIA_ROOT Yapısının Ayarlara Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676475-page-modelinin-olusturulmasi-ve-media_root-yapisinin-ayarlara-eklenmesi",
+     0
+    ],
+    [
+     "Page Context Düzenlemesi 'url namespace' ve 'get_absolute_url'",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676472-page-context-duzenlemesi-url-namespace-ve-get_absolute_url",
+     0
+    ],
+    [
+     "Page İçerisindeki Görselin Gösterilmesi ve Debug Mode ile Web Sunucusu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676469-page-icerisindeki-gorselin-gosterilmesi-ve-debug-mode-ile-web-sunucusu",
+     1
+    ],
+    [
+     "TinyMCE İle İçeriklerin Admin Panelde Düzenlenmesi ve Sayfa İçinde Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676471-tinymce-ile-iceriklerin-admin-panelde-duzenlenmesi-ve-sayfa-icinde-gosterilmesi",
+     0
+    ],
+    [
+     "Local Network İçerisinde Projelerimizin Görüntülenmesini Sağlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676477-local-network-icerisinde-projelerimizin-goruntulenmesini-saglamak",
+     0
+    ],
+    [
+     "Blog Model Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676478-blog-model-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "Blog Yapısının Admin Panele Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676474-blog-yapisinin-admin-panele-eklenmesi",
+     0
+    ],
+    [
+     "'Shell' İçerisinden Blog Postlarının Oluşturulması ve 'Slug' Yapısının Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676482-shell-icerisinden-blog-postlarinin-olusturulmasi-ve-slug-yapisinin-eklenmesi",
+     0
+    ],
+    [
+     "Blog Post İçerisindeki 'Slug Field' Bilgisinin Unique Olmasını Sağlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676479-blog-post-icerisindeki-slug-field-bilgisinin-unique-olmasini-saglamak",
+     0
+    ],
+    [
+     "Blog Postlarının Proje İçerisinde Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676490-blog-postlarinin-proje-icerisinde-gosterilmesi",
+     0
+    ],
+    [
+     "Blog Postlarının Kategori Bazlı Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676480-blog-postlarinin-kategori-bazli-gosterilmesi",
+     0
+    ],
+    [
+     "Blog Postlarının Etiket Bazlı Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676481-blog-postlarinin-etiket-bazli-gosterilmesi",
+     0
+    ],
+    [
+     "Blog Detail Sayfasının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676497-blog-detail-sayfasinin-olusturulmasi",
+     0
+    ],
+    [
+     "Blog Yapısına 'Pagination' Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/7676502-blog-yapisina-pagination-eklenmesi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407522-django-proje-3/8074804-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django: Proje 4",
+   [
+    [
+     "'Medium Clone' Projesinin Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676483-medium-clone-projesinin-kurulumu",
+     0
+    ],
+    [
+     "'Home_view' Eklendi ve Ayarlar Güncellendi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676495-home_view-eklendi-ve-ayarlar-guncellendi",
+     0
+    ],
+    [
+     "Ana Sayfanın 'Settings' İçerisinde Ayarlarının Yapılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676491-ana-sayfanin-settings-icerisinde-ayarlarinin-yapilmasi",
+     0
+    ],
+    [
+     "Projede Yapılacak İşlerin TODO List'e Aktarılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676494-projede-yapilacak-islerin-todo-list-e-aktarilmasi",
+     0
+    ],
+    [
+     "'Login html' Yapısının Oluşturulması ve 'Login' Formunun Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676507-login-html-yapisinin-olusturulmasi-ve-login-formunun-eklenmesi",
+     0
+    ],
+    [
+     "'Login' Bilgilerinin 'Authenticate' ile Kontrolü",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676500-login-bilgilerinin-authenticate-ile-kontrolu",
+     0
+    ],
+    [
+     "Django 'Messages Framework' Yapısı ile Login Olan Kullanıcının Bilgilendirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676499-django-messages-framework-yapisi-ile-login-olan-kullanicinin-bilgilendirilmesi",
+     0
+    ],
+    [
+     "'Logout View' Oluşturulması ve Urls'e Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676498-logout-view-olusturulmasi-ve-urls-e-eklenmesi",
+     0
+    ],
+    [
+     "Login Denetimlerinin Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676503-login-denetimlerinin-eklenmesi",
+     0
+    ],
+    [
+     "Üye Ol 'Register' Sayfasının Oluşturulması Bölüm-1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676512-uye-ol-register-sayfasinin-olusturulmasi-bolum-1",
+     1
+    ],
+    [
+     "Üye Ol 'Register' Sayfasının Oluşturulması Bölüm-2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676510-uye-ol-register-sayfasinin-olusturulmasi-bolum-2",
+     0
+    ],
+    [
+     "Kullanıcı Profil Model Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676514-kullanici-profil-model-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "'Register View' İçerisinde Kontrollerin Yapılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676511-register-view-icerisinde-kontrollerin-yapilmasi",
+     0
+    ],
+    [
+     "Register Olmak İsteyen Kullanıcının Kaydının Olup Olmadığının Kontrolü",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676518-register-olmak-isteyen-kullanicinin-kaydinin-olup-olmadiginin-kontrolu",
+     0
+    ],
+    [
+     "Kullanıcı Bilgilerinin 'Profile' Modeline Yazılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676515-kullanici-bilgilerinin-profile-modeline-yazilmasi",
+     0
+    ],
+    [
+     "Media Files Ayarlarının Yapılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676513-media-files-ayarlarinin-yapilmasi",
+     0
+    ],
+    [
+     "'abstract' Model Yapısı ile Blog Model Bilgilerinin Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676517-abstract-model-yapisi-ile-blog-model-bilgilerinin-olusturulmasi",
+     0
+    ],
+    [
+     "'ModelForm' ile 'Blog Post Create' Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676521-modelform-ile-blog-post-create-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "Ana Sayfanın Düzenlenmesi ve Form Yapısının Django Form Class Olarak Düzenlenme",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676523-ana-sayfanin-duzenlenmesi-ve-form-yapisinin-django-form-class-olarak-duzenlenme",
+     0
+    ],
+    [
+     "BlogPost Düzenlemeleri ve Crispy Forms Entegrasyonu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676526-blogpost-duzenlemeleri-ve-crispy-forms-entegrasyonu",
+     0
+    ],
+    [
+     "Form İçerisindeki Bilgilerin View ile Alınıp İşlenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676525-form-icerisindeki-bilgilerin-view-ile-alinip-islenmesi",
+     0
+    ],
+    [
+     "TinyMCE Kullanımı ve PostModelForm içindeki Bilgilerin Kaydedilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676582-tinymce-kullanimi-ve-postmodelform-icindeki-bilgilerin-kaydedilmesi",
+     0
+    ],
+    [
+     "Form Validators ile Form içindeki Bilgilerin Kontrol Edilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676534-form-validators-ile-form-icindeki-bilgilerin-kontrol-edilmesi",
+     0
+    ],
+    [
+     "TagifyJS ile Form-Yapisina Etiket Sisteminin Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676528-tagifyjs-ile-form-yapisina-etiket-sisteminin-eklenmesi",
+     0
+    ],
+    [
+     "Tag Eklerken Many-To-Many ile Form Yapısının Oluşturulması ve Django Extensions",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676843-tag-eklerken-many-to-many-ile-form-yapisinin-olusturulmasi-ve-django-extensions",
+     0
+    ],
+    [
+     "Formun Kaydedilmesi ve The Messages Framework Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676527-formun-kaydedilmesi-ve-the-messages-framework-kullanimi",
+     0
+    ],
+    [
+     "Postların AnaSayfa'da Görünür Hale Getirilmesi ve Easy-Thumbnail Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676848-postlarin-anasayfa-da-gorunur-hale-getirilmesi-ve-easy-thumbnail-kullanimi",
+     0
+    ],
+    [
+     "Model Yapısına Ordering Eklenmesi ve AnaSayfa Düzenlemeleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676842-model-yapisina-ordering-eklenmesi-ve-anasayfa-duzenlemeleri",
+     0
+    ],
+    [
+     "Kullanıcıya Tüm BlogPostların Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676849-kullaniciya-tum-blogpostlarin-gosterilmesi",
+     0
+    ],
+    [
+     "Kullanıcı Profiline get_absolute_url ile Ulaşılabilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676825-kullanici-profiline-get_absolute_url-ile-ulasilabilmesi",
+     0
+    ],
+    [
+     "Post Detay Sayfasının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676846-post-detay-sayfasinin-olusturulmasi",
+     0
+    ],
+    [
+     "URL Bilgilerinin Düzeltilmesi ve with Yapısının Template içinde Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676858-url-bilgilerinin-duzeltilmesi-ve-with-yapisinin-template-icinde-kullanimi",
+     0
+    ],
+    [
+     "Profil Düzenleme Sayfasının Form ile Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676851-profil-duzenleme-sayfasinin-form-ile-olusturulmasi",
+     0
+    ],
+    [
+     "Profil Düzenleme Sayfasının Form Düzenlemesi - Instance ve Initial Data Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676850-profil-duzenleme-sayfasinin-form-duzenlemesi-instance-ve-initial-data-kullanimi",
+     0
+    ],
+    [
+     "NavBar Düzenlemesi ve Profil Url Bilgilerinin Zenginleştirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676855-navbar-duzenlemesi-ve-profil-url-bilgilerinin-zenginlestirilmesi",
+     0
+    ],
+    [
+     "Post Bilgilerinin Shell Ekranından Oluşturulması ve Shell içinde Sorgu Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676854-post-bilgilerinin-shell-ekranindan-olusturulmasi-ve-shell-icinde-sorgu-kullanimi",
+     0
+    ],
+    [
+     "Top Articles(En Çok Okunan Blok Postları) Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676856-top-articles-en-cok-okunan-blok-postlari-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "Axios - Fav Yapısının Oluşturulması ve View içinde Gelen Request-Post Bilgileri",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676867-axios-fav-yapisinin-olusturulmasi-ve-view-icinde-gelen-request-post-bilgileri",
+     0
+    ],
+    [
+     "UserPostFav Model Yapısının Oluşturulması ve Alınan Bilgilerin İşlenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676861-userpostfav-model-yapisinin-olusturulmasi-ve-alinan-bilgilerin-islenmesi",
+     0
+    ],
+    [
+     "User Profile içerisindeki Favorilere Eklenenlerin Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676869-user-profile-icerisindeki-favorilere-eklenenlerin-gosterilmesi",
+     0
+    ],
+    [
+     "Kullanıcıya Ait Blog Post Bilgisinin Güncellenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/7676874-kullaniciya-ait-blog-post-bilgisinin-guncellenmesi",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407523-django-proje-4/8074807-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Full Stack Developer: Freelancer Olmak",
+   [
+    [
+     "5M Kuralı ile Hayatınızı Pozitif Yönde Geliştirin",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407524-full-stack-developer-freelancer-olmak/7676973-5m-kurali-ile-hayatinizi-pozitif-yonde-gelistirin",
+     0
+    ],
+    [
+     "Freelance İşlerde Minimum Maliyeti Nasıl Hesaplamalıyız",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407524-full-stack-developer-freelancer-olmak/7676972-freelance-islerde-minimum-maliyeti-nasil-hesaplamaliyiz",
+     0
+    ],
+    [
+     "Freelancer Olmak veya Maaşlı Çalışan Olmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407524-full-stack-developer-freelancer-olmak/7676956-freelancer-olmak-veya-maasli-calisan-olmak",
+     0
+    ],
+    [
+     "Freelance Projeleri Nasıl Buluruz",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407524-full-stack-developer-freelancer-olmak/7676953-freelance-projeleri-nasil-buluruz",
+     0
+    ],
+    [
+     "Bölüm Sonu İleri Bildirim Formu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2407524-full-stack-developer-freelancer-olmak/8074813-bolum-sonu-ileri-bildirim-formu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django 5.x ile Gelen Özelliklerin Kullanımı",
+   [
+    [
+     "Django 5.x Kurulumu ve db_default Özelliğinin Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2579510-django-5-x-ile-gelen-ozelliklerin-kullanimi/8278286-django-5-x-kurulumu-ve-db_default-ozelliginin-kullanimi",
+     0
+    ],
+    [
+     "Geliştirilmiş Belirlenebilir Veri Seçim Opsiyonları (Declaring Field Choices)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2579510-django-5-x-ile-gelen-ozelliklerin-kullanimi/8278283-gelistirilmis-belirlenebilir-veri-secim-opsiyonlari-declaring-field-choices",
+     0
+    ],
+    [
+     "Veritabanında Otomatik Oluşturulmuş/Hesaplanmış Alanlar (Generated Model Field)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2579510-django-5-x-ile-gelen-ozelliklerin-kullanimi/8278287-veritabaninda-otomatik-olusturulmus-hesaplanmis-alanlar-generated-model-field",
+     0
+    ]
+   ]
+  ],
+  [
+   "Django Uygulamalarının DigitalOcean App Platform ile Yayına Alınması",
+   [
+    [
+     "DigitalOcean App Platforma Django Uygulamasının Kurulması - Genel Bilgi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi/8405135-digitalocean-app-platforma-django-uygulamasinin-kurulmasi-genel-bilgi",
+     1
+    ],
+    [
+     "Proje Yapısının Oluşturulması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi/8405144-proje-yapisinin-olusturulmasi",
+     0
+    ],
+    [
+     "App Yapısının Çalıştırılması ve AnaSayfanın Gösterilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi/8405139-app-yapisinin-calistirilmasi-ve-anasayfanin-gosterilmesi",
+     0
+    ],
+    [
+     "Sabit Dosyaların Projede Gösterilmesi (StaticFiles)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi/8405148-sabit-dosyalarin-projede-gosterilmesi-staticfiles",
+     0
+    ],
+    [
+     "Media Files Yapısının Eklenmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi/8405153-media-files-yapisinin-eklenmesi",
+     0
+    ]
+   ]
+  ],
+  [
+   "Birden Fazla Projenin Linux Sunucu Üzerine Kurulumu",
+   [
+    [
+     "Projelerin Linux Sunucu Üzerine Kurulumu Hakkında Genel Bilgilendirme",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489065-projelerin-linux-sunucu-uzerine-kurulumu-hakkinda-genel-bilgilendirme",
+     0
+    ],
+    [
+     "Güvenlik ve Diğer Konularla İlgili Uyarı (Lütfen İzleyin)",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489084-guvenlik-ve-diger-konularla-ilgili-uyari-lutfen-izleyin",
+     0
+    ],
+    [
+     "GUI Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489094-gui-nedir",
+     0
+    ],
+    [
+     "SSH Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489062-ssh-nedir",
+     0
+    ],
+    [
+     "Terminal Kullanımı - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489037-terminal-kullanimi-bolum-1",
+     0
+    ],
+    [
+     "Terminal Kullanımı - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489100-terminal-kullanimi-bolum-2",
+     0
+    ],
+    [
+     "Terminal Kullanımı - Bölüm 3",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489042-terminal-kullanimi-bolum-3",
+     0
+    ],
+    [
+     "nano Text Editörü ile Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489057-nano-text-editoru-ile-calismak",
+     0
+    ],
+    [
+     "sudo Nedir? root Kullanıcısı ile İşlemler Nasıl Yapılır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489082-sudo-nedir-root-kullanicisi-ile-islemler-nasil-yapilir",
+     0
+    ],
+    [
+     "DigitalOcean'da Linux Sunucu Kurulumu ve Uzak Sunucuya Bağlanmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489104-digitalocean-da-linux-sunucu-kurulumu-ve-uzak-sunucuya-baglanmak",
+     0
+    ],
+    [
+     "Kendi Bilgisayarımızda Sanal Linux Sunucu Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489105-kendi-bilgisayarimizda-sanal-linux-sunucu-kurulumu",
+     0
+    ],
+    [
+     "hosts Dosyası ile Local DNS Ayarı Nasıl Yapılır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489068-hosts-dosyasi-ile-local-dns-ayari-nasil-yapilir",
+     0
+    ],
+    [
+     "Sanal Sunucuya Django Projelerinin Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489038-sanal-sunucuya-django-projelerinin-kurulumu",
+     0
+    ],
+    [
+     "Sanal Sunucuya NGINX ve uWSGI Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489051-sanal-sunucuya-nginx-ve-uwsgi-kurulumu",
+     0
+    ],
+    [
+     "Sanal Sunucuya PostgreSQL Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489069-sanal-sunucuya-postgresql-kurulumu",
+     0
+    ],
+    [
+     "Sıfırdan Projelerin Tekrar Oluşturulması ve Uzak Sunucu için Hazırlık",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489064-sifirdan-projelerin-tekrar-olusturulmasi-ve-uzak-sunucu-icin-hazirlik",
+     0
+    ],
+    [
+     "Projelere Media Files Ayarlarının Yapılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489023-projelere-media-files-ayarlarinin-yapilmasi",
+     0
+    ],
+    [
+     "DigitalOcean'da Sanal Sunucunun Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489024-digitalocean-da-sanal-sunucunun-kurulumu",
+     0
+    ],
+    [
+     "DigitalOcean Üzerindeki Projeler için PostgreSQL Kurulumu ve Yapılandırma",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489106-digitalocean-uzerindeki-projeler-icin-postgresql-kurulumu-ve-yapilandirma",
+     0
+    ],
+    [
+     "NGINX ve uWSGI Düzenlemelerinin Yapılması ve Projelerin Çalışır Hale Getirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu/8489107-nginx-ve-uwsgi-duzenlemelerinin-yapilmasi-ve-projelerin-calisir-hale-getirilmesi",
+     0
+    ]
+   ]
+  ]
+ ]
+}

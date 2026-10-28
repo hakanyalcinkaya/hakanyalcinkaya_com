@@ -1,0 +1,23 @@
+{% load static %}
+<div class="card {{ card_class|default:'shadow' }} overflow-hidden">
+  <a href="{{ course.url }}#mufredat" class="ratio ratio-16x9 bg-body-secondary d-block border-bottom" aria-label="Müfredata git">
+    <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" decoding="async" class="object-fit-cover">
+  </a>
+  <div class="card-body p-4">
+    <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+    {% include "page/partials/buy_actions.html" %}
+    <ul class="list-unstyled d-grid gap-2 small text-body-secondary mt-4 mb-0">
+      <li><i class="bi bi-clock me-2 text-body-tertiary" aria-hidden="true"></i>{{ course.duration }} detaylı video</li>
+      <li><i class="bi bi-collection-play me-2 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders · {{ section_count }} bölüm</li>
+      <li><i class="bi bi-kanban me-2 text-body-tertiary" aria-hidden="true"></i>Her bölümde bölüm sonu projesi</li>
+      {% if first_preview %}<li><i class="bi bi-play-circle me-2 text-body-tertiary" aria-hidden="true"></i><a href="{{ first_preview.url }}">{{ preview_count }} dersi ücretsiz izle</a></li>{% endif %}
+    </ul>
+  </div>
+  {% if detail.discount %}
+  <div class="card-footer bg-transparent p-4 small">
+    <div class="fw-semibold"><i class="bi bi-tag me-2 text-primary-emphasis" aria-hidden="true"></i>İndirim kodu</div>
+    <p class="text-body-secondary mt-1 mb-2">{{ detail.discount.text }}</p>
+    <a href="{{ detail.discount.url }}" class="fw-medium">İndirimi uygula <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+  </div>
+  {% endif %}
+</div>

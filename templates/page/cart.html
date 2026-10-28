@@ -1,0 +1,99 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}Sepetim — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+  {% include "page/partials/steps.html" %}
+  <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+    <h1 class="h2 fw-semibold mb-0">Sepetim <span class="text-body-tertiary fw-normal fs-5">{{ summary.count_text }}</span></h1>
+    <a href="{% url 'page:course_list' %}" class="small fw-medium"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Alışverişe devam et</a>
+  </div>
+
+  {% if added_course %}
+  <div role="status" class="alert alert-secondary d-flex align-items-center gap-2 small"><i class="bi bi-check-circle text-success" aria-hidden="true"></i><span><b>{{ added_course.title }}</b> sepetine eklendi.</span></div>
+  {% endif %}
+  {% if removed_course %}
+  <div role="status" class="alert alert-secondary d-flex align-items-center gap-2 small">
+    <span><b>{{ removed_course.title }}</b> sepetten çıkarıldı.</span>
+    <form method="post" action="{{ removed_course.cart_url }}" class="ms-auto">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-link btn-sm p-0">Geri al</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if summary.items %}
+  <div class="row g-4 g-lg-5">
+    <section class="col-lg-8" aria-label="Sepetteki kurslar">
+      <ul class="list-group">
+        {% for course in summary.items %}
+        <li class="list-group-item bg-transparent p-3 p-sm-4">
+          <div class="d-flex gap-3">
+            <a href="{{ course.url }}" class="flex-shrink-0" tabindex="-1" aria-hidden="true"><img src="{% static course.image %}" alt="" width="256" height="144" class="rounded-1 object-fit-cover" style="width:128px;height:72px"></a>
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex flex-wrap justify-content-between gap-2">
+                <h2 class="h6 fw-semibold mb-1"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h2>
+                <span class="fw-semibold">{{ course.price }}</span>
+              </div>
+              <p class="small text-body-tertiary mb-2">{{ course.meta_line }}</p>
+              <form method="post" action="{{ course.remove_url }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link btn-sm p-0 link-secondary" aria-label="{{ course.remove_label }}"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Kaldır</button>
+              </form>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.</p>
+    </section>
+
+    <aside class="col-lg-4" aria-labelledby="ozet-baslik">
+      <div class="card shadow sticky-lg-top top-lg-nav">
+        <div class="card-body p-4">
+          <h2 id="ozet-baslik" class="h6 fw-semibold mb-3">Sipariş özeti</h2>
+          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam ({{ summary.count }} kurs)</span><span>{{ summary.subtotal }}</span></div>
+          <hr>
+          <div class="d-flex justify-content-between align-items-baseline"><span class="fw-semibold">Toplam</span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>
+          <p class="small text-body-tertiary mt-1 mb-0">İndirim kodunu ödeme adımında girebilirsin.</p>
+          <a href="{% url 'page:checkout' %}" class="btn btn-primary btn-lg fs-6 w-100 mt-3">Ödemeye geç <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </aside>
+  </div>
+  {% else %}
+  <div class="text-center border rounded p-5">
+    <i class="bi bi-bag fs-1 text-body-tertiary" aria-hidden="true"></i>
+    <h2 class="h5 fw-semibold mt-3">Sepetin boş</h2>
+    <p class="text-body-secondary mb-4">Sıfırdan başlayıp projelerle ilerleyen kurslara göz at.</p>
+    <a href="{% url 'page:course_list' %}" class="btn btn-primary">Kursları incele</a>
+  </div>
+  {% endif %}
+
+  {% if suggestions %}
+  <section class="mt-5 pt-4 border-top" aria-labelledby="oneri-baslik">
+    <h2 id="oneri-baslik" class="h6 fw-semibold mb-3">Sepetine ekleyebileceğin kurslar</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+      {% for course in suggestions %}
+      <div class="col">
+        <div class="card h-100 flex-row align-items-center gap-3 p-3">
+          <img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:96px;height:54px">
+          <span class="flex-grow-1 min-w-0">
+            <a href="{{ course.url }}" class="d-block fw-semibold small link-body-emphasis text-decoration-none">{{ course.short }}</a>
+            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {{ course.price }}</span>
+          </span>
+          <form method="post" action="{{ course.cart_url }}" class="flex-shrink-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm" aria-label="{{ course.cart_label }}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ekle</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

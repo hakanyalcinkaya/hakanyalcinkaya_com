@@ -1,0 +1,33 @@
+{% extends "_base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Abonelikten çık — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center py-lg-4">
+    <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5">
+      {% if unsubscribed %}
+      <div class="text-center">
+        <span class="d-inline-flex align-items-center justify-content-center rounded bg-body-secondary text-body-secondary hy-icon-tile" aria-hidden="true"><i class="bi bi-envelope-x fs-3"></i></span>
+        <h1 class="h2 fw-semibold mt-3">Abonelikten çıktın</h1>
+        <p class="text-body-secondary mb-1"><b class="text-body">{{ unsubscribed }}</b> adresine artık bülten gönderilmeyecek.</p>
+        <p class="small text-body-tertiary mb-0">Yanlışlıkla mı çıktın? <a href="{% url 'page:index' %}#bulten">Yeniden abone ol</a></p>
+        <a href="{% url 'page:index' %}" class="btn btn-outline-secondary mt-4">Ana sayfa</a>
+      </div>
+      {% else %}
+      <div class="text-center mb-4">
+        <h1 class="h2 fw-semibold mb-1">Abonelikten çık</h1>
+        <p class="text-body-secondary mb-0">E-posta adresini gir; yeni kurs ve kaynak e-postaları gönderilmesin.</p>
+      </div>
+      <div class="card shadow">
+        <div class="card-body p-4 p-sm-5">{% crispy form %}</div>
+      </div>
+      <p class="small text-body-tertiary text-center mt-4 mb-0">Hesabınla ilgili e-postalar (sipariş, şifre sıfırlama) bundan etkilenmez.</p>
+      {% endif %}
+      <p class="small font-monospace text-body-tertiary text-center mt-2 mb-0">[PLACEHOLDER: abonelik servisi — adres listeden çıkarılmaz]</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

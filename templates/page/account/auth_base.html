@@ -1,0 +1,24 @@
+{% extends "_base/base.html" %}
+
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5">
+      <div class="text-center mb-4">
+        <span class="font-monospace border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
+        <h1 class="h2 fw-semibold mt-3 mb-1">{% block heading %}{% endblock %}</h1>
+        <p class="text-body-secondary mb-0">{% block lead %}{% endblock %}</p>
+      </div>
+      <div class="card shadow">
+        <div class="card-body p-4 p-sm-5">
+          {% block form %}{% endblock %}
+        </div>
+      </div>
+      <p class="small text-body-secondary text-center mt-4 mb-0">{% block footnote %}{% endblock %}</p>
+      <p class="small font-monospace text-body-tertiary text-center mt-2 mb-0">[PLACEHOLDER: kimlik doğrulama — tasarımda oturum açılmaz]</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

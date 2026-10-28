@@ -1,0 +1,106 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}Kurslar — Hakan Yalçınkaya{% endblock %}
+{% block description %}JavaScript, TypeScript ve Python kursları: Front-End ve React 18.x, Python ve Django, Sıfırdan Python. Sıfırdan başla, projelerle öğren.{% endblock %}
+{% block head %}
+<meta property="og:title" content="Kurslar — Hakan Yalçınkaya">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block content %}
+<header class="py-5 border-bottom">
+  <div class="container pt-lg-4">
+    <nav aria-label="Sayfa konumu">
+      <ol class="breadcrumb small mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'page:index' %}" class="link-secondary text-decoration-none">Ana Sayfa</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Kurslar</li>
+      </ol>
+    </nav>
+    <div class="row align-items-end g-4">
+      <div class="col-lg-7">
+        <h1 class="display-4 fw-semibold lh-1 mb-0">Kurslar</h1>
+        <p class="lead text-body-secondary mt-3 mb-0">JavaScript, TypeScript ve Python. Her kurs sıfırdan başlar ve uçtan uca projelerle ilerler.</p>
+      </div>
+      <div class="col-lg-5">
+        <dl class="row row-cols-3 g-0 mb-0 ms-lg-auto" aria-label="Rakamlarla kurslar" style="max-width:420px">
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.courses }}</dt><dd class="small text-body-tertiary mt-1 mb-0">kurs</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">100+</dt><dd class="small text-body-tertiary mt-1 mb-0">saat video</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section aria-labelledby="liste-baslik" class="py-5 bg-body-tertiary border-bottom">
+  <div class="container">
+    <h2 id="liste-baslik" class="visually-hidden">Kurs listesi</h2>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div role="radiogroup" aria-label="Konuya göre filtrele" class="btn-group">
+        {% for item in filters %}
+        <a href="{{ item.url }}" role="radio" aria-checked="{% if item.checked %}true{% else %}false{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}">{{ item.label }} <span class="text-body-tertiary ms-1">{{ item.count }}</span></a>
+        {% endfor %}
+      </div>
+      <p class="small text-body-tertiary mb-0" aria-live="polite">{{ result_text }}</p>
+    </div>
+
+    {% if empty %}
+    <div class="card text-center p-5">
+      <p class="fw-semibold mb-1">Bu konuda henüz kurs yok.</p>
+      <p class="text-body-secondary mb-3">Yeni kurslar eklendiğinde e-postayla haber vermemizi ister misin?</p>
+      <div class="d-flex justify-content-center gap-2">
+        <a href="{% url 'page:course_list' %}" class="btn btn-outline-secondary">Tüm kursları göster</a>
+        <a href="#bulten" class="btn btn-primary">Bültene katıl</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="d-grid gap-3">
+      {% for course in course_list %}
+      <article class="card shadow overflow-hidden hover-lift" aria-labelledby="egitim-{{ forloop.counter }}">
+        <div class="row g-0">
+          <div class="col-md-5">
+            <a href="{{ course.url }}" tabindex="-1" aria-label="{{ course.image_label }}" class="d-block h-100 bg-body-secondary">
+              <div class="ratio ratio-16x9 h-100">
+                <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async" class="object-fit-cover">
+              </div>
+            </a>
+          </div>
+          <div class="col-md-7 d-flex flex-column">
+            <div class="card-body p-4 p-lg-5 pb-lg-4">
+              <div class="d-flex flex-wrap gap-1">
+                {% for tag in course.tags %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span>{% endfor %}
+              </div>
+              <h3 id="egitim-{{ forloop.counter }}" class="h4 fw-semibold mt-3 mb-2"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h3>
+              <p class="text-body-secondary mb-3" style="max-width:56ch">{{ course.description }}</p>
+              <ul class="list-inline small text-body-secondary mb-0">
+                <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span class="visually-hidden">Süre: </span>{{ course.duration }}</li>
+                <li class="list-inline-item me-3"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders</li>
+                <li class="list-inline-item"><i class="bi bi-bar-chart me-1 text-body-tertiary" aria-hidden="true"></i>Sıfırdan başlar</li>
+              </ul>
+            </div>
+            <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 px-lg-5 py-3 mt-auto">
+              <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+              <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></button></form>
+                <a href="{{ course.url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% include "components/reviews.html" %}
+
+<section aria-labelledby="bulten-baslik" class="pb-5">
+  <div class="container">
+    {% include "components/newsletter.html" %}
+  </div>
+</section>
+{% endblock %}

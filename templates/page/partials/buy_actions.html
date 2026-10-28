@@ -1,0 +1,7 @@
+<div class="d-grid gap-2 mt-3">
+  <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+  <form method="post" action="{{ course.cart_url }}" class="d-grid">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-secondary btn-lg fs-6"><i class="bi bi-bag-plus me-2" aria-hidden="true"></i>Sepete Ekle</button>
+  </form>
+</div>

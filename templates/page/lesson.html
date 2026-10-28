@@ -1,0 +1,289 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}Ders — {{ course.title }}{% endblock %}
+{% block description %}{{ current.title }}{% endblock %}
+{% block head %}
+<meta name="robots" content="noindex">
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar sticky-top bg-body border-bottom" aria-label="Ders menüsü">
+  <div class="container-fluid flex-nowrap gap-2 gap-md-3 px-3 px-md-4">
+    <a href="{% url 'page:index' %}" class="navbar-brand me-0" aria-label="Ana Sayfa">
+      <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
+    </a>
+    <ul class="navbar-nav flex-row gap-3 d-none d-lg-flex ms-2">
+      <li class="nav-item"><a href="{% url 'page:course_list' %}" class="nav-link">Tüm Kurslar</a></li>
+      {% if nav_member %}<li class="nav-item"><a href="{{ library_url }}" class="nav-link">Kurslarım</a></li>{% endif %}
+      <li class="nav-item"><a href="{{ course.url }}" class="nav-link active" aria-current="page">{{ course.short }}</a></li>
+    </ul>
+    <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
+      {% if not nav_member %}{% include "_base/theme_dropdown.html" %}{% endif %}
+      {% if preview %}
+      <span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium px-3 d-none d-xl-inline-flex align-items-center align-self-stretch">Ücretsiz önizleme</span>
+      {% if not nav_member %}<a href="{{ login_url }}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary d-none d-md-inline-flex">Giriş Yap</a>{% endif %}
+      <a href="{{ course.buy_url }}" class="btn btn-primary d-none d-sm-inline-flex">Kursu satın al · {{ course.price }}</a>
+      {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
+      {% if nav_member %}{% include "_base/account_menu.html" %}{% endif %}
+      {% else %}
+      <div class="d-none d-xl-flex align-items-center gap-2 small text-body-secondary me-2" aria-label="İlerleme">
+        <div class="progress" style="width:120px;height:6px" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ pct }}%"></div></div>
+        <span class="text-nowrap">%{{ pct }} · {{ done }}/{{ total }}</span>
+      </div>
+      {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
+      {% include "_base/account_menu.html" %}
+      {% endif %}
+      <button type="button" class="btn btn-outline-secondary d-lg-none" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu"><i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
+    </div>
+  </div>
+  {# Mobil menü: geniş ekranda üst çubukta görünen bağlantılar ve düğmeler. #}
+  <div id="mobil-menu" class="collapse w-100 d-lg-none border-top mt-2">
+    <div class="container-fluid px-3 px-md-4">
+      <ul class="navbar-nav pt-2">
+        <li class="nav-item"><a href="#ders-listesi" data-nav="ders-listesi" class="nav-link d-flex justify-content-between align-items-center">Ders listesi<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
+        <li class="nav-item"><a href="{{ course.url }}" class="nav-link d-flex justify-content-between align-items-center">{{ course.short }}<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
+        {% if nav_member %}<li class="nav-item"><a href="{{ library_url }}" class="nav-link d-flex justify-content-between align-items-center">Kurslarım<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>{% endif %}
+        <li class="nav-item"><a href="{% url 'page:course_list' %}" class="nav-link d-flex justify-content-between align-items-center">Tüm Kurslar<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
+      </ul>
+      <div class="row g-2 py-3">
+        {% if show_cart %}
+        <div class="col-12"><a href="{{ cart_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-bag me-2" aria-hidden="true"></i>Sepet{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
+        {% endif %}
+        {% if not nav_member %}
+        <div class="col-6"><a href="{{ login_url }}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
+        {% endif %}
+        {% if preview %}
+        <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 w-100">Satın al · {{ course.price }}</a></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+
+{% block main %}
+<div class="container-fluid px-0">
+  <div class="row g-0">
+    <main id="icerik" class="col-lg-8 col-xxl-9">
+      <div class="bg-black">
+        {% if locked %}
+        <div class="position-relative d-flex align-items-center justify-content-center text-center text-white overflow-hidden mx-auto p-4" style="aspect-ratio:16/9;min-height:340px;max-width:1280px">
+          <img src="{% static course.image %}" alt="" width="1280" height="720" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
+          <div class="position-relative" style="max-width:520px">
+            <i class="bi bi-lock fs-1" aria-hidden="true"></i>
+            <h2 class="h4 fw-semibold mt-2">Bu ders kursun tam sürümünde</h2>
+            <p class="opacity-75 mb-4">{{ total }} dersin tamamına ve her bölümdeki projelere erişmek için kursa kaydol. Kaydolduktan sonra izlemeye hemen başlayabilirsin.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+              <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol · {{ course.price }}</a>
+              {% if previews %}<a href="{{ previews.0.url }}" class="btn btn-outline-light btn-lg fs-6">Ücretsiz önizlemeye dön</a>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="ratio ratio-16x9 mx-auto" style="max-width:1280px">
+          <div class="d-flex align-items-center justify-content-center overflow-hidden">
+            <img src="{% static course.image %}" alt="" width="1280" height="720" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
+            <div class="position-relative text-center text-white px-3">
+              <span class="btn btn-primary btn-lg px-4 py-3" aria-hidden="true"><i class="bi bi-play-fill fs-2 lh-1"></i></span>
+              <div class="small mt-3 opacity-75 font-monospace">[PLACEHOLDER: video oynatıcı]</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="px-3 px-md-4 px-xl-5 py-4 mx-auto" style="max-width:1100px">
+        <nav aria-label="Ders konumu">
+          <ol class="breadcrumb small mb-1">
+            <li class="breadcrumb-item"><a href="{{ course.url }}" class="link-secondary text-decoration-none">{{ course.short }}</a></li>
+            <li class="breadcrumb-item text-body-tertiary">{{ current.section }}</li>
+            <li class="breadcrumb-item active" aria-current="page">Ders {{ current.n }}/{{ total }}</li>
+          </ol>
+        </nav>
+        <div class="d-flex flex-wrap align-items-start gap-2 mt-1">
+          <h1 class="h3 fw-semibold mb-0 me-auto">{{ current.title }}</h1>
+          {% if current.preview %}<span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium mt-1">Ücretsiz önizleme</span>{% endif %}
+        </div>
+
+        <div class="hy-lesson-nav d-flex flex-wrap align-items-center gap-2 mt-3">
+          {% if prev %}
+          <a href="{{ prev.url }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %}</a>
+          {% else %}
+          <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki</button>
+          {% endif %}
+          {% if not preview %}
+          <span class="btn btn-outline-secondary hy-lesson-nav-full order-last order-sm-0{% if current.n <= done %} active{% endif %}" aria-pressed="{% if current.n <= done %}true{% else %}false{% endif %}"><i class="bi {% if current.n <= done %}bi-check-circle{% else %}bi-circle{% endif %} me-2" aria-hidden="true"></i>{% if current.n <= done %}Tamamlandı{% else %}Tamamlandı olarak işaretle{% endif %}</span>
+          {% endif %}
+          {% if next %}
+          <a href="{{ next.url }}" class="btn btn-primary ms-sm-auto">Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          {% elif preview %}
+          <a href="{{ course.buy_url }}" class="btn btn-primary ms-sm-auto">Tamamına eriş<span class="d-none d-sm-inline"> · {{ course.price }}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          {% else %}
+          <button type="button" class="btn btn-primary ms-sm-auto" disabled>Sonraki <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></button>
+          {% endif %}
+        </div>
+        {% if next %}<p class="small text-body-tertiary text-sm-end mt-2 mb-0">Sıradaki: {{ next.title }}</p>{% endif %}
+
+        {% if preview %}
+        <section class="mt-4 pt-2" aria-labelledby="onizleme-baslik">
+          <div class="d-flex align-items-baseline justify-content-between gap-2">
+            <h2 id="onizleme-baslik" class="h6 fw-semibold mb-0">Ücretsiz önizleme dersleri</h2>
+            <span class="small text-body-tertiary">{{ preview_count }} ders · satın almadan izle</span>
+          </div>
+          <div class="row flex-nowrap overflow-x-auto scrollbar-none g-2 pb-2 mt-1 hy-strip" data-preview-strip>
+            {% for lesson in previews %}
+            <div class="col-9 col-sm-5 col-xl-3">
+              <a href="{{ lesson.url }}" class="card h-100 p-3 text-decoration-none hover-lift{% if lesson.n == current.n %} border-primary bg-primary-subtle{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
+                <span class="small text-body-tertiary text-truncate">{{ lesson.n }}. ders · {{ lesson.section }}</span>
+                <span class="small fw-medium text-body mt-1">{{ lesson.title }}</span>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="card bg-body-tertiary mt-4" aria-labelledby="satin-al-baslik">
+          <div class="card-body p-4">
+            <div class="row g-4 align-items-center">
+              <div class="col-md-7">
+                <h2 id="satin-al-baslik" class="h4 fw-semibold">Kursun tamamına eriş</h2>
+                <p class="text-body-secondary">Bu ders, {{ total }} derslik kursun parçası. {{ section_count }} bölüm, {{ course.duration }} video ve her bölümde proje.</p>
+                <ul class="list-unstyled d-grid gap-2 small mb-0">
+                  {% for item in learn_top %}
+                  <li class="d-flex gap-2"><i class="bi bi-check2 text-primary-emphasis" aria-hidden="true"></i><span>{{ item }}</span></li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div class="col-md-5">
+                <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+                {% include "page/partials/buy_actions.html" %}
+                <div class="d-flex flex-wrap gap-3 small mt-3">
+                  <a href="{{ course.url }}">Kurs detayları</a>
+                  <a href="{{ course.buy_url }}">İndirim kodunu uygula</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {# Masaüstünde içeriğin altında; mobilde ders listesinden sonra (aşağıda). #}
+        {% include "page/partials/lesson_reviews.html" with place="icerik" section_class="mt-5 d-none d-lg-block" %}
+        {% else %}
+        <section class="pt-4" aria-label="Notlar">
+          <h2 class="h6 fw-semibold">Not al</h2>
+          <textarea class="form-control" rows="3" placeholder="Bu derse not ekle" readonly></textarea>
+          <p class="small text-body-tertiary mt-2 mb-0">Notlar şimdilik örnek. Kayıt modeli sonra bağlanacak.</p>
+          {% if note %}
+          <ul class="list-group list-group-flush border-top mt-4">
+            <li class="list-group-item bg-transparent px-0 py-3">
+              <div class="d-flex flex-wrap align-items-center gap-2 small text-body-tertiary">
+                <span class="badge rounded-1 fw-medium bg-primary-subtle text-primary-emphasis">{{ note.scope_label }}</span>
+                <span>{{ note.date }}</span>
+              </div>
+              <p class="mt-2 mb-0 text-pre-line">{{ note.text }}</p>
+            </li>
+          </ul>
+          {% else %}
+          <div class="text-center text-body-secondary border rounded p-4 mt-4">
+            <i class="bi bi-journal-text fs-3 text-body-tertiary" aria-hidden="true"></i>
+            <p class="fw-semibold text-body mt-2 mb-1">Bu derste notun yok</p>
+            <p class="small mb-0">İzlerken aldığın notlar burada görünecek.</p>
+          </div>
+          {% endif %}
+        </section>
+
+        <section class="pt-4" aria-label="Ders bilgisi">
+          <h2 class="h6 fw-semibold">Ders bilgisi</h2>
+          <dl class="row small mb-0">
+            <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Kurs</dt><dd class="col-sm-8 col-lg-9"><a href="{{ course.url }}">{{ course.title }}</a></dd>
+            <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Bölüm</dt><dd class="col-sm-8 col-lg-9">{{ current.section }} · {{ current.section_index }}. bölüm</dd>
+            <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Sıra</dt><dd class="col-sm-8 col-lg-9">{{ current.n }}. ders / {{ total }}</dd>
+            <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">İlerleme</dt><dd class="col-sm-8 col-lg-9 mb-0">%{{ pct }} · {{ done }}/{{ total }} ders</dd>
+          </dl>
+        </section>
+        {% endif %}
+      </div>
+    </main>
+
+    <aside id="ders-listesi" class="col-lg-4 col-xxl-3 border-start" aria-label="Ders listesi">
+      <div class="hy-sidebar d-flex flex-column">
+        <div class="p-3 border-bottom flex-shrink-0">
+          {% if preview %}
+          <div class="small"><span class="fw-semibold">Ücretsiz önizleme</span><span class="text-body-secondary"> · {{ preview_count }} ders açık, {{ locked_count }} ders kayıtla açılır</span></div>
+          {% else %}
+          <div class="d-flex justify-content-between small mb-2"><span class="fw-semibold">İlerlemen</span><span class="text-body-secondary">%{{ pct }} · {{ done }}/{{ total }} ders</span></div>
+          <div class="progress" style="height:6px" role="progressbar" aria-label="Kurs ilerlemesi" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ pct }}%"></div></div>
+          {% endif %}
+        </div>
+        <div class="flex-grow-1 overflow-y-auto" data-side-scroll>
+          {% if preview and previews %}
+          <div class="px-3 pt-3 pb-1 small fw-semibold text-body-secondary">Ücretsiz önizleme dersleri</div>
+          <div class="list-group list-group-flush">
+            {% for lesson in previews %}
+            <a href="{{ lesson.url }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 px-3 py-2 small{% if lesson.n == current.n %} active{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
+              {% include "page/partials/lesson_meta.html" %}
+              <span class="min-w-0"><span class="d-block">{{ lesson.title }}</span><span class="d-block text-body-tertiary text-truncate">{{ lesson.section }}</span></span>
+            </a>
+            {% endfor %}
+          </div>
+          <div class="px-3 pt-4 pb-2 small fw-semibold text-body-secondary border-top mt-3">Tüm müfredat · {{ total }} ders</div>
+          {% endif %}
+          <div>
+            {% for section in sections %}
+            <details class="hy-fold hy-lesson-fold border-bottom"{% if section.open %} open{% endif %}{% if section.current %} data-current-section{% endif %}{% if section.completed %} data-completed-section{% endif %}>
+              <summary class="d-flex align-items-start gap-2 px-3 py-3 {% if section.completed %}hy-section-done{% else %}bg-body-secondary{% endif %}">
+                <span class="flex-grow-1 min-w-0">
+                  <span class="d-block small fw-semibold{% if section.current %} text-primary-emphasis{% endif %}">{% if section.current %}<span class="visually-hidden">Şu an bu bölümdesin: </span>{% endif %}{{ section.index }}. {{ section.name }}</span>
+                  <span class="d-flex flex-wrap align-items-center gap-2 small text-body-tertiary mt-1">{% if preview %}{{ section.meta }}{% else %}{{ section.meta_enrolled }}{% endif %}{% if section.completed %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Tamamlandı</span>{% endif %}</span>
+                </span>
+                <i class="bi bi-chevron-down small text-body-tertiary mt-1 hy-fold-icon" aria-hidden="true"></i>
+              </summary>
+              <div class="list-group list-group-flush py-1">
+                {% for lesson in section.lessons %}
+                <a href="{{ lesson.url }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 ps-4 pe-3 py-2 small{% if lesson.current %} active{% endif %}{% if lesson.locked and not lesson.current %} text-body-tertiary{% endif %}"{% if lesson.current %} aria-current="page"{% endif %}>
+                  {% include "page/partials/lesson_meta.html" %}
+                  <span class="flex-grow-1">{{ lesson.title }}</span>
+                </a>
+                {% endfor %}
+              </div>
+            </details>
+            {% endfor %}
+          </div>
+          {% if preview %}
+          <div class="p-3">
+            {% include "page/partials/purchase_card.html" with first_preview=previews.0 card_class="shadow-sm" %}
+          </div>
+          {% endif %}
+        </div>
+        {% if preview %}
+        <div class="border-top p-3 d-none d-lg-block flex-shrink-0">
+          <div class="d-flex align-items-center gap-3">
+            <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+            <a href="{{ course.buy_url }}" class="btn btn-primary flex-grow-1">Hemen Kaydol</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+  {% if preview %}
+  {% include "page/partials/lesson_reviews.html" with place="mobil" section_class="d-lg-none px-3 py-5 border-top" %}
+  {% endif %}
+</div>
+
+{% if preview %}
+<div class="fixed-bottom d-lg-none bg-body bg-opacity-75 navbar-blur border-top">
+  <div class="container-fluid d-flex align-items-center gap-3 py-2 px-3">
+    <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+    <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Hemen Kaydol</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% if preview %}<div class="d-lg-none" style="height:72px" aria-hidden="true"></div>{% endif %}
+{% endblock %}

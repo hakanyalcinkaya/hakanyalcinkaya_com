@@ -1,0 +1,31 @@
+{% extends "_base/base.html" %}
+
+{% block title %}Aboneliğini onayla — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center py-lg-4">
+    <div class="col-lg-8 col-xl-6">
+      <div class="text-center">
+        <span class="d-inline-flex align-items-center justify-content-center rounded bg-primary-subtle text-primary-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-envelope-check fs-3"></i></span>
+        <h1 class="display-6 fw-semibold mt-3">Son bir adım kaldı</h1>
+        <p class="lead text-body-secondary mb-1">{% if email %}<b class="text-body">{{ email }}</b> adresine{% else %}E-posta adresine{% endif %} bir onay bağlantısı gönderdik.</p>
+        <p class="text-body-secondary mb-0">Bağlantıya tıkladığında aboneliğin başlar. Yeni kurslar ve kaynaklar geldiğinde ilk sen duyarsın.</p>
+        <p class="small font-monospace text-body-tertiary mt-2 mb-0">[PLACEHOLDER: abonelik servisi ve onay e-postası]</p>
+      </div>
+
+      <ul class="list-group list-group-flush border-top border-bottom mt-5">
+        <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-inbox text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">E-posta gelmedi mi?</b><span class="text-body-secondary">İstenmeyen e-postalar ve Promosyonlar klasörüne bak. Gelmesi birkaç dakika sürebilir.</span></span></li>
+        <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-pencil text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">Adresi yanlış mı yazdın?</b><span class="text-body-secondary"><a href="{% url 'page:index' %}#bulten">Formu yeniden doldur</a>; yalnızca onayladığın adres listeye eklenir.</span></span></li>
+        <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-shield-check text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">İstediğin zaman çıkabilirsin</b><span class="text-body-secondary">Her e-postada abonelikten çıkma bağlantısı var. <a href="{% url 'page:newsletter_unsubscribe' %}">Abonelikten çık</a> · <a href="{{ privacy_url }}">Gizlilik Politikası</a></span></span></li>
+      </ul>
+
+      <div class="d-flex flex-wrap justify-content-center gap-2 mt-5">
+        <a href="{% url 'page:course_list' %}" class="btn btn-primary btn-lg fs-6">Kursları incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+        <a href="{% url 'page:index' %}" class="btn btn-outline-secondary btn-lg fs-6">Ana sayfa</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

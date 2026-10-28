@@ -1,0 +1,38 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}Sayfa bulunamadı — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center py-lg-5">
+    <div class="col-lg-8 col-xl-7 text-center">
+      <p class="font-monospace text-primary-emphasis mb-2">[404] =&gt; bulunamadı</p>
+      <h1 class="display-6 fw-semibold">Aradığın sayfa burada değil</h1>
+      <p class="lead text-body-secondary">Bağlantı eskimiş ya da adres yanlış yazılmış olabilir.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+        <a href="{% url 'page:course_list' %}" class="btn btn-primary btn-lg fs-6">Kursları incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+        <a href="{% url 'page:index' %}" class="btn btn-outline-secondary btn-lg fs-6">Ana sayfa</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-5 pt-4 border-top" aria-labelledby="oneri-baslik">
+    <h2 id="oneri-baslik" class="h6 fw-semibold mb-3">Belki bunlardan birini arıyordun</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+      {% for course in courses %}
+      <div class="col">
+        <a href="{{ course.url }}" class="card h-100 flex-row align-items-center gap-3 p-3 text-decoration-none hover-lift">
+          <img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:96px;height:54px">
+          <span class="min-w-0">
+            <span class="d-block fw-semibold small text-body">{{ course.short }}</span>
+            <span class="d-block small text-body-tertiary">{{ course.meta_line }}</span>
+          </span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -21,7 +21,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("page.urls")),
 ]
 
 if settings.DEBUG:
@@ -29,4 +28,10 @@ if settings.DEBUG:
         path("__debug__/", include("debug_toolbar.urls")),
         path("__reload__/", include("django_browser_reload.urls")),
     ]
+
+urlpatterns += [
+    path("", include("page.urls")),
+]
+
+if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

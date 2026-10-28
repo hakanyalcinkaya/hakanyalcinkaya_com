@@ -1,0 +1,88 @@
+{% extends "_base/base.html" %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Ödeme — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+  {% include "page/partials/steps.html" %}
+  <h1 class="h2 fw-semibold mb-4">Ödeme</h1>
+
+  {% if summary.items %}
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-7 d-grid gap-3 align-content-start">
+      <section class="card" aria-labelledby="iletisim-baslik">
+        <div class="card-body p-4">
+          <h2 id="iletisim-baslik" class="h6 fw-semibold mb-3"><span class="text-body-tertiary me-1">1.</span>İletişim bilgileri</h2>
+          {% crispy checkout_form %}
+          {% if not nav_member %}<p class="small text-body-tertiary mb-0">Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>{% endif %}
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="yontem-baslik">
+        <div class="card-body p-4">
+          <h2 id="yontem-baslik" class="h6 fw-semibold mb-0"><span class="text-body-tertiary me-1">2.</span>Ödeme yöntemi</h2>
+          <div class="border rounded p-4 mt-3 text-center" style="border-style:dashed!important">
+            <i class="bi bi-credit-card fs-3 text-body-tertiary" aria-hidden="true"></i>
+            <p class="small text-body-secondary mt-2 mb-1">Kart bilgilerini ödeme sağlayıcısının güvenli alanında gireceksin.</p>
+            <p class="small font-monospace text-body-tertiary mb-0">[PLACEHOLDER: ödeme sağlayıcı alanı ve yöntemleri]</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="col-lg-5" aria-labelledby="ozet-baslik">
+      <div class="card shadow sticky-lg-top top-lg-nav">
+        <div class="card-body p-4">
+          <h2 id="ozet-baslik" class="h6 fw-semibold mb-3">Sipariş özeti</h2>
+          <ul class="list-unstyled d-grid gap-3 mb-0">
+            {% for course in summary.items %}
+            <li class="d-flex gap-3 align-items-start">
+              <img src="{% static course.image %}" alt="" width="192" height="108" class="rounded-1 object-fit-cover flex-shrink-0" style="width:72px;height:41px">
+              <span class="flex-grow-1 small fw-medium min-w-0">{{ course.title }}</span>
+              <span class="small fw-semibold">{{ course.price }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <div class="mt-4">
+            {% if summary.coupon %}
+            <div class="small fw-medium text-body-secondary mb-2">İndirim kodu</div>
+            <form method="post" role="status" class="small">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="coupon_remove">
+              <span class="text-success"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ summary.coupon }}</b> uygulandı: %{{ summary.coupon_pct }} indirim</span>
+              <button type="submit" class="btn btn-link btn-sm p-0 ms-1 align-baseline">Kaldır</button>
+            </form>
+            {% else %}
+            {% crispy coupon_form %}
+            <p class="small text-body-tertiary mt-n2 mb-0">Örnek kod: <span class="font-monospace">ORNEK10</span></p>
+            {% endif %}
+          </div>
+
+          <hr>
+          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam</span><span>{{ summary.subtotal }}</span></div>
+          {% if summary.coupon %}
+          <div class="d-flex justify-content-between small text-success mt-1"><span>İndirim</span><span>−{{ summary.discount }}</span></div>
+          {% endif %}
+          <div class="d-flex justify-content-between align-items-baseline mt-2"><span class="fw-semibold">Toplam</span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>
+
+          <button type="submit" form="odeme-formu" class="btn btn-primary btn-lg fs-6 w-100 mt-3"><i class="bi bi-lock me-2" aria-hidden="true"></i>Öde {{ summary.total }}</button>
+          <p class="small text-body-tertiary mt-3 mb-0">"Öde" düğmesine tıklayarak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
+          <p class="small font-monospace text-body-tertiary mt-2 mb-0">[PLACEHOLDER: ödeme entegrasyonu — tasarımda ödeme alınmaz]</p>
+        </div>
+      </div>
+      <a href="{{ cart_url }}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Sepete dön</a>
+    </aside>
+  </div>
+  {% else %}
+  <div class="text-center border rounded p-5">
+    <i class="bi bi-bag fs-1 text-body-tertiary" aria-hidden="true"></i>
+    <h2 class="h5 fw-semibold mt-3">Ödenecek kurs yok</h2>
+    <p class="text-body-secondary mb-4">Sepetin boş görünüyor. Bir kurs seçip yeniden dene.</p>
+    <a href="{% url 'page:course_list' %}" class="btn btn-primary">Kursları incele</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

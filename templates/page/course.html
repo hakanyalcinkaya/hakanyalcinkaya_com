@@ -1,0 +1,209 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}{{ course.title }} — Hakan Yalçınkaya{% endblock %}
+{% block description %}{{ detail.subtitle }}{% endblock %}
+{% block head %}
+<meta property="og:title" content="{{ course.title }} — Hakan Yalçınkaya">
+<meta property="og:description" content="{{ detail.subtitle }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <nav aria-label="Sayfa konumu">
+        <ol class="breadcrumb small mb-4">
+          <li class="breadcrumb-item"><a href="{% url 'page:index' %}" class="link-secondary text-decoration-none">Ana Sayfa</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'page:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ course.short }}</li>
+        </ol>
+      </nav>
+
+      <header>
+        <h1 class="display-5 fw-semibold lh-1">{{ course.title }}</h1>
+        <p class="lead text-body-secondary mt-3 mb-0">{{ detail.subtitle }}</p>
+        <dl class="row row-cols-2 row-cols-sm-4 g-3 mt-3 mb-0" aria-label="Kurs özeti">
+          <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ course.duration }}</dt><dd class="small text-body-tertiary mt-1 mb-0">video</dd></div>
+          <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ course.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
+          <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ section_count }}</dt><dd class="small text-body-tertiary mt-1 mb-0">bölüm</dd></div>
+          <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ preview_count }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ücretsiz önizleme</dd></div>
+        </dl>
+        <div class="d-flex flex-wrap align-items-center gap-1 mt-4" aria-label="Kategori">
+          <span class="small text-body-tertiary me-2 hy-meta-label">Kategori</span>
+          {% for tag in course.tags %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span>{% endfor %}
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-1 mt-2" aria-label="Kullanılan teknolojiler">
+          <span class="small text-body-tertiary me-2 hy-meta-label">Teknolojiler</span>
+          {% for item in detail.stack %}<span class="badge rounded-1 bg-body-tertiary border text-body fw-medium">{{ item }}</span>{% endfor %}
+        </div>
+      </header>
+
+      <div class="d-lg-none mt-4">
+        <div class="card shadow">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-baseline justify-content-between gap-3">
+              <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+              {% if first_preview %}<a href="{{ first_preview.url }}" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
+            </div>
+            {% include "page/partials/buy_actions.html" %}
+            {% if detail.discount %}
+            <div class="border rounded p-3 mt-3 small">
+              <div class="fw-semibold"><i class="bi bi-tag me-2 text-primary-emphasis" aria-hidden="true"></i>İndirim kodu</div>
+              <p class="text-body-secondary mt-1 mb-2">{{ detail.discount.text }}</p>
+              <a href="{{ detail.discount.url }}" class="fw-medium">İndirimi uygula <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky-top top-nav hy-section-bar mt-5" data-section-bar>
+        <ul class="nav nav-underline flex-nowrap overflow-x-auto scrollbar-none px-1 px-sm-3" aria-label="Sayfa bölümleri" data-section-nav>
+          <li class="nav-item"><a href="#genel" class="nav-link text-nowrap py-3 active" aria-current="true">Genel bakış</a></li>
+          <li class="nav-item"><a href="#mufredat" class="nav-link text-nowrap py-3">Müfredat</a></li>
+          {% if detail.outcomes %}<li class="nav-item"><a href="#kazanimlar" class="nav-link text-nowrap py-3">Kazanımlar</a></li>{% endif %}
+          {% if detail.audience %}<li class="nav-item"><a href="#kimler" class="nav-link text-nowrap py-3">Kimler için</a></li>{% endif %}
+          <li class="nav-item"><a href="#yorumlar" class="nav-link text-nowrap py-3">Yorumlar</a></li>
+        </ul>
+        <button type="button" class="hy-section-more hy-section-more-start" data-section-scroll="-1" tabindex="-1" aria-hidden="true"><i class="bi bi-chevron-left"></i></button>
+        <button type="button" class="hy-section-more hy-section-more-end" data-section-scroll="1" tabindex="-1" aria-hidden="true"><i class="bi bi-chevron-right"></i></button>
+      </div>
+
+      <section id="genel" aria-labelledby="genel-baslik" class="pt-5">
+        <h2 id="genel-baslik" class="h3 fw-semibold">Neler öğreneceksin?</h2>
+        <div class="card bg-body-tertiary mt-4">
+          <ul class="row row-cols-1 row-cols-md-2 g-3 list-unstyled card-body p-4 m-0">
+            {% for item in detail.learn %}
+            <li class="col d-flex gap-3"><i class="bi bi-check2 text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span>{{ item }}</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <h3 class="h5 fw-semibold mt-5">Kurs hakkında</h3>
+        {% for paragraph in detail.about %}
+        <p class="text-body-secondary" style="max-width:68ch">{{ paragraph }}</p>
+        {% endfor %}
+        {% if detail.features %}
+        <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+          {% for item in detail.features %}
+          <div class="col"><div class="border rounded h-100 p-4"><div class="fw-semibold">{{ item.title }}</div><p class="small text-body-secondary mt-1 mb-0">{{ item.text }}</p></div></div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if detail.topics %}
+        <h3 class="h5 fw-semibold mt-5">Kursta işlenen konular</h3>
+        <ul class="row row-cols-1 row-cols-md-2 gx-4 list-unstyled mt-3 mb-0">
+          {% for item in detail.topics %}
+          <li class="col border-top py-3"><div class="fw-semibold">{{ item.title }}</div><div class="small text-body-secondary">{{ item.text }}</div></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </section>
+
+      <section id="mufredat" aria-labelledby="mufredat-baslik" class="pt-5">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+          <div>
+            <h2 id="mufredat-baslik" class="h3 fw-semibold mb-1">Müfredat</h2>
+            <p class="small text-body-tertiary mb-0">{{ section_count }} bölüm · {{ course.lessons }} ders{% if preview_count %} · {{ preview_count }} ücretsiz önizleme{% endif %}</p>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-fold-all="[data-curriculum] > details" aria-controls="mufredat-listesi" aria-expanded="true">Tümünü kapat</button>
+        </div>
+        {% if enrolled %}
+        <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Bir dersi açmak için başlığına tıkla.</p>
+        {% else %}
+        <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Önizleme derslerini satın almadan izleyebilirsin. Diğer dersler kayıtla açılır.</p>
+        {% endif %}
+        <div id="mufredat-listesi" class="border rounded mt-3" data-curriculum>
+          {% for section in sections %}
+          <details class="hy-fold border-bottom" open>
+            <summary class="px-3 py-3">
+              <span class="d-block fw-semibold">{{ section.index }}. {{ section.name }}</span>
+              <span class="d-block small text-body-tertiary mt-1">{% if enrolled %}{{ section.meta_enrolled }}{% else %}{{ section.meta }}{% endif %}</span>
+            </summary>
+            <ul class="list-group list-group-flush">
+              {% for lesson in section.lessons %}
+              <li class="list-group-item bg-transparent d-flex align-items-center gap-3 px-4 py-2">
+                <span class="small text-body-tertiary">{% include "page/partials/lesson_meta.html" %}</span>
+                {% if lesson.locked %}
+                <span class="flex-grow-1 small">{{ lesson.title }}</span>
+                {% else %}
+                <a href="{{ lesson.url }}" class="flex-grow-1 small link-body-emphasis text-decoration-none">{{ lesson.title }}</a>
+                {% if lesson.preview and not enrolled %}<a href="{{ lesson.url }}" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme">Önizleme</a>{% endif %}
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </details>
+          {% endfor %}
+        </div>
+      </section>
+
+      {% if detail.outcomes %}
+      <section id="kazanimlar" aria-labelledby="kazanim-baslik" class="pt-5">
+        <h2 id="kazanim-baslik" class="h3 fw-semibold">Kursun sonunda kazanımların</h2>
+        <ul class="row row-cols-1 row-cols-md-2 gx-4 list-unstyled mt-3 mb-0">
+          {% for item in detail.outcomes %}
+          <li class="col d-flex gap-3 border-top py-3"><i class="bi bi-check2-circle text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span><span class="d-block fw-semibold">{{ item.title }}</span><span class="small text-body-secondary">{{ item.text }}</span></span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% if detail.audience %}
+      <section id="kimler" aria-labelledby="kimler-baslik" class="pt-5">
+        <h2 id="kimler-baslik" class="h3 fw-semibold">Bu kurs kimler için?</h2>
+        <div class="card mt-3">
+          <div class="card-body p-4">
+            <ul class="list-unstyled d-grid gap-3 mb-0">
+              {% for item in detail.audience %}
+              <li class="d-flex gap-3"><i class="bi bi-person-check text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span>{{ item }}</span></li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 p-4">
+            <span class="text-body-secondary small" style="max-width:44ch">{{ detail.access }}</span>
+            <a href="{{ course.buy_url }}" class="btn btn-primary">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+
+      <section id="yorumlar" data-reviews aria-labelledby="yorum-baslik" aria-roledescription="carousel" class="pt-5">
+        {% include "components/review_carousel.html" with heading_class="h3 fw-semibold mb-1" %}
+      </section>
+    </div>
+
+    <aside class="col-lg-4 d-none d-lg-block" aria-label="Satın alma">
+      <div class="sticky-top top-lg-nav">
+        {% include "page/partials/purchase_card.html" %}
+      </div>
+    </aside>
+  </div>
+</div>
+
+<section aria-labelledby="diger-baslik" class="py-5 bg-body-tertiary border-top">
+  <div class="container py-lg-4">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <h2 id="diger-baslik" class="h3 fw-semibold mb-0">Diğer kurslar</h2>
+      <a href="{% url 'page:course_list' %}" class="fw-medium">Tüm kursları gör <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+      {% for item in others %}
+      <div class="col">
+        <a href="{{ item.url }}" class="card h-100 flex-row align-items-center gap-3 p-3 text-decoration-none hover-lift">
+          <img src="{% static item.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:128px;height:72px">
+          <span class="flex-grow-1 min-w-0">
+            <span class="d-block fw-semibold text-body">{{ item.short }}</span>
+            <span class="d-block small text-body-tertiary">{{ item.meta_line }}</span>
+          </span>
+          <span class="fw-semibold text-body d-none d-sm-inline">{{ item.price }}</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    {% include "components/newsletter.html" %}
+  </div>
+</section>
+{% endblock %}

@@ -10,6 +10,7 @@
   --bs-border-radius-xxl:16px;
   --bs-border-radius-pill:10px;
   --hy-nav-h:65px;
+  --hy-lesson-nav-h:57px;
 }
 
 html{
@@ -43,6 +44,18 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
   --bs-btn-disabled-color:var(--hy-accent-on);
   --bs-btn-font-weight:600;
 }
+.btn-outline-primary{
+  --bs-btn-color:var(--bs-primary-text-emphasis);
+  --bs-btn-border-color:var(--bs-primary-border-subtle);
+  --bs-btn-hover-bg:var(--bs-primary);
+  --bs-btn-hover-border-color:var(--bs-primary);
+  --bs-btn-hover-color:var(--hy-accent-on);
+  --bs-btn-active-bg:var(--hy-accent-hover);
+  --bs-btn-active-border-color:var(--hy-accent-hover);
+  --bs-btn-active-color:var(--hy-accent-on);
+  --bs-btn-disabled-color:var(--bs-primary-text-emphasis);
+  --bs-btn-disabled-border-color:var(--bs-primary-border-subtle);
+}
 .btn-outline-secondary{
   --bs-btn-color:var(--bs-body-color);
   --bs-btn-border-color:var(--bs-border-color);
@@ -56,11 +69,26 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
   --bs-btn-disabled-border-color:var(--bs-border-color);
 }
 
+/* Aktif liste öğesi (ör. oynayan ders) vurgu rengini izler; Bootstrap'te sabit mavi. */
+.list-group{
+  --bs-list-group-active-bg:var(--bs-primary);
+  --bs-list-group-active-border-color:var(--bs-primary);
+  --bs-list-group-active-color:var(--hy-accent-on);
+}
+
 .navbar.sticky-top{z-index:1030}
 .navbar-blur{backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px)}
 [data-theme-root]>.dropdown-menu{top:100%;right:0;left:auto}
 
 @media (min-width:992px){
+  .navbar>.container.hy-nav{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    align-items:center;
+  }
+  .hy-nav>.navbar-brand{grid-column:1;justify-self:start;margin-right:0}
+  .hy-nav>.hy-nav-center{grid-column:2;justify-self:center;flex-grow:0}
+  .hy-nav>.hy-nav-tools{grid-column:3;justify-self:end}
   .navbar .nav-link{position:relative}
   .navbar .nav-link::after{
     content:"";
@@ -115,6 +143,87 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .js main > section.is-visible .placeholder-glow .placeholder{
   animation:placeholder-glow 2s ease-in-out infinite;
 }
+
+/* Kurs sayfası bölüm menüsü: üst çubuğun altına yapışır, aktif bölüm vurgu rengiyle altı çizili. */
+.top-nav{top:var(--hy-nav-h)}
+.nav-underline{
+  --bs-nav-underline-border-width:2px;
+  --bs-nav-link-color:var(--bs-secondary-color);
+  --bs-nav-link-hover-color:var(--bs-body-color);
+}
+.nav-underline .nav-link.active{color:var(--bs-body-color);border-bottom-color:var(--bs-primary)}
+/* Bölüm çubuğu: vurgu renginin açık tonu, sayfadan ayrışır; aktif bölüm vurgu renginde ve kalın çizgili. */
+.hy-section-bar{
+  --hy-section-bar-bg:color-mix(in srgb, var(--bs-primary) 9%, var(--bs-body-bg));
+  background:var(--hy-section-bar-bg);
+  border-bottom:1px solid color-mix(in srgb, var(--bs-primary) 30%, var(--bs-border-color));
+}
+.hy-section-bar .nav-underline{--bs-nav-underline-border-width:3px;--bs-nav-link-color:var(--bs-body-color)}
+.hy-section-bar .nav-link{opacity:.8}
+.hy-section-bar .nav-link:hover,.hy-section-bar .nav-link.active{opacity:1}
+.hy-section-bar .nav-link.active{color:var(--bs-primary-text-emphasis);font-weight:600}
+/* Menü taşıyorsa kenarda solma ve ok: kaydırılabildiğini gösterir. */
+.hy-section-more{
+  position:absolute;top:0;bottom:0;width:3rem;display:none;align-items:center;border:0;padding:0 .5rem;
+  color:var(--bs-primary-text-emphasis);
+}
+.hy-section-more-end{right:0;justify-content:flex-end;background:linear-gradient(to right, transparent, var(--hy-section-bar-bg) 55%)}
+.hy-section-more-start{left:0;justify-content:flex-start;background:linear-gradient(to left, transparent, var(--hy-section-bar-bg) 55%)}
+.hy-section-bar.has-more-end .hy-section-more-end,.hy-section-bar.has-more-start .hy-section-more-start{display:flex}
+.scrollbar-none{scrollbar-width:none}
+.scrollbar-none::-webkit-scrollbar{display:none}
+[data-section-nav] ~ *{scroll-margin-top:calc(var(--hy-nav-h) + 57px)}
+
+.text-pre-line{white-space:pre-line}
+/* Baş harf rozeti ve ikon kutusu ölçüleri */
+.hy-avatar{width:32px;height:32px}
+.hy-avatar-sm{width:24px;height:24px}
+.hy-initials{width:28px;height:24px;letter-spacing:-.02em}
+.hy-icon-tile{width:56px;height:56px}
+/* Kurs başlığındaki Kategori / Teknolojiler satırları: etiketler alt alta hizalı başlar. */
+.hy-meta-label{min-width:5.5rem}
+
+.hy-fold > summary{list-style:none;cursor:pointer}
+.hy-fold > summary::-webkit-details-marker{display:none}
+.hy-fold-icon{transition:transform .2s}
+/* Ders satırı: ikon ve süre sabit genişlikte; başlıklar alt alta hizalı kalır. */
+.hy-lesson-meta{min-width:4.25rem;font-variant-numeric:tabular-nums}
+.hy-fold[open] > summary .hy-fold-icon{transform:rotate(180deg)}
+/* Ders listesi: içinde bulunulan bölüm sol kenarda tema rengiyle işaretlenir. */
+.hy-lesson-fold[open] > summary{border-bottom:1px solid var(--bs-border-color)}
+.hy-lesson-fold[data-current-section]{border-left:3px solid var(--bs-primary)}
+/* Tamamlanan bölüm başlığı yeşil tonla ayrışır. */
+.hy-section-done{background:var(--bs-success-bg-subtle)}
+
+/* Önizleme şeridi: mobilde kaydırınca kartlar ortaya oturur; açılışta aktif kart ortalanır (site.js). */
+@media (max-width:575.98px){
+  .hy-strip{scroll-snap-type:x mandatory}
+  .hy-strip > *{scroll-snap-align:center}
+}
+
+/* Ders gezinme düğmeleri: mobilde Önceki/Sonraki yan yana ve eşit, "Tamamlandı" altta tam genişlik. */
+@media (max-width:575.98px){
+  .hy-lesson-nav > .btn{flex:1 1 0;min-width:0}
+  .hy-lesson-nav > .hy-lesson-nav-full{flex-basis:100%}
+}
+
+/* Ders listesi: geniş ekranda ekran yüksekliğinde sabit, dersler kendi içinde kayar; sol içerikten uzun olmaz. */
+@media (min-width:992px){
+  .hy-sidebar{position:sticky;top:var(--hy-lesson-nav-h);height:calc(100vh - var(--hy-lesson-nav-h))}
+}
+
+/* Bildirimler (SweetAlert2 toast): tema renklerini ve vurgu rengini izler, yapışkan üst çubuğun altında açılır. */
+.hy-toast-container.swal2-top-end{padding-top:var(--hy-toast-top, calc(var(--hy-nav-h) + .5rem))}
+.hy-toast{
+  --swal2-background:var(--bs-body-bg);
+  --swal2-color:var(--bs-body-color);
+  --swal2-toast-border:1px solid var(--bs-border-color);
+  --swal2-border-radius:var(--bs-border-radius);
+  --swal2-close-button-color:var(--bs-secondary-color);
+  --swal2-timer-progress-bar-background:var(--bs-primary);
+  font-family:var(--bs-body-font-family);
+}
+.hy-toast .swal2-title{font-size:.875rem;font-weight:500}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:.01ms!important}

@@ -1,0 +1,635 @@
+{
+ "slug": "iki-egitmen-ile-sifirdan-python-ogren",
+ "curriculum": [
+  [
+   "Başlangıç",
+   [
+    [
+     "Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7496937-tanitim-videosu",
+     1
+    ],
+    [
+     "Neden İki Eğitmen",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7497001-neden-iki-egitmen",
+     0
+    ],
+    [
+     "Sıfiıdan Python Öğren Kursu Kimler İçindir",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7496997-sifiidan-python-ogren-kursu-kimler-icindir",
+     0
+    ],
+    [
+     "Framework ve Yazılım Dillerindeki Versiyon Değişiklikleri Hakkında Genel Bilgi",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/8277870-framework-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     1
+    ],
+    [
+     "Bu Kursta Nelere Dikkat Etmeliyim? Nasıl Hazırlanmalıyım?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7496988-bu-kursta-nelere-dikkat-etmeliyim-nasil-hazirlanmaliyim",
+     0
+    ],
+    [
+     "Sıfırdan Python Öğren Kursunda Neler Öğreneceğiz?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7497010-sifirdan-python-ogren-kursunda-neler-ogrenecegiz",
+     0
+    ],
+    [
+     "Neden Python?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356145-baslangic/7497002-neden-python",
+     0
+    ]
+   ]
+  ],
+  [
+   "Python Kurulumu ve Çalışma Ortamının Oluşturulması",
+   [
+    [
+     "Windows'a Python Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356160-python-kurulumu-ve-calisma-ortaminin-olusturulmasi/7497074-windows-a-python-kurulumu",
+     0
+    ],
+    [
+     "macOS'a Python Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356160-python-kurulumu-ve-calisma-ortaminin-olusturulmasi/7497067-macos-a-python-kurulumu",
+     0
+    ],
+    [
+     "Virtualbox ve Ubuntu Desktop ile Python Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356160-python-kurulumu-ve-calisma-ortaminin-olusturulmasi/7497109-virtualbox-ve-ubuntu-desktop-ile-python-kurulumu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Örnek Dosyaların Kullanımı",
+   [
+    [
+     "Python Örnek Dosyaları IDLE ve Visual Studio Code ile Nasıl Açılır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356161-ornek-dosyalarin-kullanimi/7497176-python-ornek-dosyalari-idle-ve-visual-studio-code-ile-nasil-acilir",
+     0
+    ],
+    [
+     "Örnek Dosyaların Komut Satırında Çalıştırılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356161-ornek-dosyalarin-kullanimi/7497163-ornek-dosyalarin-komut-satirinda-calistirilmasi",
+     0
+    ],
+    [
+     "Örnek Dosyaların Online Ortamda Çalıştırılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356161-ornek-dosyalarin-kullanimi/7497178-ornek-dosyalarin-online-ortamda-calistirilmasi",
+     0
+    ],
+    [
+     "Örnek Dosyaların Python Interpreter'da Çalıştırılması",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356161-ornek-dosyalarin-kullanimi/7497157-ornek-dosyalarin-python-interpreter-da-calistirilmasi",
+     0
+    ]
+   ]
+  ],
+  [
+   "Aritmetik Operatörler, Print Kullanımı ve Açıklama Satırları Eklemek",
+   [
+    [
+     "Aritmetik İşlemler Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497261-aritmetik-islemler-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "IDLE ile Çalışmak ve Dosyaları Kaydetmek",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497273-idle-ile-calismak-ve-dosyalari-kaydetmek",
+     0
+    ],
+    [
+     "Print Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497361-print-kullanimi",
+     1
+    ],
+    [
+     "Temel Aritmetik İşlemler (Toplama, Çıkarma, Çarpma ve Bölme)",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497303-temel-aritmetik-islemler-toplama-cikarma-carpma-ve-bolme",
+     0
+    ],
+    [
+     "Aritmetik İşlemlerde İşlem Önceliği",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497277-aritmetik-islemlerde-islem-onceligi",
+     0
+    ],
+    [
+     "Python'da Açıklama Satırları Eklemek",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497344-python-da-aciklama-satirlari-eklemek",
+     0
+    ],
+    [
+     "Python'da Kaçış Karakteri(Escape Character) Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497406-python-da-kacis-karakteri-escape-character-nedir",
+     0
+    ],
+    [
+     "Print ile Shell Çıktısı Arasındaki Farklar Nelerdir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497358-print-ile-shell-ciktisi-arasindaki-farklar-nelerdir",
+     0
+    ],
+    [
+     "Aritmetik İşlemler - Bölüm Sonu Özeti",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek/7497342-aritmetik-islemler-bolum-sonu-ozeti",
+     0
+    ]
+   ]
+  ],
+  [
+   "Input Kullanımı, Metin(str) Veri Tipiyle Çalışmak ve Değişken Tanımlamak",
+   [
+    [
+     "Input Kullanımı, Str Veri Tipi ile Çalışmak Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497367-input-kullanimi-str-veri-tipi-ile-calismak-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Değişken Nedir? Nasıl Tanımlanır? - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497634-degisken-nedir-nasil-tanimlanir-bolum-1",
+     0
+    ],
+    [
+     "Değişken Nedir? Nasıl Tanımlanır? - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497490-degisken-nedir-nasil-tanimlanir-bolum-2",
+     0
+    ],
+    [
+     "String (str) Veri Tipi Nedir? Nasıl Tanımlanır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497400-string-str-veri-tipi-nedir-nasil-tanimlanir",
+     0
+    ],
+    [
+     "Verilerin Birleştirilmesi",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497602-verilerin-birlestirilmesi",
+     0
+    ],
+    [
+     "Metinsel İşlemler",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497620-metinsel-islemler",
+     1
+    ],
+    [
+     "Input Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497581-input-kullanimi",
+     0
+    ],
+    [
+     "Input Kullanımı Bölümünde Neler Öğrendik?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497494-input-kullanimi-bolumunde-neler-ogrendik",
+     0
+    ],
+    [
+     "Input Kullanımı - Kendini Sına",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497501-input-kullanimi-kendini-sina",
+     0
+    ],
+    [
+     "Input Kullanımı - Kendini Sına - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak/7497640-input-kullanimi-kendini-sina-cozum",
+     0
+    ]
+   ]
+  ],
+  [
+   "Değişken Tanımlama Kuralları",
+   [
+    [
+     "Değişken Tanımlama Kuralları Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356164-degisken-tanimlama-kurallari/7497587-degisken-tanimlama-kurallari-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Değişkenlere İsim Verilmesi - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356164-degisken-tanimlama-kurallari/7497665-degiskenlere-isim-verilmesi-bolum-1",
+     0
+    ],
+    [
+     "Değişkenlere İsim Verilmesi - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356164-degisken-tanimlama-kurallari/7497675-degiskenlere-isim-verilmesi-bolum-2",
+     0
+    ]
+   ]
+  ],
+  [
+   "Visual Studio Code Kurulumu ve Kullanımı",
+   [
+    [
+     "Visual Studio Code Kurulumu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356495-visual-studio-code-kurulumu-ve-kullanimi/7497860-visual-studio-code-kurulumu",
+     0
+    ]
+   ]
+  ],
+  [
+   "Değişkenlerle Çalışmak",
+   [
+    [
+     "Değişkenlerle Çalışmak Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497779-degiskenlerle-calismak-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Tam Sayı(int) Veri Tipi - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497849-tam-sayi-int-veri-tipi-bolum-1",
+     0
+    ],
+    [
+     "Tam Sayı(int) Veri Tipi - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497810-tam-sayi-int-veri-tipi-bolum-2",
+     0
+    ],
+    [
+     "Virgüllü Sayı(float) Veri Tipi",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497925-virgullu-sayi-float-veri-tipi",
+     0
+    ],
+    [
+     "Boolean Veri Tipi",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497850-boolean-veri-tipi",
+     1
+    ],
+    [
+     "Input ile Değişken Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497896-input-ile-degisken-kullanimi",
+     0
+    ],
+    [
+     "Değişkenlerle Çalışmak - Kendini Sına",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7497854-degiskenlerle-calismak-kendini-sina",
+     0
+    ],
+    [
+     "Değişkenlerle Çalışmak - Kendini Sına - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356497-degiskenlerle-calismak/7498098-degiskenlerle-calismak-kendini-sina-cozum",
+     0
+    ]
+   ]
+  ],
+  [
+   "Karar Yapıları",
+   [
+    [
+     "Karar Yapıları Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7497923-karar-yapilari-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Karşılaştırma Operatörlerine Neden İhtiyaç Duyarız?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498090-karsilastirma-operatorlerine-neden-ihtiyac-duyariz",
+     0
+    ],
+    [
+     "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7497954-karsilastirma-operatorleri-ile-calismak-bolum-1",
+     0
+    ],
+    [
+     "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7497989-karsilastirma-operatorleri-ile-calismak-bolum-2",
+     0
+    ],
+    [
+     "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 3",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498042-karsilastirma-operatorleri-ile-calismak-bolum-3",
+     0
+    ],
+    [
+     "If - Else - Else IF(elif) Kullanımı - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498149-if-else-else-if-elif-kullanimi-bolum-1",
+     1
+    ],
+    [
+     "If - Else - Else IF(elif) Kullanımı - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498140-if-else-else-if-elif-kullanimi-bolum-2",
+     0
+    ],
+    [
+     "Mantıksal Operatörlerle Çalışmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498189-mantiksal-operatorlerle-calismak-bolum-1",
+     0
+    ],
+    [
+     "Mantıksal Operatörlerle Çalışmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498275-mantiksal-operatorlerle-calismak-bolum-2",
+     0
+    ],
+    [
+     "Karar Yapıları Kategorisi - Kendini Sına",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498095-karar-yapilari-kategorisi-kendini-sina",
+     0
+    ],
+    [
+     "Karar Yapıları Kategorisi - Kendini Sına - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356498-karar-yapilari/7498164-karar-yapilari-kategorisi-kendini-sina-cozum",
+     0
+    ]
+   ]
+  ],
+  [
+   "List Veri Tipiyle Çalışmak",
+   [
+    [
+     "List Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498142-list-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "List Tanımlamak",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498219-list-tanimlamak",
+     0
+    ],
+    [
+     "List Elemanlarına Erişmek, Eklemek, Düzenlemek, Çıkarmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498216-list-elemanlarina-erismek-eklemek-duzenlemek-cikarmak-bolum-1",
+     0
+    ],
+    [
+     "List Elemanlarına Erişmek, Eklemek, Düzenlemek, Çıkarmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498341-list-elemanlarina-erismek-eklemek-duzenlemek-cikarmak-bolum-2",
+     0
+    ],
+    [
+     "List İçerisindeki Elemanlara Ulaşmak - Arama Yapmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498195-list-icerisindeki-elemanlara-ulasmak-arama-yapmak",
+     0
+    ],
+    [
+     "Str ve List'lerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498265-str-ve-list-lerle-calismak",
+     0
+    ],
+    [
+     "List'leri Birleştirmek, İç içe List Oluşturmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498257-list-leri-birlestirmek-ic-ice-list-olusturmak-bolum-1",
+     1
+    ],
+    [
+     "List'leri Birleştirmek, İç içe List Oluşturmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498270-list-leri-birlestirmek-ic-ice-list-olusturmak-bolum-2",
+     0
+    ],
+    [
+     "List Metodları - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498286-list-metodlari-bolum-1",
+     0
+    ],
+    [
+     "List Metodları - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498305-list-metodlari-bolum-2",
+     0
+    ],
+    [
+     "List Veri Tipiyle Çalışmak Kategorisi - Kendini Sına",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498271-list-veri-tipiyle-calismak-kategorisi-kendini-sina",
+     0
+    ],
+    [
+     "List Veri Tipiyle Çalışmak Kategorisi - Kendini Sına - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356499-list-veri-tipiyle-calismak/7498289-list-veri-tipiyle-calismak-kategorisi-kendini-sina-cozum",
+     0
+    ]
+   ]
+  ],
+  [
+   "Döngüler",
+   [
+    [
+     "Döngüler Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505595-donguler-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Neden Döngülere İhtiyaç Duyarız?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505601-neden-dongulere-ihtiyac-duyariz",
+     0
+    ],
+    [
+     "While Döngüsü Kullanımı",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505624-while-dongusu-kullanimi",
+     0
+    ],
+    [
+     "For Döngüsü Kullanımı - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505633-for-dongusu-kullanimi-bolum-1",
+     1
+    ],
+    [
+     "For Döngüsü Kullanımı - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505636-for-dongusu-kullanimi-bolum-2",
+     0
+    ],
+    [
+     "Atlama İfadeleri - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505602-atlama-ifadeleri-bolum-1",
+     0
+    ],
+    [
+     "Atlama İfadeleri - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505594-atlama-ifadeleri-bolum-2",
+     0
+    ],
+    [
+     "Döngüler Kategorisi - Kendini Sına",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505588-donguler-kategorisi-kendini-sina",
+     0
+    ],
+    [
+     "Döngüler Kategorisi - Kendini Sına - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356500-donguler/7505637-donguler-kategorisi-kendini-sina-cozum",
+     0
+    ]
+   ]
+  ],
+  [
+   "Tuple Veri Tipiyle Çalışmak",
+   [
+    [
+     "Tuple Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356501-tuple-veri-tipiyle-calismak/7505623-tuple-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Tuple Veri Tipiyle Çalışmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356501-tuple-veri-tipiyle-calismak/7505649-tuple-veri-tipiyle-calismak-bolum-1",
+     1
+    ],
+    [
+     "Tuple Veri Tipiyle Çalışmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356501-tuple-veri-tipiyle-calismak/7505646-tuple-veri-tipiyle-calismak-bolum-2",
+     0
+    ]
+   ]
+  ],
+  [
+   "Sözlük(Dict) Veri Tipiyle Çalışmak",
+   [
+    [
+     "Sözlük(Dict) Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505641-sozluk-dict-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Dictionary(dict) Nedir?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505650-dictionary-dict-nedir",
+     0
+    ],
+    [
+     "Dictionary(dict) Nasıl Tanımlanır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505687-dictionary-dict-nasil-tanimlanir",
+     1
+    ],
+    [
+     "Dictionary(dict) İçerisinde Çalışmak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505692-dictionary-dict-icerisinde-calismak-bolum-1",
+     0
+    ],
+    [
+     "Dictionary(dict) İçerisinde Çalışmak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505686-dictionary-dict-icerisinde-calismak-bolum-2",
+     0
+    ],
+    [
+     "Dictionary(dict) Metodları",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505697-dictionary-dict-metodlari",
+     0
+    ],
+    [
+     "Dictionary ve Döngülerle Çalışmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356502-sozluk-dict-veri-tipiyle-calismak/7505710-dictionary-ve-dongulerle-calismak",
+     0
+    ]
+   ]
+  ],
+  [
+   "Metin Denetimleri ve Metin Biçimlendirme İşlemleri",
+   [
+    [
+     "Metin Denetimleri ve Metin Biçimlendirme İşlemleri - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri/7505682-metin-denetimleri-ve-metin-bicimlendirme-islemleri-tanitim-videosu",
+     0
+    ],
+    [
+     "Metin Denetimleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri/7505754-metin-denetimleri",
+     0
+    ],
+    [
+     "Metin Biçimlendirme - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri/7505718-metin-bicimlendirme-bolum-1",
+     1
+    ],
+    [
+     "Metin Biçimlendirme - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri/7505727-metin-bicimlendirme-bolum-2",
+     0
+    ],
+    [
+     "Metin Biçimlendirme Örnekleri",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri/7505760-metin-bicimlendirme-ornekleri",
+     0
+    ]
+   ]
+  ],
+  [
+   "Fonksiyon ile Çalışmak",
+   [
+    [
+     "Fonksiyon ile Çalışmak - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356504-fonksiyon-ile-calismak/7505723-fonksiyon-ile-calismak-tanitim-videosu",
+     0
+    ],
+    [
+     "Fonksiyon Nedir? Nasıl Tanımlanır?",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356504-fonksiyon-ile-calismak/7505809-fonksiyon-nedir-nasil-tanimlanir",
+     0
+    ],
+    [
+     "Fonksiyon'a Değer Göndermek ve Değer Almak - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356504-fonksiyon-ile-calismak/7505791-fonksiyon-a-deger-gondermek-ve-deger-almak-bolum-1",
+     0
+    ],
+    [
+     "Fonksiyon'a Değer Göndermek ve Değer Almak - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356504-fonksiyon-ile-calismak/7505839-fonksiyon-a-deger-gondermek-ve-deger-almak-bolum-2",
+     1
+    ],
+    [
+     "Fonksiyon'larda Arküman(args) ve Anahtarlı Argüman / Keyword Arguments(kwargs)",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356504-fonksiyon-ile-calismak/7505795-fonksiyon-larda-arkuman-args-ve-anahtarli-arguman-keyword-arguments-kwargs",
+     0
+    ]
+   ]
+  ],
+  [
+   "Standart Kütüphaneler ve Modüllerle Çalışmak",
+   [
+    [
+     "Standart Kütüphaneler ve Modüllerle Çalışmak - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356505-standart-kutuphaneler-ve-modullerle-calismak/7505811-standart-kutuphaneler-ve-modullerle-calismak-tanitim-videosu",
+     0
+    ],
+    [
+     "Python Kütüphanesinden Modül Yüklenmesi ve Random Modülünün Kullanımı - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356505-standart-kutuphaneler-ve-modullerle-calismak/7505824-python-kutuphanesinden-modul-yuklenmesi-ve-random-modulunun-kullanimi-bolum-1",
+     0
+    ],
+    [
+     "Python Kütüphanesinden Modül Yüklenmesi ve Random Modülünün Kullanımı - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356505-standart-kutuphaneler-ve-modullerle-calismak/7505831-python-kutuphanesinden-modul-yuklenmesi-ve-random-modulunun-kullanimi-bolum-2",
+     1
+    ],
+    [
+     "Kendi Modülümüzü Oluşturmak ve Kullanmak",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356505-standart-kutuphaneler-ve-modullerle-calismak/7505843-kendi-modulumuzu-olusturmak-ve-kullanmak",
+     0
+    ]
+   ]
+  ],
+  [
+   "Projeler",
+   [
+    [
+     "Projeler Kategorisi - Tanıtım Videosu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505830-projeler-kategorisi-tanitim-videosu",
+     0
+    ],
+    [
+     "Taş, Kağıt, Makas Oyunu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505812-tas-kagit-makas-oyunu",
+     0
+    ],
+    [
+     "Taş, Kağıt, Makas Oyunu - Çözüm - Bölüm 1",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505871-tas-kagit-makas-oyunu-cozum-bolum-1",
+     0
+    ],
+    [
+     "Taş, Kağıt, Makas Oyunu - Çözüm - Bölüm 2",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505876-tas-kagit-makas-oyunu-cozum-bolum-2",
+     1
+    ],
+    [
+     "Sayı Tahmin Oyunu",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505844-sayi-tahmin-oyunu",
+     0
+    ],
+    [
+     "Sayı Tahmin Oyunu - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505868-sayi-tahmin-oyunu-cozum",
+     0
+    ],
+    [
+     "FizzBuzz Testi",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505867-fizzbuzz-testi",
+     0
+    ],
+    [
+     "FizzBuzz Testi - Çözüm",
+     "https://www.hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/2356506-projeler/7505869-fizzbuzz-testi-cozum",
+     0
+    ]
+   ]
+  ]
+ ]
+}

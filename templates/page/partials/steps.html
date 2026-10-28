@@ -1,0 +1,15 @@
+<nav aria-label="Satın alma adımları" class="mb-4 mb-lg-5">
+  <ol class="list-unstyled d-flex flex-wrap align-items-center gap-2 gap-sm-3 small mb-0">
+    {% for step in steps %}
+    <li class="d-flex align-items-center gap-2 {{ step.text_cls }}"{% if step.current %} aria-current="step"{% endif %}>
+      {% if step.url %}<a href="{{ step.url }}" class="d-flex align-items-center gap-2 link-secondary link-hover text-decoration-none">{% endif %}
+      <span class="d-inline-flex align-items-center justify-content-center rounded-1 fw-semibold hy-avatar-sm {{ step.box_cls }}">
+        {% if step.done %}<i class="bi bi-check-lg" aria-hidden="true"></i><span class="visually-hidden">Tamamlandı: </span>{% else %}{{ step.num }}{% endif %}
+      </span>
+      <span class="fw-medium">{{ step.label }}</span>
+      {% if step.url %}</a>{% endif %}
+      {% if step.sep %}<i class="bi bi-chevron-right text-body-tertiary ms-1 ms-sm-2" aria-hidden="true"></i>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</nav>

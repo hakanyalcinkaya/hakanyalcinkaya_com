@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 <div id="bulten" class="card mt-5">
   <div class="card-body p-4 p-lg-5">
     <div class="row g-4">
@@ -6,26 +7,9 @@
         <p class="text-body-secondary mb-0">Yeni yazılım kursları, faydalı kaynaklar ve geliştirici içerikleri e-posta kutuna gelsin.</p>
       </div>
       <div class="col-lg-7">
-        <form method="post" action="{% url 'index' %}#bulten" novalidate aria-describedby="bulten-not">
+        <form method="post" action="{% url 'page:index' %}#bulten" novalidate aria-describedby="bulten-not">
           {% csrf_token %}
-          <div class="row g-3">
-            <div class="col-sm-6">
-              <label for="bulten-isim" class="form-label small fw-medium text-body-secondary">İsim</label>
-              <input id="bulten-isim" name="name" type="text" autocomplete="name" placeholder="Adın" value="{{ form.name.value|default:'' }}" aria-invalid="{% if form.name.errors %}true{% else %}false{% endif %}" aria-describedby="bulten-isim-hata" class="form-control form-control-lg fs-6{% if form.name.errors %} is-invalid{% endif %}">
-              <div id="bulten-isim-hata" role="alert" class="invalid-feedback d-block" style="min-height:1.25rem">{{ form.name.errors.0 }}</div>
-            </div>
-            <div class="col-sm-6">
-              <label for="bulten-eposta" class="form-label small fw-medium text-body-secondary">E-posta</label>
-              <input id="bulten-eposta" name="email" type="email" autocomplete="email" inputmode="email" placeholder="ornek@eposta.com" value="{{ form.email.value|default:'' }}" aria-invalid="{% if form.email.errors %}true{% else %}false{% endif %}" aria-describedby="bulten-eposta-hata" class="form-control form-control-lg fs-6{% if form.email.errors %} is-invalid{% endif %}">
-              <div id="bulten-eposta-hata" role="alert" class="invalid-feedback d-block" style="min-height:1.25rem">{{ form.email.errors.0 }}</div>
-            </div>
-            <div class="col-12">
-              <button type="submit" class="btn btn-outline-secondary btn-lg fs-6 w-100">Abone Ol <i class="bi bi-send ms-1" aria-hidden="true"></i></button>
-            </div>
-          </div>
-          {% if newsletter_pending %}
-          <div role="status" class="alert alert-secondary d-flex gap-2 small mt-3 mb-0"><i class="bi bi-info-circle text-primary-emphasis" aria-hidden="true"></i><span>Bilgilerin doğrulandı, ancak abonelik servisi henüz bağlı değil — kayıt yapılmadı. <span class="font-monospace">[PLACEHOLDER: backend entegrasyonu]</span></span></div>
-          {% endif %}
+          {% crispy form %}
           <p id="bulten-not" class="small text-body-tertiary mt-3 mb-0">İstediğin zaman abonelikten çıkabilirsin. <a href="{{ privacy_url }}">Gizlilik Politikası</a></p>
         </form>
       </div>

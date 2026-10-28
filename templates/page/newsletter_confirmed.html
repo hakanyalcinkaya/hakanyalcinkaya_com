@@ -1,0 +1,22 @@
+{% extends "_base/base.html" %}
+
+{% block title %}Aboneliğin onaylandı — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center py-lg-4">
+    <div class="col-lg-8 col-xl-6 text-center">
+      <span class="d-inline-flex align-items-center justify-content-center rounded bg-success-subtle text-success-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-check2-circle fs-3"></i></span>
+      <h1 class="display-6 fw-semibold mt-3">Aboneliğin onaylandı</h1>
+      <p class="lead text-body-secondary mb-1">Teşekkürler! Yeni kurslar, kaynaklar ve geliştirici içerikleri e-posta kutuna gelecek.</p>
+      <p class="small text-body-tertiary mb-0">Her e-postanın altında abonelikten çıkma bağlantısı var. <a href="{% url 'page:newsletter_unsubscribe' %}">Abonelikten çık</a></p>
+      <p class="small font-monospace text-body-tertiary mt-2 mb-0">[PLACEHOLDER: abonelik servisi — onay bağlantısı]</p>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+        <a href="{% url 'page:course_list' %}" class="btn btn-primary btn-lg fs-6">Kursları incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+        <a href="{% url 'page:index' %}" class="btn btn-outline-secondary btn-lg fs-6">Ana sayfa</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

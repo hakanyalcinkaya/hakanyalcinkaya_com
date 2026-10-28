@@ -38,6 +38,23 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
   }
 
+  // Hesap menüsü gibi basit açılır menüler: data-dropdown > data-dropdown-toggle + data-dropdown-menu
+  var dropdowns = Array.prototype.map.call(document.querySelectorAll("[data-dropdown]"), function (dropdownRoot) {
+    var button = dropdownRoot.querySelector("[data-dropdown-toggle]");
+    var list = dropdownRoot.querySelector("[data-dropdown-menu]");
+    function set(open) {
+      list.classList.toggle("show", open);
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    button.addEventListener("click", function () {
+      set(!list.classList.contains("show"));
+    });
+    document.addEventListener("mousedown", function (event) {
+      if (!dropdownRoot.contains(event.target)) set(false);
+    });
+    return { set: set };
+  });
+
   function setMenu(open) {
     if (!menu || !menuBtn) return;
     menu.classList.toggle("show", open);
@@ -74,6 +91,7 @@
     if (event.key === "Escape") {
       setPanel(false);
       setMenu(false);
+      dropdowns.forEach(function (dropdown) { dropdown.set(false); });
     }
   });
 
@@ -113,6 +131,92 @@
     document.querySelectorAll("main > section[id]").forEach(function (section) {
       observer.observe(section);
     });
+  }
+
+  // Kurs sayfası bölüm menüsü: ekranda okunan bölümün bağlantısını aktif yapar.
+  // scrollIntoView kullanılmaz; sayfayı da kaydırıp kullanıcının kaydırmasıyla çakışıyor.
+  var sectionNav = document.querySelector("[data-section-nav]");
+  var sectionLinks = Array.prototype.slice.call(document.querySelectorAll("[data-section-nav] a[href^='#']"));
+  var currentSection = "";
+  function setSection(id) {
+    if (id === currentSection) return;
+    currentSection = id;
+    sectionLinks.forEach(function (link) {
+      var on = link.hash === "#" + id;
+      link.classList.toggle("active", on);
+      if (on) link.setAttribute("aria-current", "true");
+      else link.removeAttribute("aria-current");
+      // Menü dar ekranda taşıyorsa yalnız menünün kendisi yatay kayar.
+      if (on && sectionNav.scrollWidth > sectionNav.clientWidth) {
+        sectionNav.scrollTo({ left: link.parentElement.offsetLeft - (sectionNav.clientWidth - link.offsetWidth) / 2 });
+      }
+    });
+  }
+  if (sectionLinks.length && "IntersectionObserver" in window) {
+    var sectionObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) setSection(entry.target.id);
+      });
+    }, { rootMargin: "-35% 0px -60% 0px" });
+    sectionLinks.forEach(function (link) {
+      var target = document.getElementById(link.hash.slice(1));
+      if (target) sectionObserver.observe(target);
+    });
+  }
+
+  // Bölüm menüsü taşıyorsa (mobil) kenarlarda solma ve ok gösterilir; ok menüyü kaydırır.
+  var sectionBar = document.querySelector("[data-section-bar]");
+  if (sectionBar && sectionNav) {
+    function syncSectionMore() {
+      var max = sectionNav.scrollWidth - sectionNav.clientWidth;
+      sectionBar.classList.toggle("has-more-start", sectionNav.scrollLeft > 2);
+      sectionBar.classList.toggle("has-more-end", sectionNav.scrollLeft < max - 2);
+    }
+    sectionBar.querySelectorAll("[data-section-scroll]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var step = Number(button.getAttribute("data-section-scroll")) * sectionNav.clientWidth * 0.6;
+        sectionNav.scrollBy({ left: step, behavior: "smooth" });
+      });
+    });
+    sectionNav.addEventListener("scroll", syncSectionMore, { passive: true });
+    window.addEventListener("resize", syncSectionMore);
+    syncSectionMore();
+  }
+
+  // Müfredat: bölümler açık başlar; tek düğmeyle hepsi kapanır ya da açılır.
+  var foldToggle = document.querySelector("[data-fold-all]");
+  if (foldToggle) {
+    var folds = Array.prototype.slice.call(document.querySelectorAll(foldToggle.getAttribute("data-fold-all")));
+    function syncFoldToggle() {
+      var allOpen = folds.every(function (fold) { return fold.open; });
+      foldToggle.textContent = allOpen ? "Tümünü kapat" : "Tümünü aç";
+      foldToggle.setAttribute("aria-expanded", allOpen ? "true" : "false");
+    }
+    foldToggle.addEventListener("click", function () {
+      var open = !folds.every(function (fold) { return fold.open; });
+      folds.forEach(function (fold) { fold.open = open; });
+      syncFoldToggle();
+    });
+    folds.forEach(function (fold) { fold.addEventListener("toggle", syncFoldToggle); });
+    syncFoldToggle();
+  }
+
+  // Önizleme şeridi: açılışta izlenen ders kartını şeridin ortasına getirir (ilk kart doğal olarak solda kalır).
+  var previewStrip = document.querySelector("[data-preview-strip]");
+  var previewCurrent = previewStrip && previewStrip.querySelector("[aria-current]");
+  if (previewCurrent) {
+    var stripBox = previewStrip.getBoundingClientRect();
+    var cardBox = previewCurrent.getBoundingClientRect();
+    previewStrip.scrollLeft += cardBox.left + cardBox.width / 2 - (stripBox.left + previewStrip.clientWidth / 2);
+  }
+
+  // Ders listesi: açılışta geçerli dersi listenin ortasına getirir (yalnız liste kayar, sayfa kaymaz).
+  var sideScroll = document.querySelector("[data-side-scroll]");
+  var sideCurrent = sideScroll && sideScroll.querySelector("details [aria-current]");
+  if (sideCurrent && sideScroll.scrollHeight > sideScroll.clientHeight) {
+    var sideBox = sideScroll.getBoundingClientRect();
+    var itemBox = sideCurrent.getBoundingClientRect();
+    sideScroll.scrollTop += itemBox.top - sideBox.top - (sideScroll.clientHeight - itemBox.height) / 2;
   }
 
   var carousel = document.querySelector("[data-hero]");
@@ -163,7 +267,7 @@
       carousel.querySelector("[data-hero-price]").textContent = current.getAttribute("data-price");
       carousel.querySelector("[data-hero-inspect]").href = current.getAttribute("href");
       var cart = carousel.querySelector("[data-hero-cart]");
-      cart.href = current.getAttribute("data-cart");
+      cart.form.action = current.getAttribute("data-cart");
       cart.setAttribute("aria-label", current.getAttribute("data-cart-label"));
       var tags = carousel.querySelector("[data-hero-tags]");
       tags.replaceChildren();
@@ -356,7 +460,7 @@
       });
     }, { threshold: 0, rootMargin: "0px 0px -35% 0px" });
     window.requestAnimationFrame(function () {
-      document.querySelectorAll("main > section").forEach(function (section) {
+      document.querySelectorAll("main > section, [data-reviews]").forEach(function (section) {
         revealObserver.observe(section);
       });
     });
@@ -365,6 +469,40 @@
       section.classList.add("is-visible");
     });
     startReviews();
+  }
+
+  // Bildirimler: Django mesajları sağ üstte kendiliğinden kapanan toast olarak gösterilir (SweetAlert2).
+  var toastIcons = { success: "success", info: "info", warning: "warning", error: "error", debug: "info" };
+  var toast = window.Swal && window.Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    showCloseButton: true,
+    timer: 3500,
+    timerProgressBar: true,
+    customClass: { container: "hy-toast-container", popup: "hy-toast" },
+    didOpen: function (popup) {
+      popup.addEventListener("mouseenter", window.Swal.stopTimer);
+      popup.addEventListener("mouseleave", window.Swal.resumeTimer);
+    }
+  });
+
+  window.hyToast = function (level, text) {
+    if (!toast) return Promise.resolve();
+    // Üst çubuğun yüksekliği sayfaya ve ekran genişliğine göre değişir; bildirim hep altında açılır.
+    var bar = document.querySelector("nav.navbar");
+    var top = bar ? Math.max(bar.getBoundingClientRect().bottom, 0) : 0;
+    document.documentElement.style.setProperty("--hy-toast-top", top + 8 + "px");
+    return toast.fire({ icon: toastIcons[level] || "info", title: text });
+  };
+
+  var toastData = document.querySelector("template[data-toasts]");
+  if (toastData) {
+    Array.prototype.reduce.call(toastData.content.querySelectorAll("[data-toast-level]"), function (queue, item) {
+      return queue.then(function () {
+        return window.hyToast(item.getAttribute("data-toast-level"), item.textContent);
+      });
+    }, Promise.resolve());
   }
 
   syncTheme();

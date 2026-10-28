@@ -1,43 +1,40 @@
 <nav class="navbar navbar-expand-lg sticky-top bg-body bg-opacity-75 navbar-blur border-bottom" aria-label="Ana menü">
-  <div class="container">
-    <a href="{% url 'index' %}#top" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6" aria-label="Hakan Yalçınkaya — Ana Sayfa">
+  <div class="container hy-nav">
+    <a href="{% url 'page:index' %}#top" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6" aria-label="{% if nav_member %}Ana Sayfa{% else %}Hakan Yalçınkaya — Ana Sayfa{% endif %}">
       <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
-      Hakan Yalçınkaya
+      {% if not nav_member %}Hakan Yalçınkaya{% endif %}
     </a>
 
-    <div class="d-flex align-items-center gap-2 order-lg-last">
-      <a href="{{ login_url }}" class="btn btn-outline-secondary d-none d-lg-inline-flex">Giriş Yap</a>
-      <div class="dropdown" data-theme-root>
-        <button type="button" class="btn btn-outline-secondary" data-theme-toggle aria-label="Tema ve vurgu rengi ayarları" aria-expanded="false" aria-haspopup="dialog" aria-controls="tema-paneli"><i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i></button>
-        <div id="tema-paneli" role="dialog" aria-label="Görünüm ayarları" class="dropdown-menu dropdown-menu-end p-3 shadow" data-bs-popper="static" style="width:264px">
-          <div class="small fw-semibold text-body-secondary mb-2">Tema</div>
-          <div role="radiogroup" aria-label="Tema" class="btn-group w-100">
-            <button type="button" role="radio" data-theme-choice="dark" aria-checked="true" class="btn btn-outline-secondary active"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Koyu</button>
-            <button type="button" role="radio" data-theme-choice="light" aria-checked="false" class="btn btn-outline-secondary text-body-secondary"><i class="bi bi-sun me-2" aria-hidden="true"></i>Açık</button>
-          </div>
-          <div class="small fw-semibold text-body-secondary mt-3 mb-2">Vurgu rengi</div>
-          <div role="radiogroup" aria-label="Vurgu rengi" class="row row-cols-4 g-2">
-            <div class="col"><button type="button" role="radio" data-accent-choice="indigo" data-label="Indigo" data-hex="#6366F1" aria-checked="true" aria-label="Indigo (varsayılan)" title="Indigo (varsayılan)" class="btn w-100 border-0 rounded-1 py-2" style="background:#6366F1;color:#ffffff"><i class="bi bi-check-lg" aria-hidden="true"></i></button></div>
-            <div class="col"><button type="button" role="radio" data-accent-choice="blue" data-label="Blue" data-hex="#3B82F6" aria-checked="false" aria-label="Blue" title="Blue" class="btn w-100 border-0 rounded-1 py-2" style="background:#3B82F6;color:#ffffff"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:hidden"></i></button></div>
-            <div class="col"><button type="button" role="radio" data-accent-choice="orange" data-label="Orange" data-hex="#F97316" aria-checked="false" aria-label="Orange" title="Orange" class="btn w-100 border-0 rounded-1 py-2" style="background:#F97316;color:#0b0b0f"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:hidden"></i></button></div>
-            <div class="col"><button type="button" role="radio" data-accent-choice="pink" data-label="Pink" data-hex="#EC4899" aria-checked="false" aria-label="Pink" title="Pink" class="btn w-100 border-0 rounded-1 py-2" style="background:#EC4899;color:#0b0b0f"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:hidden"></i></button></div>
-          </div>
-          <div class="small text-body-tertiary mt-3"><span data-accent-label>Indigo</span> · seçimin bu cihazda saklanır</div>
-        </div>
-      </div>
-      <a href="{% url 'index' %}#egitimler" class="btn btn-primary d-none d-sm-inline-flex align-items-center gap-2">Kursları Keşfet <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    <div class="hy-nav-tools d-flex align-items-center gap-2 order-lg-last">
+      {% if not nav_member %}{% include "_base/theme_dropdown.html" %}{% endif %}
+      {% if not nav_member %}
+      <a href="{{ login_url }}" class="btn btn-outline-secondary d-none d-lg-inline-flex text-nowrap">Giriş Yap</a>
+      {% endif %}
+      {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
+      {% if nav_member %}
+      {% include "_base/account_menu.html" %}
+      {% elif show_explore %}
+      <a href="{% url 'page:course_list' %}" class="btn btn-primary d-none d-sm-inline-flex align-items-center gap-2 text-nowrap">Kursları Keşfet <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      {% endif %}
       <button type="button" class="btn btn-outline-secondary d-lg-none" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu"><i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
     </div>
 
-    <div id="mobil-menu" class="collapse navbar-collapse">
-      <ul class="navbar-nav mx-lg-auto gap-lg-3 pt-3 pt-lg-0">
+    <div id="mobil-menu" class="collapse navbar-collapse hy-nav-center">
+      <ul class="navbar-nav gap-lg-3 pt-3 pt-lg-0">
         {% for item in nav_items %}
         <li class="nav-item"><a href="{{ item.href }}" data-nav="{{ item.id }}" class="nav-link d-flex justify-content-between align-items-center">{{ item.label }}<i class="bi bi-chevron-right small d-lg-none text-body-tertiary" data-nav-chevron aria-hidden="true"></i></a></li>
         {% endfor %}
       </ul>
       <div class="row g-2 py-3 d-lg-none">
+        {% if show_cart %}
+        <div class="col-12 d-sm-none"><a href="{{ cart_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-bag me-2" aria-hidden="true"></i>Sepet{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
+        {% endif %}
+        {% if nav_member %}
+        <div class="col-6"><a href="{{ library_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-collection-play me-2" aria-hidden="true"></i>Kurslarım</a></div>
+        {% else %}
         <div class="col-6"><a href="{{ login_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
-        <div class="col-6"><a href="{% url 'index' %}#egitimler" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
+        {% endif %}
+        <div class="col-6"><a href="{% url 'page:course_list' %}" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
       </div>
     </div>
   </div>

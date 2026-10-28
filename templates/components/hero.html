@@ -49,7 +49,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top mt-3 pt-3">
               <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span><span data-hero-price>{{ course.price }}</span></div>
               <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
-                <a href="{{ course.cart_url }}" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></a>
+                <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>
                 <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
               </div>
             </div>

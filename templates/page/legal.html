@@ -1,0 +1,56 @@
+{% extends "_base/base.html" %}
+
+{% block title %}{{ title }} — Hakan Yalçınkaya{% endblock %}
+{% block description %}{{ intro }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <header class="pb-4 border-bottom">
+    <h1 class="display-6 fw-semibold mb-1">{{ title }}</h1>
+    <p class="text-body-secondary mb-1">{{ intro }}</p>
+    <p class="small text-body-tertiary mb-0">Son güncelleme: {{ updated }}</p>
+  </header>
+
+  <div class="row g-4 g-lg-5 pt-4">
+    <nav class="col-lg-4 col-xl-3 d-none d-lg-block" aria-label="İçindekiler">
+      <div class="sticky-lg-top top-lg-nav">
+        <div class="small fw-semibold text-body-secondary mb-2">İçindekiler</div>
+        <ol class="list-unstyled d-grid gap-2 small mb-0">
+          {% for section in sections %}
+          <li><a href="#{{ section.id }}" class="text-body-secondary text-decoration-none link-hover">{{ forloop.counter }}. {{ section.title }}</a></li>
+          {% endfor %}
+        </ol>
+        <div class="small fw-semibold text-body-secondary mt-4 mb-2">Diğer belgeler</div>
+        <ul class="list-unstyled d-grid gap-2 small mb-0">
+          {% for doc in others %}<li><a href="{{ doc.url }}">{{ doc.label }} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></li>{% endfor %}
+        </ul>
+      </div>
+    </nav>
+
+    <article class="col-lg-8 col-xl-7">
+      <p class="small font-monospace text-body-tertiary">[PLACEHOLDER: hukuki metin — yayından önce hukuki inceleme gerekli]</p>
+      {% for section in sections %}
+      <section id="{{ section.id }}" class="{% if not forloop.first %}pt-4{% endif %}" aria-labelledby="{{ section.id }}-baslik">
+        <h2 id="{{ section.id }}-baslik" class="h5 fw-semibold">{{ forloop.counter }}. {{ section.title }}</h2>
+        <p class="text-body-secondary mb-0" style="max-width:68ch">{{ section.text }}</p>
+        {% if section.rows %}
+        <div class="table-responsive border rounded mt-3">
+          <table class="table table-sm small align-middle mb-0">
+            <thead><tr>{% for column in section.columns %}<th scope="col" class="fw-semibold text-body-secondary bg-body-tertiary px-3 py-2">{{ column }}</th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for name, kind, purpose, duration in section.rows %}
+              <tr><td class="font-monospace px-3 py-2">{{ name }}</td><td class="px-3 py-2">{{ kind }}</td><td class="px-3 py-2">{{ purpose }}</td><td class="px-3 py-2 text-nowrap">{{ duration }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </section>
+      {% endfor %}
+      <div class="d-flex flex-wrap gap-3 small mt-5 d-lg-none">
+        {% for doc in others %}<a href="{{ doc.url }}">{{ doc.label }} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endfor %}
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock %}

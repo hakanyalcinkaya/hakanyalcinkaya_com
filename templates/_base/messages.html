@@ -1,0 +1,13 @@
+{% if messages %}
+{# Mesajlar site.js tarafından sağ üstte kendiliğinden kapanan bildirim olarak gösterilir. #}
+<template data-toasts>
+  {% for message in messages %}<span data-toast-level="{{ message.level_tag }}">{{ message }}</span>{% endfor %}
+</template>
+<noscript>
+  <div class="container pt-3">
+    {% for message in messages %}
+    <div role="status" class="alert alert-secondary small mb-2">{{ message }}</div>
+    {% endfor %}
+  </div>
+</noscript>
+{% endif %}

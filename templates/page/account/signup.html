@@ -1,0 +1,8 @@
+{% extends "page/account/auth_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Kayıt Ol — Hakan Yalçınkaya{% endblock %}
+{% block heading %}Hesap oluştur{% endblock %}
+{% block lead %}Satın aldığın kurslar, ilerlemen ve notların tek yerde.{% endblock %}
+{% block form %}{% crispy form %}{% endblock %}
+{% block footnote %}Zaten hesabın var mı? <a href="{{ login_url }}">Giriş yap</a>{% endblock %}

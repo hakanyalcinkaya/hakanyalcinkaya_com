@@ -1,0 +1,52 @@
+{% extends "_base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Ayarlar — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <header>
+    <h1 class="display-6 fw-semibold mb-1">Ayarlar</h1>
+    <p class="text-body-secondary mb-0">{{ account_user.display_name }} · {{ account_user.email }}</p>
+  </header>
+
+  <div class="row g-4 g-lg-5 mt-1">
+    <nav class="col-lg-3" aria-label="Ayar bölümleri">
+      <ul class="nav flex-lg-column gap-1 sticky-lg-top top-lg-nav">
+        <li class="nav-item"><a href="#profile" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-person me-2 text-body-tertiary" aria-hidden="true"></i>Profil</a></li>
+        <li class="nav-item"><a href="#email" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-envelope me-2 text-body-tertiary" aria-hidden="true"></i>E-posta</a></li>
+        <li class="nav-item"><a href="#password" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-key me-2 text-body-tertiary" aria-hidden="true"></i>Şifre</a></li>
+      </ul>
+    </nav>
+
+    <div class="col-lg-9 col-xl-7 d-grid gap-4">
+      <section id="profile" class="card" aria-labelledby="profil-baslik">
+        <div class="card-body p-4">
+          <h2 id="profil-baslik" class="h5 fw-semibold">Profil</h2>
+          <p class="small text-body-secondary">Adın sertifikalarda ve yorumlarında görünür.</p>
+          {% crispy profile_form %}
+        </div>
+      </section>
+
+      <section id="email" class="card" aria-labelledby="eposta-baslik">
+        <div class="card-body p-4">
+          <h2 id="eposta-baslik" class="h5 fw-semibold">E-posta</h2>
+          <p class="small text-body-secondary">Şu anki adresin: <b class="text-body">{{ account_user.email }}</b></p>
+          {% crispy email_form %}
+        </div>
+      </section>
+
+      <section id="password" class="card" aria-labelledby="sifre-baslik">
+        <div class="card-body p-4">
+          <h2 id="sifre-baslik" class="h5 fw-semibold">Şifre</h2>
+          <p class="small text-body-secondary">Şifreni hatırlamıyorsan <a href="{% url 'page:password_reset' %}">sıfırlama bağlantısı iste</a>.</p>
+          {% crispy password_form %}
+        </div>
+      </section>
+
+      <p class="small font-monospace text-body-tertiary mb-0">[PLACEHOLDER: e-posta değişikliğinde onay bağlantısı — e-posta servisi bağlanınca]</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

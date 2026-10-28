@@ -1,0 +1,70 @@
+{% extends "_base/base.html" %}
+{% load static %}
+
+{% block title %}Kaydın tamamlandı — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+  {% include "page/partials/steps.html" %}
+  {% if order %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      <div class="text-center">
+        <span class="d-inline-flex align-items-center justify-content-center rounded bg-success-subtle text-success-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-check-lg fs-2"></i></span>
+        <h1 class="display-6 fw-semibold mt-3">Kaydın tamamlandı</h1>
+        <p class="lead text-body-secondary mb-1">{{ headline }}</p>
+        <p class="small text-body-tertiary mb-0">Sipariş özetin <b class="text-body-secondary">{{ order.email }}</b> adresine gönderilecek. <span class="font-monospace">[PLACEHOLDER: e-posta bildirimi]</span></p>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+          <a href="{{ start_url }}" class="btn btn-primary btn-lg fs-6 px-4">Kursa başla <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="{{ library_url }}" class="btn btn-outline-secondary btn-lg fs-6 px-4">Kurslarım</a>
+        </div>
+      </div>
+
+      <section class="card mt-5" aria-labelledby="siparis-baslik">
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap justify-content-between gap-2">
+            <h2 id="siparis-baslik" class="h6 fw-semibold mb-0">Sipariş özeti</h2>
+            <span class="small text-body-tertiary">Sipariş no <span class="font-monospace">[PLACEHOLDER]</span></span>
+          </div>
+          <ul class="list-unstyled d-grid gap-3 mt-3 mb-0">
+            {% for item in summary.items %}
+            <li class="d-flex gap-3 align-items-center">
+              <img src="{% static item.image %}" alt="" width="192" height="108" class="rounded-1 object-fit-cover flex-shrink-0" style="width:72px;height:41px">
+              <span class="flex-grow-1 small fw-medium min-w-0">{{ item.title }}</span>
+              <span class="small fw-semibold">{{ item.price }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          <hr>
+          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam</span><span>{{ summary.subtotal }}</span></div>
+          {% if summary.coupon %}
+          <div class="d-flex justify-content-between small text-success mt-1"><span>İndirim ({{ summary.coupon }})</span><span>−{{ summary.discount }}</span></div>
+          {% endif %}
+          <div class="d-flex justify-content-between fw-semibold mt-2"><span>Ödenen</span><span>{{ summary.total }}</span></div>
+        </div>
+      </section>
+
+      <section class="mt-5" aria-labelledby="sonra-baslik">
+        <h2 id="sonra-baslik" class="h6 fw-semibold">Bundan sonra</h2>
+        <ul class="list-group list-group-flush border-top border-bottom mt-3">
+          <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-collection-play text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">Kursların Kurslarım'da</b><span class="text-body-secondary">İlerlemeni takip et, kaldığın yerden devam et.</span></span></li>
+          <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-journal-text text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">Derslerde not al</b><span class="text-body-secondary">İzlediğin derse ya da kursun geneline notlar ekle.</span></span></li>
+          <li class="list-group-item bg-transparent d-flex gap-3 px-0 py-3"><i class="bi bi-kanban text-primary-emphasis fs-5 lh-1" aria-hidden="true"></i><span class="small"><b class="d-block">Her bölümde proje</b><span class="text-body-secondary">Bölüm sonu projeleriyle öğrendiklerini pekiştir.</span></span></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center border rounded p-5">
+    <i class="bi bi-receipt fs-1 text-body-tertiary" aria-hidden="true"></i>
+    <h1 class="h5 fw-semibold mt-3">Görüntülenecek sipariş yok</h1>
+    <p class="text-body-secondary mb-4">Tamamlanmış bir sipariş bulunamadı. Kurslarına Kurslarım sayfasından ulaşabilirsin.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <a href="{% url 'page:course_list' %}" class="btn btn-primary">Kursları incele</a>
+      <a href="{{ library_url }}" class="btn btn-outline-secondary">Kurslarım</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

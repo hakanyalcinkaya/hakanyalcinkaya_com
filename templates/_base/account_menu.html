@@ -1,0 +1,27 @@
+<div class="dropdown" data-dropdown>
+  <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="hesap-menusu" aria-label="Hesap menüsü">
+    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>
+    <span class="d-none d-xl-inline">Hesabım</span><i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
+  </button>
+  <ul id="hesap-menusu" class="dropdown-menu dropdown-menu-end shadow py-2" data-dropdown-menu data-bs-popper="static" style="width:280px">
+    <li class="px-3 pt-1 pb-2"><div class="fw-semibold small">{{ account_user.display_name }}</div><div class="small text-body-tertiary text-truncate">{{ account_user.email }}</div></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a href="{{ library_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-collection-play text-body-tertiary" aria-hidden="true"></i>Kurslarım</a></li>
+    <li><a href="{% url 'page:course_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-grid text-body-tertiary" aria-hidden="true"></i>Tüm Kurslar</a></li>
+    <li><a href="{{ settings_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-gear text-body-tertiary" aria-hidden="true"></i>Ayarlar</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+      <details class="hy-fold">
+        <summary class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-palette text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Görünüm</span><i class="bi bi-chevron-down small text-body-tertiary hy-fold-icon" aria-hidden="true"></i></summary>
+        <div class="px-3 pt-1 pb-2" role="group" aria-label="Görünüm ayarları">{% include "_base/theme_controls.html" %}</div>
+      </details>
+    </li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+      <form method="post" action="{{ logout_url }}">
+        {% csrf_token %}
+        <button type="submit" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-box-arrow-right text-body-tertiary" aria-hidden="true"></i>Oturumu kapat</button>
+      </form>
+    </li>
+  </ul>
+</div>

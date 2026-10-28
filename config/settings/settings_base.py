@@ -28,9 +28,12 @@ BASE_APPS = [
 
 THIRD_PARTY_APPS = [
     "django_htmx",
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 MY_APPS = [
+    "account",
     "page",
 ]
 
@@ -66,12 +69,24 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = "account.User"
+LOGIN_URL = "page:login"
+LOGIN_REDIRECT_URL = "page:library"
+LOGOUT_REDIRECT_URL = "page:index"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST", default="localhost"),
+        "PORT": env("DB_PORT", default="5432"),
     }
 }
 
