@@ -1,0 +1,18 @@
+<section id="egitimler" aria-labelledby="egitim-baslik" class="py-5 bg-body-tertiary border-top border-bottom">
+  <div class="container py-lg-5">
+    <div class="row align-items-end g-3 mb-5">
+      <div class="col-lg-7"><h2 id="egitim-baslik" class="display-6 fw-semibold mb-0">Sıfırdan başla, gerçek projelerle uçtan uca öğren.</h2></div>
+      <div class="col-lg-5"><p class="lead text-body-secondary mb-0">Her kurs sıfırdan başlar ve projelerle ilerler. Sana uygun olanı seç.</p></div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+      {% for course in courses %}
+      <div class="col">
+        {% include "components/course_card.html" %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-end mt-4">
+      <a href="#egitimler" class="link-offset-2 fw-medium">Tüm kursları gör <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</section>

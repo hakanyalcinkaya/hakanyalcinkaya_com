@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Ortak katman: tema, veri ve bileşen yardımcıları. Bootstrap'ten sonra ve senkron yüklenir. -->
+<link rel="stylesheet" href="./assets/hy.css">
+<script src="./assets/hy.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Eğitimler — Hakan Yalçınkaya</title>
+<meta name="description" content="JavaScript, TypeScript ve Python eğitimleri: Front-End ve React 18.x, Python ve Django, Sıfırdan Python. Sıfırdan başla, projelerle öğren.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hakan Yalçınkaya">
+<meta property="og:title" content="Eğitimler — Hakan Yalçınkaya">
+<meta property="og:description" content="JavaScript, TypeScript ve Python eğitimleri. Sıfırdan başla, projelerle öğren.">
+<meta property="og:url" content="https://www.hakanyalcinkaya.dev/courses">
+<meta property="og:image" content="https://www.hakanyalcinkaya.dev/content-assets/public/eyJhbGciOiJIUzI1NiJ9.eyJvYmplY3Rfa2V5IjoiMGV4dG95bjBiMWtpNXdlamF3ZGdzY3IzaG9hbCIsImRvbWFpbiI6Ind3dy5oYWthbnlhbGNpbmtheWEuZGV2In0.hvzdBBCysCN5gl0Iv8pEQnxrynKN5xKJrc39SmoTCHU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.hakanyalcinkaya.dev/courses">
+</helmet>
+
+<a href="#icerik" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index:2000">İçeriğe geç</a>
+
+<nav class="navbar navbar-expand-lg sticky-top bg-body bg-opacity-75 navbar-blur border-bottom" aria-label="Ana menü">
+  <div class="container">
+    <a href="index_v2.dc.html" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6" aria-label="Hakan Yalçınkaya — Ana Sayfa">
+      <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
+      Hakan Yalçınkaya
+    </a>
+
+    <div class="d-flex align-items-center gap-2 order-lg-last">
+      <a href="https://www.hakanyalcinkaya.dev/account/sessions/new" class="btn btn-outline-secondary d-none d-lg-inline-flex">Giriş Yap</a>
+      <a href="cart.dc.html" class="btn btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1" aria-label="Sepet, {{ cartCount }} kurs"><i class="bi bi-bag" aria-hidden="true"></i><sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><span class="badge rounded-1 bg-primary" style="color:var(--hy-accent-on)" aria-hidden="true">{{ cartCount }}</span></sc-if></a>
+      <div class="dropdown" ref="{{ panelRef }}">
+        <button type="button" class="btn btn-outline-secondary" onClick="{{ togglePanel }}" aria-label="Tema ve vurgu rengi ayarları" aria-expanded="{{ panelOpen }}" aria-haspopup="dialog" aria-controls="tema-paneli"><i class="bi {{ themeIcon }}" aria-hidden="true"></i></button>
+        <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+          <div id="tema-paneli" role="dialog" aria-label="Görünüm ayarları" class="dropdown-menu dropdown-menu-end show p-3 shadow" data-bs-popper="static" style="width:264px">
+            <div class="small fw-semibold text-body-secondary mb-2">Tema</div>
+            <div role="radiogroup" aria-label="Tema" class="btn-group w-100">
+              <sc-for list="{{ themeOpts }}" as="t" hint-placeholder-count="2">
+                <button type="button" role="radio" aria-checked="{{ t.checked }}" onClick="{{ t.onClick }}" class="btn btn-outline-secondary {{ t.cls }}"><i class="bi {{ t.icon }} me-2" aria-hidden="true"></i>{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div class="small fw-semibold text-body-secondary mt-3 mb-2">Vurgu rengi</div>
+            <div role="radiogroup" aria-label="Vurgu rengi" class="row row-cols-4 g-2">
+              <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="4">
+                <div class="col"><button type="button" role="radio" aria-checked="{{ s.checked }}" aria-label="{{ s.label }}" title="{{ s.label }}" onClick="{{ s.onClick }}" class="btn w-100 border-0 rounded-1 py-2" style="background:{{ s.hex }};color:{{ s.on }};box-shadow:{{ s.ring }}"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:{{ s.vis }}"></i></button></div>
+              </sc-for>
+            </div>
+            <div class="small text-body-tertiary mt-3">{{ accentLabel }} · seçimin bu cihazda saklanır</div>
+          </div>
+        </sc-if>
+      </div>
+      <button type="button" class="btn btn-outline-secondary d-lg-none" onClick="{{ toggleMenu }}" aria-label="{{ menuLabel }}" aria-expanded="{{ menuOpen }}" aria-controls="mobil-menu"><i class="bi {{ menuIcon }}" aria-hidden="true"></i></button>
+    </div>
+
+    <div id="mobil-menu" class="collapse navbar-collapse {{ menuCls }}">
+      <ul class="navbar-nav mx-lg-auto gap-lg-3 pt-3 pt-lg-0">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+          <li class="nav-item"><a href="{{ n.href }}" aria-current="{{ n.current }}" onClick="{{ closeMenu }}" class="nav-link d-flex justify-content-between align-items-center {{ n.cls }}">{{ n.label }}<i class="bi bi-chevron-right small d-lg-none {{ n.chev }}" aria-hidden="true"></i></a></li>
+        </sc-for>
+        <li class="nav-item d-sm-none"><a href="cart.dc.html" class="nav-link d-flex justify-content-between align-items-center">Sepet<i class="bi bi-bag small text-body-tertiary" aria-hidden="true"></i></a></li>
+      </ul>
+      <div class="row g-2 py-3 d-lg-none">
+        <div class="col-6"><a href="https://www.hakanyalcinkaya.dev/account/sessions/new" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
+        <div class="col-6"><a href="https://www.hakanyalcinkaya.dev/p/join" class="btn btn-primary btn-lg fs-6 w-100">Kayıt Ol</a></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main id="icerik">
+
+<header class="py-5 border-bottom">
+  <div class="container pt-lg-4">
+    <nav aria-label="Sayfa konumu">
+      <ol class="breadcrumb small mb-4">
+        <li class="breadcrumb-item"><a href="index_v2.dc.html" class="link-secondary text-decoration-none">Ana Sayfa</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Eğitimler</li>
+      </ol>
+    </nav>
+    <div class="row align-items-end g-4">
+      <div class="col-lg-7">
+        <h1 class="display-4 fw-semibold lh-1 mb-0">Eğitimler</h1>
+        <p class="lead text-body-secondary mt-3 mb-0">JavaScript, TypeScript ve Python. Her eğitim sıfırdan başlar ve uçtan uca projelerle ilerler.</p>
+      </div>
+      <div class="col-lg-5">
+        <dl class="row row-cols-3 g-0 mb-0 ms-lg-auto" aria-label="Rakamlarla eğitimler" style="max-width:420px">
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.courses }}</dt><dd class="small text-body-tertiary mt-1 mb-0">eğitim</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">100+</dt><dd class="small text-body-tertiary mt-1 mb-0">saat video</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section aria-labelledby="liste-baslik" class="py-5 bg-body-tertiary border-bottom">
+  <div class="container">
+    <h2 id="liste-baslik" class="visually-hidden">Eğitim listesi</h2>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div role="radiogroup" aria-label="Konuya göre filtrele" class="btn-group" onKeyDown="{{ filterKey }}">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+          <button type="button" role="radio" aria-checked="{{ f.checked }}" tabindex="{{ f.tab }}" onClick="{{ f.onClick }}" class="btn btn-outline-secondary {{ f.cls }}">{{ f.label }} <span class="text-body-tertiary ms-1">{{ f.count }}</span></button>
+        </sc-for>
+      </div>
+      <p class="small text-body-tertiary mb-0" aria-live="polite">{{ resultText }}</p>
+    </div>
+
+    <div class="d-grid gap-3">
+      <sc-for list="{{ list }}" as="c" hint-placeholder-count="3">
+        <article class="card shadow overflow-hidden hover-lift" aria-labelledby="{{ c.hid }}">
+          <div class="row g-0">
+            <div class="col-md-5 col-lg-5">
+              <a href="{{ c.url }}" tabindex="-1" aria-label="{{ c.imgLabel }}" class="d-block h-100 bg-body-secondary">
+                <div class="ratio ratio-16x9 h-100">
+                  <img src="{{ c.img }}" alt="{{ c.alt }}" width="1280" height="720" loading="{{ c.loading }}" decoding="async" class="object-fit-cover">
+                </div>
+              </a>
+            </div>
+            <div class="col-md-7 col-lg-7 d-flex flex-column">
+              <div class="card-body p-4 p-lg-5 pb-lg-4">
+                <div class="d-flex flex-wrap gap-1">
+                  <sc-for list="{{ c.tags }}" as="tag" hint-placeholder-count="2"><span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span></sc-for>
+                </div>
+                <h3 id="{{ c.hid }}" class="h4 fw-semibold mt-3 mb-2"><a href="{{ c.url }}" class="link-body-emphasis text-decoration-none">{{ c.title }}</a></h3>
+                <p class="text-body-secondary mb-3" style="max-width:56ch">{{ c.desc }}</p>
+                <ul class="list-inline small text-body-secondary mb-0">
+                  <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span class="visually-hidden">Süre: </span>{{ c.duration }}</li>
+                  <li class="list-inline-item me-3"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i>{{ c.lessons }} ders</li>
+                  <li class="list-inline-item"><i class="bi bi-bar-chart me-1 text-body-tertiary" aria-hidden="true"></i>Sıfırdan başlar</li>
+                </ul>
+              </div>
+              <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 px-lg-5 py-3 mt-auto">
+                <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ c.price }}</div>
+                <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                  <a href="{{ c.cart }}" class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ c.cartLabel }}"><i class="bi bi-bag-plus me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></a>
+                  <a href="{{ c.url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Eğitimi İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div class="card text-center p-5">
+        <p class="fw-semibold mb-1">Bu konuda henüz eğitim yok.</p>
+        <p class="text-body-secondary mb-3">Yeni eğitimler eklendiğinde e-postayla haber vermemizi ister misin?</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button type="button" class="btn btn-outline-secondary" onClick="{{ showAll }}">Tüm eğitimleri göster</button>
+          <a href="#bulten" class="btn btn-primary">Bültene katıl</a>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<section aria-labelledby="yorum-baslik" class="py-5">
+  <div class="container py-lg-4">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-4">
+        <h2 id="yorum-baslik" class="display-6 fw-semibold">Eğitimleri alanlar ne diyor?</h2>
+        <a href="index_v2.dc.html#yorumlar" class="fw-medium link-offset-2">Tüm yorumları oku <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+      </div>
+      <div class="col-lg-8">
+        <figure class="card mb-0">
+          <div class="card-body p-4 p-lg-5">
+            <blockquote class="fs-5 mb-0">{{ quote.text }}</blockquote>
+          </div>
+          <figcaption class="card-footer bg-transparent d-flex align-items-center gap-2 fw-semibold px-4 px-lg-5 py-3">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis small" style="width:32px;height:32px" aria-hidden="true">{{ quote.initial }}</span>{{ quote.name }}
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bulten" aria-labelledby="bulten-baslik" class="pb-5">
+  <div class="container">
+    <div class="card bg-body-tertiary">
+      <div class="card-body p-4 p-lg-5">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <h2 id="bulten-baslik" class="h3 fw-semibold">Yeni eğitimlerden ilk sen haberdar ol.</h2>
+            <p class="text-body-secondary mb-0">Yeni yazılım eğitimleri, faydalı kaynaklar ve geliştirici içerikleri e-posta kutuna gelsin.</p>
+          </div>
+          <div class="col-lg-7">
+            <form novalidate="" onSubmit="{{ onSubmit }}" aria-describedby="bulten-not">
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <label for="bulten-isim" class="form-label small fw-medium text-body-secondary">İsim</label>
+                  <input id="bulten-isim" name="name" type="text" autocomplete="name" placeholder="Adın" value="{{ fName }}" onInput="{{ onName }}" aria-invalid="{{ nameInvalid }}" aria-describedby="bulten-isim-hata" class="form-control form-control-lg fs-6 {{ nameCls }}">
+                  <div id="bulten-isim-hata" role="alert" class="invalid-feedback d-block" style="min-height:1.25rem">{{ nameError }}</div>
+                </div>
+                <div class="col-sm-6">
+                  <label for="bulten-eposta" class="form-label small fw-medium text-body-secondary">E-posta</label>
+                  <input id="bulten-eposta" name="email" type="email" autocomplete="email" inputmode="email" placeholder="ornek@eposta.com" value="{{ fEmail }}" onInput="{{ onEmail }}" aria-invalid="{{ emailInvalid }}" aria-describedby="bulten-eposta-hata" class="form-control form-control-lg fs-6 {{ emailCls }}">
+                  <div id="bulten-eposta-hata" role="alert" class="invalid-feedback d-block" style="min-height:1.25rem">{{ emailError }}</div>
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-outline-secondary btn-lg fs-6 w-100">Abone Ol <i class="bi bi-send ms-1" aria-hidden="true"></i></button>
+                </div>
+              </div>
+              <sc-if value="{{ pending }}" hint-placeholder-val="{{ false }}">
+                <div role="status" class="alert alert-secondary d-flex gap-2 small mt-3 mb-0"><i class="bi bi-info-circle text-primary-emphasis" aria-hidden="true"></i><span>Bilgilerin doğrulandı, ancak abonelik servisi henüz bağlı değil — kayıt yapılmadı. <span class="font-monospace">[PLACEHOLDER: backend entegrasyonu]</span></span></div>
+              </sc-if>
+              <p id="bulten-not" class="small text-body-tertiary mt-3 mb-0">İstediğin zaman abonelikten çıkabilirsin. <a href="https://www.hakanyalcinkaya.dev/privacy">Gizlilik Politikası</a></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="border-top py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a href="index_v2.dc.html" class="d-inline-flex align-items-center gap-2 fw-semibold link-body-emphasis text-decoration-none"><span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>Hakan Yalçınkaya</a>
+        <p class="small text-body-secondary mt-3" style="max-width:34ch">#Yazılım ve #Üretkenlik odaklı eğitimlerle kendini geliştir. <span class="font-monospace text-body-tertiary">[Kodla] =&gt; Üret</span></p>
+        <ul class="list-unstyled d-flex gap-2 mb-0" aria-label="Sosyal medya">
+          <li><a class="btn btn-outline-secondary" href="https://youtube.com/hakanyalcinkaya/" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube" aria-hidden="true"></i></a></li>
+          <li><a class="btn btn-outline-secondary" href="https://www.linkedin.com/in/hakanyalcinkaya/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a></li>
+          <li><a class="btn btn-outline-secondary" href="https://www.instagram.com/hakanyalcinkayadev" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-7 col-lg-4">
+        <h2 class="h6 fw-semibold mb-3">Eğitimler</h2>
+        <ul class="list-unstyled d-grid gap-2 small mb-0">
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/sifirdan-projelerle-front-end-ve-react-18-x-ogren">Front-End ve React 18.x</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/sifirdan-uctan-uca-projelerle-python-ve-django-ogren">Python ve Django</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/iki-egitmen-ile-sifirdan-python-ogren">Sıfırdan Python</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="courses.dc.html">Tüm eğitimler</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-5 col-lg-3">
+        <h2 class="h6 fw-semibold mb-3">Hesap</h2>
+        <ul class="list-unstyled d-grid gap-2 small mb-0">
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/account/sessions/new">Giriş Yap</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/p/join">Kayıt Ol</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="cart.dc.html">Sepet</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between gap-3 border-top mt-5 pt-4 small text-body-tertiary">
+      <span>© {{ year }} Hakan Yalçınkaya. Tüm hakları saklıdır.</span>
+      <div class="d-flex gap-3">
+        <a class="text-body-tertiary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/privacy">Gizlilik Politikası</a>
+        <a class="text-body-tertiary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/terms">Kullanım Şartları</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const H = window.HY;
+const FILTERS = [['all', 'Tümü'], ['frontend', 'Front-End'], ['python', 'Python']];
+// Bu sayfada "Eğitimler" sabit aktif; diğer öğeler ana sayfadaki bölümlere gider.
+const NAV = [['egitimler', 'courses.dc.html', 'Eğitimler'], ['yorumlar', 'index_v2.dc.html#yorumlar', 'Öğrenci Yorumları'], ['hakkimda', 'index_v2.dc.html#hakkimda', 'Hakkımda']];
+
+class Component extends DCLogic {
+  state = H.initState({ filter: 'all' });
+  panelRef = React.createRef();
+
+  componentDidMount() { H.mount(this); }
+  componentWillUnmount() { H.unmount(this); }
+
+  renderVals() {
+    const s = this.state;
+    const C = H.COURSES.map((c, i) => ({ ...c, loading: i < 2 ? 'eager' : 'lazy' }));
+    const list = s.filter === 'all' ? C : C.filter((c) => c.topic === s.filter);
+    const fi = FILTERS.findIndex(([k]) => k === s.filter);
+    const go = (i) => this.setState({ filter: FILTERS[(i + FILTERS.length) % FILTERS.length][0] });
+    return {
+      ...H.chrome(this, NAV, 'egitimler'),
+      ...H.newsletter(this),
+      stats: H.stats,
+      filters: FILTERS.map(([k, label], i) => { const on = s.filter === k;
+        return { label, count: k === 'all' ? C.length : C.filter((c) => c.topic === k).length,
+          checked: on ? 'true' : 'false', tab: on ? 0 : -1, cls: on ? 'active' : 'text-body-secondary', onClick: () => go(i) }; }),
+      filterKey: (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); go(fi + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); go(fi - 1); }
+      },
+      list, empty: list.length === 0, showAll: () => this.setState({ filter: 'all' }),
+      resultText: list.length + ' eğitim gösteriliyor',
+      quote: H.REVIEWS[0]
+    };
+  }
+}
+</script>
+</body>
+</html>

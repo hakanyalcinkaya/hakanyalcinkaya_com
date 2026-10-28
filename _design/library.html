@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Ortak katman: tema, veri ve bileşen yardımcıları. Bootstrap'ten sonra ve senkron yüklenir. -->
+<link rel="stylesheet" href="./assets/hy.css">
+<script src="./assets/hy.js"></script>
+<!-- Sahip olunan kursların müfredatı (ilerleme ve "kaldığın yer" için). Hepsi HY_DETAILS kaydına eklenir. -->
+<script src="./assets/data/sifirdan-projelerle-front-end-ve-react-18-x-ogren.js"></script>
+<script src="./assets/data/sifirdan-uctan-uca-projelerle-python-ve-django-ogren.js"></script>
+<script src="./assets/data/iki-egitmen-ile-sifirdan-python-ogren.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Kurslarım — Hakan Yalçınkaya</title>
+<meta name="robots" content="noindex">
+</helmet>
+
+<a href="#icerik" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index:2000">İçeriğe geç</a>
+
+<!-- Üst çubuk (giriş yapmış): logo · Tüm Kurslar · Kurslarım (aktif) · tema · hesap menüsü -->
+<nav class="navbar sticky-top bg-body bg-opacity-75 navbar-blur border-bottom py-0" style="min-height:var(--hy-nav-h);--bs-navbar-padding-y:0px" aria-label="Ana menü">
+  <div class="container flex-nowrap align-self-stretch gap-2 gap-md-3">
+    <a href="index_v2.dc.html" class="navbar-brand me-0" aria-label="Hakan Yalçınkaya — Ana Sayfa">
+      <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
+    </a>
+    <ul class="navbar-nav flex-row align-self-stretch gap-2 gap-sm-3 ms-sm-2">
+      <sc-for list="{{ topNav }}" as="n" hint-placeholder-count="2">
+        <li class="nav-item d-flex"><a href="{{ n.href }}" aria-current="{{ n.current }}" class="nav-link d-flex align-items-center text-nowrap {{ n.cls }}">{{ n.label }}</a></li>
+      </sc-for>
+    </ul>
+
+    <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
+      <div class="dropdown" ref="{{ panelRef }}">
+        <button type="button" class="btn btn-outline-secondary" onClick="{{ togglePanel }}" aria-label="Tema ve vurgu rengi ayarları" aria-expanded="{{ panelOpen }}" aria-haspopup="dialog" aria-controls="tema-paneli"><i class="bi {{ themeIcon }}" aria-hidden="true"></i></button>
+        <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+          <div id="tema-paneli" role="dialog" aria-label="Görünüm ayarları" class="dropdown-menu dropdown-menu-end show p-3 shadow" data-bs-popper="static" style="width:264px">
+            <div class="small fw-semibold text-body-secondary mb-2">Tema</div>
+            <div role="radiogroup" aria-label="Tema" class="btn-group w-100">
+              <sc-for list="{{ themeOpts }}" as="t" hint-placeholder-count="2">
+                <button type="button" role="radio" aria-checked="{{ t.checked }}" onClick="{{ t.onClick }}" class="btn btn-outline-secondary {{ t.cls }}"><i class="bi {{ t.icon }} me-2" aria-hidden="true"></i>{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div class="small fw-semibold text-body-secondary mt-3 mb-2">Vurgu rengi</div>
+            <div role="radiogroup" aria-label="Vurgu rengi" class="row row-cols-4 g-2">
+              <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="4">
+                <div class="col"><button type="button" role="radio" aria-checked="{{ s.checked }}" aria-label="{{ s.label }}" title="{{ s.label }}" onClick="{{ s.onClick }}" class="btn w-100 border-0 rounded-1 py-2" style="background:{{ s.hex }};color:{{ s.on }};box-shadow:{{ s.ring }}"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:{{ s.vis }}"></i></button></div>
+              </sc-for>
+            </div>
+            <div class="small text-body-tertiary mt-3">{{ accentLabel }} · seçimin bu cihazda saklanır</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div class="dropdown" ref="{{ userRef }}">
+        <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" onClick="{{ toggleUser }}" aria-expanded="{{ userOpen }}" aria-haspopup="menu" aria-controls="hesap-menusu" aria-label="Hesap menüsü">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small" style="width:24px;height:24px" aria-hidden="true">{{ user.initial }}</span>
+          <span class="d-none d-xl-inline">Hesabım</span><i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
+        </button>
+        <sc-if value="{{ userOpen }}" hint-placeholder-val="{{ false }}">
+          <ul id="hesap-menusu" class="dropdown-menu dropdown-menu-end show shadow py-2" data-bs-popper="static" style="min-width:248px">
+            <li class="px-3 pt-1 pb-2"><div class="fw-semibold small">{{ user.name }}</div><div class="small text-body-tertiary text-truncate">{{ user.email }}</div></li>
+            <li><hr class="dropdown-divider"></li>
+            <sc-for list="{{ userMenu }}" as="m" hint-placeholder-count="4">
+              <sc-if value="{{ m.divider }}" hint-placeholder-val="{{ false }}"><li><hr class="dropdown-divider"></li></sc-if>
+              <li><a href="{{ m.href }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi {{ m.icon }} text-body-tertiary" aria-hidden="true"></i>{{ m.label }}</a></li>
+            </sc-for>
+          </ul>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main id="icerik" class="container py-5">
+  <header class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+    <div>
+      <h1 class="display-6 fw-semibold mb-1">Kurslarım</h1>
+      <p class="text-body-secondary mb-0">{{ summary }}</p>
+    </div>
+    <a href="courses.dc.html" class="btn btn-outline-secondary">Tüm Kurslar</a>
+  </header>
+  <sc-if value="{{ sampleUsed }}" hint-placeholder-val="{{ false }}">
+    <p class="small text-body-tertiary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Bu cihazda gerçek ilerleme kaydı olmayan kurslarda örnek ilerleme gösteriliyor. <span class="font-monospace">[ÖRNEK VERİ]</span></p>
+  </sc-if>
+
+  <!-- ============ 1. VERSİYON: devam kartı + tüm kurslar + notlar ============ -->
+  <sc-if value="{{ isV1 }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ hasContinue }}" hint-placeholder-val="{{ true }}">
+      <section class="card shadow overflow-hidden mt-4" aria-labelledby="devam-baslik">
+        <div class="row g-0">
+          <div class="col-md-5">
+            <a href="{{ cont.href }}" class="d-block h-100 position-relative bg-body-secondary" aria-label="{{ cont.playLabel }}">
+              <div class="ratio ratio-16x9 h-100"><img src="{{ cont.img }}" alt="" width="1280" height="720" class="object-fit-cover"></div>
+              <span class="position-absolute top-50 start-50 translate-middle btn btn-primary btn-lg px-4" aria-hidden="true"><i class="bi bi-play-fill fs-4 lh-1"></i></span>
+            </a>
+          </div>
+          <div class="col-md-7 d-flex flex-column">
+            <div class="card-body p-4 p-lg-5">
+              <div class="small text-body-tertiary">{{ cont.kicker }}</div>
+              <h2 id="devam-baslik" class="h4 fw-semibold mt-1">{{ cont.title }}</h2>
+              <p class="text-body-secondary mb-0"><span class="fw-medium text-body">{{ cont.lessonLabel }}</span> {{ cont.lessonTitle }}<br><span class="small">{{ cont.section }}</span></p>
+              <div class="d-flex justify-content-between small mt-4 mb-2"><span class="fw-semibold">İlerleme</span><span class="text-body-secondary">%{{ cont.pct }} · {{ cont.done }}/{{ cont.total }} ders</span></div>
+              <div class="progress" style="height:6px" role="progressbar" aria-label="{{ cont.progressLabel }}" aria-valuenow="{{ cont.pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary" style="width:{{ cont.pct }}%"></div></div>
+            </div>
+            <div class="card-footer bg-transparent d-flex flex-wrap gap-2 px-4 px-lg-5 py-3 mt-auto">
+              <a href="{{ cont.href }}" class="btn btn-primary btn-lg fs-6">{{ cont.cta }} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+              <a href="{{ cont.courseHref }}" class="btn btn-outline-secondary btn-lg fs-6">Kurs sayfası</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <div class="row g-4 g-lg-5 mt-1">
+      <section class="col-lg-8" aria-labelledby="kurslar-baslik">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <h2 id="kurslar-baslik" class="h5 fw-semibold mb-0">Tüm kurslarım</h2>
+          <div role="radiogroup" aria-label="Kurs filtresi" class="btn-group btn-group-sm">
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{ f.checked }}" onClick="{{ f.onClick }}" class="btn btn-outline-secondary {{ f.cls }}">{{ f.label }} <span class="text-body-tertiary">{{ f.count }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+          <sc-for list="{{ ownedShown }}" as="c" hint-placeholder-count="3">
+            <div class="col">
+              <article class="card h-100 overflow-hidden hover-lift">
+                <a href="{{ c.href }}" class="ratio ratio-16x9 bg-body-secondary border-bottom" tabindex="-1" aria-hidden="true">
+                  <img src="{{ c.img }}" alt="" width="1280" height="720" loading="lazy" class="object-fit-cover">
+                </a>
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center gap-2 small">
+                    <span class="badge rounded-1 fw-medium {{ c.stateCls }}">{{ c.stateLabel }}</span>
+                    <span class="text-body-tertiary">{{ c.meta }}</span>
+                  </div>
+                  <h3 class="h6 fw-semibold mt-2 mb-3"><a href="{{ c.courseHref }}" class="link-body-emphasis text-decoration-none">{{ c.title }}</a></h3>
+                  <div class="progress" style="height:6px" role="progressbar" aria-label="{{ c.progressLabel }}" aria-valuenow="{{ c.pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary" style="width:{{ c.pct }}%"></div></div>
+                  <div class="d-flex justify-content-between small text-body-secondary mt-2"><span>%{{ c.pct }} tamamlandı</span><span>{{ c.done }}/{{ c.total }} ders</span></div>
+                </div>
+                <div class="card-footer bg-transparent px-4 py-3">
+                  <a href="{{ c.href }}" class="btn btn-primary w-100">{{ c.cta }}</a>
+                </div>
+              </article>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ ownedEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="text-center border rounded p-5 mt-3">
+            <i class="bi bi-collection-play fs-2 text-body-tertiary" aria-hidden="true"></i>
+            <p class="fw-semibold mt-2 mb-1">{{ emptyTitle }}</p>
+            <p class="small text-body-secondary mb-3">{{ emptyText }}</p>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ showAll }}">Tüm kurslarımı göster</button>
+          </div>
+        </sc-if>
+      </section>
+
+      <aside class="col-lg-4" aria-labelledby="not-baslik">
+        <div class="d-flex align-items-center justify-content-between gap-2">
+          <h2 id="not-baslik" class="h5 fw-semibold mb-0">Son notların</h2>
+          <span class="small text-body-tertiary">{{ noteTotal }} not</span>
+        </div>
+        <sc-if value="{{ hasNotes }}" hint-placeholder-val="{{ false }}">
+          <ul class="list-group mt-3">
+            <sc-for list="{{ notes }}" as="n" hint-placeholder-count="3">
+              <li class="list-group-item bg-transparent p-3">
+                <div class="d-flex flex-wrap align-items-center gap-2 small text-body-tertiary">
+                  <span class="badge rounded-1 fw-medium {{ n.scopeCls }}">{{ n.scopeLabel }}</span><span>{{ n.date }}</span>
+                </div>
+                <p class="small mt-2 mb-1" style="white-space:pre-line">{{ n.text }}</p>
+                <a href="{{ n.href }}" class="small text-truncate d-block">{{ n.where }}</a>
+              </li>
+            </sc-for>
+          </ul>
+        </sc-if>
+        <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ true }}">
+          <div class="border rounded p-4 mt-3 text-center">
+            <i class="bi bi-journal-text fs-3 text-body-tertiary" aria-hidden="true"></i>
+            <p class="fw-semibold small mt-2 mb-1">Henüz not almadın.</p>
+            <p class="small text-body-secondary mb-0">Ders izlerken aldığın notlar burada, derslerine bağlantılarıyla görünür.</p>
+          </div>
+        </sc-if>
+        <p class="small text-body-tertiary mt-3 mb-0">İlerleme ve notlar şimdilik yalnızca bu tarayıcıda saklanır. <span class="font-monospace">[PLACEHOLDER: hesapla eşitleme]</span></p>
+      </aside>
+    </div>
+
+    <sc-if value="{{ hasOthers }}" hint-placeholder-val="{{ true }}">
+      <section class="mt-5 pt-4 border-top" aria-labelledby="diger-baslik">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2">
+          <div>
+            <h2 id="diger-baslik" class="h5 fw-semibold mb-1">Alabileceğin kurslar</h2>
+            <p class="small text-body-secondary mb-0">Henüz almadığın kurslar. Hepsi sıfırdan başlar ve projelerle ilerler.</p>
+          </div>
+          <a href="courses.dc.html" class="small fw-medium">Tüm Kurslar <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+          <sc-for list="{{ others }}" as="c" hint-placeholder-count="1">
+            <div class="col">
+              <a href="{{ c.url }}" class="card h-100 flex-row align-items-center gap-3 p-3 text-decoration-none hover-lift">
+                <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ true }}"><img src="{{ c.img }}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:128px;height:72px"></sc-if>
+                <sc-if value="{{ c.noImg }}" hint-placeholder-val="{{ false }}"><span class="rounded-1 border bg-body-tertiary flex-shrink-0 d-flex align-items-center justify-content-center text-body-tertiary" style="width:128px;height:72px" aria-hidden="true"><i class="bi bi-image"></i></span></sc-if>
+                <span class="flex-grow-1 min-w-0">
+                  <span class="d-block fw-semibold text-body">{{ c.short }}</span>
+                  <span class="d-block small text-body-tertiary">{{ c.metaLine }}</span>
+                </span>
+                <span class="fw-semibold text-body d-none d-sm-inline">{{ c.price }}</span>
+              </a>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+  </sc-if>
+
+  <!-- ============ 2. VERSİYON: devam eden kurslarım + alabileceğim kurslar (tekrar yok) ============ -->
+  <sc-if value="{{ isV2 }}" hint-placeholder-val="{{ false }}">
+    <section class="mt-4" aria-labelledby="devam-eden-baslik">
+      <div class="d-flex align-items-baseline justify-content-between gap-2">
+        <h2 id="devam-eden-baslik" class="h5 fw-semibold mb-0">Devam eden kurslarım</h2>
+        <span class="small text-body-tertiary">{{ ownedCount }} kurs</span>
+      </div>
+      <div class="d-grid gap-3 mt-3">
+        <sc-for list="{{ ownedAll }}" as="c" hint-placeholder-count="3">
+          <article class="card overflow-hidden hover-lift">
+            <div class="row g-0">
+              <div class="col-sm-4 col-lg-3">
+                <a href="{{ c.href }}" class="d-block h-100 position-relative bg-body-secondary" aria-label="{{ c.playLabel }}">
+                  <div class="ratio ratio-16x9 h-100"><img src="{{ c.img }}" alt="" width="1280" height="720" loading="lazy" class="object-fit-cover"></div>
+                  <span class="position-absolute top-50 start-50 translate-middle btn btn-primary px-3" aria-hidden="true"><i class="bi bi-play-fill fs-5 lh-1"></i></span>
+                </a>
+              </div>
+              <div class="col-sm-8 col-lg-9">
+                <div class="card-body p-4 h-100 d-flex flex-column flex-lg-row gap-3 gap-lg-4">
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex flex-wrap align-items-center gap-2 small">
+                      <span class="badge rounded-1 fw-medium {{ c.stateCls }}">{{ c.stateLabel }}</span>
+                      <span class="text-body-tertiary">{{ c.meta }}</span>
+                    </div>
+                    <h3 class="h5 fw-semibold mt-2 mb-1"><a href="{{ c.courseHref }}" class="link-body-emphasis text-decoration-none">{{ c.title }}</a></h3>
+                    <p class="small text-body-secondary mb-3 text-truncate"><span class="fw-medium text-body">{{ c.lessonLabel }}</span> {{ c.lessonTitle }}</p>
+                    <div class="progress" style="height:6px" role="progressbar" aria-label="{{ c.progressLabel }}" aria-valuenow="{{ c.pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary" style="width:{{ c.pct }}%"></div></div>
+                    <div class="d-flex justify-content-between small text-body-secondary mt-2"><span>%{{ c.pct }} tamamlandı</span><span>{{ c.done }}/{{ c.total }} ders</span></div>
+                  </div>
+                  <div class="d-flex flex-lg-column gap-2 flex-shrink-0 align-self-lg-center" style="min-width:160px">
+                    <a href="{{ c.href }}" class="btn btn-primary flex-grow-1">{{ c.cta }}</a>
+                    <a href="{{ c.courseHref }}" class="btn btn-outline-secondary flex-grow-1">Kurs sayfası</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+
+    <sc-if value="{{ hasOthers }}" hint-placeholder-val="{{ true }}">
+      <section class="mt-5 pt-4 border-top" aria-labelledby="alinabilir-baslik">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2">
+          <div>
+            <h2 id="alinabilir-baslik" class="h5 fw-semibold mb-1">Alabileceğim kurslar</h2>
+            <p class="small text-body-secondary mb-0">Henüz almadığın kurslar. Hepsi sıfırdan başlar ve projelerle ilerler.</p>
+          </div>
+          <a href="courses.dc.html" class="small fw-medium">Tüm Kurslar <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mt-1">
+          <sc-for list="{{ others }}" as="c" hint-placeholder-count="1">
+            <div class="col">
+              <article class="card h-100 overflow-hidden hover-lift">
+                <a href="{{ c.url }}" class="ratio ratio-16x9 bg-body-tertiary border-bottom" tabindex="-1" aria-hidden="true">
+                  <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ true }}"><img src="{{ c.img }}" alt="" width="1280" height="720" loading="lazy" class="object-fit-cover"></sc-if>
+                  <sc-if value="{{ c.noImg }}" hint-placeholder-val="{{ false }}"><span class="d-flex align-items-center justify-content-center text-body-tertiary"><i class="bi bi-image fs-3"></i></span></sc-if>
+                </a>
+                <div class="card-body p-4">
+                  <div class="d-flex flex-wrap gap-1">
+                    <sc-for list="{{ c.tags }}" as="tag" hint-placeholder-count="2"><span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span></sc-for>
+                  </div>
+                  <h3 class="h6 fw-semibold mt-2 mb-1"><a href="{{ c.url }}" class="link-body-emphasis text-decoration-none">{{ c.title }}</a></h3>
+                  <p class="small text-body-tertiary mb-0">{{ c.metaLine }}</p>
+                </div>
+                <div class="card-footer bg-transparent d-flex align-items-center justify-content-between gap-2 px-4 py-3">
+                  <span class="fs-5 fw-semibold">{{ c.price }}</span>
+                  <div class="d-flex gap-2">
+                    <a href="{{ c.cart }}" class="btn btn-outline-secondary" aria-label="{{ c.cartLabel }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></a>
+                    <a href="{{ c.url }}" class="btn btn-primary">İncele</a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+  </sc-if>
+</main>
+
+<footer class="border-top py-4">
+  <div class="container d-flex flex-wrap justify-content-between gap-3 small text-body-tertiary">
+    <span>© {{ year }} Hakan Yalçınkaya</span>
+    <div class="d-flex gap-3">
+      <a class="text-body-tertiary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/privacy">Gizlilik Politikası</a>
+      <a class="text-body-tertiary text-decoration-none link-hover" href="https://www.hakanyalcinkaya.dev/terms">Kullanım Şartları</a>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;surum&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;2&quot;],&quot;default&quot;:&quot;1&quot;,&quot;tsType&quot;:&quot;'1' | '2'&quot;,&quot;section&quot;:&quot;Görünüm&quot;},&quot;ornekIlerleme&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Görünüm&quot;}}">
+// Kurslarım: giriş yapmış öğrencinin kütüphanesi. İki sürüm:
+//   1 (varsayılan) — kaldığın yer kartı, tüm kurslarım, son notlar, alabileceğin kurslar
+//   2 (?surum=2)   — devam eden kurslarım (her kurs kendi devam kartıyla, tekrar yok) + alabileceğim kurslar
+// İlerleme, "kaldığın yer" ve notlar ders oynatıcısıyla aynı tarayıcı kaydından okunur.
+const H = window.HY;
+const A = H.ACCOUNT;
+const params = new URLSearchParams(location.search);
+// [PLACEHOLDER: hesaptaki kurslar] Canlıda öğrencinin satın aldığı kurslardan gelecek.
+const OWNED = ['sifirdan-projelerle-front-end-ve-react-18-x-ogren', 'sifirdan-uctan-uca-projelerle-python-ve-django-ogren', 'iki-egitmen-ile-sifirdan-python-ogren'];
+// Ders oynatıcısı tasarımı yalnızca React kursu için hazır; diğer kurslarda dersler canlı sitede açılır.
+const LOCAL_PLAYER = 'sifirdan-projelerle-front-end-ve-react-18-x-ogren';
+// [ÖRNEK VERİ] Katalogda başka kurs olmadığı için "alınabilir" bölümünü göstermek üzere eklenen örnek kurs. Canlıya taşınmaz.
+const SAMPLE_AVAILABLE = [{ slug: 'ornek-kurs', title: '[ÖRNEK] Yeni kursun adı buraya gelecek', short: '[ÖRNEK] Yeni kurs',
+  tags: ['Örnek'], metaLine: '[süre] · [ders sayısı]', price: '[fiyat]', img: '', url: 'courses.dc.html', cart: 'courses.dc.html',
+  cartLabel: 'Örnek kurs — sepete ekle' }];
+// [ÖRNEK VERİ] Bu cihazda gerçek kayıt yoksa farklı durumları göstermek için bellekte kullanılan ilerleme (kaydedilmez).
+// done: baştan kaç ders tamamlandı; last: kaçıncı ders en son izlendi.
+const SAMPLE_PROGRESS = {
+  'sifirdan-projelerle-front-end-ve-react-18-x-ogren': { done: 140, last: 141, at: 3 },
+  'sifirdan-uctan-uca-projelerle-python-ve-django-ogren': { done: 40, last: 41, at: 2 }
+};
+const NAV = [['Tüm Kurslar', 'courses.dc.html', false], ['Kurslarım', A.library, true]];
+const FILTERS = [['all', 'Tümü'], ['active', 'Devam eden'], ['done', 'Tamamlanan']];
+const fmt = (ms) => new Date(ms).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+// Bir kursun ilerleme özeti: tamamlanan, sıradaki ders, son izlenen. Gerçek kayıt yoksa ve izin verildiyse örnek ilerleme.
+function progressOf(course, allowSample) {
+  const d = (window.HY_DETAILS || {})[course.slug];
+  const lessons = d ? H.lessons(d) : [];
+  let doneIds = H.load('hy-done-' + course.slug, []);
+  let lastId = H.load('hy-last-' + course.slug, null);
+  let sample = false, at = lastId ? 9 : 0;
+  const ex = SAMPLE_PROGRESS[course.slug];
+  if (allowSample && !doneIds.length && !lastId && ex && lessons.length) {
+    doneIds = lessons.slice(0, ex.done).map((l) => l.id);
+    lastId = (lessons[ex.last - 1] || {}).id;
+    sample = true; at = ex.at;
+  }
+  const done = new Set(doneIds);
+  const doneCount = lessons.filter((l) => done.has(l.id)).length;
+  const last = lessons.find((l) => l.id === lastId);
+  const firstOpen = lessons.find((l) => !done.has(l.id));
+  // Son izlenen ders bitmediyse ona, bittiyse sıradaki tamamlanmamış derse dönülür.
+  const target = (last && !done.has(last.id)) ? last : (firstOpen || lessons[0]);
+  const total = lessons.length || course.lessons;
+  const pct = lessons.length ? Math.round((doneCount / lessons.length) * 100) : 0;
+  const state = !doneCount && !last ? 'new' : (lessons.length && !firstOpen ? 'done' : 'active');
+  return { lessons, doneCount, total, pct, target, last, state, sample, at };
+}
+const lessonLink = (course, l) => (course.slug === LOCAL_PLAYER ? H.lessonHref(l.id, false) : l.live);
+const courseLink = (course) => (course.slug === LOCAL_PLAYER ? 'course.dc.html?oturum=acik' : course.url);
+
+class Component extends DCLogic {
+  state = H.initState({ filter: 'all', userOpen: false });
+  panelRef = React.createRef();
+  userRef = React.createRef();
+
+  componentDidMount() { H.mount(this); }
+  componentWillUnmount() { H.unmount(this); }
+
+  version() { const v = params.get('surum'); return v === '2' || (!v && this.props.surum === '2') ? 2 : 1; }
+
+  renderVals() {
+    const s = this.state;
+    const allowSample = params.get('ornek') !== '0' && this.props.ornekIlerleme !== false;
+    // Son etkinliğe göre sıralı: en son izlenen kurs en üstte.
+    const owned = H.COURSES.filter((c) => OWNED.includes(c.slug)).map((c) => ({ c, p: progressOf(c, allowSample) }))
+      .sort((a, b) => b.p.at - a.p.at);
+    const label = { new: 'Başlanmadı', active: 'Devam ediyor', done: 'Tamamlandı' };
+    const cls = { new: 'bg-body-tertiary text-body-secondary border', active: 'bg-primary-subtle text-primary-emphasis', done: 'bg-success-subtle text-success-emphasis' };
+    const cta = (p) => (p.state === 'new' ? 'Eğitime başla' : p.state === 'done' ? 'Baştan izle' : 'Devam et');
+    const href = (c, p) => (p.target ? lessonLink(c, p.target) : courseLink(c));
+    const card = ({ c, p }) => {
+      const t = p.target;
+      return { title: c.title, img: c.img, href: href(c, p), courseHref: courseLink(c), pct: p.pct, done: p.doneCount, total: p.total,
+        meta: c.duration, cta: cta(p), stateLabel: label[p.state], stateCls: cls[p.state], progressLabel: c.short + ' ilerlemesi',
+        lessonLabel: p.last && t && p.last.id === t.id ? 'Kaldığın ders:' : (p.state === 'new' ? 'İlk ders:' : 'Sıradaki ders:'),
+        lessonTitle: t ? t.n + '. ' + t.title : '', playLabel: cta(p) + ': ' + c.title };
+    };
+    const match = (p) => s.filter === 'all' || (s.filter === 'done' ? p.state === 'done' : p.state !== 'done');
+    const shown = owned.filter(({ p }) => match(p));
+
+    // Devam kartı (1. sürüm): son izlenen dersi olan kurs öncelikli.
+    const pick = owned.find(({ p }) => p.last) || owned[0];
+    const cont = pick && (() => {
+      const { c, p } = pick, t = p.target;
+      return { ...card(pick), kicker: p.state === 'new' ? 'Henüz başlamadın' : 'Kaldığın yerden devam et',
+        section: t ? t.section : '' };
+    })();
+
+    // Notlar: sahip olunan kurslardaki tüm notlar, en yeniden.
+    const all = [];
+    owned.forEach(({ c, p }) => {
+      const byId = Object.fromEntries(p.lessons.map((l) => [l.id, l]));
+      H.load('hy-notes-' + c.slug, []).forEach((n) => {
+        const l = byId[n.lessonId];
+        all.push({ at: n.at, text: n.text, date: fmt(n.at),
+          scopeLabel: n.scope === 'course' ? 'Eğitim geneli' : 'Ders notu',
+          scopeCls: n.scope === 'course' ? 'bg-body-tertiary text-body-secondary border' : 'bg-primary-subtle text-primary-emphasis',
+          where: n.scope === 'course' ? c.short : (l ? l.n + '. ' + l.title : c.short),
+          href: l ? lessonLink(c, l) : courseLink(c) });
+      });
+    });
+    all.sort((a, b) => b.at - a.at);
+
+    const others = H.COURSES.filter((c) => !OWNED.includes(c.slug)).concat(SAMPLE_AVAILABLE)
+      .map((c) => ({ ...c, hasImg: !!c.img, noImg: !c.img }));
+    const avg = owned.length ? Math.round(owned.reduce((n, { p }) => n + p.pct, 0) / owned.length) : 0;
+    const v = this.version();
+    return {
+      ...H.chrome(this, [], ''),
+      ...H.account(this, true),
+      topNav: NAV.map(([l, h, on]) => ({ label: l, href: h, current: on ? 'page' : undefined, cls: on ? 'active' : '' })),
+      isV1: v === 1, isV2: v === 2,
+      summary: owned.length + ' kurs · ortalama %' + avg + ' tamamlandı',
+      sampleUsed: owned.some(({ p }) => p.sample),
+      hasContinue: !!cont, cont: cont || {},
+      filters: FILTERS.map(([k, l]) => ({ label: l, count: owned.filter(({ p }) => k === 'all' || (k === 'done' ? p.state === 'done' : p.state !== 'done')).length,
+        checked: s.filter === k ? 'true' : 'false', cls: s.filter === k ? 'active' : 'text-body-secondary', onClick: () => this.setState({ filter: k }) })),
+      ownedShown: shown.map(card), ownedAll: owned.map(card), ownedCount: owned.length,
+      ownedEmpty: shown.length === 0,
+      emptyTitle: s.filter === 'done' ? 'Henüz tamamladığın kurs yok.' : 'Devam eden kursun yok.',
+      emptyText: s.filter === 'done' ? 'Bir kursun tüm derslerini bitirdiğinde burada görünür.' : 'Başladığın kurslar burada listelenir.',
+      showAll: () => this.setState({ filter: 'all' }),
+      notes: all.slice(0, 4), noteTotal: all.length, hasNotes: all.length > 0, noNotes: all.length === 0,
+      others, hasOthers: others.length > 0
+    };
+  }
+}
+</script>
+</body>
+</html>

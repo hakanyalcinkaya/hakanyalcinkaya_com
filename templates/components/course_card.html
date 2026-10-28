@@ -1,0 +1,26 @@
+{% load static %}
+<article class="card h-100 shadow overflow-hidden hover-lift">
+  <a href="{{ course.url }}" aria-label="{{ course.image_label }}" tabindex="-1" class="ratio ratio-16x9 bg-body-secondary border-bottom">
+    <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" loading="{% if forloop.counter <= 3 %}eager{% else %}lazy{% endif %}" decoding="async" class="object-fit-cover">
+  </a>
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap gap-1">
+      {% for tag in course.tags %}
+      <span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    <h3 class="h5 fw-semibold mt-3 mb-2"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h3>
+    <p class="text-body-secondary mb-3">{{ course.description }}</p>
+    <ul class="list-inline small text-body-secondary mb-0">
+      <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span class="visually-hidden">Süre: </span>{{ course.duration }}</li>
+      <li class="list-inline-item"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders</li>
+    </ul>
+  </div>
+  <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 py-3">
+    <div class="fs-4 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+    <div class="d-flex gap-2">
+      <a href="{{ course.cart_url }}" class="btn btn-outline-secondary" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></a>
+      <a href="{{ course.url }}" class="btn btn-primary">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</article>

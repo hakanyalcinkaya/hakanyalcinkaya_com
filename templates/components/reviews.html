@@ -1,0 +1,75 @@
+<section id="yorumlar" data-reviews aria-labelledby="yorum-baslik" aria-roledescription="carousel" class="py-5">
+  <div class="container py-lg-5">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+      <div>
+        <h2 id="yorum-baslik" class="display-6 fw-semibold mb-1">Kursları alanlar ne diyor?</h2>
+        <p class="small text-body-tertiary mb-0">Toplam {{ reviews|length }} yorum</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="small text-body-tertiary me-1" data-review-pos aria-live="polite"></span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-review-prev disabled aria-label="Önceki yorumlar"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-review-next disabled aria-label="Sonraki yorumlar"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+      </div>
+    </div>
+
+    <div class="row gx-3 mt-3" data-review-skeleton aria-busy="true">
+      <span class="visually-hidden" role="status">Yorumlar yükleniyor</span>
+      <div class="col-12 col-md-4">
+        <div class="card h-100" aria-hidden="true">
+          <div class="card-body p-4 placeholder-glow">
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-11"></span>
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-9"></span>
+            <span class="placeholder rounded-1 col-6"></span>
+          </div>
+          <div class="card-footer bg-transparent d-flex align-items-center gap-2 px-4 py-3 placeholder-glow">
+            <span class="placeholder rounded-1" style="width:32px;height:32px"></span>
+            <span class="placeholder rounded-1 col-4"></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 d-none d-md-block">
+        <div class="card h-100" aria-hidden="true">
+          <div class="card-body p-4 placeholder-glow">
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-10"></span>
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-8"></span>
+            <span class="placeholder rounded-1 col-5"></span>
+          </div>
+          <div class="card-footer bg-transparent d-flex align-items-center gap-2 px-4 py-3 placeholder-glow">
+            <span class="placeholder rounded-1" style="width:32px;height:32px"></span>
+            <span class="placeholder rounded-1 col-4"></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 d-none d-md-block">
+        <div class="card h-100" aria-hidden="true">
+          <div class="card-body p-4 placeholder-glow">
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-11"></span>
+            <span class="placeholder rounded-1 col-9"></span>
+            <span class="placeholder rounded-1 col-12"></span>
+            <span class="placeholder rounded-1 col-7"></span>
+          </div>
+          <div class="card-footer bg-transparent d-flex align-items-center gap-2 px-4 py-3 placeholder-glow">
+            <span class="placeholder rounded-1" style="width:32px;height:32px"></span>
+            <span class="placeholder rounded-1 col-4"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden mt-3 d-none" data-review-ready>
+      <div class="d-flex" data-review-track style="transition:transform .5s cubic-bezier(.22,.8,.24,1)">
+        {% for review in reviews %}
+        <div class="px-2" data-review-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ reviews|length }}: {{ review.name }}">
+          {% include "components/review_card.html" %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="d-none justify-content-center gap-1 mt-3" data-review-dots role="group" aria-label="Yorum sayfaları"></div>
+  </div>
+</section>

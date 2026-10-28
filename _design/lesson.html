@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Ortak katman: tema, veri ve bileşen yardımcıları. Bootstrap'ten sonra ve senkron yüklenir. -->
+<link rel="stylesheet" href="./assets/hy.css">
+<script src="./assets/hy.js"></script>
+<!-- Eğitime özel içerik ve müfredat. -->
+<script src="./assets/data/sifirdan-projelerle-front-end-ve-react-18-x-ogren.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Ders — Sıfırdan Projelerle Front-End ve React 18.x Öğren</title>
+<meta name="robots" content="noindex">
+</helmet>
+
+<a href="#icerik" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index:2000">İçeriğe geç</a>
+
+<!-- Üst çubuk. Giriş yapmış öğrenci: Eğitimlerim, Tüm eğitimler, ilerleme, hesap menüsü.
+     Giriş yapmamış ziyaretçi (eğitimi almamış sayılır): Tüm eğitimler, Giriş Yap, satın alma. -->
+<nav class="navbar sticky-top bg-body bg-opacity-75 navbar-blur border-bottom py-0" style="min-height:var(--hy-nav-h);--bs-navbar-padding-y:0px" aria-label="Ana menü">
+  <div class="container-fluid flex-nowrap align-self-stretch gap-2 gap-md-3 px-3 px-md-4">
+    <a href="index_v2.dc.html" class="navbar-brand me-0" aria-label="Hakan Yalçınkaya — Ana Sayfa">
+      <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
+    </a>
+    <ul class="navbar-nav flex-row align-self-stretch gap-3 d-none d-lg-flex ms-2">
+      <sc-for list="{{ topNav }}" as="n" hint-placeholder-count="2">
+        <li class="nav-item d-flex"><a href="{{ n.href }}" aria-current="{{ n.current }}" class="nav-link d-flex align-items-center {{ n.cls }}">{{ n.label }}</a></li>
+      </sc-for>
+    </ul>
+
+    <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
+      <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+        <div class="d-none d-xl-flex align-items-center gap-2 small text-body-secondary me-2" aria-label="{{ progressLabel }}">
+          <div class="progress" style="width:120px;height:6px" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary" style="width:{{ pct }}%"></div></div>
+          <span class="text-nowrap">%{{ pct }} · {{ doneCount }}/{{ total }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+        <span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium d-none d-xl-inline">Ücretsiz önizleme</span>
+        <a href="{{ account.login }}" class="btn btn-outline-secondary d-none d-md-inline-flex">Giriş Yap</a>
+        <a href="{{ course.buy }}" class="btn btn-primary d-none d-sm-inline-flex">Eğitimi satın al · {{ course.price }}</a>
+      </sc-if>
+
+      <div class="dropdown" ref="{{ panelRef }}">
+        <button type="button" class="btn btn-outline-secondary" onClick="{{ togglePanel }}" aria-label="Tema ve vurgu rengi ayarları" aria-expanded="{{ panelOpen }}" aria-haspopup="dialog" aria-controls="tema-paneli"><i class="bi {{ themeIcon }}" aria-hidden="true"></i></button>
+        <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+          <div id="tema-paneli" role="dialog" aria-label="Görünüm ayarları" class="dropdown-menu dropdown-menu-end show p-3 shadow" data-bs-popper="static" style="width:264px">
+            <div class="small fw-semibold text-body-secondary mb-2">Tema</div>
+            <div role="radiogroup" aria-label="Tema" class="btn-group w-100">
+              <sc-for list="{{ themeOpts }}" as="t" hint-placeholder-count="2">
+                <button type="button" role="radio" aria-checked="{{ t.checked }}" onClick="{{ t.onClick }}" class="btn btn-outline-secondary {{ t.cls }}"><i class="bi {{ t.icon }} me-2" aria-hidden="true"></i>{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div class="small fw-semibold text-body-secondary mt-3 mb-2">Vurgu rengi</div>
+            <div role="radiogroup" aria-label="Vurgu rengi" class="row row-cols-4 g-2">
+              <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="4">
+                <div class="col"><button type="button" role="radio" aria-checked="{{ s.checked }}" aria-label="{{ s.label }}" title="{{ s.label }}" onClick="{{ s.onClick }}" class="btn w-100 border-0 rounded-1 py-2" style="background:{{ s.hex }};color:{{ s.on }};box-shadow:{{ s.ring }}"><i class="bi bi-check-lg" aria-hidden="true" style="visibility:{{ s.vis }}"></i></button></div>
+              </sc-for>
+            </div>
+            <div class="small text-body-tertiary mt-3">{{ accentLabel }} · seçimin bu cihazda saklanır</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- Hesap menüsü: giriş yapmışta tam menü, giriş yapmamışta yalnızca küçük ekranda -->
+      <div class="dropdown {{ userWrapCls }}" ref="{{ userRef }}">
+        <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" onClick="{{ toggleUser }}" aria-expanded="{{ userOpen }}" aria-haspopup="menu" aria-controls="hesap-menusu" aria-label="{{ userButtonLabel }}">
+          <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small" style="width:24px;height:24px" aria-hidden="true">{{ user.initial }}</span>
+            <span class="d-none d-xl-inline">Hesabım</span>
+          </sc-if>
+          <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}"><i class="bi bi-person" aria-hidden="true"></i></sc-if>
+          <i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
+        </button>
+        <sc-if value="{{ userOpen }}" hint-placeholder-val="{{ false }}">
+          <ul id="hesap-menusu" class="dropdown-menu dropdown-menu-end show shadow py-2" data-bs-popper="static" style="min-width:248px">
+            <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+              <li class="px-3 pt-1 pb-2">
+                <div class="fw-semibold small">{{ user.name }}</div>
+                <div class="small text-body-tertiary text-truncate">{{ user.email }}</div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+            </sc-if>
+            <sc-for list="{{ userMenu }}" as="m" hint-placeholder-count="4">
+              <sc-if value="{{ m.divider }}" hint-placeholder-val="{{ false }}"><li><hr class="dropdown-divider"></li></sc-if>
+              <li><a href="{{ m.href }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi {{ m.icon }} text-body-tertiary" aria-hidden="true"></i>{{ m.label }}</a></li>
+            </sc-for>
+          </ul>
+        </sc-if>
+      </div>
+
+      <button type="button" class="btn btn-outline-secondary d-lg-none" onClick="{{ toggleMenu }}" aria-expanded="{{ menuOpen }}" aria-controls="ders-listesi"><i class="bi bi-list-ul" aria-hidden="true"></i><span class="d-none d-sm-inline ms-2">Dersler</span><span class="visually-hidden d-sm-none">Ders listesi</span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-0">
+  <div class="row g-0">
+
+    <!-- Oynatıcı ve ders içeriği -->
+    <main id="icerik" class="col-lg-8 col-xxl-9">
+      <div class="bg-black">
+        <sc-if value="{{ playable }}" hint-placeholder-val="{{ true }}">
+          <div class="ratio ratio-16x9 mx-auto" style="max-width:1280px">
+            <div class="d-flex align-items-center justify-content-center overflow-hidden">
+              <img src="{{ course.img }}" alt="" width="1280" height="720" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
+              <div class="position-relative text-center text-white px-3">
+                <button type="button" class="btn btn-primary btn-lg px-4 py-3" aria-label="{{ playLabel }}"><i class="bi bi-play-fill fs-2 lh-1" aria-hidden="true"></i></button>
+                <div class="small mt-3 opacity-75 font-monospace">[PLACEHOLDER: Cloudflare Stream oynatıcı]</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
+          <div class="position-relative d-flex align-items-center justify-content-center text-center text-white overflow-hidden mx-auto p-4" style="aspect-ratio:16/9;min-height:340px;max-width:1280px">
+            <img src="{{ course.img }}" alt="" width="1280" height="720" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
+            <div class="position-relative" style="max-width:520px">
+              <i class="bi bi-lock fs-1" aria-hidden="true"></i>
+              <h2 class="h4 fw-semibold mt-2">Bu ders eğitimin tam sürümünde</h2>
+              <p class="opacity-75 mb-4">{{ total }} dersin tamamına ve her bölümdeki projelere erişmek için eğitime kaydol. Kaydolduktan sonra izlemeye hemen başlayabilirsin.</p>
+              <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="{{ course.buy }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol · {{ course.price }}</a>
+                <button type="button" class="btn btn-outline-light btn-lg fs-6" onClick="{{ backToPreview }}">Ücretsiz önizlemeye dön</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div class="px-3 px-md-4 px-xl-5 py-4 mx-auto" style="max-width:1100px">
+        <!-- Ders başlığı ve gezinme -->
+        <nav aria-label="Ders konumu">
+          <ol class="breadcrumb small mb-1">
+            <li class="breadcrumb-item"><a href="course.dc.html" class="link-secondary text-decoration-none">{{ course.short }}</a></li>
+            <li class="breadcrumb-item text-body-tertiary">{{ cur.section }}</li>
+            <li class="breadcrumb-item active" aria-current="page">Ders {{ cur.n }}/{{ total }}</li>
+          </ol>
+        </nav>
+        <div class="d-flex flex-wrap align-items-start gap-2 mt-1">
+          <h1 class="h3 fw-semibold mb-0 me-auto">{{ cur.title }}</h1>
+          <sc-if value="{{ curIsPreview }}" hint-placeholder-val="{{ false }}">
+            <span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium mt-1">Ücretsiz önizleme</span>
+          </sc-if>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+          <button type="button" class="btn btn-outline-secondary" onClick="{{ prevGo }}" disabled="{{ noPrev }}"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ prevLabel }}</button>
+          <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+            <button type="button" class="btn btn-outline-secondary" onClick="{{ toggleDone }}" aria-pressed="{{ donePressed }}"><i class="bi {{ doneIcon }} me-2" aria-hidden="true"></i>{{ doneLabel }}</button>
+          </sc-if>
+          <button type="button" class="btn btn-primary ms-sm-auto" onClick="{{ nextGo }}" disabled="{{ noNext }}">{{ nextLabel }} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></button>
+        </div>
+        <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+          <p class="small text-body-tertiary text-sm-end mt-2 mb-0">Sıradaki: {{ next.title }}</p>
+        </sc-if>
+
+        <!-- KAYITLI ÖĞRENCİ: notlar ve ders bilgisi -->
+        <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+          <ul class="nav nav-underline border-bottom mt-4" role="tablist">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+              <li class="nav-item" role="presentation"><button type="button" role="tab" aria-selected="{{ t.selected }}" onClick="{{ t.onClick }}" class="nav-link py-3 {{ t.cls }}">{{ t.label }}</button></li>
+            </sc-for>
+          </ul>
+
+          <sc-if value="{{ tabNotes }}" hint-placeholder-val="{{ true }}">
+            <section class="pt-4" aria-label="Notlar">
+              <label for="not-metni" class="form-label fw-semibold">Not al</label>
+              <textarea id="not-metni" class="form-control" rows="3" placeholder="{{ draftPlaceholder }}" value="{{ draft }}" onInput="{{ onDraft }}" onKeyDown="{{ onDraftKey }}"></textarea>
+              <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                <div role="radiogroup" aria-label="Not kapsamı" class="btn-group btn-group-sm">
+                  <sc-for list="{{ scopes }}" as="o" hint-placeholder-count="2">
+                    <button type="button" role="radio" aria-checked="{{ o.checked }}" onClick="{{ o.onClick }}" class="btn btn-outline-secondary {{ o.cls }}"><i class="bi {{ o.icon }} me-1" aria-hidden="true"></i>{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <span class="small text-body-tertiary d-none d-md-inline ms-auto">⌘/Ctrl + Enter ile kaydet</span>
+                <button type="button" class="btn btn-primary btn-sm ms-auto ms-md-0" onClick="{{ saveDraft }}" disabled="{{ draftEmpty }}">Notu kaydet</button>
+              </div>
+
+              <sc-if value="{{ undoNote }}" hint-placeholder-val="{{ false }}">
+                <div role="status" class="alert alert-secondary d-flex align-items-center gap-2 py-2 small mt-3 mb-0">Not silindi.<button type="button" class="btn btn-link btn-sm p-0 ms-auto" onClick="{{ onUndo }}">Geri al</button></div>
+              </sc-if>
+
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-4">
+                <h2 class="h6 fw-semibold mb-0">Notların</h2>
+                <div role="radiogroup" aria-label="Gösterilen notlar" class="btn-group btn-group-sm">
+                  <sc-for list="{{ noteViews }}" as="v" hint-placeholder-count="3">
+                    <button type="button" role="radio" aria-checked="{{ v.checked }}" onClick="{{ v.onClick }}" class="btn btn-outline-secondary {{ v.cls }}">{{ v.label }} <span class="text-body-tertiary">{{ v.count }}</span></button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <ul class="list-group list-group-flush border-top mt-3">
+                <sc-for list="{{ notesList }}" as="n" hint-placeholder-count="2">
+                  <li class="list-group-item bg-transparent px-0 py-3">
+                    <div class="d-flex flex-wrap align-items-center gap-2 small text-body-tertiary">
+                      <span class="badge rounded-1 fw-medium {{ n.scopeCls }}">{{ n.scopeLabel }}</span>
+                      <span>{{ n.date }}</span>
+                      <sc-if value="{{ n.showLesson }}" hint-placeholder-val="{{ false }}">
+                        <span>·</span><a href="{{ n.lessonHref }}" onClick="{{ n.goLesson }}" class="text-truncate min-w-0">{{ n.lessonTitle }}</a>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ n.notEditing }}" hint-placeholder-val="{{ true }}">
+                      <p class="mt-2 mb-1" style="white-space:pre-line">{{ n.text }}</p>
+                      <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-link btn-sm p-0 link-secondary" onClick="{{ n.onEdit }}">Düzenle</button>
+                        <button type="button" class="btn btn-link btn-sm p-0 link-secondary" onClick="{{ n.onDelete }}">Sil</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ n.editing }}" hint-placeholder-val="{{ false }}">
+                      <textarea class="form-control mt-2" rows="3" aria-label="Notu düzenle" value="{{ n.editText }}" onInput="{{ n.onEditInput }}"></textarea>
+                      <div class="d-flex gap-2 mt-2">
+                        <button type="button" class="btn btn-primary btn-sm" onClick="{{ n.onEditSave }}">Kaydet</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ n.onEditCancel }}">Vazgeç</button>
+                      </div>
+                    </sc-if>
+                  </li>
+                </sc-for>
+              </ul>
+              <sc-if value="{{ notesEmpty }}" hint-placeholder-val="{{ false }}">
+                <div class="text-center text-body-secondary border rounded p-4 mt-3">
+                  <i class="bi bi-journal-text fs-3 text-body-tertiary" aria-hidden="true"></i>
+                  <p class="fw-semibold text-body mt-2 mb-1">{{ emptyTitle }}</p>
+                  <p class="small mb-0">{{ emptyText }}</p>
+                </div>
+              </sc-if>
+              <p class="small text-body-tertiary mt-3 mb-0">Notların şimdilik yalnızca bu tarayıcıda saklanır. <span class="font-monospace">[PLACEHOLDER: hesapla eşitleme]</span></p>
+            </section>
+          </sc-if>
+
+          <sc-if value="{{ tabInfo }}" hint-placeholder-val="{{ false }}">
+            <section class="pt-4" aria-label="Ders bilgisi">
+              <dl class="row small mb-0">
+                <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Eğitim</dt><dd class="col-sm-8 col-lg-9"><a href="course.dc.html">{{ course.title }}</a></dd>
+                <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Bölüm</dt><dd class="col-sm-8 col-lg-9">{{ cur.section }} · {{ sectionNo }}. bölüm</dd>
+                <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Sıra</dt><dd class="col-sm-8 col-lg-9">{{ cur.n }}. ders / {{ total }}</dd>
+                <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Bölüm ilerlemesi</dt><dd class="col-sm-8 col-lg-9">{{ sectionProgress }}</dd>
+                <dt class="col-sm-4 col-lg-3 fw-medium text-body-secondary">Bu derse ait not</dt><dd class="col-sm-8 col-lg-9 mb-0">{{ lessonNoteCount }}</dd>
+              </dl>
+            </section>
+          </sc-if>
+        </sc-if>
+
+        <!-- ÖNİZLEME: hızlı geçiş şeridi ve satın alma yönlendirmesi -->
+        <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+          <section class="mt-4 pt-2" aria-labelledby="onizleme-baslik">
+            <div class="d-flex align-items-baseline justify-content-between gap-2">
+              <h2 id="onizleme-baslik" class="h6 fw-semibold mb-0">Ücretsiz önizleme dersleri</h2>
+              <span class="small text-body-tertiary">{{ previewCount }} ders · satın almadan izle</span>
+            </div>
+            <div class="row flex-nowrap overflow-x-auto scrollbar-none g-2 pb-2 mt-1" data-strip>
+              <sc-for list="{{ strip }}" as="p" hint-placeholder-count="6">
+                <div class="col-9 col-sm-5 col-xl-3">
+                  <a href="{{ p.href }}" onClick="{{ p.go }}" aria-current="{{ p.current }}" class="card h-100 p-3 text-decoration-none hover-lift {{ p.cardCls }}">
+                    <span class="small text-body-tertiary text-truncate">{{ p.meta }}</span>
+                    <span class="small fw-medium text-body mt-1">{{ p.title }}</span>
+                  </a>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <section class="card bg-body-tertiary mt-4" aria-labelledby="satin-al-baslik">
+            <div class="card-body p-4">
+              <div class="row g-4 align-items-center">
+                <div class="col-md-7">
+                  <h2 id="satin-al-baslik" class="h4 fw-semibold">Eğitimin tamamına eriş</h2>
+                  <p class="text-body-secondary">Bu ders, {{ total }} derslik eğitimin parçası. {{ sectionTotal }} bölüm, {{ course.duration }} video ve her bölümde proje.</p>
+                  <ul class="list-unstyled d-grid gap-2 small mb-0">
+                    <sc-for list="{{ learnTop }}" as="l" hint-placeholder-count="3">
+                      <li class="d-flex gap-2"><i class="bi bi-check2 text-primary-emphasis" aria-hidden="true"></i><span>{{ l }}</span></li>
+                    </sc-for>
+                  </ul>
+                </div>
+                <div class="col-md-5">
+                  <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+                  <div class="d-grid gap-2 mt-3">
+                    <a href="{{ course.buy }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                    <a href="{{ course.cart }}" class="btn btn-outline-secondary"><i class="bi bi-bag-plus me-2" aria-hidden="true"></i>Sepete Ekle</a>
+                  </div>
+                  <div class="d-flex flex-wrap gap-3 small mt-3">
+                    <a href="course.dc.html">Eğitim detayları</a>
+                    <a href="{{ detail.discount.url }}">İndirim kodunu uygula</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Öğrenci yorumları: üçlü kayan alan (mobilde tekli), yüklenirken iskelet -->
+          <section class="mt-5" aria-labelledby="yorum-baslik" aria-roledescription="carousel" onMouseEnter="{{ revPause }}" onMouseLeave="{{ revResume }}" onFocusCapture="{{ revPause }}" onBlurCapture="{{ revResume }}">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+              <div>
+                <h2 id="yorum-baslik" class="h5 fw-semibold mb-1">Öğrenciler ne diyor?</h2>
+                <p class="small text-body-tertiary mb-0">Toplam {{ reviewTotal }} yorum · <a href="course.dc.html#yorumlar">Tümünü gör</a></p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="small text-body-tertiary me-1" aria-live="polite">{{ revPos }}</span>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ revPrev }}" disabled="{{ revLoading }}" aria-label="Önceki yorumlar"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onClick="{{ revNext }}" disabled="{{ revLoading }}" aria-label="Sonraki yorumlar"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+              </div>
+            </div>
+
+            <sc-if value="{{ revLoading }}" hint-placeholder-val="{{ false }}">
+              <div class="row gx-3 mt-3" aria-busy="true">
+                <span class="visually-hidden" role="status">Yorumlar yükleniyor</span>
+                <sc-for list="{{ revSkel }}" as="k" hint-placeholder-count="3">
+                  <div class="col-12 col-md-4 {{ k.cls }}">
+                    <div class="card h-100" aria-hidden="true">
+                      <div class="card-body p-4 placeholder-glow">
+                        <span class="placeholder rounded-1 col-12"></span>
+                        <span class="placeholder rounded-1 col-11"></span>
+                        <span class="placeholder rounded-1 col-12"></span>
+                        <span class="placeholder rounded-1 col-9"></span>
+                        <span class="placeholder rounded-1 col-6"></span>
+                      </div>
+                      <div class="card-footer bg-transparent d-flex align-items-center gap-2 px-4 py-3 placeholder-glow">
+                        <span class="placeholder rounded-1" style="width:28px;height:28px"></span>
+                        <span class="placeholder rounded-1 col-4"></span>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ revReady }}" hint-placeholder-val="{{ true }}">
+              <div class="overflow-hidden mt-3">
+                <div class="row flex-nowrap gx-3" style="transform:translateX({{ revX }});transition:transform .5s cubic-bezier(.22,.8,.24,1)">
+                  <sc-for list="{{ revItems }}" as="r" hint-placeholder-count="6">
+                    <div class="col-12 col-md-4" role="group" aria-roledescription="slide" aria-label="{{ r.label }}" aria-hidden="{{ r.hidden }}">
+                      <figure class="card h-100 mb-0">
+                        <div class="card-body p-4"><blockquote class="small mb-0" style="white-space:pre-line">{{ r.text }}</blockquote></div>
+                        <figcaption class="card-footer bg-transparent d-flex align-items-center gap-2 small fw-semibold px-4 py-3">
+                          <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis" style="width:28px;height:28px" aria-hidden="true">{{ r.initial }}</span>{{ r.name }}
+                        </figcaption>
+                      </figure>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="d-flex justify-content-center gap-1 mt-3" role="group" aria-label="Yorum sayfaları">
+                <sc-for list="{{ revDots }}" as="d" hint-placeholder-count="2">
+                  <button type="button" class="btn border-0 p-2" onClick="{{ d.go }}" aria-label="{{ d.label }}" aria-current="{{ d.current }}"><span class="d-block rounded-1" style="width:{{ d.w }};height:4px;background:{{ d.bg }};transition:width .3s"></span></button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </section>
+          <div class="d-lg-none" style="height:72px" aria-hidden="true"></div>
+        </sc-if>
+      </div>
+    </main>
+
+    <!-- Ders listesi: geniş ekranda sağ sütun, küçük ekranda yandan açılan panel -->
+    <aside id="ders-listesi" class="col-lg-4 col-xxl-3 border-start offcanvas-lg offcanvas-end {{ menuCls }}" tabindex="-1" aria-label="Ders listesi">
+      <div class="offcanvas-header border-bottom d-lg-none">
+        <h2 class="offcanvas-title h6 fw-semibold mb-0">Ders listesi</h2>
+        <button type="button" class="btn-close" onClick="{{ closeMenu }}" aria-label="Ders listesini kapat"></button>
+      </div>
+      <div class="offcanvas-body p-0">
+        <div class="hy-sidebar d-flex flex-column w-100">
+          <div class="p-3 border-bottom">
+            <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+              <div class="d-flex justify-content-between small mb-2"><span class="fw-semibold">İlerlemen</span><span class="text-body-secondary">%{{ pct }} · {{ doneCount }}/{{ total }} ders</span></div>
+              <div class="progress mb-3" style="height:6px" role="progressbar" aria-label="Eğitim ilerlemesi" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar bg-primary" style="width:{{ pct }}%"></div></div>
+            </sc-if>
+            <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+              <div class="small mb-3"><span class="fw-semibold">Ücretsiz önizleme</span><span class="text-body-secondary"> · {{ previewCount }} ders açık, {{ lockedCount }} ders kayıtla açılır</span></div>
+            </sc-if>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-transparent"><i class="bi bi-search" aria-hidden="true"></i></span>
+              <input type="search" class="form-control" placeholder="Derslerde ara" aria-label="Derslerde ara" value="{{ q }}" onInput="{{ onSearch }}">
+            </div>
+            <sc-if value="{{ isEnrolled }}" hint-placeholder-val="{{ true }}">
+              <div role="radiogroup" aria-label="Ders filtresi" class="btn-group btn-group-sm w-100 mt-2">
+                <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+                  <button type="button" role="radio" aria-checked="{{ f.checked }}" onClick="{{ f.onClick }}" class="btn btn-outline-secondary {{ f.cls }}">{{ f.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ filtering }}" hint-placeholder-val="{{ false }}">
+              <p class="small text-body-tertiary mt-2 mb-0" aria-live="polite">{{ shownText }}</p>
+            </sc-if>
+          </div>
+
+          <div class="flex-grow-1 overflow-y-auto position-relative" data-side-scroll>
+            <!-- Önizlemede ücretsiz dersler en üstte -->
+            <sc-if value="{{ showPreviewGroup }}" hint-placeholder-val="{{ false }}">
+              <div class="px-3 pt-3 pb-1 small fw-semibold text-body-secondary">Ücretsiz önizleme dersleri</div>
+              <div class="list-group list-group-flush">
+                <sc-for list="{{ previewItems }}" as="l" hint-placeholder-count="6">
+                  <a href="{{ l.href }}" onClick="{{ l.go }}" aria-current="{{ l.current }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 px-3 py-2 small {{ l.cls }}">
+                    <i class="bi {{ l.icon }} mt-1" aria-hidden="true"></i>
+                    <span class="min-w-0"><span class="d-block">{{ l.title }}</span><span class="d-block text-body-tertiary text-truncate">{{ l.meta }}</span></span>
+                  </a>
+                </sc-for>
+              </div>
+              <div class="px-3 pt-4 pb-2 small fw-semibold text-body-secondary border-top mt-3">Tüm müfredat · {{ total }} ders</div>
+            </sc-if>
+
+            <div class="accordion accordion-flush">
+              <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="18">
+                <div class="accordion-item {{ sec.hide }}">
+                  <h3 class="accordion-header">
+                    <button type="button" class="accordion-button px-3 py-3 {{ sec.btnCls }}" aria-expanded="{{ sec.exp }}" aria-controls="{{ sec.id }}" onClick="{{ sec.toggle }}">
+                      <span class="me-2 min-w-0"><span class="d-block small fw-semibold">{{ sec.no }}. {{ sec.name }}</span><span class="d-block small text-body-tertiary mt-1">{{ sec.meta }}</span></span>
+                    </button>
+                  </h3>
+                  <div id="{{ sec.id }}" class="accordion-collapse collapse {{ sec.show }}">
+                    <div class="list-group list-group-flush pb-2">
+                      <sc-for list="{{ sec.items }}" as="l" hint-placeholder-count="8">
+                        <a href="{{ l.href }}" onClick="{{ l.go }}" aria-current="{{ l.current }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 px-3 py-2 small {{ l.cls }}">
+                          <i class="bi {{ l.icon }} mt-1" aria-hidden="true"></i><span class="visually-hidden">{{ l.status }}: </span>
+                          <span class="flex-grow-1">{{ l.title }}</span>
+                          <sc-if value="{{ l.hasNote }}" hint-placeholder-val="{{ false }}"><i class="bi bi-journal-text text-body-tertiary mt-1" title="Bu derste notun var" aria-label="Notun var"></i></sc-if>
+                        </a>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ noMatch }}" hint-placeholder-val="{{ false }}">
+              <div class="text-center small text-body-secondary p-4">
+                <p class="fw-semibold text-body mb-1">{{ noMatchText }}</p>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onClick="{{ clearFilters }}">Filtreleri temizle</button>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+            <div class="border-top p-3 d-none d-lg-block">
+              <div class="d-flex align-items-center gap-3">
+                <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+                <a href="{{ course.buy }}" class="btn btn-primary flex-grow-1">Hemen Kaydol</a>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </aside>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div class="offcanvas-backdrop fade show d-lg-none" onClick="{{ closeMenu }}"></div>
+    </sc-if>
+  </div>
+</div>
+
+<!-- Önizleme: mobil satın alma çubuğu -->
+<sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+  <div class="fixed-bottom d-lg-none bg-body bg-opacity-75 navbar-blur border-top">
+    <div class="container-fluid d-flex align-items-center gap-3 py-2 px-3">
+      <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+      <a href="{{ course.buy }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Hemen Kaydol</a>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;access&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;kayitli&quot;,&quot;onizleme&quot;],&quot;default&quot;:&quot;kayitli&quot;,&quot;tsType&quot;:&quot;'kayitli' | 'onizleme'&quot;,&quot;section&quot;:&quot;Erişim&quot;}}">
+// Tek şablon, iki sürüm: kayıtlı öğrenci (ilerleme, notlar, tam müfredat) ve önizleme (ücretsiz dersler, satın alma yönlendirmesi).
+// Sürüm adresle seçilir: ?erisim=onizleme | ?erisim=kayitli; adres yoksa "access" özelliği. Ders: ?ders=<kimlik>
+const H = window.HY;
+const D = window.HY_DETAIL;
+const C = H.course(D.slug);
+const L = H.lessons(D);
+const BY_ID = Object.fromEntries(L.map((l) => [l.id, l]));
+const PREVIEWS = L.filter((l) => l.preview);
+const SECTIONS = D.curriculum.map(([name], i) => ({ i, name, lessons: L.filter((l) => l.si === i) }));
+const DEFAULT_LESSON = '7588944';
+const KEY_DONE = 'hy-done-' + D.slug;
+const KEY_NOTES = 'hy-notes-' + D.slug;
+const params = new URLSearchParams(location.search);
+const lower = (t) => t.toLocaleLowerCase('tr');
+const fmt = (ms) => new Date(ms).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const A = H.ACCOUNT;
+// Üst menü: logo · Tüm Kurslar · Kurslarım · kurs adı (aktif). "Kurslarım" giriş gerektirir, ziyaretçide gösterilmez.
+const NAV_IN = [['Tüm Kurslar', 'courses.dc.html', false], ['Kurslarım', A.library, false], [C.short, 'course.dc.html', true]];
+const NAV_OUT = [['Tüm Kurslar', 'courses.dc.html', false], [C.short, 'course.dc.html', true]];
+
+class Component extends DCLogic {
+  state = (() => {
+    const id = BY_ID[params.get('ders')] ? params.get('ders') : DEFAULT_LESSON;
+    return H.initState({ cur: id, open: { [BY_ID[id].si]: true }, q: '', filter: 'all', tab: 'notes',
+      done: H.load(KEY_DONE, []), notes: H.load(KEY_NOTES, []), draft: '', scope: 'lesson', noteView: 'lesson',
+      editing: null, editText: '', undo: null, userOpen: false, ...H.reviewState() });
+  })();
+  panelRef = React.createRef();
+  userRef = React.createRef();
+
+  componentDidMount() {
+    H.mount(this);
+    this.remember(this.state.cur);
+    this.scrollSide();
+    H.mountReviews(this);
+  }
+  componentWillUnmount() {
+    H.unmount(this);
+    H.unmountReviews(this);
+  }
+
+  preview() {
+    const u = params.get('erisim');
+    if (u === 'onizleme') return true;
+    if (u === 'kayitli') return false;
+    return this.props.access === 'onizleme';
+  }
+
+  // Ders listesinde ve önizleme şeridinde geçerli dersi görünür alana getirir.
+  scrollSide() {
+    setTimeout(() => {
+      const box = document.querySelector('[data-side-scroll]');
+      const el = box && box.querySelector('[aria-current="true"]');
+      if (box && el) box.scrollTop = Math.max(0, el.offsetTop - box.clientHeight / 2);
+      const strip = document.querySelector('[data-strip]');
+      const card = strip && strip.querySelector('[aria-current="true"]');
+      if (strip && card) strip.scrollLeft = Math.max(0, card.parentElement.offsetLeft - strip.offsetLeft - 8);
+    }, 60);
+  }
+
+  // Kayıtlı öğrencide son izlenen ders saklanır; Kurslarım'daki "kaldığın yerden devam et" bunu kullanır.
+  remember(id) { if (!this.preview()) H.save('hy-last-' + D.slug, id); }
+
+  go(id, e) {
+    if (e) e.preventDefault();
+    const l = BY_ID[id];
+    if (!l) return;
+    this.remember(id);
+    this.setState((st) => ({ cur: id, menuOpen: false, editing: null, open: { ...st.open, [l.si]: true } }));
+    try { history.replaceState(null, '', H.lessonHref(id, this.preview())); } catch (err) {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.scrollSide();
+  }
+
+  setDone(done) { H.save(KEY_DONE, done); this.setState({ done }); }
+  setNotes(notes, extra) { H.save(KEY_NOTES, notes); this.setState({ notes, ...(extra || {}) }); }
+
+  saveDraft() {
+    const st = this.state, text = st.draft.trim();
+    if (!text) return;
+    const note = { id: Date.now().toString(36), scope: st.scope, lessonId: st.cur, text, at: Date.now() };
+    this.setNotes([note, ...st.notes], { draft: '', undo: null, noteView: st.noteView === 'all' ? 'all' : st.scope });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const preview = this.preview();
+    const cur = BY_ID[s.cur];
+    const locked = preview && !cur.preview;
+    const done = new Set(s.done);
+    const noted = new Set(s.notes.filter((n) => n.scope === 'lesson').map((n) => n.lessonId));
+    const doneCount = L.filter((l) => done.has(l.id)).length;
+    const pct = Math.round((doneCount / L.length) * 100);
+
+    // Önceki/sonraki: önizlemede yalnızca ücretsiz dersler arasında gezinilir.
+    const next = preview ? PREVIEWS.find((l) => l.n > cur.n) : L[cur.n];
+    const prev = preview ? PREVIEWS.filter((l) => l.n < cur.n).pop() : L[cur.n - 2];
+
+    const q = lower(s.q.trim());
+    const filtering = !!q || (!preview && s.filter !== 'all');
+    const visible = (l) => (!q || lower(l.title).includes(q))
+      && (preview || s.filter === 'all' || (s.filter === 'left' ? !done.has(l.id) : noted.has(l.id)));
+    const item = (l, withMeta) => {
+      const on = l.id === s.cur, isDone = done.has(l.id);
+      return {
+        title: l.title, href: H.lessonHref(l.id, preview), go: (e) => this.go(l.id, e),
+        current: on ? 'true' : undefined, cls: on ? 'bg-primary-subtle text-primary-emphasis fw-medium' : 'text-body-secondary',
+        icon: preview
+          ? (l.preview ? (on ? 'bi-play-circle-fill' : 'bi-play-circle') + ' text-primary-emphasis' : 'bi-lock text-body-tertiary')
+          : (isDone ? 'bi-check-circle-fill text-success' : on ? 'bi-play-circle-fill text-primary-emphasis' : 'bi-circle text-body-tertiary'),
+        status: preview ? (l.preview ? 'Ücretsiz önizleme' : 'Kilitli') : (isDone ? 'Tamamlandı' : 'Tamamlanmadı'),
+        hasNote: !preview && noted.has(l.id),
+        meta: withMeta ? l.n + '. ders · ' + l.section : ''
+      };
+    };
+
+    let shown = 0;
+    const sections = SECTIONS.map((sec) => {
+      const items = sec.lessons.filter(visible);
+      shown += items.length;
+      const open = filtering ? items.length > 0 : !!s.open[sec.i];
+      const k = sec.lessons.filter((l) => done.has(l.id)).length;
+      const pv = sec.lessons.filter((l) => l.preview).length;
+      return {
+        id: 'yan-bolum-' + (sec.i + 1), no: sec.i + 1, name: sec.name,
+        meta: preview ? (pv ? pv + ' önizleme · ' : '') + sec.lessons.length + ' ders' : k + '/' + sec.lessons.length + ' tamamlandı',
+        hide: filtering && !items.length ? 'd-none' : '', show: open ? 'show' : '', btnCls: open ? '' : 'collapsed', exp: open ? 'true' : 'false',
+        toggle: () => this.setState((st) => ({ open: { ...st.open, [sec.i]: !st.open[sec.i] } })),
+        items: items.map((l) => item(l, false))
+      };
+    });
+    const previewItems = PREVIEWS.filter(visible).map((l) => item(l, true));
+
+    // Notlar
+    const lessonNotes = s.notes.filter((n) => n.scope === 'lesson' && n.lessonId === s.cur);
+    const courseNotes = s.notes.filter((n) => n.scope === 'course');
+    const pool = s.noteView === 'lesson' ? lessonNotes : s.noteView === 'course' ? courseNotes : s.notes;
+    const notesList = pool.slice().sort((a, b) => b.at - a.at).map((n) => {
+      const l = BY_ID[n.lessonId], editing = s.editing === n.id;
+      return {
+        text: n.text, date: fmt(n.at),
+        scopeLabel: n.scope === 'course' ? 'Eğitim geneli' : 'Ders notu',
+        scopeCls: n.scope === 'course' ? 'bg-body-tertiary text-body-secondary border' : 'bg-primary-subtle text-primary-emphasis',
+        showLesson: n.scope === 'lesson' && n.lessonId !== s.cur && !!l,
+        lessonTitle: l ? l.n + '. ' + l.title : '', lessonHref: l ? H.lessonHref(l.id, false) : '#', goLesson: (e) => this.go(n.lessonId, e),
+        editing, notEditing: !editing, editText: s.editText,
+        onEdit: () => this.setState({ editing: n.id, editText: n.text }),
+        onEditInput: (e) => this.setState({ editText: e.target.value }),
+        onEditSave: () => { const t = this.state.editText.trim(); if (t) this.setNotes(this.state.notes.map((x) => (x.id === n.id ? { ...x, text: t } : x)), { editing: null }); },
+        onEditCancel: () => this.setState({ editing: null }),
+        onDelete: () => this.setNotes(this.state.notes.filter((x) => x.id !== n.id), { undo: n, editing: null })
+      };
+    });
+    const empty = {
+      lesson: ['Bu derste henüz notun yok.', 'İzlerken aklına gelenleri yukarıya yaz; ders notları bu derse bağlanır.'],
+      course: ['Eğitim geneli notun yok.', 'Kapsamı “Eğitime genel” seçerek tüm derslerde göreceğin notlar al.'],
+      all: ['Henüz hiç not almadın.', 'Aldığın tüm notlar burada, derslerine bağlantılarıyla listelenir.']
+    }[s.noteView];
+
+    const secOf = SECTIONS[cur.si];
+    const secDone = secOf.lessons.filter((l) => done.has(l.id)).length;
+    const isLast = cur.n === L.length;
+
+    return {
+      ...H.chrome(this, [], ''),
+      ...H.account(this, !preview),
+      topNav: (preview ? NAV_OUT : NAV_IN).map(([label, href, on]) => ({ label, href, current: on ? 'page' : undefined, cls: on ? 'active' : '' })),
+      // Giriş yapmamışta geniş ekranda "Giriş Yap" düğmesi var; menü yalnızca küçük ekranda.
+      userWrapCls: preview ? 'd-md-none' : '',
+      userButtonLabel: preview ? 'Hesap menüsü: giriş yap veya kayıt ol' : 'Hesap menüsü',
+      course: C, detail: D, total: L.length, sectionTotal: SECTIONS.length,
+      isPreview: preview, isEnrolled: !preview, playable: !locked, locked,
+      cur, curIsPreview: preview && cur.preview, sectionNo: cur.si + 1,
+      playLabel: 'Videoyu oynat: ' + cur.title,
+      pct, doneCount, progressLabel: 'Eğitim ilerlemesi: yüzde ' + pct,
+
+      prevLabel: preview ? 'Önceki önizleme' : 'Önceki',
+      prevGo: () => prev && this.go(prev.id), noPrev: !prev,
+      next: next || {}, hasNext: !!next,
+      // Son önizleme dersinde düğme çıkmaz yerine satın almaya yönlendirir.
+      nextLabel: preview ? (next ? 'Sonraki önizleme' : 'Tamamına eriş · ' + C.price) : (isLast ? 'Eğitimi tamamla' : 'Tamamla ve devam et'),
+      noNext: false,
+      nextGo: () => {
+        if (preview && !next) { window.location.href = C.buy; return; }
+        if (!preview) { const d = new Set(this.state.done); d.add(this.state.cur); this.setDone([...d]); }
+        if (next) this.go(next.id);
+      },
+      backToPreview: () => this.go((PREVIEWS.find((l) => l.n > cur.n) || PREVIEWS[0]).id),
+
+      donePressed: done.has(s.cur) ? 'true' : 'false',
+      doneIcon: done.has(s.cur) ? 'bi-check-circle-fill text-success' : 'bi-circle',
+      doneLabel: done.has(s.cur) ? 'Tamamlandı' : 'Tamamlandı olarak işaretle',
+      toggleDone: () => { const d = new Set(this.state.done); if (d.has(this.state.cur)) d.delete(this.state.cur); else d.add(this.state.cur); this.setDone([...d]); },
+
+      tabs: [['notes', 'Notlar · ' + s.notes.length], ['info', 'Ders bilgisi']].map(([k, label]) => ({ label,
+        selected: s.tab === k ? 'true' : 'false', cls: s.tab === k ? 'active' : '', onClick: () => this.setState({ tab: k }) })),
+      tabNotes: s.tab === 'notes', tabInfo: s.tab === 'info',
+
+      draft: s.draft, draftEmpty: !s.draft.trim(),
+      draftPlaceholder: s.scope === 'course' ? 'Eğitimin geneliyle ilgili bir not yaz…' : 'Bu dersle ilgili bir not yaz…',
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      onDraftKey: (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); this.saveDraft(); } },
+      saveDraft: () => this.saveDraft(),
+      scopes: [['lesson', 'Bu derse', 'bi-play-btn'], ['course', 'Eğitime genel', 'bi-journal-bookmark']].map(([k, label, icon]) => ({ label, icon,
+        checked: s.scope === k ? 'true' : 'false', cls: s.scope === k ? 'active' : 'text-body-secondary', onClick: () => this.setState({ scope: k }) })),
+      noteViews: [['lesson', 'Bu ders', lessonNotes.length], ['course', 'Eğitim geneli', courseNotes.length], ['all', 'Tümü', s.notes.length]].map(([k, label, count]) => ({
+        label, count, checked: s.noteView === k ? 'true' : 'false', cls: s.noteView === k ? 'active' : 'text-body-secondary', onClick: () => this.setState({ noteView: k }) })),
+      notesList, notesEmpty: notesList.length === 0, emptyTitle: empty[0], emptyText: empty[1],
+      undoNote: !!s.undo, onUndo: () => { const u = this.state.undo; if (u) this.setNotes([u, ...this.state.notes], { undo: null }); },
+      sectionProgress: secDone + '/' + secOf.lessons.length + ' ders tamamlandı',
+      lessonNoteCount: lessonNotes.length ? lessonNotes.length + ' not' : 'Yok',
+
+      previewCount: PREVIEWS.length, lockedCount: L.length - PREVIEWS.length,
+      strip: PREVIEWS.map((l) => ({ ...item(l, true), cardCls: l.id === s.cur ? 'border-primary bg-primary-subtle' : '' })),
+      learnTop: D.learn.slice(0, 3),
+      ...H.reviews(this),
+
+      q: s.q, onSearch: (e) => this.setState({ q: e.target.value }),
+      filters: [['all', 'Tümü'], ['left', 'Kalanlar'], ['noted', 'Notlu']].map(([k, label]) => ({ label,
+        checked: s.filter === k ? 'true' : 'false', cls: s.filter === k ? 'active' : 'text-body-secondary', onClick: () => this.setState({ filter: k }) })),
+      filtering, shownText: shown + ' ders gösteriliyor',
+      showPreviewGroup: preview && previewItems.length > 0,
+      previewItems, sections,
+      noMatch: filtering && shown === 0,
+      noMatchText: q ? '“' + s.q.trim() + '” için ders bulunamadı.' : (s.filter === 'left' ? 'Tüm dersleri tamamladın.' : 'Henüz notlu ders yok.'),
+      clearFilters: () => this.setState({ q: '', filter: 'all' })
+    };
+  }
+}
+</script>
+</body>
+</html>

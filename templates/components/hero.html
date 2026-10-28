@@ -1,0 +1,73 @@
+{% load static %}
+<section id="top" aria-labelledby="hero-baslik" class="py-5">
+  <div class="container py-lg-5">
+    <div class="row align-items-center g-4 g-lg-5">
+      <div class="col-lg-6">
+        <h1 id="hero-baslik" class="display-4 fw-semibold lh-1">Kodla. Üret. <span class="text-primary-emphasis">Kendini Geliştir.</span></h1>
+        <p class="lead text-body-secondary mt-4 mb-0">Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren. Teoriyi pratiğe dönüştür, kendi projelerini geliştir.</p>
+        <div class="d-grid d-sm-flex gap-2 mt-4 pt-2">
+          <a href="#egitimler" class="btn btn-primary btn-lg fs-6 px-4">Kursları Keşfet <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="#yorumlar" class="btn btn-outline-secondary btn-lg fs-6 px-4">Öğrenci yorumları</a>
+        </div>
+        <dl class="row row-cols-3 g-0 border-top mt-5 pt-4 mb-0" aria-label="Rakamlarla kurslar" style="max-width:420px">
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.courses }}</dt><dd class="small text-body-tertiary mt-1 mb-0">kurs</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">100+</dt><dd class="small text-body-tertiary mt-1 mb-0">saat video</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
+        </dl>
+      </div>
+
+      <div class="col-lg-6 order-first order-lg-0">
+        {% with course=courses.0 %}
+        <div class="card bg-body-tertiary shadow p-2" data-hero role="region" aria-roledescription="carousel" aria-label="Öne çıkan kurslar — ok tuşlarıyla gezinebilirsin" tabindex="0">
+          <div class="ratio ratio-16x9 rounded overflow-hidden bg-body-secondary" data-hero-surface style="touch-action:pan-y">
+            <div>
+              <div class="d-flex h-100" data-hero-track style="transform:translateX(0);transition:transform .55s cubic-bezier(.22,.8,.24,1)">
+                {% for item in courses %}
+                <a href="{{ item.url }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ courses|length }}: {{ item.title }}" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}" {% if not forloop.first %}tabindex="-1"{% endif %} draggable="false" class="d-block flex-shrink-0 w-100 h-100" data-title="{{ item.title }}" data-duration="{{ item.duration }}" data-lessons="{{ item.lessons }}" data-price="{{ item.price }}" data-cart="{{ item.cart_url }}" data-cart-label="{{ item.cart_label }}" data-tags="{{ item.tags_attr }}">
+                  <img src="{% static item.image %}" alt="{{ item.alt }}" width="1280" height="720" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async" draggable="false" class="w-100 h-100 object-fit-cover user-select-none">
+                </a>
+                {% endfor %}
+              </div>
+              <div class="position-absolute bottom-0 end-0 m-2 d-flex gap-2">
+                <button type="button" class="btn btn-dark bg-opacity-75" data-hero-prev aria-label="Önceki kurs"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-dark bg-opacity-75" data-hero-next aria-label="Sonraki kurs"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="hy-hero-progress mx-2 mt-2" data-hero-progress aria-hidden="true"><span></span></div>
+          <div class="card-body px-2 pb-2" aria-live="polite">
+            <div class="d-flex flex-wrap gap-1" data-hero-tags>
+              {% for tag in course.tags %}
+              <span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            <h2 class="h5 fw-semibold mt-3 mb-2"><a href="{{ course.url }}" data-hero-title-link class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h2>
+            <ul class="list-inline small text-body-secondary mb-0">
+              <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span data-hero-duration>{{ course.duration }}</span></li>
+              <li class="list-inline-item"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i><span data-hero-lessons>{{ course.lessons }} ders</span></li>
+            </ul>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top mt-3 pt-3">
+              <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span><span data-hero-price>{{ course.price }}</span></div>
+              <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                <a href="{{ course.cart_url }}" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></a>
+                <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div role="group" aria-label="Kurs seç" class="row g-2 px-2 pb-2">
+            {% for item in courses %}
+            <div class="col-4">
+              <button type="button" data-hero-thumb="{{ forloop.counter0 }}" aria-label="{{ forloop.counter }}. kursu göster: {{ item.title }}" {% if forloop.first %}aria-current="true"{% endif %} class="btn btn-sm w-100 hy-hero-thumb border {% if forloop.first %}border-primary bg-primary-subtle text-body{% else %}text-body-secondary{% endif %}">
+                <img src="{% static item.image %}" alt="" width="128" height="72" loading="lazy" class="hy-hero-thumb-img">
+                <span class="hy-hero-thumb-label text-truncate small fw-medium">{{ item.short }}</span>
+                <span class="hy-hero-meter" data-hero-meter aria-hidden="true"><span></span></span>
+              </button>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+</section>

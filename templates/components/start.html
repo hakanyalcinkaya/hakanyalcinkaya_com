@@ -1,0 +1,21 @@
+{% load static %}
+<section id="basla" aria-labelledby="basla-baslik" class="py-5 bg-body-tertiary border-top">
+  <div class="container py-lg-5">
+    <h2 id="basla-baslik" class="display-6 fw-semibold">Öğrenmeye bugün başla.</h2>
+    <p class="lead text-body-secondary mt-3" style="max-width:48ch">Üç kurs da sıfırdan başlar. Hangi teknolojiyle üretmek istiyorsan oradan gir.</p>
+    <div class="list-group list-group-flush border-top border-bottom mt-4">
+      {% for course in courses %}
+      <a href="{{ course.url }}" class="list-group-item list-group-item-action bg-transparent d-flex align-items-center gap-3 px-0 py-3">
+        <img src="{% static course.image %}" alt="" width="192" height="108" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:88px;height:50px">
+        <span class="flex-grow-1 min-w-0">
+          <span class="d-block fw-semibold">{{ course.short }}</span>
+          <span class="d-block small text-body-tertiary">{{ course.meta_line }}</span>
+        </span>
+        <span class="fs-5 fw-semibold d-none d-sm-inline">{{ course.price }}</span>
+        <span class="btn btn-primary" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
+      </a>
+      {% endfor %}
+    </div>
+    {% include "components/newsletter.html" %}
+  </div>
+</section>

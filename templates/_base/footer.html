@@ -1,0 +1,39 @@
+<footer class="border-top py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a href="{% url 'index' %}#top" class="d-inline-flex align-items-center gap-2 fw-semibold link-body-emphasis text-decoration-none"><span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>Hakan Yalçınkaya</a>
+        <p class="small text-body-secondary mt-3" style="max-width:34ch">#Yazılım ve #Üretkenlik odaklı kurslarla kendini geliştir. <span class="font-monospace text-body-tertiary">[Kodla] =&gt; Üret</span></p>
+        <ul class="list-unstyled d-flex gap-2 mb-0" aria-label="Sosyal medya">
+          <li><a class="btn btn-outline-secondary" href="https://youtube.com/hakanyalcinkaya/" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube" aria-hidden="true"></i></a></li>
+          <li><a class="btn btn-outline-secondary" href="https://www.linkedin.com/in/hakanyalcinkaya/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin" aria-hidden="true"></i></a></li>
+          <li><a class="btn btn-outline-secondary" href="https://www.instagram.com/hakanyalcinkayadev" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-7 col-lg-4">
+        <h2 class="h6 fw-semibold mb-3">Kurslar</h2>
+        <ul class="list-unstyled d-grid gap-2 small mb-0">
+          {% for course in courses %}
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ course.url }}">{{ course.short }}</a></li>
+          {% endfor %}
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="{% url 'index' %}#egitimler">Tüm kurslar</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-5 col-lg-3">
+        <h2 class="h6 fw-semibold mb-3">Hesap</h2>
+        <ul class="list-unstyled d-grid gap-2 small mb-0">
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ login_url }}">Giriş Yap</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ join_url }}">Kayıt Ol</a></li>
+          <li><a class="text-body-secondary text-decoration-none link-hover" href="{% url 'index' %}#egitimler">Sepet</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between gap-3 border-top mt-5 pt-4 small text-body-tertiary">
+      <span>© {{ year }} Hakan Yalçınkaya. Tüm hakları saklıdır.</span>
+      <div class="d-flex gap-3">
+        <a class="text-body-tertiary text-decoration-none link-hover" href="{{ privacy_url }}">Gizlilik Politikası</a>
+        <a class="text-body-tertiary text-decoration-none link-hover" href="{{ terms_url }}">Kullanım Şartları</a>
+      </div>
+    </div>
+  </div>
+</footer>
