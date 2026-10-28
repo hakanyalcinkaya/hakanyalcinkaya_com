@@ -13,11 +13,11 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 - [ ] Bağlantıyla gelen indirim kodu: `?kod=KOD` oturumda beklet, sepet oluşunca uygula; kurs ve paket sayfalarında "KOD uygulandı" ile indirimli fiyatı göster.
 - [ ] iyzico ödeme entegrasyonu (TL, KDV dahil fiyatlar).
 
-## Video (Vimeo)
-- [ ] Ders sayfasındaki yer tutucunun yerine Video.js 10 oynatıcısı (`frontend/` paketinde derlenen `static_files/js/videojs/player.js` hazır; kurs tanıtım videosunda kullanılıyor). Vimeo'da gizlilik (yalnız kendi alan adında oynatma) ve kontrolleri gizleme ayarları ücretli plan ister.
-- [ ] İzlenen süreyi her 5 saniyede bir veritabanına yaz (kaldığı yerden devam; `LessonProgress.position_seconds`).
-- [ ] Stüdyoda kurs tanıtım videosu yükleme (şimdilik yalnız ders videoları; tanıtım videosu kimliği admin'den girilir).
-- [ ] Ders videosu değiştirilince eski video Vimeo'da kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
+## Video (Bunny Stream)
+- [ ] CDN token koruması: imzalı oynatma adreslerinin biçimini Bunny'nin gerçek CDN'inde doğrula, sonra `.env`'de `BUNNY_CDN_TOKEN_AUTH=True` yap (kod hazır, `course/bunny.py` `_signed`). Bunny panelinde MediaCage DRM kapalı, izinli alan adları dolu olmalı.
+- [ ] İzlenen süreyi her 5 saniyede bir veritabanına yaz (kaldığı yerden devam; `LessonProgress.position_seconds`); ders sayfasında ilerleme ve "tamamlandı" işaretleri şu an boş.
+- [ ] Kurs sayfasının tanıtım metinleri (neler öğreneceksin, kimler için ...) aynı slug'lı örnek kurstan geliyor; kurs maddeleri (CourseHighlight) doldurulunca örnek veri kaldırılabilir. Ana sayfa, kurs listesi, sepet ve kütüphane hâlâ örnek veride.
+- [ ] Ders/tanıtım videosu değiştirilince eski video Bunny'de kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
 - [ ] Prod: Celery işçisini servis olarak çalıştır (systemd/supervisor), Redis'i ayrı veritabanı numarasıyla kullan; sunucuda büyük dosya yüklemesi için Nginx `client_max_body_size` ve zaman aşımı ayarları.
 
 ## Diğer

@@ -14,7 +14,6 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import reswap, trigger_client_event
 
 from config.celery import worker_online
-from course import vimeo
 from course.models import (
     BUSY_UPLOAD_STATUSES,
     FINISHED_UPLOAD_STATUSES,
@@ -101,8 +100,8 @@ def course_detail(request, course_id):
         course=course,
         sections=_with_lessons(course.sections.all()),
         section_form=SectionCreateForm(),
-        title_sync_total=course.lessons_needing_vimeo_title_sync().count(),
-        vimeo_configured=bool(settings.VIMEO_ACCESS_TOKEN),
+        title_sync_total=course.lessons_needing_video_title_sync().count(),
+        video_service_configured=bool(settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY),
         worker_online=_worker_online(),
     )
     return render(request, "studio/course_detail.html", context)
@@ -116,7 +115,7 @@ def section_detail(request, section_id):
         section=section,
         course=section.course,
         section_no=_section_no(section),
-        vimeo_configured=bool(settings.VIMEO_ACCESS_TOKEN),
+        video_service_configured=bool(settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY),
         worker_online=_worker_online(),
     )
     return render(request, "studio/section_detail.html", context)
@@ -239,67 +238,22 @@ def lesson_preview(request, lesson_id):
 
 @staff_required
 def lesson_delete(request, lesson_id):
-    """GET onay panelini açar (Vimeo'dan da silinsin mi sorulur); POST dersi siler ve satırı kaldırır."""
+    """GET onay panelini açar (Bunny'den de silinsin mi sorulur); POST dersi siler ve satırı kaldırır."""
     lesson = get_object_or_404(Lesson, pk=lesson_id)
     if request.method != "POST":
         return render(request, "studio/partials/_lesson_delete.html", dict(lesson=lesson))
-    delete_from_vimeo = request.POST.get("vimeo") == "1"
-    lesson.remove(delete_from_vimeo=delete_from_vimeo)
-    text = _("Ders ve Vimeo videosu silindi.") if delete_from_vimeo else _("Ders silindi.")
+    delete_remote = request.POST.get("remote") == "1"
+    lesson.remove(delete_remote=delete_remote)
+    text = _("Ders ve Bunny'deki videosu silindi.") if delete_remote else _("Ders silindi.")
     return _toast(HttpResponse(), "success", text)
-
-
-# Taşıma başlatılınca klasör sayısı 5 saniyede bir, en fazla 2 dakika yenilenir.
-FOLDER_POLL_LIMIT = 24
-
-
-def _folder_context(course, tries=0):
-    expected = len(course.vimeo_video_ids())
-    folder_total, error = None, ""
-    if course.vimeo_folder_uri:
-        try:
-            folder_total = vimeo.folder_video_total(course.vimeo_folder_uri)
-        except vimeo.VimeoError as exc:
-            error = str(exc)
-    complete = folder_total is not None and folder_total >= expected
-    return dict(
-        course=course,
-        expected=expected,
-        folder_total=folder_total,
-        error=error,
-        moving=0 < tries <= FOLDER_POLL_LIMIT and not complete and not error,
-        next_try=tries + 1,
-        can_move=bool(expected) and not complete and not error,
-    )
-
-
-@staff_required
-def course_folder(request, course_id):
-    """Kursun Vimeo klasörü: içindeki video sayısı Vimeo'dan okunur; POST eksik videoları klasöre taşır."""
-    course = get_object_or_404(Course, pk=course_id)
-    if request.method != "POST":
-        tries = int(request.GET.get("tries", 0)) if request.GET.get("tries", "").isdigit() else 0
-        return render(request, "studio/partials/_course_folder.html", _folder_context(course, tries))
-    try:
-        scopes = vimeo.token_scopes()
-    except vimeo.VimeoError as error:
-        response = render(request, "studio/partials/_course_folder.html", _folder_context(course))
-        return _toast(response, "error", _("Vimeo'ya ulaşılamadı: %(error)s") % {"error": error})
-    if "interact" not in scopes:
-        response = render(request, "studio/partials/_course_folder.html", _folder_context(course))
-        text = _("Vimeo anahtarında 'interact' yetkisi yok; videolar klasöre taşınamaz. Bu yetkiyle yeni anahtar oluştur.")
-        return _toast(response, "error", text)
-    course.queue_move_to_vimeo_folder()
-    response = render(request, "studio/partials/_course_folder.html", _folder_context(course, tries=1))
-    return _toast(response, "success", _("Videolar Vimeo klasörüne taşınıyor."))
 
 
 @staff_required
 @require_POST
 def course_sync_titles(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    queued = sum(lesson.queue_vimeo_title_sync() for lesson in course.lessons_needing_vimeo_title_sync())
-    messages.success(request, _("%(count)s dersin başlığı Vimeo'da güncellenecek.") % {"count": queued})
+    queued = sum(lesson.queue_video_title_sync() for lesson in course.lessons_needing_video_title_sync())
+    messages.success(request, _("%(count)s dersin başlığı Bunny'de güncellenecek.") % {"count": queued})
     return redirect("studio:course_detail", course_id=course.pk)
 
 
@@ -310,7 +264,7 @@ def lesson_title(request, lesson_id):
         form = LessonTitleForm(request.POST, instance=lesson, auto_id=_auto_id(lesson))
         if form.is_valid():
             form.save()
-            lesson.queue_vimeo_title_sync()
+            lesson.queue_video_title_sync()
             return render(request, "studio/partials/_lesson_title.html", dict(lesson=lesson))
         return render(request, "studio/partials/_lesson_title_form.html", dict(lesson=lesson, form=form))
     if request.GET.get("edit"):
@@ -329,7 +283,7 @@ def lesson_video(request, lesson_id):
     if is_post and form.is_valid():
         form.save(request.user)
         response = render(request, "studio/partials/_video_queued.html", dict(lesson=_lesson(lesson_id)))
-        return _toast(response, "success", _("Video sunucuya ulaştı; Vimeo'ya gönderiliyor."))
+        return _toast(response, "success", _("Video sunucuya ulaştı; Bunny'ye gönderiliyor."))
     return render(request, "studio/partials/_video_form.html", dict(lesson=lesson, form=form))
 
 
@@ -349,7 +303,7 @@ def course_preview(request, course_id):
     if is_post and form.is_valid():
         form.save(request.user)
         response = render(request, "studio/partials/_preview_queued.html", dict(course=_course(course_id)))
-        return _toast(response, "success", _("Tanıtım videosu sunucuya ulaştı; Vimeo'ya gönderiliyor."))
+        return _toast(response, "success", _("Tanıtım videosu sunucuya ulaştı; Bunny'ye gönderiliyor."))
     return render(request, "studio/partials/_video_form.html", dict(form=form, course=course))
 
 

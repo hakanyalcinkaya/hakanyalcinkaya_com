@@ -6,22 +6,20 @@
   <div>
     <h1 class="h3 mb-1">{{ course.title }}</h1>
     <p class="small text-body-secondary mb-1">{{ course.get_status_display }}</p>
-    {# Klasördeki video sayısı Vimeo'dan okunur; sayfa açılışını yavaşlatmasın diye ayrı istekle yüklenir. #}
-    <div id="course-folder" class="small text-body-tertiary" hx-get="{% url 'studio:course_folder' course.id %}" hx-trigger="load" hx-swap="outerHTML">Vimeo klasörü okunuyor…</div>
   </div>
   <div class="d-flex flex-wrap gap-2">
     {% if title_sync_total %}
     <form method="post" action="{% url 'studio:course_sync_titles' course.id %}">
       {% csrf_token %}
-      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Vimeo başlıklarını eşitle ({{ title_sync_total }})</button>
+      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Bunny başlıklarını eşitle ({{ title_sync_total }})</button>
     </form>
     {% endif %}
     <a href="{% url 'admin:course_course_change' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Kursu düzenle</a>
   </div>
 </div>
 
-{% if not vimeo_configured %}
-<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i><code>.env</code> dosyasında <code>VIMEO_ACCESS_TOKEN</code> yok; yüklemeler hata verir.</div>
+{% if not video_service_configured %}
+<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i><code>.env</code> dosyasında <code>BUNNY_LIBRARY_ID</code> / <code>BUNNY_API_KEY</code> yok; yüklemeler hata verir.</div>
 {% endif %}
 {% if not worker_online %}
 <div class="alert alert-warning small" role="alert">
@@ -33,7 +31,7 @@
   <div class="row g-2 g-lg-3 align-items-center">
     <div class="col">
       <h2 id="course-preview-title" class="h6 mb-0"><i class="bi bi-film me-2 text-body-tertiary" aria-hidden="true"></i>Tanıtım videosu</h2>
-      <div class="small text-body-secondary">Kurs sayfasında görsele tıklanınca oynar. Vimeo'daki başlığı kurs başlığıdır.</div>
+      <div class="small text-body-secondary">Kurs sayfasında görsele tıklanınca oynar. Bunny'deki başlığı kurs başlığıdır.</div>
     </div>
     <div class="col-12 col-md-4 col-xl-3">{% include "studio/partials/_preview_video.html" %}</div>
     <div class="col-12 col-md-auto">

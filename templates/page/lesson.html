@@ -5,6 +5,7 @@
 {% block description %}{{ current.title }}{% endblock %}
 {% block head %}
 <meta name="robots" content="noindex">
+{% include "page/partials/video_referrer.html" %}
 {% endblock %}
 
 {% block navbar %}
@@ -81,13 +82,22 @@
             </div>
           </div>
         </div>
+        {% elif current.video %}
+        {# Video.js oynatıcısı site.js tarafından bu yer tutucunun yerine kurulur (HLS, Bunny Stream). #}
+        <div class="ratio ratio-16x9 mx-auto" style="max-width:1280px">
+          <div class="d-flex align-items-center justify-content-center text-white-50" data-lesson-video="{{ current.video.src }}" data-poster="{{ current.video.poster }}" data-tracks="{{ current.video.tracks_json }}" data-player-src="{% static 'js/videojs/player.js' %}">
+            <span class="spinner-border" aria-hidden="true"></span><span class="visually-hidden">Video yükleniyor</span>
+          </div>
+        </div>
         {% else %}
         <div class="ratio ratio-16x9 mx-auto" style="max-width:1280px">
+          {# Dersin videosu henüz yüklenmemiş ya da işleniyor. #}
           <div class="d-flex align-items-center justify-content-center overflow-hidden">
             <img src="{% static course.image %}" alt="" width="1280" height="720" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
             <div class="position-relative text-center text-white px-3">
-              <span class="btn btn-primary btn-lg px-4 py-3" aria-hidden="true"><i class="bi bi-play-fill fs-2 lh-1"></i></span>
-              <div class="small mt-3 opacity-75 font-monospace">[PLACEHOLDER: video oynatıcı]</div>
+              <i class="bi bi-camera-video-off fs-1" aria-hidden="true"></i>
+              <p class="mt-2 mb-0">Bu dersin videosu henüz hazır değil.</p>
+              {% if request.user.is_staff and current.object %}<a href="{% url 'studio:course_detail' current.object.section.course_id %}#lesson-{{ current.object.id }}" class="btn btn-outline-light btn-sm mt-3">Stüdyo'da video yükle</a>{% endif %}
             </div>
           </div>
         </div>

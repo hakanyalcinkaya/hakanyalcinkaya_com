@@ -30,7 +30,7 @@ def hours_minutes(minutes):
 def video_file_seconds(path):
     """MP4/MOV/M4V dosyasının süresi (saniye); başlık bulunamazsa ya da biçim farklıysa None.
 
-    Vimeo süreyi ancak işlemeye başlayınca bildiriyor; yükleme biter bitmez göstermek için dosyanın `moov/mvhd`
+    Video servisi süreyi ancak işlemeye başlayınca bildiriyor; yükleme biter bitmez göstermek için dosyanın `moov/mvhd`
     kutusundaki süre okunur. Dosyanın tamamı okunmaz, kutular arasında atlanır.
     """
     try:

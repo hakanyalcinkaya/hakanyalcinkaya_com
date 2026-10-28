@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from page import content
 from page.catalog import (
     COUPON_SESSION_KEY,
     NEWSLETTER_SESSION_KEY,
@@ -99,8 +100,18 @@ def course_list(request):
     )
 
 
+def _enrolled(request, slug):
+    # Personel stüdyodan yüklediği içeriği kayıtlı öğrenci gibi görür.
+    return request.user.is_staff or owns_course(request.user, request.session, slug)
+
+
 def course_detail(request, slug):
-    page = course_page(slug, enrolled=owns_course(request.user, request.session, slug))
+    # Veritabanındaki kurs (müfredat, tanıtım videosu) önce gelir; yoksa örnek veri gösterilir.
+    course = content.visible_course(slug, request.user)
+    if course is not None:
+        page = content.course_page(course, enrolled=_enrolled(request, slug), staff=request.user.is_staff)
+    else:
+        page = course_page(slug, enrolled=owns_course(request.user, request.session, slug))
     if page is None:
         raise Http404
     form, done = _newsletter(request)
@@ -118,8 +129,13 @@ def course_detail(request, slug):
 
 
 def lesson(request, course_slug, section_slug, lesson_slug):
-    enrolled = owns_course(request.user, request.session, course_slug)
-    page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
+    course = content.visible_course(course_slug, request.user)
+    if course is not None:
+        enrolled = _enrolled(request, course_slug)
+        page = content.find_lesson(course, section_slug, lesson_slug, enrolled=enrolled, staff=request.user.is_staff)
+    else:
+        enrolled = owns_course(request.user, request.session, course_slug)
+        page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
     if page is None:
         raise Http404
     return render(

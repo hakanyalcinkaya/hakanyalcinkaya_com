@@ -14,5 +14,5 @@
     </div>
   </div>
   {% for field in form %}{% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}{% endfor %}
-  <div class="form-text">Aynı dilde altyazı varsa yenisi yerine geçer. {% if not lesson.vimeo_id %}Video Vimeo'da hazır olunca gönderilir.{% endif %}</div>
+  <div class="form-text">Aynı dilde altyazı varsa yenisi yerine geçer. {% if not lesson.video_id %}Video Bunny'de hazır olunca gönderilir.{% endif %}</div>
 </form>

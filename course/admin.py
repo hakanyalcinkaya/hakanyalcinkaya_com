@@ -1,7 +1,6 @@
 from adminsortable2.admin import SortableAdminMixin, SortableTabularInline
 from django.conf import settings
 from django.contrib import admin, messages
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from core.admin import ParentFilteredSortableAdminMixin
@@ -20,17 +19,17 @@ from course.models import (
     Technology,
     VideoUpload,
 )
-from course.vimeo import VimeoError
+from course.bunny import VideoServiceError
 
 # Sıralama sürükle-bırak ile yapılır (django-admin-sortable2); sort_order formlarda gösterilmez.
 PUBLISH_FIELDS = (_("Yayın"), {"fields": ("status", "published_at")})
 
 
-def vimeo_ready(modeladmin, request):
-    if settings.VIMEO_ACCESS_TOKEN:
+def video_service_ready(modeladmin, request):
+    if settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY:
         return True
     modeladmin.message_user(
-        request, _("Vimeo API anahtarı (VIMEO_ACCESS_TOKEN) tanımlı değil; süre hesaplanamadı."), messages.ERROR
+        request, _("Bunny ayarları (BUNNY_LIBRARY_ID, BUNNY_API_KEY) tanımlı değil; süre hesaplanamadı."), messages.ERROR
     )
     return False
 
@@ -83,10 +82,10 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("title", "short_title", "slug", "subtitle", "description", "image")}),
         (
-            _("Vimeo"),
+            _("Video (Bunny)"),
             {
-                "fields": ("preview_vimeo_id", "preview_vimeo_hash", "preview_vimeo_title", "vimeo_folder_uri", "vimeo_folder_link"),
-                "description": _("Tanıtım videosu ve klasör, stüdyodan yükleme yapınca kendiliğinden dolar."),
+                "fields": ("preview_video_id", "preview_video_title", "video_collection_id"),
+                "description": _("Tanıtım videosu ve koleksiyon, stüdyodan yükleme yapınca kendiliğinden dolar."),
             },
         ),
         (_("Sınıflandırma"), {"fields": ("category", "subcategories", "technologies", "level")}),
@@ -95,18 +94,12 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
         PUBLISH_FIELDS,
     )
 
-    readonly_fields = ("preview_vimeo_title", "vimeo_folder_link")
-
-    @admin.display(description=_("Vimeo'da klasör"))
-    def vimeo_folder_link(self, obj):
-        if not obj.vimeo_folder_url:
-            return "—"
-        return format_html('<a href="{}" target="_blank" rel="noopener">{}</a>', obj.vimeo_folder_url, obj.vimeo_folder_url)
+    readonly_fields = ("preview_video_title",)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         if obj.queue_preview_title_sync():
-            self.message_user(request, _("Tanıtım videosunun başlığı Vimeo'da da güncellenecek."))
+            self.message_user(request, _("Tanıtım videosunun başlığı Bunny'de de güncellenecek."))
 
     @admin.display(description=_("fiyat"), ordering="price")
     def price_display(self, obj):
@@ -114,14 +107,14 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
             return f"{format_try(obj.price)} (liste {format_try(obj.list_price)})"
         return format_try(obj.price)
 
-    @admin.action(description=_("Seçili kursların tüm ders sürelerini Vimeo'dan hesapla"))
+    @admin.action(description=_("Seçili kursların tüm ders sürelerini Bunny'den hesapla"))
     def sync_durations(self, request, queryset):
-        if not vimeo_ready(self, request):
+        if not video_service_ready(self, request):
             return
         for course in queryset:
             try:
                 count = course.sync_durations()
-            except VimeoError as error:
+            except VideoServiceError as error:
                 self.message_user(request, f"{course}: {error}", messages.ERROR)
                 continue
             self.message_user(request, _("%(course)s: %(count)s dersin süresi güncellendi.") % {"course": course, "count": count})
@@ -130,7 +123,7 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
 class LessonInline(SortableTabularInline):
     model = Lesson
     extra = 0
-    fields = ("title", "slug", "kind", "is_preview", "vimeo_id", "vimeo_hash", "duration_seconds", "status")
+    fields = ("title", "slug", "kind", "is_preview", "video_id", "duration_seconds", "status")
     show_change_link = True
 
 
@@ -157,19 +150,19 @@ class LessonAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
     sort_parent_filter = "section__id__exact"
     list_display = ("title", "section", "kind", "is_preview", "duration_display", "status")
     list_editable = ("status",)
-    list_filter = ("status", "kind", "is_preview", ("vimeo_id", admin.EmptyFieldListFilter), "section__course", "section")
-    search_fields = ("title", "section__title", "section__course__title", "vimeo_id")
+    list_filter = ("status", "kind", "is_preview", ("video_id", admin.EmptyFieldListFilter), "section__course", "section")
+    search_fields = ("title", "section__title", "section__course__title", "video_id")
     list_select_related = ("section__course",)
     autocomplete_fields = ("section",)
     actions = ("sync_duration",)
     fieldsets = (
         (None, {"fields": ("section", "title", "slug", "kind", "is_preview")}),
-        (_("Video (Vimeo)"), {"fields": ("vimeo_id", "vimeo_hash", "vimeo_title", "duration_seconds")}),
+        (_("Video (Bunny)"), {"fields": ("video_id", "video_title", "duration_seconds")}),
         (_("Diğer içerik"), {"fields": ("external_url", "body"), "classes": ("collapse",)}),
         PUBLISH_FIELDS,
     )
 
-    readonly_fields = ("vimeo_title",)
+    readonly_fields = ("video_title",)
 
     @admin.display(description=_("süre"))
     def duration_display(self, obj):
@@ -177,18 +170,18 @@ class LessonAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        if obj.queue_vimeo_title_sync():
-            self.message_user(request, _("Başlık Vimeo'da da güncellenecek."))
+        if obj.queue_video_title_sync():
+            self.message_user(request, _("Başlık Bunny'de de güncellenecek."))
 
-    @admin.action(description=_("Seçili derslerin süresini Vimeo'dan hesapla"))
+    @admin.action(description=_("Seçili derslerin süresini Bunny'den hesapla"))
     def sync_duration(self, request, queryset):
-        if not vimeo_ready(self, request):
+        if not video_service_ready(self, request):
             return
         updated = 0
-        for lesson in queryset.exclude(vimeo_id=""):
+        for lesson in queryset.exclude(video_id=""):
             try:
                 lesson.sync_duration()
-            except VimeoError as error:
+            except VideoServiceError as error:
                 self.message_user(request, f"{lesson}: {error}", messages.ERROR)
                 continue
             updated += 1
@@ -268,9 +261,9 @@ class BundleCourseAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
 
 @admin.register(VideoUpload)
 class VideoUploadAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "status", "progress", "vimeo_id", "created_by", "created_at")
+    list_display = ("__str__", "status", "progress", "video_id", "created_by", "created_at")
     list_filter = ("status", ("course", admin.EmptyFieldListFilter), "lesson__section__course", "course")
-    search_fields = ("lesson__title", "course__title", "original_name", "vimeo_id")
+    search_fields = ("lesson__title", "course__title", "original_name", "video_id")
     list_select_related = ("lesson", "course", "created_by")
     autocomplete_fields = ("lesson", "course")
     readonly_fields = ("created_at", "finished_at")

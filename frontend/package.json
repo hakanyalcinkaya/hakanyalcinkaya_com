@@ -6,8 +6,8 @@
     "build": "node build.mjs"
   },
   "dependencies": {
+    "@videojs/hlsjs-video": "10.2.0",
     "@videojs/html": "10.2.0",
-    "@videojs/vimeo-video": "10.2.0",
     "sortablejs": "1.15.7"
   },
   "devDependencies": {

@@ -13,18 +13,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.duration import ceil_minutes, clock, hours_minutes, video_file_seconds
+from course import bunny
 from core.models import BaseModel, BaseSortOrder, BaseStatus, Status, StatusQuerySet
 from core.text import slugify_tr
 
 GENERAL_SECTION_SLUG = "genel"
 PRICE_FIELD = {"max_digits": 10, "decimal_places": 2, "validators": [MinValueValidator(Decimal("0"))]}
-
-
-def vimeo_src(vimeo_id, vimeo_hash=""):
-    """Video.js Vimeo kaynağı. Gizli (unlisted) videolar Vimeo'nun verdiği anahtarla açılır: vimeo.com/<id>?h=<anahtar>."""
-    if not vimeo_id:
-        return ""
-    return f"https://vimeo.com/{vimeo_id}?h={vimeo_hash}" if vimeo_hash else f"https://vimeo.com/{vimeo_id}"
 
 
 def lesson_minutes_expression(prefix="", filter=None):
@@ -142,7 +136,7 @@ class CourseQuerySet(StatusQuerySet):
         return self.annotate(
             video_lesson_total=Count("sections__lessons", filter=video_lessons, distinct=True),
             video_ready_total=Count(
-                "sections__lessons", filter=video_lessons & ~Q(sections__lessons__vimeo_id=""), distinct=True
+                "sections__lessons", filter=video_lessons & ~Q(sections__lessons__video_id=""), distinct=True
             ),
             busy_upload_total=Count(
                 "sections__lessons__video_uploads",
@@ -159,23 +153,18 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
     subtitle = models.CharField(_("alt başlık"), max_length=300, blank=True)
     description = models.TextField(_("kısa açıklama"), blank=True, help_text=_("Kurs kartlarında görünür."))
     image = models.ImageField(_("kapak görseli"), upload_to="courses/", blank=True)
-    preview_vimeo_id = models.CharField(
-        _("tanıtım videosu (Vimeo kimliği)"), max_length=40, blank=True, help_text=_("Varsa kurs görseline tıklanınca oynar.")
+    # Videolar Bunny Stream'de tutulur; stüdyodan yüklenince kimlikler kendiliğinden dolar.
+    preview_video_id = models.CharField(
+        _("tanıtım videosu (Bunny kimliği)"), max_length=40, blank=True, help_text=_("Varsa kurs görseline tıklanınca oynar.")
     )
-    preview_vimeo_hash = models.CharField(
-        _("tanıtım videosu gizli anahtarı"),
-        max_length=40,
-        blank=True,
-        help_text=_("Gizli videolarda Vimeo bağlantısındaki h= değeri (ör. 9a60ec7769)."),
-    )
-    preview_vimeo_title = models.CharField(
-        _("tanıtım videosunun Vimeo'daki başlığı"),
+    preview_video_title = models.CharField(
+        _("tanıtım videosunun Bunny'deki başlığı"),
         max_length=200,
         blank=True,
-        help_text=_("Kurs başlığından farklıysa Vimeo'ya yeniden gönderilir."),
+        help_text=_("Kurs başlığından farklıysa Bunny'ye yeniden gönderilir."),
     )
-    vimeo_folder_uri = models.CharField(
-        _("Vimeo klasörü"), max_length=200, blank=True, help_text=_("İlk video yüklemesinde kurs adıyla açılır.")
+    video_collection_id = models.CharField(
+        _("Bunny koleksiyonu"), max_length=40, blank=True, help_text=_("İlk video yüklemesinde kurs adıyla açılır.")
     )
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name="courses", verbose_name=_("kategori")
@@ -223,11 +212,16 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
 
     @property
     def preview_video(self):
-        return vimeo_src(self.preview_vimeo_id, self.preview_vimeo_hash)
+        """Tanıtım videosunun HLS adresi (CDN koruması açıksa kısa süreli imzalı)."""
+        return bunny.playlist_url(self.preview_video_id)
+
+    @property
+    def preview_poster(self):
+        return bunny.thumbnail_url(self.preview_video_id)
 
     @property
     def has_preview_video(self):
-        return bool(self.preview_vimeo_id)
+        return bool(self.preview_video_id)
 
     @property
     def latest_preview_upload(self):
@@ -240,10 +234,10 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
 
     @property
     def needs_preview_title_sync(self):
-        return bool(self.preview_vimeo_id) and self.preview_vimeo_title != self.title
+        return bool(self.preview_video_id) and self.preview_video_title != self.title
 
     def queue_preview_title_sync(self):
-        """Kurs başlığı tanıtım videosunun Vimeo başlığından farklıysa kayıt tamamlanınca Vimeo'da günceller."""
+        """Kurs başlığı tanıtım videosunun Bunny'deki başlığından farklıysa kayıt tamamlanınca Bunny'de günceller."""
         if not self.needs_preview_title_sync:
             return False
         from course.tasks import sync_preview_title
@@ -251,11 +245,10 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         transaction.on_commit(partial(sync_preview_title.delay, str(self.pk)))
         return True
 
-    def attach_preview_video(self, vimeo_id, vimeo_hash, vimeo_title):
-        self.preview_vimeo_id = vimeo_id
-        self.preview_vimeo_hash = vimeo_hash
-        self.preview_vimeo_title = vimeo_title
-        self.save(update_fields=["preview_vimeo_id", "preview_vimeo_hash", "preview_vimeo_title", "updated_at"])
+    def attach_preview_video(self, video_id, video_title):
+        self.preview_video_id = video_id
+        self.preview_video_title = video_title
+        self.save(update_fields=["preview_video_id", "preview_video_title", "updated_at"])
 
     @property
     def level_card_text(self):
@@ -272,25 +265,15 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
     def duration_display(self):
         return hours_minutes(self.total_minutes)
 
-    @property
-    def vimeo_folder_url(self):
-        """Klasörün Vimeo'daki sayfası; API adresi /users/<kullanıcı>/projects/<klasör> biçimindedir."""
-        parts = self.vimeo_folder_uri.strip("/").split("/")
-        if len(parts) != 4:
-            return ""
-        return f"https://vimeo.com/user/{parts[1]}/folder/{parts[3]}"
-
-    def ensure_vimeo_folder(self):
-        """Kursun Vimeo klasörünü döner, yoksa açar. Aynı anda çalışan yüklemeler tek klasör açsın diye satır kilitlenir."""
-        from course import vimeo
-
+    def ensure_video_collection(self):
+        """Kursun Bunny koleksiyonunu döner, yoksa açar. Aynı anda çalışan yüklemeler tek koleksiyon açsın diye satır kilitlenir."""
         with transaction.atomic():
             course = Course.objects.select_for_update().get(pk=self.pk)
-            if not course.vimeo_folder_uri:
-                course.vimeo_folder_uri = vimeo.create_folder(course.title)
-                course.save(update_fields=["vimeo_folder_uri", "updated_at"])
-        self.vimeo_folder_uri = course.vimeo_folder_uri
-        return self.vimeo_folder_uri
+            if not course.video_collection_id:
+                course.video_collection_id = bunny.create_collection(course.title)
+                course.save(update_fields=["video_collection_id", "updated_at"])
+        self.video_collection_id = course.video_collection_id
+        return self.video_collection_id
 
     def general_section(self):
         """Kursa doğrudan bırakılan videoların bölümü; yoksa en başa taslak olarak açılır."""
@@ -326,24 +309,13 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
                 seen.add(lesson.pk)
                 lesson.move_to(own_sections[section_id], lesson_index)
 
-    def vimeo_video_ids(self):
-        """Kursa bağlı tüm Vimeo videoları: tanıtım videosu ve ders videoları."""
-        lesson_ids = Lesson.objects.filter(section__course=self).exclude(vimeo_id="").values_list("vimeo_id", flat=True)
-        ids = [self.preview_vimeo_id, *lesson_ids] if self.preview_vimeo_id else list(lesson_ids)
-        return list(dict.fromkeys(ids))
-
-    def queue_move_to_vimeo_folder(self):
-        from course.tasks import move_course_videos_to_folder
-
-        transaction.on_commit(partial(move_course_videos_to_folder.delay, str(self.pk)))
-
-    def lessons_needing_vimeo_title_sync(self):
-        return Lesson.objects.filter(section__course=self).exclude(vimeo_id="").exclude(vimeo_title=F("title"))
+    def lessons_needing_video_title_sync(self):
+        return Lesson.objects.filter(section__course=self).exclude(video_id="").exclude(video_title=F("title"))
 
     def sync_durations(self):
-        """Vimeo kimliği olan derslerin süresini API'den günceller; güncellenen ders sayısını döner."""
+        """Videosu olan derslerin süresini Bunny'den günceller; güncellenen ders sayısını döner."""
         updated = 0
-        for lesson in self.published_lessons().exclude(vimeo_id=""):
+        for lesson in self.published_lessons().exclude(video_id=""):
             lesson.sync_duration()
             updated += 1
         return updated
@@ -451,16 +423,13 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
     slug = models.SlugField(_("slug"), max_length=250, blank=True)
     kind = models.CharField(_("tür"), max_length=10, choices=LessonKind, default=LessonKind.VIDEO)
     is_preview = models.BooleanField(_("ücretsiz önizleme"), default=False)
-    # Video yönetim panelinden (studio) Celery ile Vimeo'ya yüklenir; kimlik elle de girilebilir.
-    vimeo_id = models.CharField(_("Vimeo video kimliği"), max_length=40, blank=True)
-    vimeo_hash = models.CharField(
-        _("Vimeo gizli anahtarı"), max_length=40, blank=True, help_text=_("Gizli videolarda Vimeo bağlantısındaki h= değeri.")
-    )
+    # Video yönetim panelinden (studio) Celery ile Bunny Stream'e yüklenir; kimlik elle de girilebilir.
+    video_id = models.CharField(_("Bunny video kimliği"), max_length=40, blank=True)
     duration_seconds = models.PositiveIntegerField(
-        _("süre (saniye)"), null=True, blank=True, help_text=_("Vimeo API ile hesaplanır; anahtar yoksa elle girilebilir.")
+        _("süre (saniye)"), null=True, blank=True, help_text=_("Dosyadan ya da Bunny'den okunur; elle de girilebilir.")
     )
-    vimeo_title = models.CharField(
-        _("Vimeo'daki başlık"), max_length=250, blank=True, help_text=_("Ders başlığından farklıysa Vimeo'ya yeniden gönderilir.")
+    video_title = models.CharField(
+        _("Bunny'deki başlık"), max_length=250, blank=True, help_text=_("Ders başlığından farklıysa Bunny'ye yeniden gönderilir.")
     )
     external_url = models.URLField(_("dış bağlantı"), blank=True, help_text=_("Form dersleri için."))
     body = models.TextField(_("metin içeriği"), blank=True)
@@ -486,7 +455,12 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
 
     @property
     def video_src(self):
-        return vimeo_src(self.vimeo_id, self.vimeo_hash)
+        """Dersin HLS adresi (CDN koruması açıksa kısa süreli imzalı)."""
+        return bunny.playlist_url(self.video_id)
+
+    @property
+    def video_poster(self):
+        return bunny.thumbnail_url(self.video_id)
 
     @property
     def duration_minutes(self):
@@ -497,9 +471,7 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         return clock(self.duration_seconds) if self.duration_seconds else ""
 
     def sync_duration(self):
-        from course.vimeo import fetch_duration
-
-        self.duration_seconds = fetch_duration(self.vimeo_id)
+        self.duration_seconds = bunny.fetch_duration(self.video_id)
         self.save(update_fields=["duration_seconds", "updated_at"])
         return self.duration_seconds
 
@@ -522,16 +494,16 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         return any(subtitle.is_busy for subtitle in self.subtitles.all())
 
     @property
-    def needs_vimeo_title_sync(self):
-        return bool(self.vimeo_id) and self.vimeo_title != self.title
+    def needs_video_title_sync(self):
+        return bool(self.video_id) and self.video_title != self.title
 
-    def queue_vimeo_title_sync(self):
-        """Başlık Vimeo'dakinden farklıysa kayıt tamamlanınca Vimeo'da güncellenmek üzere sıraya alır."""
-        if not self.needs_vimeo_title_sync:
+    def queue_video_title_sync(self):
+        """Başlık Bunny'dekinden farklıysa kayıt tamamlanınca Bunny'de güncellenmek üzere sıraya alır."""
+        if not self.needs_video_title_sync:
             return False
-        from course.tasks import sync_vimeo_title
+        from course.tasks import sync_video_title
 
-        transaction.on_commit(partial(sync_vimeo_title.delay, str(self.pk)))
+        transaction.on_commit(partial(sync_video_title.delay, str(self.pk)))
         return True
 
     def slug_siblings(self):
@@ -552,38 +524,37 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         self.is_preview = not self.is_preview
         self.save(update_fields=["is_preview", "updated_at"])
 
-    def remove(self, delete_from_vimeo=False):
+    def remove(self, delete_remote=False):
         """Dersi siler. Süren yüklemeler iptal edilir, sunucudaki dosyalar silinir.
 
-        `delete_from_vimeo` ise dersin Vimeo videosu da (kayıt tamamlanınca) silinir; değilse Vimeo'da kalır.
+        `delete_remote` ise dersin Bunny'deki videosu da (kayıt tamamlanınca) silinir; değilse Bunny'de kalır.
         """
-        from course.tasks import delete_vimeo_video
+        from course.tasks import delete_remote_video
 
         for upload in self.video_uploads.all():
             upload.cancel()
             upload.discard_file()
         for subtitle in self.subtitles.all():
             subtitle.file.delete(save=False)
-        if delete_from_vimeo and self.vimeo_id:
-            transaction.on_commit(partial(delete_vimeo_video.delay, self.vimeo_id))
+        if delete_remote and self.video_id:
+            transaction.on_commit(partial(delete_remote_video.delay, self.video_id))
         self.delete()
 
-    def attach_video(self, vimeo_id, vimeo_hash, duration_seconds, vimeo_title):
-        self.vimeo_id = vimeo_id
-        self.vimeo_hash = vimeo_hash
+    def attach_video(self, video_id, duration_seconds, video_title):
+        self.video_id = video_id
         self.duration_seconds = duration_seconds or None
-        self.vimeo_title = vimeo_title
-        self.save(update_fields=["vimeo_id", "vimeo_hash", "duration_seconds", "vimeo_title", "updated_at"])
+        self.video_title = video_title
+        self.save(update_fields=["video_id", "duration_seconds", "video_title", "updated_at"])
         # Altyazılar videoya bağlıdır; yeni video gelince hepsi yeniden gönderilir.
         for subtitle in self.subtitles.all():
-            subtitle.vimeo_uri = ""
+            subtitle.remote_language = ""
             subtitle.schedule()
 
 
 class VideoUploadStatus(models.TextChoices):
     QUEUED = "queued", _("Sırada")
-    UPLOADING = "uploading", _("Vimeo'ya gönderiliyor")
-    PROCESSING = "processing", _("Vimeo'da işleniyor")
+    UPLOADING = "uploading", _("Bunny'ye gönderiliyor")
+    PROCESSING = "processing", _("Bunny'de işleniyor")
     READY = "ready", _("Hazır")
     FAILED = "failed", _("Hata")
     CANCELED = "canceled", _("İptal edildi")
@@ -591,11 +562,12 @@ class VideoUploadStatus(models.TextChoices):
 
 BUSY_UPLOAD_STATUSES = (VideoUploadStatus.QUEUED, VideoUploadStatus.UPLOADING, VideoUploadStatus.PROCESSING)
 FINISHED_UPLOAD_STATUSES = (VideoUploadStatus.READY, VideoUploadStatus.FAILED, VideoUploadStatus.CANCELED)
-# Dosya Vimeo'ya ulaştıktan sonra Vimeo'nun kendi video durumu; bekleme Vimeo tarafında olduğunda panelde açıklanır.
-VIMEO_STATE_LABELS = {
-    "uploading": _("Vimeo dosyayı sıraya aldı"),
-    "transcode_starting": _("Vimeo işlemeye başlıyor"),
-    "transcoding": _("Vimeo işliyor"),
+# Dosya Bunny'ye ulaştıktan sonra Bunny'nin kendi video durumu (bunny.STATE_NAMES); panelde açıklanır.
+SERVICE_STATE_LABELS = {
+    "created": _("Bunny sıraya aldı"),
+    "uploaded": _("Bunny dosyayı aldı"),
+    "processing": _("Bunny işlemeye başladı"),
+    "transcoding": _("Bunny kaliteleri hazırlıyor"),
 }
 # İşçi kapalıyken ya da görev kaybolduğunda yükleme "Sırada" takılı kalır; bu süreden sonra yeniden sıraya alınabilir.
 STALE_QUEUE_MINUTES = 10
@@ -621,9 +593,9 @@ class VideoUploadQuerySet(models.QuerySet):
 
 
 class VideoUpload(BaseModel):
-    """Videonun Vimeo'ya yüklenme işi; hedef ya bir ders ya da bir kursun tanıtım videosudur.
+    """Videonun Bunny Stream'e yüklenme işi; hedef ya bir ders ya da bir kursun tanıtım videosudur.
 
-    Dosya önce sunucuya gelir; Vimeo işlemeyi bitirince silinir, o zamana kadar hata olursa yeniden gönderilebilir.
+    Dosya önce sunucuya gelir; Bunny işlemeyi bitirince silinir, o zamana kadar hata olursa yeniden gönderilebilir.
     """
 
     lesson = models.ForeignKey(
@@ -638,20 +610,21 @@ class VideoUpload(BaseModel):
         verbose_name=_("kurs (tanıtım videosu)"),
     )
     file = models.FileField(
-        _("dosya"), upload_to="video_uploads/%Y/%m/", blank=True, help_text=_("Vimeo videoyu işleyince silinir.")
+        _("dosya"), upload_to="video_uploads/%Y/%m/", blank=True, help_text=_("Bunny videoyu işleyince silinir.")
     )
     original_name = models.CharField(_("dosya adı"), max_length=255)
     size = models.PositiveBigIntegerField(_("boyut (bayt)"), default=0)
     duration_seconds = models.PositiveIntegerField(
-        _("süre (saniye)"), null=True, blank=True, help_text=_("Yüklenen dosyadan okunur; Vimeo işleyince onun süresi esas alınır.")
+        _("süre (saniye)"), null=True, blank=True, help_text=_("Yüklenen dosyadan okunur; Bunny işleyince onun süresi esas alınır.")
     )
     status = models.CharField(
         _("durum"), max_length=20, choices=VideoUploadStatus, default=VideoUploadStatus.QUEUED, db_index=True
     )
     progress = models.PositiveSmallIntegerField(_("ilerleme (%)"), default=0)
-    vimeo_id = models.CharField(_("Vimeo video kimliği"), max_length=40, blank=True)
-    vimeo_title = models.CharField(_("Vimeo'ya gönderilen başlık"), max_length=250, blank=True)
-    vimeo_state = models.CharField(_("Vimeo durumu"), max_length=30, blank=True)
+    video_id = models.CharField(_("Bunny video kimliği"), max_length=40, blank=True)
+    video_title = models.CharField(_("Bunny'ye gönderilen başlık"), max_length=250, blank=True)
+    service_state = models.CharField(_("Bunny durumu"), max_length=30, blank=True)
+    encode_progress = models.PositiveSmallIntegerField(_("Bunny işleme ilerlemesi (%)"), default=0)
     error = models.TextField(_("hata"), blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -661,7 +634,7 @@ class VideoUpload(BaseModel):
         related_name="+",
         verbose_name=_("yükleyen"),
     )
-    sent_at = models.DateTimeField(_("Vimeo'ya ulaştı"), null=True, blank=True)
+    sent_at = models.DateTimeField(_("Bunny'ye ulaştı"), null=True, blank=True)
     finished_at = models.DateTimeField(_("bitiş"), null=True, blank=True)
 
     objects = VideoUploadQuerySet.as_manager()
@@ -693,8 +666,8 @@ class VideoUpload(BaseModel):
         return self.course if self.is_preview else self.lesson.section.course
 
     @property
-    def vimeo_name(self):
-        """Vimeo'daki ad oynatıcıda görünür: dersin ya da kursun Türkçe başlığı."""
+    def video_name(self):
+        """Bunny'deki video adı: dersin ya da kursun Türkçe başlığı."""
         return self.course.title if self.is_preview else self.lesson.title
 
     @property
@@ -728,8 +701,11 @@ class VideoUpload(BaseModel):
         return clock(self.duration_seconds) if self.duration_seconds else ""
 
     @property
-    def vimeo_state_label(self):
-        return VIMEO_STATE_LABELS.get(self.vimeo_state, "")
+    def service_state_label(self):
+        label = SERVICE_STATE_LABELS.get(self.service_state, "")
+        if label and self.encode_progress:
+            return f"{label} · %{self.encode_progress}"
+        return label
 
     @property
     def can_cancel(self):
@@ -757,10 +733,10 @@ class VideoUpload(BaseModel):
         return bool(moved)
 
     def read_duration(self):
-        """Süreyi dosyadan okur; videosu olmayan derse hemen yazılır (video değiştiriliyorsa Vimeo hazır olunca)."""
+        """Süreyi dosyadan okur; videosu olmayan derse hemen yazılır (video değiştiriliyorsa Bunny hazır olunca)."""
         self.duration_seconds = video_file_seconds(self.file.path)
         self.save(update_fields=["duration_seconds", "updated_at"])
-        if self.duration_seconds and self.lesson_id and not self.lesson.vimeo_id:
+        if self.duration_seconds and self.lesson_id and not self.lesson.video_id:
             self.lesson.duration_seconds = self.duration_seconds
             self.lesson.save(update_fields=["duration_seconds", "updated_at"])
 
@@ -772,7 +748,7 @@ class VideoUpload(BaseModel):
     # Panel eylemleri
 
     def retry(self):
-        """Hatalı, iptal edilmiş ya da takılı yüklemeyi aynı dosyayla baştan sıraya alır; Vimeo'da yeni kayıt açılır."""
+        """Hatalı, iptal edilmiş ya da takılı yüklemeyi aynı dosyayla baştan sıraya alır; Bunny'de yeni kayıt açılır."""
         if not self.can_retry or self.has_other_busy_upload():
             return False
         statuses = (VideoUploadStatus.FAILED, VideoUploadStatus.CANCELED, VideoUploadStatus.QUEUED)
@@ -780,8 +756,9 @@ class VideoUpload(BaseModel):
             statuses,
             status=VideoUploadStatus.QUEUED,
             progress=0,
-            vimeo_id="",
-            vimeo_state="",
+            video_id="",
+            service_state="",
+            encode_progress=0,
             error="",
             sent_at=None,
             finished_at=None,
@@ -791,15 +768,15 @@ class VideoUpload(BaseModel):
         return moved
 
     def cancel(self):
-        """Süren yüklemeyi durdurur. Vimeo'da açılmış (henüz derse bağlanmamış) video silinir; dosya yeniden başlatmak için kalır."""
+        """Süren yüklemeyi durdurur. Bunny'de açılmış (henüz derse bağlanmamış) video silinir; dosya yeniden başlatmak için kalır."""
         if not self._move(BUSY_UPLOAD_STATUSES, status=VideoUploadStatus.CANCELED, finished_at=timezone.now()):
             return False
-        # İşçi bu arada Vimeo kaydı açmış olabilir; güncel kimlik okunur.
-        self.refresh_from_db(fields=["vimeo_id"])
-        if self.vimeo_id:
-            from course.tasks import delete_vimeo_video
+        # İşçi bu arada Bunny kaydı açmış olabilir; güncel kimlik okunur.
+        self.refresh_from_db(fields=["video_id"])
+        if self.video_id:
+            from course.tasks import delete_remote_video
 
-            transaction.on_commit(partial(delete_vimeo_video.delay, self.vimeo_id))
+            transaction.on_commit(partial(delete_remote_video.delay, self.video_id))
         return True
 
     def discard(self):
@@ -815,8 +792,8 @@ class VideoUpload(BaseModel):
     def mark_uploading(self):
         return self._move((VideoUploadStatus.QUEUED,), status=VideoUploadStatus.UPLOADING, progress=0)
 
-    def mark_created(self, vimeo_id, vimeo_title):
-        if not self._move((VideoUploadStatus.UPLOADING,), vimeo_id=vimeo_id, vimeo_title=vimeo_title):
+    def mark_created(self, video_id, video_title):
+        if not self._move((VideoUploadStatus.UPLOADING,), video_id=video_id, video_title=video_title):
             raise UploadCanceled
 
     def set_progress(self, sent, total):
@@ -826,20 +803,21 @@ class VideoUpload(BaseModel):
             raise UploadCanceled
 
     def mark_sent(self):
-        """Dosya Vimeo'ya ulaştı, işlemesi beklenir. Yerel kopya, işleme başarısız olursa yeniden gönderilmek üzere kalır."""
+        """Dosya Bunny'ye ulaştı, işlemesi beklenir. Yerel kopya, işleme başarısız olursa yeniden gönderilmek üzere kalır."""
         return self._move(
             (VideoUploadStatus.UPLOADING,), status=VideoUploadStatus.PROCESSING, progress=100, sent_at=timezone.now()
         )
 
-    def set_vimeo_state(self, state):
-        if state and state != self.vimeo_state:
-            self._move((VideoUploadStatus.PROCESSING,), vimeo_state=state)
+    def set_service_state(self, status):
+        if (status.state, status.progress) != (self.service_state, self.encode_progress):
+            self._move((VideoUploadStatus.PROCESSING,), service_state=status.state, encode_progress=status.progress)
 
-    def mark_ready(self, vimeo_status):
+    def mark_ready(self, status):
         moved = self._move(
             (VideoUploadStatus.PROCESSING,),
             status=VideoUploadStatus.READY,
-            vimeo_state=vimeo_status.state,
+            service_state=status.state,
+            encode_progress=100,
             finished_at=timezone.now(),
         )
         if not moved:
@@ -847,10 +825,10 @@ class VideoUpload(BaseModel):
         self.discard_file()
         VideoUpload.objects.filter(pk=self.pk).update(file="")
         if self.is_preview:
-            self.course.attach_preview_video(self.vimeo_id, vimeo_status.hash, self.vimeo_title)
+            self.course.attach_preview_video(self.video_id, self.video_title)
         else:
-            duration = vimeo_status.duration or self.duration_seconds
-            self.lesson.attach_video(self.vimeo_id, vimeo_status.hash, duration, self.vimeo_title)
+            duration = status.duration or self.duration_seconds
+            self.lesson.attach_video(self.video_id, duration, self.video_title)
         return True
 
     def mark_failed(self, error):
@@ -875,7 +853,7 @@ class SubtitleLanguage(models.TextChoices):
 class SubtitleStatus(models.TextChoices):
     WAITING = "waiting", _("Video bekleniyor")
     QUEUED = "queued", _("Gönderiliyor")
-    READY = "ready", _("Vimeo'da")
+    READY = "ready", _("Bunny'de")
     FAILED = "failed", _("Hata")
 
 
@@ -891,7 +869,8 @@ class LessonSubtitle(BaseModel):
     status = models.CharField(
         _("durum"), max_length=20, choices=SubtitleStatus, default=SubtitleStatus.QUEUED, db_index=True
     )
-    vimeo_uri = models.CharField(_("Vimeo altyazı adresi"), max_length=200, blank=True)
+    # Bunny'de altyazı videonun ve dil kodunun altında durur; gönderilmişse dil kodu tutulur.
+    remote_language = models.CharField(_("Bunny'deki altyazı dili"), max_length=10, blank=True)
     error = models.TextField(_("hata"), blank=True)
 
     class Meta:
@@ -916,22 +895,22 @@ class LessonSubtitle(BaseModel):
         return Path(self.file.name).name
 
     def schedule(self):
-        """Videosu hazırsa Vimeo'ya gönderilmek üzere sıraya alır, değilse video hazır olunca gönderilir."""
+        """Videosu hazırsa Bunny'ye gönderilmek üzere sıraya alır, değilse video hazır olunca gönderilir."""
         from course.tasks import upload_subtitle
 
-        ready = self.lesson.vimeo_id and not self.lesson.has_busy_upload
+        ready = self.lesson.video_id and not self.lesson.has_busy_upload
         self.status = SubtitleStatus.QUEUED if ready else SubtitleStatus.WAITING
         self.error = ""
-        self.save(update_fields=["status", "error", "vimeo_uri", "updated_at"])
+        self.save(update_fields=["status", "error", "remote_language", "updated_at"])
         if ready:
             transaction.on_commit(partial(upload_subtitle.delay, str(self.pk)))
 
     def remove(self):
-        """Kaydı ve dosyasını siler; Vimeo'daki altyazı kayıt tamamlanınca kaldırılır."""
-        from course.tasks import delete_text_track
+        """Kaydı ve dosyasını siler; Bunny'deki altyazı kayıt tamamlanınca kaldırılır."""
+        from course.tasks import delete_remote_caption
 
-        if self.vimeo_uri:
-            transaction.on_commit(partial(delete_text_track.delay, self.vimeo_uri))
+        if self.remote_language and self.lesson.video_id:
+            transaction.on_commit(partial(delete_remote_caption.delay, self.lesson.video_id, self.remote_language))
         self.file.delete(save=False)
         self.delete()
 
@@ -939,10 +918,10 @@ class LessonSubtitle(BaseModel):
         self.status = SubtitleStatus.WAITING
         self.save(update_fields=["status", "updated_at"])
 
-    def mark_ready(self, vimeo_uri):
+    def mark_ready(self, language):
         self.status = SubtitleStatus.READY
-        self.vimeo_uri = vimeo_uri
-        self.save(update_fields=["status", "vimeo_uri", "updated_at"])
+        self.remote_language = language
+        self.save(update_fields=["status", "remote_language", "updated_at"])
 
     def mark_failed(self, error):
         self.status = SubtitleStatus.FAILED

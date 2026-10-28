@@ -70,7 +70,6 @@ _COURSES = (
         "lessons": 335,
         "price": "€99.90",
         "image": "img/courses/react.jpg",
-        "preview_video": "https://vimeo.com/1240306462",
     },
     {
         "slug": "sifirdan-uctan-uca-projelerle-python-ve-django-ogren",

@@ -8,7 +8,6 @@ urlpatterns = [
     path("", views.course_list, name="course_list"),
     path("courses/<uuid:course_id>/", views.course_detail, name="course_detail"),
     path("courses/<uuid:course_id>/sync-titles/", views.course_sync_titles, name="course_sync_titles"),
-    path("courses/<uuid:course_id>/folder/", views.course_folder, name="course_folder"),
     path("courses/<uuid:course_id>/videos/", views.course_videos, name="course_videos"),
     path("courses/<uuid:course_id>/structure/", views.course_structure, name="course_structure"),
     path("courses/<uuid:course_id>/sections/", views.section_create, name="section_create"),

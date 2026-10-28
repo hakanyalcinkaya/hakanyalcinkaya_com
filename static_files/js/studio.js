@@ -12,7 +12,7 @@
     toast(event.detail.level, event.detail.text);
   });
 
-  // Tarayıcıdan sunucuya gönderim ilerlemesi; Vimeo'ya gönderim ilerlemesini ders satırı kendisi yeniler.
+  // Tarayıcıdan sunucuya gönderim ilerlemesi; Bunny'ye gönderim ilerlemesini ders satırı kendisi yeniler.
   document.body.addEventListener("htmx:xhr:progress", function (event) {
     var form = event.target.closest && event.target.closest("[data-upload-form]");
     if (!form || !event.detail.lengthComputable) return;

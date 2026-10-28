@@ -145,7 +145,7 @@ class SubtitleForm(forms.Form):
             raise forms.ValidationError(_("Yalnız .srt ve .vtt dosyaları yüklenebilir."))
         if upload.size > SUBTITLE_MAX_BYTES:
             raise forms.ValidationError(_("Altyazı dosyası en fazla 2 MB olabilir."))
-        # Vimeo altyazıyı UTF-8 bekler; farklı kodlamada Türkçe karakterler bozulur.
+        # Oynatıcı altyazıyı UTF-8 bekler; farklı kodlamada Türkçe karakterler bozulur.
         try:
             upload.read().decode("utf-8-sig")
         except UnicodeDecodeError:
@@ -154,7 +154,7 @@ class SubtitleForm(forms.Form):
         return upload
 
     def save(self):
-        """Aynı dilde altyazı varsa dosyası değiştirilir; Vimeo'daki eskisi gönderim sırasında kaldırılır."""
+        """Aynı dilde altyazı varsa dosyası değiştirilir; Bunny'deki eskisinin yerine geçer."""
         language = self.cleaned_data["language"]
         subtitle = LessonSubtitle.objects.filter(lesson=self.lesson, language=language).first()
         if subtitle is None:

@@ -17,3 +17,11 @@ def video_accept():
     from course.models import VIDEO_EXTENSIONS
 
     return ",".join(VIDEO_EXTENSIONS)
+
+
+@register.filter
+def bunny_play_url(video_id):
+    """Videonun Bunny'deki oynatma sayfası (stüdyoda "önizle" bağlantısı)."""
+    from course import bunny
+
+    return bunny.dashboard_url(video_id) if video_id else ""

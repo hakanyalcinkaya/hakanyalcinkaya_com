@@ -81,13 +81,16 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = "account.User"
 
-# Vimeo API: yönetim panelinden video/altyazı yükleme, başlık güncelleme ve süre okuma. Tanımlı değilse işler hata verir.
-# Anahtarın yetkileri: public, private, create, edit, delete, upload, interact.
-VIMEO_ACCESS_TOKEN = env("VIMEO_ACCESS_TOKEN", default="")
-# Yüklenen videolar Vimeo'da gizlenir, yalnız bu alan adlarında gömülebilir ve indirilemez.
-VIMEO_EMBED_DOMAINS = env.list("VIMEO_EMBED_DOMAINS", default=["hakanyalcinkaya.dev", "hakanyalcinkaya.com"])
+# Bunny Stream: yönetim panelinden video/altyazı yükleme, başlık güncelleme, süre okuma ve sitede HLS oynatma.
+# Kütüphane kimliği ve API anahtarı tanımlı değilse işler hata verir.
+BUNNY_LIBRARY_ID = env("BUNNY_LIBRARY_ID", default="")
+BUNNY_API_KEY = env("BUNNY_API_KEY", default="")
+BUNNY_CDN_HOST = env("BUNNY_CDN_HOST", default="")
+# CDN token koruması Bunny'de açıksa oynatma adresleri bu anahtarla kısa süreli imzalanır.
+BUNNY_TOKEN_KEY = env("BUNNY_TOKEN_KEY", default="")
+BUNNY_CDN_TOKEN_AUTH = env.bool("BUNNY_CDN_TOKEN_AUTH", default=False)
 
-# Celery: uzun süren Vimeo işleri (yükleme, işleme takibi, altyazı) arka planda çalışır.
+# Celery: uzun süren video işleri (yükleme, işleme takibi, altyazı) arka planda çalışır.
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_TASK_IGNORE_RESULT = True
 CELERY_TIMEZONE = "Europe/Istanbul"

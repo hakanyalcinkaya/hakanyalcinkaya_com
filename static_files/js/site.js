@@ -471,43 +471,103 @@
     startReviews();
   }
 
-  // Tanıtım videosu: görsele tıklanınca Video.js oynatıcısı (Vimeo kaynağı) yüklenir ve görselin yerine geçer.
-  // Oynatıcı paketi büyük olduğu için yalnız tıklanınca yüklenir (frontend/ → static_files/js/videojs/player.js).
-  // Django tüm sayfalarda "Referrer-Policy: same-origin" gönderir; alan adı kısıtlı Vimeo videoları bu bilgi olmadan oynamaz.
-  // Yalnız Vimeo bağlantısı için Vimeo'nun kendi gömme kodundaki politika kullanılır.
-  var VIMEO_REFERRER_POLICY = "strict-origin-when-cross-origin";
-  var VIMEO_DEFAULT_QUALITY = "720p";
+  // Video.js oynatıcısı (HLS, Bunny Stream). Paket büyük olduğu için yalnız gerektiğinde yüklenir
+  // (frontend/ → static_files/js/videojs/player.js). Açılışta 720p seçilir; kalite menüsünden değiştirilebilir.
+  var DEFAULT_QUALITY_HEIGHT = 720;
+  function mountPlayer(target, options) {
+    // HLS motoru CDN reddettiğinde (ör. 403) hata vermeden boş kalıyor; liste önce yoklanır, alınamazsa açıklama gösterilir.
+    return fetch(options.src, { credentials: "omit" }).then(function (response) {
+      if (response.ok) return createPlayer(target, options);
+      console.warn("Video alınamadı (" + response.status + "): Bunny CDN bu sayfanın adresine izin vermiyor olabilir. Port içeren adresler (ör. :8001) reddedilir.");
+      showPlayerError(target);
+      return null;
+    });
+  }
+
+  function createPlayer(target, options) {
+    return import(options.playerSrc).then(function (videojs) {
+      // Oynatıcı metinleri <media-i18n> sağlayıcısından çevrilir; dil sayfanın dilinden gelir.
+      var i18n = document.createElement("media-i18n");
+      var player = document.createElement("video-player");
+      var skin = document.createElement("video-skin");
+      var media = document.createElement("hlsjs-video");
+      i18n.className = "d-block";
+      i18n.setAttribute("lang", document.documentElement.lang || "tr");
+      player.className = "d-block hy-video";
+      skin.className = "hy-video-skin";
+      media.setAttribute("src", options.src);
+      media.setAttribute("playsinline", "");
+      media.setAttribute("crossorigin", "");
+      if (options.poster) media.setAttribute("poster", options.poster);
+      if (options.autoplay) media.setAttribute("autoplay", "");
+      (options.tracks || []).forEach(function (item) {
+        var track = document.createElement("track");
+        track.kind = "subtitles";
+        track.src = item.src;
+        track.srclang = item.lang;
+        track.label = item.label;
+        media.appendChild(track);
+      });
+      videojs.preferQuality(media, DEFAULT_QUALITY_HEIGHT);
+      // Video alınamazsa (ör. CDN izin vermedi) oynatıcı yerine açıklama gösterilir.
+      media.addEventListener("error", function () { showPlayerError(i18n); }, { once: true });
+      skin.appendChild(media);
+      player.appendChild(skin);
+      i18n.appendChild(player);
+      target.replaceWith(i18n);
+      return media;
+    });
+  }
+
+  function showPlayerError(element) {
+    var box = document.createElement("div");
+    box.className = "d-flex flex-column align-items-center justify-content-center text-center text-white bg-black p-4";
+    box.setAttribute("role", "alert");
+    box.innerHTML = '<i class="bi bi-exclamation-octagon fs-1" aria-hidden="true"></i><p class="mt-2 mb-0">Video oynatılamadı. Sayfayı yenileyip tekrar dene; sorun sürerse bize yaz.</p>';
+    // Ders sayfasında yer tutucu zaten 16:9 kutunun içinde; tanıtım düğmesinin yerine 16:9 kutu kurulur.
+    var holder = box;
+    if (!element.parentElement.classList.contains("ratio")) {
+      holder = document.createElement("div");
+      holder.className = "ratio ratio-16x9 bg-black";
+      holder.appendChild(box);
+    }
+    element.replaceWith(holder);
+  }
+
+  function playerFailed() {
+    if (window.hyToast) window.hyToast("error", "Video yüklenemedi. Sayfayı yenileyip tekrar dene.");
+  }
+
+  // Tanıtım videosu: görsele tıklanınca oynatıcı görselin yerine geçer ve oynamaya başlar.
   document.querySelectorAll("[data-preview-video]").forEach(function (trigger) {
     trigger.addEventListener("click", function () {
       trigger.setAttribute("aria-busy", "true");
-      import(trigger.getAttribute("data-player-src"))
-        .then(function (videojs) {
-          // Oynatıcı metinleri <media-i18n> sağlayıcısından çevrilir; dil sayfanın dilinden gelir.
-          var i18n = document.createElement("media-i18n");
-          var player = document.createElement("video-player");
-          var skin = document.createElement("video-skin");
-          var media = document.createElement("vimeo-video");
-          i18n.className = "d-block";
-          i18n.setAttribute("lang", document.documentElement.lang || "tr");
-          player.className = "d-block hy-video";
-          skin.className = "hy-video-skin";
-          // Vimeo, alan adı kısıtlı videolarda referrer ister; Django'nun same-origin politikası onu göndermez.
-          // Eklenti referrerpolicy özniteliğini iframe'e aktarmadığı için kaynak verilmeden önce doğrudan ayarlanır.
-          media.shadowRoot.querySelector("iframe").referrerPolicy = VIMEO_REFERRER_POLICY;
-          media.setAttribute("src", trigger.getAttribute("data-preview-video"));
-          media.setAttribute("autoplay", "");
-          media.setAttribute("playsinline", "");
-          videojs.enableVimeoQuality(media, VIMEO_DEFAULT_QUALITY);
-          skin.appendChild(media);
-          player.appendChild(skin);
-          i18n.appendChild(player);
-          trigger.replaceWith(i18n);
-        })
-        .catch(function () {
-          trigger.removeAttribute("aria-busy");
-          if (window.hyToast) window.hyToast("error", "Video yüklenemedi. Sayfayı yenileyip tekrar dene.");
-        });
+      mountPlayer(trigger, {
+        playerSrc: trigger.getAttribute("data-player-src"),
+        src: trigger.getAttribute("data-preview-video"),
+        poster: trigger.getAttribute("data-poster"),
+        autoplay: true,
+      }).catch(function () {
+        trigger.removeAttribute("aria-busy");
+        playerFailed();
+      });
     });
+  });
+
+  // Ders videosu: sayfa açılınca yer tutucunun yerine oynatıcı kurulur; altyazılar JSON olarak gelir.
+  document.querySelectorAll("[data-lesson-video]").forEach(function (holder) {
+    var tracks = [];
+    try {
+      tracks = JSON.parse(holder.getAttribute("data-tracks") || "[]");
+    } catch (error) {
+      tracks = [];
+    }
+    mountPlayer(holder, {
+      playerSrc: holder.getAttribute("data-player-src"),
+      src: holder.getAttribute("data-lesson-video"),
+      poster: holder.getAttribute("data-poster"),
+      tracks: tracks,
+    }).catch(playerFailed);
   });
 
   // Bildirimler: Django mesajları sağ üstte kendiliğinden kapanan toast olarak gösterilir (SweetAlert2).

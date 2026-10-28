@@ -1,6 +1,6 @@
 """Celery uygulaması. Çalıştırma: `celery -A config worker -l info -P threads` (Redis açık olmalı).
 
-İşler ağ ağırlıklı (Vimeo yükleme); thread havuzu yeterli. macOS'ta varsayılan prefork havuzu görevleri çalıştıramıyor.
+İşler ağ ağırlıklı (video yükleme); thread havuzu yeterli. macOS'ta varsayılan prefork havuzu görevleri çalıştıramıyor.
 """
 
 import os

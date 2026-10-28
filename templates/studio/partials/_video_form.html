@@ -15,7 +15,7 @@
   {% for error in form.non_field_errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
   <div class="progress studio-progress mt-2 d-none" role="progressbar" aria-label="Sunucuya yükleme" aria-valuemin="0" aria-valuemax="100" data-upload-progress><div class="progress-bar"></div></div>
   <div class="form-text">
-    Vimeo'daki başlık: <strong>{% if course %}{{ course.title }}{% else %}{{ lesson.title }}{% endif %}</strong>. Dosya önce sunucuya, ardından arka planda Vimeo'ya gönderilir; sayfadan ayrılabilirsin.
-    {% if course and course.preview_vimeo_id or lesson.vimeo_id %}Mevcut video, yenisi hazır olunca değişir; eskisi Vimeo'da kalır.{% endif %}
+    Bunny'deki başlık: <strong>{% if course %}{{ course.title }}{% else %}{{ lesson.title }}{% endif %}</strong>. Dosya önce sunucuya, ardından arka planda Vimeo'ya gönderilir; sayfadan ayrılabilirsin.
+    {% if course and course.preview_video_id or lesson.video_id %}Mevcut video, yenisi hazır olunca değişir; eskisi Bunny'de kalır.{% endif %}
   </div>
 </form>
