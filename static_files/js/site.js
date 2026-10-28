@@ -471,6 +471,45 @@
     startReviews();
   }
 
+  // Tanıtım videosu: görsele tıklanınca Video.js oynatıcısı (Vimeo kaynağı) yüklenir ve görselin yerine geçer.
+  // Oynatıcı paketi büyük olduğu için yalnız tıklanınca yüklenir (frontend/ → static_files/js/videojs/player.js).
+  // Django tüm sayfalarda "Referrer-Policy: same-origin" gönderir; alan adı kısıtlı Vimeo videoları bu bilgi olmadan oynamaz.
+  // Yalnız Vimeo bağlantısı için Vimeo'nun kendi gömme kodundaki politika kullanılır.
+  var VIMEO_REFERRER_POLICY = "strict-origin-when-cross-origin";
+  var VIMEO_DEFAULT_QUALITY = "720p";
+  document.querySelectorAll("[data-preview-video]").forEach(function (trigger) {
+    trigger.addEventListener("click", function () {
+      trigger.setAttribute("aria-busy", "true");
+      import(trigger.getAttribute("data-player-src"))
+        .then(function (videojs) {
+          // Oynatıcı metinleri <media-i18n> sağlayıcısından çevrilir; dil sayfanın dilinden gelir.
+          var i18n = document.createElement("media-i18n");
+          var player = document.createElement("video-player");
+          var skin = document.createElement("video-skin");
+          var media = document.createElement("vimeo-video");
+          i18n.className = "d-block";
+          i18n.setAttribute("lang", document.documentElement.lang || "tr");
+          player.className = "d-block hy-video";
+          skin.className = "hy-video-skin";
+          // Vimeo, alan adı kısıtlı videolarda referrer ister; Django'nun same-origin politikası onu göndermez.
+          // Eklenti referrerpolicy özniteliğini iframe'e aktarmadığı için kaynak verilmeden önce doğrudan ayarlanır.
+          media.shadowRoot.querySelector("iframe").referrerPolicy = VIMEO_REFERRER_POLICY;
+          media.setAttribute("src", trigger.getAttribute("data-preview-video"));
+          media.setAttribute("autoplay", "");
+          media.setAttribute("playsinline", "");
+          videojs.enableVimeoQuality(media, VIMEO_DEFAULT_QUALITY);
+          skin.appendChild(media);
+          player.appendChild(skin);
+          i18n.appendChild(player);
+          trigger.replaceWith(i18n);
+        })
+        .catch(function () {
+          trigger.removeAttribute("aria-busy");
+          if (window.hyToast) window.hyToast("error", "Video yüklenemedi. Sayfayı yenileyip tekrar dene.");
+        });
+    });
+  });
+
   // Bildirimler: Django mesajları sağ üstte kendiliğinden kapanan toast olarak gösterilir (SweetAlert2).
   var toastIcons = { success: "success", info: "info", warning: "warning", error: "error", debug: "info" };
   var toast = window.Swal && window.Swal.mixin({

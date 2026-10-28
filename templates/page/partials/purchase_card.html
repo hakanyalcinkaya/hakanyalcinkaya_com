@@ -1,8 +1,6 @@
 {% load static %}
 <div class="card {{ card_class|default:'shadow' }} overflow-hidden">
-  <a href="{{ course.url }}#mufredat" class="ratio ratio-16x9 bg-body-secondary d-block border-bottom" aria-label="Müfredata git">
-    <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" decoding="async" class="object-fit-cover">
-  </a>
+  {% include "page/partials/preview_media.html" with media_class=" border-bottom" %}
   <div class="card-body p-4">
     <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
     {% include "page/partials/buy_actions.html" %}

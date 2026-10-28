@@ -1,0 +1,2 @@
+{% url 'studio:lesson_video_status' lesson.id as status_url %}
+{% with lesson_id=lesson.id|stringformat:"s" %}{% with cell_id="lesson-"|add:lesson_id|add:"-video" %}{% include "studio/partials/_video_status.html" with upload=lesson.latest_upload vimeo_id=lesson.vimeo_id duration=lesson.duration_display|default:"süre yok" %}{% endwith %}{% endwith %}

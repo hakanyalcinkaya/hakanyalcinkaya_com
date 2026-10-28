@@ -1,0 +1,7 @@
+{# Başlık Vimeo'dakinden farklıyken arka plandaki güncelleme bitene kadar birkaç saniyede bir yenilenir. #}
+<div id="lesson-{{ lesson.id }}-title" class="d-flex flex-wrap align-items-center gap-2"{% if lesson.needs_vimeo_title_sync %} hx-get="{% url 'studio:lesson_title' lesson.id %}" hx-trigger="every 5s" hx-swap="outerHTML"{% endif %}>
+  <span class="fw-medium">{{ lesson.title }}</span>
+  {% if not lesson.is_video %}<span class="badge border text-body-secondary fw-normal">{{ lesson.get_kind_display }}</span>{% endif %}
+  {% if lesson.needs_vimeo_title_sync %}<span class="badge bg-warning-subtle text-warning-emphasis fw-normal" title="Vimeo'daki başlık: {{ lesson.vimeo_title|default:'—' }}"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Vimeo başlığı güncelleniyor</span>{% endif %}
+  <button type="button" class="btn btn-link btn-sm p-0 link-secondary" hx-get="{% url 'studio:lesson_title' lesson.id %}?edit=1" hx-target="#lesson-{{ lesson.id }}-title" hx-swap="outerHTML" aria-label="Başlığı düzenle"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+</div>

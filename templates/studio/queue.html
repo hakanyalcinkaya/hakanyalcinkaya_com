@@ -1,0 +1,14 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Kuyruk{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Kuyruk</h1>
+  <p class="text-body-secondary mb-0">Video yüklemelerinin durumu. Süren işi iptal edebilir, iptal edilen ya da hatalı işi aynı dosyayla yeniden başlatabilir, biten işleri temizleyebilirsin.</p>
+</div>
+{% if not worker_online %}
+<div class="alert alert-warning small" role="alert">
+  <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Celery işçisi çalışmıyor; işler "Sırada" bekler. Proje klasöründe başlat: <code>celery -A config worker -l info -P threads</code>
+</div>
+{% endif %}
+{% include "studio/partials/_queue.html" %}
+{% endblock %}

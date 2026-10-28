@@ -1,0 +1,12 @@
+<div id="lesson-{{ lesson.id }}-subtitles" class="d-flex flex-wrap align-items-center gap-1 small"{% if oob %} hx-swap-oob="true"{% endif %}{% if lesson.has_busy_subtitles %} hx-get="{% url 'studio:lesson_subtitles_status' lesson.id %}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
+  {% for subtitle in lesson.subtitles.all %}
+  <span class="badge border fw-normal d-inline-flex align-items-center gap-1 {% if subtitle.is_failed %}border-danger-subtle text-danger-emphasis{% elif subtitle.status == 'ready' %}text-success-emphasis{% else %}text-body-secondary{% endif %}" title="{{ subtitle.get_language_display }} · {{ subtitle.get_status_display }}{% if subtitle.error %}: {{ subtitle.error }}{% endif %} · {{ subtitle.file_name }}">
+    {% if subtitle.is_busy %}<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>{% elif subtitle.status == 'waiting' %}<i class="bi bi-hourglass-split" aria-hidden="true"></i>{% elif subtitle.is_failed %}<i class="bi bi-x-circle" aria-hidden="true"></i>{% endif %}
+    {{ subtitle.language|upper }}<span class="visually-hidden">: {{ subtitle.get_status_display }}</span>
+    {% if subtitle.is_failed %}<button type="button" class="btn btn-link btn-sm p-0 lh-1 link-secondary" aria-label="{{ subtitle.get_language_display }} altyazıyı yeniden gönder" title="Yeniden gönder" hx-post="{% url 'studio:subtitle_retry' subtitle.id %}" hx-target="#lesson-{{ lesson.id }}-subtitles" hx-swap="outerHTML"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i></button>{% endif %}
+    <button type="button" class="btn btn-link btn-sm p-0 lh-1 link-secondary" aria-label="{{ subtitle.get_language_display }} altyazıyı sil" hx-post="{% url 'studio:subtitle_delete' subtitle.id %}" hx-confirm="{{ subtitle.get_language_display }} altyazı silinsin mi? Vimeo'dan da kaldırılır." hx-target="#lesson-{{ lesson.id }}-subtitles" hx-swap="outerHTML"><i class="bi bi-x" aria-hidden="true"></i></button>
+  </span>
+  {% empty %}
+  <span class="text-body-tertiary">Altyazı yok</span>
+  {% endfor %}
+</div>

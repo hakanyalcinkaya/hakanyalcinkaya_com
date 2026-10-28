@@ -1,0 +1,30 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Kurslar{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Kurslar</h1>
+    <p class="text-body-secondary mb-0">Ders videolarını Vimeo'ya yükle, altyazı ekle, başlıkları eşitle.</p>
+  </div>
+  <a href="{% url 'admin:course_course_add' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Kurs ekle</a>
+</div>
+{% if courses %}
+<div class="list-group">
+  {% for course in courses %}
+  <a href="{% url 'studio:course_detail' course.id %}" class="list-group-item list-group-item-action d-flex flex-wrap align-items-center gap-3 py-3">
+    <div class="me-auto">
+      <div class="fw-semibold">{{ course.title }}</div>
+      <div class="small text-body-secondary">{{ course.get_status_display }}</div>
+    </div>
+    <span class="small text-body-secondary"><i class="bi bi-camera-video me-1" aria-hidden="true"></i>{{ course.video_ready_total }} / {{ course.video_lesson_total }} video</span>
+    {% if course.busy_upload_total %}<span class="badge text-bg-primary">{{ course.busy_upload_total }} yükleme sürüyor</span>{% endif %}
+    <i class="bi bi-chevron-right text-body-tertiary" aria-hidden="true"></i>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="border rounded p-4 text-center text-body-secondary">
+  Henüz kurs yok. Kurs, bölüm ve dersleri <a href="{% url 'admin:course_course_changelist' %}">Django admin</a>'den ekleyebilirsin.
+</div>
+{% endif %}
+{% endblock %}

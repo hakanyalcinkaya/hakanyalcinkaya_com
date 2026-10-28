@@ -196,3 +196,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Frontend build
+frontend/node_modules/

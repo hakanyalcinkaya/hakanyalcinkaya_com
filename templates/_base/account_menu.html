@@ -9,6 +9,9 @@
     <li><a href="{{ library_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-collection-play text-body-tertiary" aria-hidden="true"></i>Kurslarım</a></li>
     <li><a href="{% url 'page:course_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-grid text-body-tertiary" aria-hidden="true"></i>Tüm Kurslar</a></li>
     <li><a href="{{ settings_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-gear text-body-tertiary" aria-hidden="true"></i>Ayarlar</a></li>
+    {% if request.user.is_staff or request.user.is_superuser %}
+    <li><a href="{% url 'studio:course_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-camera-reels text-body-tertiary" aria-hidden="true"></i>Stüdyo</a></li>
+    {% endif %}
     <li><hr class="dropdown-divider"></li>
     <li>
       <details class="hy-fold">

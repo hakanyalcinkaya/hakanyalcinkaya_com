@@ -20,7 +20,9 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    # Gerçek yönetim paneli tahmin edilmesi zor bir adreste; /admin/ giriş denemelerini kaydeden sahte sayfa.
+    path("verona/", admin.site.urls),
+    path("admin/", include("admin_honeypot.urls")),
 ]
 
 if settings.DEBUG:
@@ -30,6 +32,7 @@ if settings.DEBUG:
     ]
 
 urlpatterns += [
+    path("studio/", include("studio.urls")),
     path("", include("page.urls")),
 ]
 

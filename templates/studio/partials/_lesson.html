@@ -1,0 +1,23 @@
+{# Video satırı. Tutamaktan sürüklenir; üstüne SRT/VTT bırakılınca altyazı formu dosyayla açılır (studio.js). #}
+<div class="list-group-item py-2 studio-lesson" id="lesson-{{ lesson.id }}" data-lesson-id="{{ lesson.id }}"{% if lesson.is_video %} data-subtitle-drop data-subtitle-url="{% url 'studio:lesson_subtitles' lesson.id %}"{% endif %}>
+  <div class="row g-2 align-items-center">
+    <div class="col-auto d-flex align-items-center gap-2">
+      <span class="studio-handle studio-lesson-handle text-body-tertiary" title="Sürükleyerek sırala ya da başka kategoriye taşı"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Videoyu taşı</span></span>
+      <span class="font-monospace small text-body-tertiary" data-lesson-no>{{ section_no }}.{{ lesson_no }}</span>
+    </div>
+    <div class="col">{% include "studio/partials/_lesson_title.html" %}</div>
+    {% if lesson.is_video %}
+    <div class="col-12 col-md-4 col-xl-3">{% include "studio/partials/_lesson_video.html" %}</div>
+    <div class="col-12 col-md-auto">{% include "studio/partials/_lesson_subtitles.html" %}</div>
+    {% endif %}
+    <div class="col-12 col-md-auto d-flex flex-wrap align-items-center gap-1">
+      {% include "studio/partials/_lesson_status.html" %}
+      {% if lesson.is_video %}
+      <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_video' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-form" aria-label="Videoyu değiştir" title="Videoyu değiştir"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_subtitles' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-form" aria-label="Altyazı ekle" title="Altyazı ekle (SRT dosyasını satırın üstüne de bırakabilirsin)"><i class="bi bi-badge-cc" aria-hidden="true"></i></button>
+      {% endif %}
+      <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_delete' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-form" aria-label="Dersi sil" title="Dersi sil"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+    </div>
+  </div>
+  <div id="lesson-{{ lesson.id }}-form"></div>
+</div>

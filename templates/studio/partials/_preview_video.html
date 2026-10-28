@@ -1,0 +1,2 @@
+{% url 'studio:course_preview_status' course.id as status_url %}
+{% with upload=course.latest_preview_upload %}{% include "studio/partials/_video_status.html" with cell_id="course-preview-video" vimeo_id=course.preview_vimeo_id duration=upload.duration_display %}{% endwith %}

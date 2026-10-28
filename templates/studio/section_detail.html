@@ -1,0 +1,25 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{{ section.title }} · {{ course.title }}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2">
+  <a href="{% url 'studio:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a> <span class="text-body-tertiary">/</span>
+  <a href="{% url 'studio:course_detail' course.id %}" class="link-secondary text-decoration-none">{{ course.title }}</a> <span class="text-body-tertiary">/</span>
+</nav>
+<h1 class="h3 mb-1">{{ section_no }}. {{ section.title }}</h1>
+<p class="small text-body-secondary mb-4">Bu kategoriye video yükle. Dosyalar adlarına göre sıralanıp kategorinin sonuna eklenir; başlıkları ve sıraları aşağıdan düzenlenir.</p>
+
+{% if not vimeo_configured %}
+<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i><code>.env</code> dosyasında <code>VIMEO_ACCESS_TOKEN</code> yok; yüklemeler hata verir.</div>
+{% endif %}
+{% if not worker_online %}
+<div class="alert alert-warning small" role="alert">
+  <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Celery işçisi çalışmıyor; yüklemeler "Sırada" bekler. Proje klasöründe başlat: <code>celery -A config worker -l info -P threads</code>
+</div>
+{% endif %}
+
+{% url 'studio:section_videos' section.id as section_videos_url %}
+{% include "studio/partials/_upload_zone.html" with upload_url=section_videos_url hint="Videolar bu kategoriye taslak ders olarak eklenir; başlık dosya adıdır." %}
+<div class="mt-3" data-structure data-structure-url="{% url 'studio:course_structure' course.id %}" data-reorder-sections="false" data-section-offset="{{ section_no }}">
+  {% include "studio/partials/_section.html" with on_section_page=True %}
+</div>
+{% endblock %}

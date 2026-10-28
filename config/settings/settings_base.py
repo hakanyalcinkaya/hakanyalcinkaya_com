@@ -27,14 +27,24 @@ BASE_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "core.apps.AdminHoneypotConfig",
+    "adminsortable2",
     "django_htmx",
     "crispy_forms",
     "crispy_bootstrap5",
 ]
 
 MY_APPS = [
+    "core",
     "account",
+    "course",
+    "learning",
+    "discount",
+    "cart",
+    "order",
+    "newsletter",
     "page",
+    "studio",
 ]
 
 INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + MY_APPS
@@ -70,6 +80,19 @@ TEMPLATES = [
 ]
 
 AUTH_USER_MODEL = "account.User"
+
+# Vimeo API: yönetim panelinden video/altyazı yükleme, başlık güncelleme ve süre okuma. Tanımlı değilse işler hata verir.
+# Anahtarın yetkileri: public, private, create, edit, delete, upload, interact.
+VIMEO_ACCESS_TOKEN = env("VIMEO_ACCESS_TOKEN", default="")
+# Yüklenen videolar Vimeo'da gizlenir, yalnız bu alan adlarında gömülebilir ve indirilemez.
+VIMEO_EMBED_DOMAINS = env.list("VIMEO_EMBED_DOMAINS", default=["hakanyalcinkaya.dev", "hakanyalcinkaya.com"])
+
+# Celery: uzun süren Vimeo işleri (yükleme, işleme takibi, altyazı) arka planda çalışır.
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_TIMEZONE = "Europe/Istanbul"
+# Yükleme görevleri dakikalar sürer; işçi aynı anda tek görev alsın ki sıradakiler başka işçiye gidebilsin.
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 LOGIN_URL = "page:login"
 LOGIN_REDIRECT_URL = "page:library"
 LOGOUT_REDIRECT_URL = "page:index"

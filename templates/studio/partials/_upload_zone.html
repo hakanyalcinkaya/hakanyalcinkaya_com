@@ -1,0 +1,9 @@
+{% load studio_tags %}
+{# Toplu video yükleme alanı: dosyalar sürüklenir ya da seçilir, adlarına göre sıralanıp tek tek sunucuya gönderilir (studio.js). #}
+<div class="studio-dropzone border border-2 rounded-3 p-4 text-center" data-upload-zone data-upload-url="{{ upload_url }}">
+  <i class="bi bi-cloud-arrow-up fs-3 text-body-tertiary" aria-hidden="true"></i>
+  <div class="fw-medium mt-1">Videoları buraya sürükle</div>
+  <div class="small text-body-secondary">{{ hint }}</div>
+  <label class="btn btn-outline-secondary btn-sm mt-2 mb-0">Dosya seç<input type="file" class="visually-hidden" accept="{% video_accept %}" multiple data-upload-input></label>
+  <ul class="list-unstyled text-start small mt-3 mb-0 vstack gap-2" data-upload-list aria-live="polite"></ul>
+</div>

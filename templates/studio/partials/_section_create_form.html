@@ -1,0 +1,8 @@
+<form id="section-create" class="d-flex flex-wrap align-items-start gap-2 mt-3" hx-post="{% url 'studio:section_create' course.id %}" hx-target="this" hx-swap="outerHTML">
+  <div class="flex-grow-1">
+    <label class="visually-hidden" for="{{ section_form.title.id_for_label }}">Yeni kategori adı</label>
+    {{ section_form.title }}
+    {% for error in section_form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Kategori ekle</button>
+</form>

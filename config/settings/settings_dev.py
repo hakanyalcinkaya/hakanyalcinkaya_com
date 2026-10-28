@@ -17,6 +17,10 @@ MIDDLEWARE = [
 
 INTERNAL_IPS = ["127.0.0.1", "::1"]
 
+# Vimeo videoları yalnız izinli alan adlarında oynar; yerelde /etc/hosts ile 127.0.0.1'e yönlenen alt alan adı kullanılır.
+# .dev alan adları tarayıcıda HTTPS'e zorlandığı için yerel adres .com altında.
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "local.hakanyalcinkaya.com"]
+
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "config.storage.DevStaticFilesStorage"},

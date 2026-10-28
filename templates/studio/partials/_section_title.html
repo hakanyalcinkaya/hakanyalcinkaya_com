@@ -1,0 +1,4 @@
+<div id="section-{{ section.id }}-title" class="d-flex flex-wrap align-items-center gap-2">
+  <a href="{% url 'studio:section_detail' section.id %}" class="fw-semibold link-body-emphasis text-decoration-none">{{ section.title }}</a>
+  <button type="button" class="btn btn-link btn-sm p-0 link-secondary" hx-get="{% url 'studio:section_title' section.id %}?edit=1" hx-target="#section-{{ section.id }}-title" hx-swap="outerHTML" aria-label="Kategori adını düzenle"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+</div>

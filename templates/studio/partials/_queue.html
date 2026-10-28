@@ -1,0 +1,21 @@
+{# Süren iş varken her 3 saniyede yenilenir; eylemler bu listeyi ve sekme sayılarını yeniden çizer. #}
+{% url 'studio:queue' as queue_url %}
+<div id="queue-list"{% if has_busy %} hx-get="{{ queue_url }}?filter={{ queue_filter }}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <nav class="nav nav-pills small" aria-label="Kuyruk filtresi">
+      <a href="{{ queue_url }}?filter=all" class="nav-link py-1 px-3{% if queue_filter == 'all' %} active{% endif %}" hx-get="{{ queue_url }}?filter=all" hx-target="#queue-list" hx-swap="outerHTML" hx-push-url="true"{% if queue_filter == 'all' %} aria-current="page"{% endif %}>Tümü <span class="opacity-75">{{ totals.all }}</span></a>
+      <a href="{{ queue_url }}?filter=active" class="nav-link py-1 px-3{% if queue_filter == 'active' %} active{% endif %}" hx-get="{{ queue_url }}?filter=active" hx-target="#queue-list" hx-swap="outerHTML" hx-push-url="true"{% if queue_filter == 'active' %} aria-current="page"{% endif %}>Sürenler <span class="opacity-75">{{ totals.active }}</span></a>
+      <a href="{{ queue_url }}?filter=finished" class="nav-link py-1 px-3{% if queue_filter == 'finished' %} active{% endif %}" hx-get="{{ queue_url }}?filter=finished" hx-target="#queue-list" hx-swap="outerHTML" hx-push-url="true"{% if queue_filter == 'finished' %} aria-current="page"{% endif %}>Bitenler <span class="opacity-75">{{ totals.finished }}</span></a>
+    </nav>
+    {% if totals.finished %}
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:queue_clear' %}" hx-vals='{"filter": "{{ queue_filter }}"}' hx-target="#queue-list" hx-swap="outerHTML" hx-confirm="Biten {{ totals.finished }} iş kuyruktan temizlensin mi? Hatalı ve iptal edilen işlerin sunucudaki dosyaları da silinir; derslere bağlanmış videolar etkilenmez."><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Bitenleri temizle</button>
+    {% endif %}
+  </div>
+  {% if uploads %}
+  <div class="list-group">
+    {% for upload in uploads %}{% include "studio/partials/_queue_row.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="border rounded p-4 text-center text-body-secondary">Bu görünümde iş yok.</div>
+  {% endif %}
+</div>

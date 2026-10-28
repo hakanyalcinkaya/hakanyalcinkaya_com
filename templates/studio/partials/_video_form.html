@@ -1,0 +1,21 @@
+{# Hedef: kurs verilmişse tanıtım videosu, değilse ders videosu. #}
+{% if course %}{% url 'studio:course_preview' course.id as form_url %}{% else %}{% url 'studio:lesson_video' lesson.id as form_url %}{% endif %}
+<form class="border rounded bg-body-tertiary p-3 mt-3" hx-post="{{ form_url }}" hx-encoding="multipart/form-data" hx-target="{% if course %}#course-preview-form{% else %}#lesson-{{ lesson.id }}-form{% endif %}" data-upload-form>
+  <div class="row g-2 align-items-end">
+    <div class="col-md">
+      <label class="form-label small mb-1" for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+      {{ form.file }}
+    </div>
+    <div class="col-md-auto d-flex gap-2">
+      <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Yükle</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" data-form-close>Vazgeç</button>
+    </div>
+  </div>
+  {% for error in form.file.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  {% for error in form.non_field_errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  <div class="progress studio-progress mt-2 d-none" role="progressbar" aria-label="Sunucuya yükleme" aria-valuemin="0" aria-valuemax="100" data-upload-progress><div class="progress-bar"></div></div>
+  <div class="form-text">
+    Vimeo'daki başlık: <strong>{% if course %}{{ course.title }}{% else %}{{ lesson.title }}{% endif %}</strong>. Dosya önce sunucuya, ardından arka planda Vimeo'ya gönderilir; sayfadan ayrılabilirsin.
+    {% if course and course.preview_vimeo_id or lesson.vimeo_id %}Mevcut video, yenisi hazır olunca değişir; eskisi Vimeo'da kalır.{% endif %}
+  </div>
+</form>

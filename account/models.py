@@ -3,6 +3,9 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 
+from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID
+from core.text import slugify_tr
+
 
 def lower_tr(text):
     """Türkçe küçük harf: İ → i, I → ı (str.lower() İ'yi "i̇" yapar)."""
@@ -41,7 +44,7 @@ class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+class User(BaseUUID, AbstractUser):
     """Kullanıcı adı yerine e-posta ile giriş yapan hesap."""
 
     username = None
@@ -76,3 +79,36 @@ class User(AbstractUser):
         """Hesap rozeti, küçük harfle: ad ve soyadın baş harfleri; ikisi de yoksa e-postanın ilk iki harfi."""
         letters = "".join(name.strip()[:1] for name in (self.first_name, self.last_name) if name.strip())
         return lower_tr(letters or self.email[:2])
+
+
+class InstructorProfile(BaseModel, BaseStatus, BaseSortOrder):
+    """Eğitmen profili. Admin oluşturur ve bir kullanıcıya bağlar; kurslara birden fazla eğitmen atanabilir."""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="instructor_profile", verbose_name=_("kullanıcı"))
+    display_name = models.CharField(_("görünen ad"), max_length=120)
+    slug = models.SlugField(_("slug"), max_length=140, unique=True, blank=True)
+    title = models.CharField(_("ünvan"), max_length=120, blank=True, help_text=_("Örn. Yazılım Geliştirici"))
+    bio = models.TextField(_("biyografi"), blank=True)
+    photo = models.ImageField(_("fotoğraf"), upload_to="instructors/", blank=True)
+    website = models.URLField(_("web sitesi"), blank=True)
+    youtube = models.URLField(_("YouTube"), blank=True)
+    linkedin = models.URLField(_("LinkedIn"), blank=True)
+    github = models.URLField(_("GitHub"), blank=True)
+
+    class Meta:
+        verbose_name = _("eğitmen profili")
+        verbose_name_plural = _("eğitmen profilleri")
+        ordering = ("sort_order", "display_name")
+
+    def __str__(self):
+        return self.display_name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify_tr(self.display_name)
+        super().save(*args, **kwargs)
+
+    @property
+    def initials(self):
+        return lower_tr("".join(part[:1] for part in self.display_name.split()[:2]))
+

@@ -1,0 +1,25 @@
+{% extends "_base/base.html" %}
+{% load static studio_tags %}
+{% block title %}{% block studio_title %}Stüdyo{% endblock %} — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block navbar %}
+<nav class="navbar sticky-top bg-body border-bottom" aria-label="Stüdyo menüsü">
+  <div class="container d-flex align-items-center gap-3">
+    <a href="{% url 'studio:course_list' %}" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6 me-auto">
+      <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>Stüdyo
+    </a>
+    {% busy_upload_total as busy_total %}
+    <a href="{% url 'studio:queue' %}" class="link-secondary small text-decoration-none"><i class="bi bi-list-task me-1" aria-hidden="true"></i>Kuyruk{% if busy_total %} <span class="badge text-bg-primary">{{ busy_total }}</span>{% endif %}</a>
+    <a href="{% url 'admin:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-sliders me-1" aria-hidden="true"></i>Django admin</a>
+    <a href="{% url 'page:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Siteye dön</a>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+{% block studio_content %}{% endblock %}
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/sortable.min.js' %}"></script>
+<script src="{% static 'js/studio.js' %}"></script>{% endblock %}

@@ -212,6 +212,37 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
   .hy-sidebar{position:sticky;top:var(--hy-lesson-nav-h);height:calc(100vh - var(--hy-lesson-nav-h))}
 }
 
+/* Tanıtım videosu: görsel üstünde oynat düğmesi; tıklanınca Video.js oynatıcısı (vurgu rengi ve yazı tipi temadan). */
+.hy-preview{cursor:pointer}
+.hy-preview-play{width:4.5rem;height:4.5rem;box-shadow:0 .5rem 2rem rgba(0,0,0,.45);transition:transform .2s}
+.hy-preview:hover .hy-preview-play,.hy-preview:focus-visible .hy-preview-play{transform:translate(-50%,-50%) scale(1.08)}
+.hy-preview[aria-busy="true"] .hy-preview-play{opacity:.7}
+.hy-video{background:#000}
+.hy-video-skin{
+  display:block;width:100%;aspect-ratio:16/9;
+  --media-accent-color:var(--bs-primary);
+  --media-accent-text-color:var(--hy-accent-on);
+  --media-font-family:var(--bs-body-font-family);
+  --media-border-radius:0;
+  --media-border-color:transparent;
+}
+/* Kaplama yalnız yerel <video>'yu yayar; Vimeo öğesi kendi inline-block boyutunda kalmasın, tam ekranda da alanı doldursun. */
+.hy-video-skin vimeo-video{display:block;width:100%;height:100%;min-width:0;min-height:0}
+.hy-video-skin:fullscreen,.hy-video:fullscreen .hy-video-skin{aspect-ratio:auto;width:100%;height:100%}
+
+/* Stüdyo (yönetim paneli): yükleme ilerleme çubukları ince. */
+.studio-progress{height:.375rem}
+/* İçerik düzenleyici: sürükleme tutamakları, bırakma alanları, boş kategori ipucu. */
+.studio-handle{cursor:grab;touch-action:none;padding:.125rem}
+.studio-dropzone{border-style:dashed!important;transition:background-color .15s,border-color .15s}
+.studio-dropzone.is-dragover{background:var(--bs-primary-bg-subtle);border-color:var(--bs-primary)!important}
+.studio-section.is-dragover{outline:2px dashed var(--bs-primary);outline-offset:2px}
+.studio-lesson.is-dragover{background:var(--bs-primary-bg-subtle)}
+.studio-lessons{min-height:2.75rem}
+.studio-empty-hint{display:none}
+.studio-lessons:not(:has([data-lesson-id])) + .studio-empty-hint{display:block}
+.sortable-ghost{opacity:.4}
+
 /* Bildirimler (SweetAlert2 toast): tema renklerini ve vurgu rengini izler, yapışkan üst çubuğun altında açılır. */
 .hy-toast-container.swal2-top-end{padding-top:var(--hy-toast-top, calc(var(--hy-nav-h) + .5rem))}
 .hy-toast{

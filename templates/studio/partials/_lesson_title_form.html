@@ -1,0 +1,9 @@
+<form id="lesson-{{ lesson.id }}-title" class="d-flex flex-wrap align-items-start gap-2" hx-post="{% url 'studio:lesson_title' lesson.id %}" hx-target="this" hx-swap="outerHTML">
+  <div class="flex-grow-1">
+    <label class="visually-hidden" for="{{ form.title.id_for_label }}">Ders başlığı</label>
+    {{ form.title }}
+    {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+  <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_title' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-title" hx-swap="outerHTML">Vazgeç</button>
+</form>

@@ -1,0 +1,4 @@
+<span id="lesson-{{ lesson.id }}-status" class="d-inline-flex align-items-center gap-1">
+  <button type="button" class="btn btn-sm py-0 px-2 {% if lesson.is_published %}btn-success{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:lesson_status' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-status" hx-swap="outerHTML" aria-pressed="{{ lesson.is_published|yesno:'true,false' }}" title="Yayına al / taslağa çevir">{{ lesson.get_status_display }}</button>
+  <button type="button" class="btn btn-sm py-0 px-2 {% if lesson.is_preview %}btn-primary{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:lesson_preview' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-status" hx-swap="outerHTML" aria-pressed="{{ lesson.is_preview|yesno:'true,false' }}" title="Satın almadan izlenebilir (ücretsiz önizleme)"><i class="bi {% if lesson.is_preview %}bi-eye{% else %}bi-eye-slash{% endif %} me-1" aria-hidden="true"></i>Önizleme</button>
+</span>

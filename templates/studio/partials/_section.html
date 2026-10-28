@@ -1,0 +1,19 @@
+{# Kategori bloğu. Videolar tutamaktan sürüklenerek sıralanır ve kategoriler arasında taşınır; bloğa video dosyası bırakılabilir. #}
+<section class="card studio-section" id="section-{{ section.id }}" data-section-id="{{ section.id }}" data-upload-zone data-upload-url="{% url 'studio:section_videos' section.id %}">
+  <div class="card-header d-flex flex-wrap align-items-center gap-2 py-2">
+    {% if not on_section_page %}<span class="studio-handle studio-section-handle text-body-tertiary" title="Sürükleyerek sırala"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Kategoriyi taşı</span></span>{% endif %}
+    <span class="font-monospace small text-body-tertiary" data-section-no>{{ section_no }}.</span>
+    <div class="flex-grow-1">{% include "studio/partials/_section_title.html" %}</div>
+    <span class="small text-body-secondary" data-section-count>{{ section.lessons.all|length }} video</span>
+    {% include "studio/partials/_section_status.html" %}
+    {% if not on_section_page %}
+    <a href="{% url 'studio:section_detail' section.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Video yükle</a>
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:section_delete' section.id %}" hx-target="#section-{{ section.id }}" hx-swap="outerHTML" hx-confirm="“{{ section.title }}” kategorisi silinsin mi?" aria-label="Kategoriyi sil" title="Kategoriyi sil (boşsa)"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+    {% endif %}
+  </div>
+  <div class="list-group list-group-flush studio-lessons" id="section-{{ section.id }}-lessons" data-sortable-lessons>
+    {% for lesson in section.lessons.all %}{% include "studio/partials/_lesson.html" with lesson_no=forloop.counter %}{% endfor %}
+  </div>
+  <div class="small text-body-tertiary px-3 py-2 studio-empty-hint">Video yok. Dosya sürükle ya da başka kategoriden video taşı.</div>
+  <ul class="list-unstyled small px-3 mb-0 vstack gap-2" data-upload-list aria-live="polite"></ul>
+</section>

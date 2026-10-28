@@ -42,7 +42,8 @@
       </header>
 
       <div class="d-lg-none mt-4">
-        <div class="card shadow">
+        <div class="card shadow overflow-hidden">
+          {% if course.preview_video %}{% include "page/partials/preview_media.html" with media_class=" border-bottom" %}{% endif %}
           <div class="card-body p-4">
             <div class="d-flex align-items-baseline justify-content-between gap-3">
               <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>

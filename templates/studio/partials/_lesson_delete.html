@@ -1,0 +1,13 @@
+<div class="border border-danger-subtle rounded bg-danger-subtle p-3 mt-2 small">
+  <div class="fw-medium mb-2">“{{ lesson.title }}” silinsin mi?</div>
+  {% if lesson.has_busy_upload %}<p class="mb-2">Süren yüklemesi iptal edilir.</p>{% endif %}
+  <div class="d-flex flex-wrap gap-2">
+    {% if lesson.vimeo_id %}
+    <button type="button" class="btn btn-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"vimeo": "1"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Dersi ve Vimeo videosunu sil</button>
+    <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"vimeo": "0"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Yalnız dersi sil, video Vimeo'da kalsın</button>
+    {% else %}
+    <button type="button" class="btn btn-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"vimeo": "0"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Dersi sil</button>
+    {% endif %}
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-form-close>Vazgeç</button>
+  </div>
+</div>

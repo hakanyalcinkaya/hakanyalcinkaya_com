@@ -1,0 +1,16 @@
+{
+  "name": "hakanyalcinkaya-frontend",
+  "private": true,
+  "description": "Tarayıcı paketleri esbuild ile static_files/js altına derlenir; sunucuda Node gerekmez.",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@videojs/html": "10.2.0",
+    "@videojs/vimeo-video": "10.2.0",
+    "sortablejs": "1.15.7"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
