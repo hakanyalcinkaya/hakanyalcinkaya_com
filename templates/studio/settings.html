@@ -6,49 +6,56 @@
   <p class="text-body-secondary mb-0">Sitenin genel ayarları.</p>
 </div>
 
-<form method="post" class="border rounded p-3 p-lg-4" style="max-width: 46rem">
+{# Büyük ekranda solda video platformu, sağda başlık ve öğrenci ayarları. #}
+<form method="post" class="border rounded p-3 p-lg-4">
   {% csrf_token %}
-  <fieldset>
-    <legend class="h5 mb-1">Video platformu</legend>
-    <p class="small text-body-secondary mb-3">Yeni yüklemeler seçili platforma gider. Yüklenmiş videolar kendi platformlarında oynamaya devam eder; platform değişince eski videolar taşınmaz.</p>
-    {% for error in form.video_platform.errors %}<div class="alert alert-danger small" role="alert">{{ error }}</div>{% endfor %}
-    <div class="list-group mb-3">
-      {% for platform in platforms %}
-      <div class="list-group-item d-flex flex-wrap align-items-start gap-3 py-3">
-        <input class="form-check-input mt-1 flex-shrink-0" type="radio" name="video_platform" value="{{ platform.value }}" id="platform-{{ platform.value }}"{% if platform.selected %} checked{% endif %}{% if platform.missing %} disabled{% endif %}>
-        <label class="flex-grow-1" for="platform-{{ platform.value }}">
-          <span class="fw-medium">{{ platform.label }}</span>{% if platform.selected %} <span class="badge text-bg-primary fw-normal">Seçili</span>{% endif %}
-          <span class="d-block small text-body-secondary">
-            {% if platform.missing %}<span class="text-warning-emphasis"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><code>.env</code> dosyasında eksik: {% for name in platform.missing %}<code>{{ name }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}</span>
-            {% else %}Anahtarlar tanımlı{% endif %} · {{ platform.lesson_total }} ders videosu
-          </span>
-          <span id="platform-{{ platform.value }}-check" class="d-block mt-1"></span>
-        </label>
-        {% if not platform.missing %}
-        <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:settings_check' platform.value %}" hx-target="#platform-{{ platform.value }}-check" hx-indicator="#platform-{{ platform.value }}-spinner">
-          <span id="platform-{{ platform.value }}-spinner" class="spinner-border spinner-border-sm me-1 htmx-indicator" aria-hidden="true"></span>Bağlantıyı dene
-        </button>
-        {% endif %}
-      </div>
-      {% endfor %}
+  <div class="row g-4">
+    <div class="col-xl-7">
+      <fieldset>
+        <legend class="h5 mb-1">Video platformu</legend>
+        <p class="small text-body-secondary mb-3">Yeni yüklemeler seçili platforma gider. Yüklenmiş videolar kendi platformlarında oynamaya devam eder; platform değişince eski videolar taşınmaz.</p>
+        {% for error in form.video_platform.errors %}<div class="alert alert-danger small" role="alert">{{ error }}</div>{% endfor %}
+        <div class="list-group mb-3">
+          {% for platform in platforms %}
+          <div class="list-group-item d-flex flex-wrap align-items-start gap-3 py-3">
+            <input class="form-check-input mt-1 flex-shrink-0" type="radio" name="video_platform" value="{{ platform.value }}" id="platform-{{ platform.value }}"{% if platform.selected %} checked{% endif %}{% if platform.missing %} disabled{% endif %}>
+            <label class="flex-grow-1" for="platform-{{ platform.value }}">
+              <span class="fw-medium">{{ platform.label }}</span>{% if platform.selected %} <span class="badge text-bg-primary fw-normal">Seçili</span>{% endif %}
+              <span class="d-block small text-body-secondary">
+                {% if platform.missing %}<span class="text-warning-emphasis"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i><code>.env</code> dosyasında eksik: {% for name in platform.missing %}<code>{{ name }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                {% else %}Anahtarlar tanımlı{% endif %} · {{ platform.lesson_total }} ders videosu
+              </span>
+              <span id="platform-{{ platform.value }}-check" class="d-block mt-1"></span>
+            </label>
+            {% if not platform.missing %}
+            <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:settings_check' platform.value %}" hx-target="#platform-{{ platform.value }}-check" hx-indicator="#platform-{{ platform.value }}-spinner">
+              <span id="platform-{{ platform.value }}-spinner" class="spinner-border spinner-border-sm me-1 htmx-indicator" aria-hidden="true"></span>Bağlantıyı dene
+            </button>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </fieldset>
     </div>
-  </fieldset>
-  <fieldset class="border-top pt-3 mt-1 mb-3">
-    <legend class="h5 mb-1">Video başlığı</legend>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" name="sync_video_titles" id="sync-video-titles"{% if form.sync_video_titles.value %} checked{% endif %}>
-      <label class="form-check-label" for="sync-video-titles">Ders ya da kurs başlığı değişince videonun platformdaki başlığını da değiştir</label>
+    <div class="col-xl-5">
+      <fieldset class="border-bottom pb-3 mb-3">
+        <legend class="h5 mb-1">Video başlığı</legend>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" name="sync_video_titles" id="sync-video-titles"{% if form.sync_video_titles.value %} checked{% endif %}>
+          <label class="form-check-label" for="sync-video-titles">Ders ya da kurs başlığı değişince videonun platformdaki başlığını da değiştir</label>
+        </div>
+        <p class="small text-body-secondary mt-1 mb-0">Vimeo başlığı oynatıcının içinde gösterir; Bunny'de başlık oynatıcıda görünmez, yalnız Bunny panelinde işe yarar. Kapalıyken başlık değişikliği yalnız sitede kalır. Yükleme sırasında video yine dersin adıyla açılır.</p>
+      </fieldset>
+      <fieldset class="mb-3">
+        <legend class="h5 mb-1">Öğrenci araçları</legend>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" name="lesson_notes_enabled" id="lesson-notes-enabled"{% if form.lesson_notes_enabled.value %} checked{% endif %}>
+          <label class="form-check-label" for="lesson-notes-enabled">Derslerde not alma</label>
+        </div>
+        <p class="small text-body-secondary mt-1 mb-0">Kapalıyken ders sayfasındaki “Not al” bölümü, Kurslarım'daki “Son notların” kutusu ve not alma tanıtımları tüm kullanıcılardan gizlenir.</p>
+      </fieldset>
     </div>
-    <p class="small text-body-secondary mt-1 mb-0">Vimeo başlığı oynatıcının içinde gösterir; Bunny'de başlık oynatıcıda görünmez, yalnız Bunny panelinde işe yarar. Kapalıyken başlık değişikliği yalnız sitede kalır. Yükleme sırasında video yine dersin adıyla açılır.</p>
-  </fieldset>
-  <fieldset class="border-top pt-3 mt-1 mb-3">
-    <legend class="h5 mb-1">Öğrenci araçları</legend>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" name="lesson_notes_enabled" id="lesson-notes-enabled"{% if form.lesson_notes_enabled.value %} checked{% endif %}>
-      <label class="form-check-label" for="lesson-notes-enabled">Derslerde not alma</label>
-    </div>
-    <p class="small text-body-secondary mt-1 mb-0">Kapalıyken ders sayfasındaki “Not al” bölümü, Kurslarım'daki “Son notların” kutusu ve not alma tanıtımları tüm kullanıcılardan gizlenir.</p>
-  </fieldset>
+  </div>
   <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
 </form>
 {% endblock %}

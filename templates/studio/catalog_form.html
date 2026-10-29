@@ -9,9 +9,16 @@
   <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:catalog_delete' entry.kind item.pk %}" hx-confirm="{{ item }} silinsin mi? Bu işlem geri alınamaz."><i class="bi bi-trash me-1" aria-hidden="true"></i>Sil</button>
   {% endif %}
 </div>
-<form method="post" enctype="multipart/form-data" class="border rounded p-3 p-lg-4" style="max-width: 46rem">
+{# Kısa alanlar büyük ekranda yan yana; metin kutuları, çoklu seçimler ve seçenek listeleri tam genişlikte. #}
+<form method="post" enctype="multipart/form-data" class="border rounded p-3 p-lg-4">
   {% csrf_token %}
-  {{ form|crispy }}
+  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+  <div class="row gx-4">
+    {% for field in form.visible_fields %}
+    <div class="{% if not field.field.widget.input_type or field.field.widget.allow_multiple_selected or field.field.widget.input_type == 'radio' %}col-12{% else %}col-lg-6{% endif %}">{{ field|as_crispy_field }}</div>
+    {% endfor %}
+  </div>
   <div class="d-flex gap-2 mt-2">
     <button type="submit" class="btn btn-primary">Kaydet</button>
     <a href="{% url 'studio:catalog_list' entry.kind %}" class="btn btn-outline-secondary">Vazgeç</a>

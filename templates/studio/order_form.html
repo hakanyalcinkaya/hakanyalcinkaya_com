@@ -7,22 +7,37 @@
   <h1 class="h3 mb-1">Sipariş oluştur</h1>
   <p class="text-body-secondary mb-0">Havale/EFT gibi site dışında alınan ödemeler için. Tutar bugünkü fiyatlardan ve indirim kodundan hesaplanır. Banka bilgisini üyeye e-postayla sen gönderirsin; ödeme gelince siparişi onaylayınca kurs erişimi açılır.</p>
 </div>
-<form method="post" class="border rounded p-3 p-lg-4" style="max-width: 46rem" novalidate>
+{# Büyük ekranda solda üye ve ürünler, sağda ödeme yolu, kod ve onay. #}
+<form method="post" class="row g-4" novalidate>
   {% csrf_token %}
   {{ form.cart }}
-  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
-  {% if form.initial.cart %}<div class="alert alert-secondary small" role="status"><i class="bi bi-cart me-1" aria-hidden="true"></i>Üyenin sepetinden dolduruldu; sipariş ödenince sepet kapanır.</div>{% endif %}
-  {{ form.email|as_crispy_field }}
-  <div class="row g-3">
-    <div class="col-md-6">{{ form.courses|as_crispy_field }}</div>
-    <div class="col-md-6">{{ form.bundles|as_crispy_field }}</div>
+  {% if form.non_field_errors or form.initial.cart %}
+  <div class="col-12">
+    {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+    {% if form.initial.cart %}<div class="alert alert-secondary small mb-0" role="status"><i class="bi bi-cart me-1" aria-hidden="true"></i>Üyenin sepetinden dolduruldu; sipariş ödenince sepet kapanır.</div>{% endif %}
   </div>
-  {{ form.payment_provider|as_crispy_field }}
-  {{ form.discount_code|as_crispy_field }}
-  {{ form.mark_paid|as_crispy_field }}
-  <div class="d-flex gap-2 mt-2">
-    <button type="submit" class="btn btn-primary">Siparişi oluştur</button>
-    <a href="{% url 'studio:orders' %}" class="btn btn-outline-secondary">Vazgeç</a>
+  {% endif %}
+  <div class="col-xl-8">
+    <fieldset class="border rounded p-3 p-lg-4 h-100">
+      <legend class="h5 float-none w-auto mb-3">Üye ve ürünler</legend>
+      {{ form.email|as_crispy_field }}
+      <div class="row g-3">
+        <div class="col-md-6">{{ form.courses|as_crispy_field }}</div>
+        <div class="col-md-6">{{ form.bundles|as_crispy_field }}</div>
+      </div>
+    </fieldset>
+  </div>
+  <div class="col-xl-4">
+    <fieldset class="border rounded p-3 p-lg-4">
+      <legend class="h5 float-none w-auto mb-3">Ödeme</legend>
+      {{ form.payment_provider|as_crispy_field }}
+      {{ form.discount_code|as_crispy_field }}
+      {{ form.mark_paid|as_crispy_field }}
+      <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-primary">Siparişi oluştur</button>
+        <a href="{% url 'studio:orders' %}" class="btn btn-outline-secondary">Vazgeç</a>
+      </div>
+    </fieldset>
   </div>
 </form>
 {% endblock %}
