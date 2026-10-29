@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from account.models import User
+from discount.models import Discount
 from learning.models import PlayerPreference
-from page.catalog import COUPONS
 
 INPUT_CLASS = "form-control-lg fs-6"
 LABEL_CLASS = "small fw-medium text-body-secondary"
@@ -421,14 +421,17 @@ class CheckoutForm(StyledForm):
 
 
 class CouponForm(StyledForm):
+    """Ödeme adımında indirim kodu (discount.Discount); geçerlilik, tarih ve kullanım sınırları kodda denetlenir."""
+
     code = forms.CharField(
         label="İndirim kodu",
         error_messages={"required": "Bir indirim kodu gir."},
         widget=forms.TextInput(attrs={"autocomplete": "off", "placeholder": "Kodunu gir"}),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, prefix="coupon", **kwargs)
+        self.user = user
         self.fields["code"].widget.attrs["class"] = ""
         self.helper.layout = Layout(
             Hidden("action", "coupon"),
@@ -436,7 +439,8 @@ class CouponForm(StyledForm):
         )
 
     def clean_code(self):
-        code = self.cleaned_data["code"].strip().upper()
-        if code not in COUPONS:
+        discount = Discount.objects.by_code(self.cleaned_data["code"])
+        if discount is None:
             raise forms.ValidationError("Bu indirim kodu geçerli değil.")
-        return code
+        discount.validate_for(self.user)
+        return discount

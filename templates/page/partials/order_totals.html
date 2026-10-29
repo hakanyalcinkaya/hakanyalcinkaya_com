@@ -5,5 +5,8 @@
 {% else %}
 <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam ({{ summary.count }} kurs)</span><span>{{ summary.subtotal }}</span></div>
 {% endif %}
+{% if summary.coupon_saving %}
+<div class="d-flex justify-content-between small text-success-emphasis mt-1"><span>İndirim kodu ({{ summary.coupon }})</span><span>−{{ summary.coupon_saving }}</span></div>
+{% endif %}
 <hr>
 <div class="d-flex justify-content-between align-items-baseline"><span class="fw-semibold">Toplam <span class="small fw-normal text-body-tertiary">(KDV dahil)</span></span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>

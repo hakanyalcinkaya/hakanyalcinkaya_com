@@ -18,6 +18,7 @@ from django.db.models import Prefetch
 from django.urls import reverse
 
 from account.models import User
+from cart.pricing import price_cart
 from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
@@ -306,22 +307,28 @@ def cart_remove(request, slug):
     catalog.cart_remove(request.session, slug)
 
 
-def order_summary(items):
-    """Sepet özeti; tutarlar kartlardaki `amount` (₺, KDV dahil) ile."""
-    total = sum((item["amount"] for item in items), Decimal("0"))
+def order_summary(items, cart=None):
+    """Sepet özeti; tutarlar kartlardaki `amount` (₺, KDV dahil) ile. Sepette indirim kodu varsa kodun düştüğü tutar
+    sipariş fiyatlamasıyla (cart.pricing) aynı hesaplanır."""
+    subtotal = sum((item["amount"] for item in items), Decimal("0"))
     # Liste fiyatı olan kursta indirim = liste fiyatı − satış fiyatı; sepette toplam indirim tutarı gösterilir.
     list_total = sum((item.get("list_amount") or item["amount"] for item in items), Decimal("0"))
-    saving = list_total - total
+    saving = list_total - subtotal
+    code, code_saving = None, Decimal("0")
+    if cart is not None and cart.discount_id:
+        slugs = {item["slug"] for item in items}
+        lines = [line for line in price_cart(cart).lines if line.item.course_id and line.item.course.slug in slugs]
+        code, code_saving = cart.discount.code, sum((line.base_price - line.final_price for line in lines), Decimal("0"))
+    total = subtotal - code_saving
     return {
         "items": items,
         "count": len(items),
         "count_text": f"{len(items)} kurs",
         "list_total": format_try(list_total),
         "saving": format_try(saving) if saving > 0 else "",
-        "subtotal": format_try(total),
-        "coupon": None,
-        "coupon_pct": 0,
-        "discount": format_try(Decimal("0")),
+        "subtotal": format_try(subtotal),
+        "coupon": code,
+        "coupon_saving": format_try(code_saving) if code_saving > 0 else "",
         "total": format_try(total),
     }
 

@@ -15,6 +15,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from cart.request_cart import current_cart
 from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
@@ -41,6 +42,7 @@ from page.catalog import (
 )
 from page.forms import (
     CheckoutForm,
+    CouponForm,
     EmailChangeForm,
     LoginForm,
     NewsletterForm,
@@ -375,7 +377,7 @@ def cart(request):
         request,
         "page/cart.html",
         {
-            "summary": content.order_summary(items),
+            "summary": content.order_summary(items, current_cart(request)),
             "steps": purchase_steps(0),
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,
@@ -397,8 +399,23 @@ def checkout(request):
     if not items:
         return redirect("page:cart")
     member = request.user.is_authenticated
-    form = None if member else CheckoutForm(request.POST or None)
-    if request.method == "POST" and (form is None or form.is_valid()):
+    cart = current_cart(request)
+    action = request.POST.get("action", "pay") if request.method == "POST" else None
+    coupon_form = CouponForm(request.POST if action == "coupon" else None, user=request.user)
+    if action == "coupon" and cart is not None and coupon_form.is_valid():
+        discount = coupon_form.cleaned_data["code"]
+        cart.apply_discount(discount, request.user)
+        if content.order_summary(items, cart)["coupon_saving"]:
+            messages.success(request, f"{discount.code} indirim kodu uygulandı.")
+        else:
+            cart.remove_discount()
+            messages.info(request, "Bu indirim kodu sepetindeki kurslarda geçerli değil.")
+        return redirect("page:checkout")
+    if action == "coupon_remove" and cart is not None:
+        cart.remove_discount()
+        return redirect("page:checkout")
+    form = None if member else CheckoutForm(request.POST if action == "pay" else None)
+    if action == "pay" and (form is None or form.is_valid()):
         if not CARD_PAYMENT_OPEN:
             messages.info(request, "Kartla online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
             return redirect("page:checkout")
@@ -409,7 +426,14 @@ def checkout(request):
     return render(
         request,
         "page/checkout.html",
-        {"summary": content.order_summary(items), "steps": purchase_steps(1), "card_payment_open": CARD_PAYMENT_OPEN, "checkout_form": form},
+        {
+            "summary": content.order_summary(items, cart),
+            "steps": purchase_steps(1),
+            "card_payment_open": CARD_PAYMENT_OPEN,
+            "checkout_form": form,
+            # İndirim kodu yalnız veritabanındaki kursların sepetine uygulanır.
+            "coupon_form": coupon_form if cart is not None else None,
+        },
     )
 
 
