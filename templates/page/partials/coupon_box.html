@@ -1,0 +1,17 @@
+{# İndirim kodu: sepet ve ödeme sayfasında; uygulanan kod kaldırılabilir. #}
+{% load crispy_forms_tags %}
+{% if coupon_form %}
+<div class="mt-4">
+  {% if summary.coupon %}
+  <div class="small fw-medium text-body-secondary mb-2">İndirim kodu</div>
+  <form method="post" role="status" class="small">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="coupon_remove">
+    <span class="text-success-emphasis"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ summary.coupon }}</b> uygulandı</span>
+    <button type="submit" class="btn btn-link btn-sm p-0 ms-1 align-baseline">Kaldır</button>
+  </form>
+  {% else %}
+  {% crispy coupon_form %}
+  {% endif %}
+</div>
+{% endif %}

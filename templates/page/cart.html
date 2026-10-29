@@ -55,6 +55,8 @@
       <div class="card shadow sticky-lg-top top-lg-nav">
         <div class="card-body p-4">
           <h2 id="ozet-baslik" class="h6 fw-semibold mb-3">Sipariş özeti</h2>
+          {% include "page/partials/coupon_box.html" %}
+          <hr>
           {% include "page/partials/order_totals.html" %}
           {% if checkout_open %}
           <a href="{% url 'page:checkout' %}" class="btn btn-primary btn-lg fs-6 w-100 mt-3">Ödemeye geç <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>

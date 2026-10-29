@@ -367,9 +367,34 @@ def buy(request, slug):
     return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
 
 
+def _coupon(request, cart, items, action, next_url):
+    """Sepet ve ödeme sayfasındaki indirim kodu: uygula / kaldır (POST action); (form, yönlendirme ya da None).
+    Sepetteki kurslarda hiçbir şey düşürmeyen kod sepette tutulmaz."""
+    form = CouponForm(request.POST if action == "coupon" else None, user=request.user)
+    if cart is None:
+        return None, None
+    if action == "coupon" and form.is_valid():
+        discount = form.cleaned_data["code"]
+        cart.apply_discount(discount, request.user)
+        if content.order_summary(items, cart)["coupon_saving"]:
+            messages.success(request, f"{discount.code} indirim kodu uygulandı.")
+        else:
+            cart.remove_discount()
+            messages.info(request, "Bu indirim kodu sepetindeki kurslarda geçerli değil.")
+        return form, redirect(next_url)
+    if action == "coupon_remove":
+        cart.remove_discount()
+        return form, redirect(next_url)
+    return form, None
+
+
 def cart(request):
     cards = content.catalog_cards(request.user)
     items = content.cart_cards(request, cards)
+    action = request.POST.get("action") if request.method == "POST" else None
+    coupon_form, done = _coupon(request, current_cart(request), items, action, "page:cart")
+    if done:
+        return done
     added = content.card_by_slug(request.GET.get("eklendi", ""), cards=cards)
     removed = content.card_by_slug(request.GET.get("cikarildi", ""), cards=cards)
     in_cart = {item["slug"] for item in items}
@@ -383,6 +408,7 @@ def cart(request):
             "removed_course": removed if removed not in items else None,
             "suggestions": [card for card in cards if card["slug"] not in in_cart and not card["owned"]],
             "checkout_open": True,
+            "coupon_form": coupon_form,
         },
     )
 
@@ -401,19 +427,9 @@ def checkout(request):
     member = request.user.is_authenticated
     cart = current_cart(request)
     action = request.POST.get("action", "pay") if request.method == "POST" else None
-    coupon_form = CouponForm(request.POST if action == "coupon" else None, user=request.user)
-    if action == "coupon" and cart is not None and coupon_form.is_valid():
-        discount = coupon_form.cleaned_data["code"]
-        cart.apply_discount(discount, request.user)
-        if content.order_summary(items, cart)["coupon_saving"]:
-            messages.success(request, f"{discount.code} indirim kodu uygulandı.")
-        else:
-            cart.remove_discount()
-            messages.info(request, "Bu indirim kodu sepetindeki kurslarda geçerli değil.")
-        return redirect("page:checkout")
-    if action == "coupon_remove" and cart is not None:
-        cart.remove_discount()
-        return redirect("page:checkout")
+    coupon_form, done = _coupon(request, cart, items, action, "page:checkout")
+    if done:
+        return done
     form = None if member else CheckoutForm(request.POST if action == "pay" else None)
     if action == "pay" and (form is None or form.is_valid()):
         if not CARD_PAYMENT_OPEN:
@@ -432,7 +448,7 @@ def checkout(request):
             "card_payment_open": CARD_PAYMENT_OPEN,
             "checkout_form": form,
             # İndirim kodu yalnız veritabanındaki kursların sepetine uygulanır.
-            "coupon_form": coupon_form if cart is not None else None,
+            "coupon_form": coupon_form,
         },
     )
 
