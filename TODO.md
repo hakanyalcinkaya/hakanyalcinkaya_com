@@ -35,6 +35,7 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 - [ ] Şablonlar hazır (`templates/emails/`, önizleme: Stüdyo → E-postalar). Yalnız "Şifremi unuttum" bağlı; diğerleri olaylara bağlanacak: kayıt (hoş geldin), ödeme onayı / başarısız / iade (iyzico), kurs bitirme, yorum onayı, şifre ve e-posta değişikliği, bülten onayı ve bülten, yönetici bildirimleri.
 - [ ] Yayına çıkarken `.env`'den `EMAIL_REDIRECT_TO` kaldırılmalı (şu an bütün e-postalar hakanyalcinkaya@gmail.com'a gidiyor) ve `SITE_URL` canlı adres olmalı.
 - [ ] Kurslarım sayfasındaki kurs kartları ve ilerleme örnek veride (Favorilerim ve Değerlendirmelerim gerçek veriden).
+- [ ] Bülten e-postasının alt bilgisindeki "Aboneliği düzenle" ve "Abonelikten çık" bağlantıları gerçek gönderimle denenmedi (yalnız önizlemede görüldü). Stüdyo → Bültenler'de bir taslaktan test adresine (`EMAIL_TEST_TO`) test e-postası gönder; e-posta istemcisinde iki bağlantının da açıldığını (tıklama izleme yönlendirmesiyle `/newsletter/manage/<anahtar>/` sayfasına gittiğini) ve Gmail'in tek tıkla abonelikten çıkma düğmesinin göründüğünü kontrol et.
 
 ## Yorumlar
 - [ ] Onay bekleyen yorum gelince yöneticiye bildirim (e-posta servisi bağlanınca).
