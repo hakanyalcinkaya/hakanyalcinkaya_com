@@ -23,7 +23,7 @@
             <div>
               <div class="d-flex h-100" data-hero-track style="transform:translateX(0);transition:transform .55s cubic-bezier(.22,.8,.24,1)">
                 {% for item in courses %}
-                <a href="{{ item.url }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ courses|length }}: {{ item.title }}" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}" {% if not forloop.first %}tabindex="-1"{% endif %} draggable="false" class="d-block flex-shrink-0 w-100 h-100" data-title="{{ item.title }}" data-duration="{{ item.duration }}" data-lessons="{{ item.lessons }}" data-price="{{ item.price }}" data-cart="{{ item.cart_url }}" data-cart-label="{{ item.cart_label }}" data-tags="{{ item.tags_attr }}">
+                <a href="{{ item.url }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ courses|length }}: {{ item.title }}" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}" {% if not forloop.first %}tabindex="-1"{% endif %} draggable="false" class="d-block flex-shrink-0 w-100 h-100" data-title="{{ item.title }}" data-duration="{{ item.duration }}" data-lessons="{{ item.lessons }}" data-price="{{ item.price }}" data-cart="{{ item.cart_url }}" data-cart-label="{{ item.cart_label }}" data-tags="{{ item.tags_attr }}" data-owned="{% if item.owned %}1{% endif %}">
                   <img src="{% static item.image %}" alt="{{ item.alt }}" width="1280" height="720" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async" draggable="false" class="w-100 h-100 object-fit-cover user-select-none">
                 </a>
                 {% endfor %}
@@ -47,10 +47,12 @@
               <li class="list-inline-item"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i><span data-hero-lessons>{{ course.lessons }} ders</span></li>
             </ul>
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top mt-3 pt-3">
-              <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span><span data-hero-price>{{ course.price }}</span></div>
+              {# Sahip olunan kursta fiyat ve sepet düğmesi yerine "Eğitimlerinde" (slayt değişince site.js günceller). #}
+              <div class="fs-3 fw-semibold lh-1{% if course.owned %} d-none{% endif %}" data-hero-price-box><span class="visually-hidden">Fiyat: </span><span data-hero-price>{{ course.price }}</span></div>
+              <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium{% if not course.owned %} d-none{% endif %}" data-hero-owned><i class="bi bi-check2 me-1" aria-hidden="true"></i>Eğitimlerinde</span>
               <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
-                <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>
-                <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                <form method="post" action="{{ course.cart_url }}" class="d-flex{% if course.owned %} d-none{% endif %}">{% csrf_token %}<button type="submit" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>
+                <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1"><span data-hero-inspect-label>{% if course.owned %}Eğitime git{% else %}Kursu İncele{% endif %}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
               </div>
             </div>
           </div>

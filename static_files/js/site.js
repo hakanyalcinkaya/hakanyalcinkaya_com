@@ -280,6 +280,12 @@
       var cart = carousel.querySelector("[data-hero-cart]");
       cart.form.action = current.getAttribute("data-cart");
       cart.setAttribute("aria-label", current.getAttribute("data-cart-label"));
+      // Sahip olunan kursta sepet düğmesi ve fiyat gizlenir, "Eğitimlerinde" görünür.
+      var owned = current.getAttribute("data-owned") === "1";
+      cart.form.classList.toggle("d-none", owned);
+      carousel.querySelector("[data-hero-price-box]").classList.toggle("d-none", owned);
+      carousel.querySelector("[data-hero-owned]").classList.toggle("d-none", !owned);
+      carousel.querySelector("[data-hero-inspect-label]").textContent = owned ? "Eğitime git" : "Kursu İncele";
       var tags = carousel.querySelector("[data-hero-tags]");
       tags.replaceChildren();
       current.getAttribute("data-tags").split("|").forEach(function (tag) {
