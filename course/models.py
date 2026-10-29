@@ -664,6 +664,17 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
     def toggle_preview(self):
         self.set_preview(not self.is_preview)
 
+    @property
+    def kind_choices(self):
+        return LessonKind.choices
+
+    def set_kind(self, kind):
+        """Ders türünü değiştirir (ör. video → metin). Varsa videosu silinmez; video türüne dönünce yine oynar."""
+        if kind not in LessonKind.values:
+            raise ValueError(kind)
+        self.kind = kind
+        self.save(update_fields=["kind", "updated_at"])
+
     def set_preview(self, value):
         self.is_preview = value
         self.save(update_fields=["is_preview", "updated_at"])

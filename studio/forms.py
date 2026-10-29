@@ -46,6 +46,8 @@ class LessonBulkAction(models.TextChoices):
     DRAFT = "draft", _("Taslağa al")
     PREVIEW_ON = "preview_on", _("Önizlemeyi aç")
     PREVIEW_OFF = "preview_off", _("Önizlemeyi kapat")
+    TO_TEXT = "to_text", _("İçerik dersine çevir")
+    TO_VIDEO = "to_video", _("Video dersine çevir")
     DELETE = "delete", _("Sil")
     DELETE_REMOTE = "delete_remote", _("Sil ve videolarını platformdan sil")
 
@@ -73,6 +75,8 @@ class LessonBulkForm(forms.Form):
                 lesson.make_draft()
             elif action in (LessonBulkAction.PREVIEW_ON, LessonBulkAction.PREVIEW_OFF):
                 lesson.set_preview(action == LessonBulkAction.PREVIEW_ON)
+            elif action in (LessonBulkAction.TO_TEXT, LessonBulkAction.TO_VIDEO):
+                lesson.set_kind(LessonKind.TEXT if action == LessonBulkAction.TO_TEXT else LessonKind.VIDEO)
             else:
                 lesson.remove(delete_remote=action == LessonBulkAction.DELETE_REMOTE)
         return len(lessons)
@@ -84,6 +88,8 @@ class LessonBulkForm(forms.Form):
             LessonBulkAction.DRAFT: _("%(count)s video taslağa alındı."),
             LessonBulkAction.PREVIEW_ON: _("%(count)s videoda önizleme açıldı."),
             LessonBulkAction.PREVIEW_OFF: _("%(count)s videoda önizleme kapatıldı."),
+            LessonBulkAction.TO_TEXT: _("%(count)s ders içerik dersine çevrildi."),
+            LessonBulkAction.TO_VIDEO: _("%(count)s ders video dersine çevrildi."),
             LessonBulkAction.DELETE: _("%(count)s video silindi; platformdaki videoları duruyor."),
             LessonBulkAction.DELETE_REMOTE: _("%(count)s video silindi; platformdaki videoları da silinecek."),
         }

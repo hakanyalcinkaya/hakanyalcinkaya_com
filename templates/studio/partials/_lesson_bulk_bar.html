@@ -11,6 +11,10 @@
       <button type="button" class="btn btn-outline-primary" hx-post="{{ bulk_url }}" hx-vals='{"action": "preview_on"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-eye me-1" aria-hidden="true"></i>Önizlemeyi aç</button>
       <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "preview_off"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i>Önizlemeyi kapat</button>
     </div>
+    <div class="btn-group btn-group-sm" role="group" aria-label="Ders türü">
+      <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "to_text"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-file-text me-1" aria-hidden="true"></i>İçerik dersi yap</button>
+      <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "to_video"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Video dersi yap</button>
+    </div>
     <div class="btn-group btn-group-sm" role="group" aria-label="Silme">
       <button type="button" class="btn btn-outline-danger" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML" hx-confirm="Seçili videolar (dersler) silinsin mi? Platformdaki video dosyaları durur."><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Sil</button>
       <button type="button" class="btn btn-danger" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete_remote"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML" hx-confirm="Seçili videolar ve platformdaki (Bunny/Vimeo) video dosyaları silinsin mi? Bu geri alınamaz.">Sil + video dosyalarını sil</button>

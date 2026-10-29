@@ -26,6 +26,7 @@ urlpatterns = [
     path("sections/<uuid:section_id>/delete/", views.section_delete, name="section_delete"),
     path("lessons/<uuid:lesson_id>/status/", views.lesson_status, name="lesson_status"),
     path("lessons/<uuid:lesson_id>/preview/", views.lesson_preview, name="lesson_preview"),
+    path("lessons/<uuid:lesson_id>/kind/", views.lesson_kind, name="lesson_kind"),
     path("lessons/<uuid:lesson_id>/delete/", views.lesson_delete, name="lesson_delete"),
     path("courses/<uuid:course_id>/preview/", views.course_preview, name="course_preview"),
     path("courses/<uuid:course_id>/preview/status/", views.course_preview_status, name="course_preview_status"),

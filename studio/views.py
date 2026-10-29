@@ -283,6 +283,19 @@ def lesson_status(request, lesson_id):
 
 @superuser_required
 @require_POST
+def lesson_kind(request, lesson_id):
+    """Ders türü (video / metin / form); satır yeniden çizilir (videolu ve içerik dersinin düğmeleri farklı)."""
+    lesson = _lesson(lesson_id)
+    try:
+        lesson.set_kind(request.POST.get("kind", ""))
+    except ValueError:
+        return HttpResponseBadRequest()
+    response = render(request, "studio/partials/_lesson.html", dict(lesson=_lesson(lesson.pk), bulk=request.GET.get("bulk") == "1"))
+    return _toast(response, "success", _("Ders türü: %(kind)s.") % {"kind": lesson.get_kind_display()})
+
+
+@superuser_required
+@require_POST
 def lesson_preview(request, lesson_id):
     lesson = get_object_or_404(Lesson, pk=lesson_id)
     lesson.toggle_preview()

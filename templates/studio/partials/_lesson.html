@@ -19,6 +19,10 @@
     </div>
     {% endif %}
     <div class="col-12 col-md-auto d-flex flex-wrap align-items-center gap-1">
+      {# Ders türü: video yerine metin (Markdown içerik) ya da form; değişince satır yeniden çizilir. #}
+      <select name="kind" class="form-select form-select-sm w-auto py-0" aria-label="“{{ lesson.title }}” dersinin türü" title="Ders türü" hx-post="{% url 'studio:lesson_kind' lesson.id %}{% if bulk %}?bulk=1{% endif %}" hx-trigger="change" hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">
+        {% for value, label in lesson.kind_choices %}<option value="{{ value }}"{% if value == lesson.kind %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
       {% include "studio/partials/_lesson_status.html" %}
       {% if lesson.is_video %}
       <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_video' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-form" aria-label="Videoyu değiştir" title="Videoyu değiştir"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></button>
