@@ -6,6 +6,8 @@ Taslak kurs, bölüm ve dersler yalnız personele görünür (stüdyodan yüklen
 """
 
 import json
+from collections import defaultdict
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Prefetch
@@ -24,10 +26,12 @@ from course.models import (
     SubtitleStatus,
     rating_summary,
 )
-from learning.models import LessonProgress
+from learning.models import Enrollment, LessonProgress
 from page import catalog
 
 FALLBACK_IMAGE = "img/courses/react.jpg"
+# Örnek veride karşılığı olmayan kursun kapağı: slug'da geçen kelimeye göre (kapak yükleme henüz yok).
+FALLBACK_IMAGES = (("django", "img/courses/django.jpg"), ("python", "img/courses/python.png"), ("react", "img/courses/react.jpg"))
 LESSON_FORMAT_KEYS = {LessonKind.VIDEO: "video", LessonKind.FORM: "form", LessonKind.TEXT: "text"}
 
 
@@ -113,14 +117,22 @@ def _course_card(course, flat):
     """Şablonların kullandığı kurs sözlüğü: örnek kurs varsa onun üstüne modeldeki güncel bilgiler yazılır."""
     card = dict(catalog.course_by_slug(course.slug) or {})
     if not card:
+        tags = [technology.name for technology in course.technologies.all()]
         card = {
             "slug": course.slug,
             "url": course.get_absolute_url(),
             "cart_url": reverse("page:add_to_cart", kwargs={"slug": course.slug}),
+            "remove_url": reverse("page:remove_from_cart", kwargs={"slug": course.slug}),
             "buy_url": reverse("page:buy", kwargs={"slug": course.slug}),
-            "image": FALLBACK_IMAGE,
+            "image": _fallback_image(course.slug),
             "alt": f"{course.title} kursunun kapak görseli",
-            "tags": [technology.name for technology in course.technologies.all()],
+            "image_label": f"{course.title} — kursu incele",
+            "cart_label": f"{course.title} — sepete ekle",
+            "remove_label": f"{course.title} — sepetten kaldır",
+            "description": course.description or course.subtitle,
+            "tags": tags,
+            "tags_attr": "|".join(tags),
+            "topic": _topic(course, tags),
         }
     minutes = sum(ceil_minutes(item["seconds"]) for item in flat)
     preview = course.preview_player or {}
@@ -128,13 +140,146 @@ def _course_card(course, flat):
         title=course.title,
         short=course.short_title,
         price=format_try(course.price),
+        amount=course.price,
         lessons=len(flat),
         duration=hours_minutes(minutes),
         preview_video=preview.get("src", ""),
         preview_poster=preview.get("poster", ""),
         preview_platform=preview.get("platform", ""),
+        course_id=course.pk,
     )
+    card["meta_line"] = f"{card['duration']} · {card['lessons']} ders"
     return card
+
+
+def _fallback_image(slug):
+    return next((image for word, image in FALLBACK_IMAGES if word in slug), FALLBACK_IMAGE)
+
+
+def _topic(course, tags):
+    """Kurs listesi filtresi (catalog.TOPIC_FILTERS): kategori ve teknolojilerde geçen anahtar kelimeye göre."""
+    words = " ".join([course.category.name, course.category.slug, *tags]).lower().replace("-", "")
+    return next((key for key, _label in catalog.TOPIC_FILTERS if key and key in words), "")
+
+
+# Mağaza: yayındaki kurslar, sahip olunanlar, sepet ve "Eğitimlerim". Veritabanında yayında kurs yoksa (yayın öncesi)
+# listeler örnek kurslarla dolar; örnek kurslara kimse sahip değildir.
+def owned_course_ids(user):
+    if not user or not user.is_authenticated:
+        return set()
+    return set(Enrollment.objects.filter(user=user).values_list("course_id", flat=True))
+
+
+def catalog_cards(user=None):
+    """Sitede listelenen kurs kartları; `owned` kullanıcının kurs kaydına (Enrollment) göre."""
+    courses = list(Course.objects.published().select_related("category").prefetch_related("technologies"))
+    if not courses:
+        return [dict(card, owned=False, amount=Decimal(str(catalog.price_amount(card["price"])))) for card in catalog.course_catalog()]
+    durations = defaultdict(list)
+    lessons = Lesson.objects.published().filter(section__status=Status.PUBLISHED, section__course__in=courses)
+    for course_id, seconds in lessons.values_list("section__course_id", "duration_seconds"):
+        durations[course_id].append({"seconds": seconds or 0})
+    owned = owned_course_ids(user)
+    return [dict(_course_card(course, durations[course.pk]), owned=course.pk in owned) for course in courses]
+
+
+def card_by_slug(slug, user=None, cards=None):
+    return next((card for card in (cards if cards is not None else catalog_cards(user)) if card["slug"] == slug), None)
+
+
+def cart_cards(session, user=None, cards=None):
+    """Sepetteki kurslar (sırasıyla). Listede olmayan ya da artık sahip olunan kurslar sepetten düşer."""
+    cards = {card["slug"]: card for card in (cards if cards is not None else catalog_cards(user))}
+    slugs = catalog.cart_slugs(session)
+    kept = [slug for slug in slugs if slug in cards and not cards[slug]["owned"]]
+    if kept != slugs:
+        session[catalog.CART_SESSION_KEY] = kept
+    return [cards[slug] for slug in kept]
+
+
+def order_summary(items):
+    """Sepet özeti; tutarlar kartlardaki `amount` (₺, KDV dahil) ile."""
+    total = sum((item["amount"] for item in items), Decimal("0"))
+    return {
+        "items": items,
+        "count": len(items),
+        "count_text": f"{len(items)} kurs",
+        "subtotal": format_try(total),
+        "coupon": None,
+        "coupon_pct": 0,
+        "discount": format_try(Decimal("0")),
+        "total": format_try(total),
+    }
+
+
+LIBRARY_FILTERS = (("", "Tümü"), ("devam", "Devam"), ("bitti", "Tamamlanan"))
+
+
+def _library_row(enrollment, card, flat, done):
+    """Eğitimlerim satırı: ilerleme, durum ve kaldığı ders (catalog._owned_row ile aynı biçim)."""
+    total = len(flat)
+    finished = bool(total and done >= total)
+    if finished:
+        state_label, state_cls, cta = "Tamamlandı", "bg-success-subtle text-success-emphasis", "Kursu tekrar izle"
+    elif done:
+        state_label, state_cls, cta = "Devam ediyor", "bg-primary-subtle text-primary-emphasis", "Devam et"
+    else:
+        state_label, state_cls, cta = "Başlanmadı", "bg-body-tertiary text-body-secondary", "Başla"
+    lesson = enrollment.continue_lesson() if total else None
+    current = next((item for item in flat if lesson and item["object"].pk == lesson.pk), None)
+    return {
+        **card,
+        "done": done,
+        "total": total,
+        "pct": round(done * 100 / total) if total else 0,
+        "continue_url": current["url"] if current else card["url"],
+        "continue_title": current["title"] if current else "",
+        "continue_section": current["section"] if current else "",
+        "continue_label": f"{current['n']}. ders" if current else "",
+        "state_label": state_label if total else "Yakında",
+        "state_cls": state_cls,
+        "cta": cta if total else "Kursa git",
+        "finished": finished,
+        "last_watched": enrollment.last_watched_at,
+    }
+
+
+def library_page(user, status):
+    """Eğitimlerim: kullanıcının kurs kayıtları (yayındaki kurslar), ilerlemesi ve filtreler (catalog.library_page biçimi)."""
+    enrollments = (
+        Enrollment.objects.filter(user=user, course__status=Status.PUBLISHED)
+        .select_related("course__category", "last_lesson__section")
+        .prefetch_related("course__technologies")
+        .order_by("-last_watched_at", "-created_at", "id")
+    )
+    owned = []
+    for enrollment in enrollments:
+        _sections, flat = curriculum(enrollment.course)
+        done = len(LessonProgress.completed_lesson_ids(user, [item["object"] for item in flat]))
+        owned.append(_library_row(enrollment, _course_card(enrollment.course, flat), flat, done))
+    groups = {
+        "": owned,
+        "devam": [row for row in owned if not row["finished"]],
+        "bitti": [row for row in owned if row["finished"]],
+    }
+    status = status if status in groups else ""
+    url = reverse("page:library")
+    filters = [
+        dict(label=label, count=len(groups[key]), checked=key == status, url=f"{url}?durum={key}" if key else url)
+        for key, label in LIBRARY_FILTERS
+    ]
+    shown = groups[status]
+    owned_ids = {row["course_id"] for row in owned}
+    return {
+        "owned": shown,
+        "owned_count": len(owned),
+        "others": [card for card in catalog_cards(user) if card.get("course_id") not in owned_ids and not card["owned"]],
+        "filters": filters,
+        "continue_course": next((row for row in owned if not row["finished"] and row["total"]), None),
+        "empty": not shown,
+        "notes": [],
+        "summary": f"{len(owned)} kurs",
+    }
 
 
 def _detail(course, card):
@@ -183,7 +328,7 @@ def course_page(course, enrolled=False, staff=False):
         "section_count": len(sections),
         "first_preview": previews[0] if previews else None,
         "enrolled": enrolled,
-        "others": [item for item in catalog.course_catalog() if item["slug"] != course.slug],
+        "others": [item for item in catalog_cards() if item["slug"] != course.slug],
     }
 
 

@@ -167,7 +167,7 @@
           </div>
           <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 p-4">
             <span class="text-body-secondary small" style="max-width:44ch">{{ detail.access }}</span>
-            <a href="{{ course.buy_url }}" class="btn btn-primary">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+            {% if enrolled %}<a href="#mufredat" class="btn btn-primary">Derslere git <i class="bi bi-arrow-up ms-1" aria-hidden="true"></i></a>{% else %}<a href="{{ course.buy_url }}" class="btn btn-primary">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endif %}
           </div>
         </div>
       </section>

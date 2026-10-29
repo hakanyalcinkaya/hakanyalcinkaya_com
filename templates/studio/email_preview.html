@@ -9,7 +9,7 @@
   </div>
   <form class="d-flex gap-2" hx-post="{% url 'studio:email_send_test' key %}" hx-swap="none">
     <input type="hidden" name="kullanici" value="{{ lookup }}">
-    <button type="submit" class="btn btn-outline-secondary btn-sm"{% if not redirect_to %} disabled title="EMAIL_REDIRECT_TO tanımlı değil"{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>{% if redirect_to %}Test gönder ({{ redirect_to }}){% else %}Test gönderimi kapalı{% endif %}</button>
+    <button type="submit" class="btn btn-outline-secondary btn-sm"{% if not test_to %} disabled title="EMAIL_TEST_TO tanımlı değil"{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>{% if test_to %}Test gönder ({{ test_to }}){% else %}Test gönderimi kapalı{% endif %}</button>
   </form>
 </div>
 

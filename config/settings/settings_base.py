@@ -157,6 +157,9 @@ MEDIA_URL = "media/"
 SENDGRID_API_KEY = env("SENDGRID_API_KEY", default="")
 # Tanımlıysa bütün e-postalar yalnız bu adrese gider (test; asıl alıcı konu satırında). Yayına çıkarken kaldırılır.
 EMAIL_REDIRECT_TO = env("EMAIL_REDIRECT_TO", default="")
+# Stüdyo'daki "Test gönder" düğmelerinin adresi (her e-posta şablonu ve bülten). Yönlendirmeden bağımsızdır; yayında da
+# kalır. Tanımsızsa EMAIL_REDIRECT_TO kullanılır.
+EMAIL_TEST_TO = env("EMAIL_TEST_TO", default=EMAIL_REDIRECT_TO)
 MAILERS = {
     "default": (
         {

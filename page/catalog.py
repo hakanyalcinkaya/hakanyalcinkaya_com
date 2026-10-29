@@ -238,8 +238,8 @@ def reviews():
     return [{"name": name, "text": text, "initial": name[0]} for name, text in _REVIEWS]
 
 
-def course_filters(selected):
-    courses = course_catalog()
+def course_filters(selected, courses=None):
+    courses = course_catalog() if courses is None else courses
     items = []
     for key, label in TOPIC_FILTERS:
         if key:
@@ -260,8 +260,8 @@ def course_filters(selected):
     return items
 
 
-def filter_courses(topic):
-    courses = course_catalog()
+def filter_courses(topic, courses=None):
+    courses = course_catalog() if courses is None else courses
     if topic not in {key for key, _label in TOPIC_FILTERS if key}:
         topic = ""
     if topic:
@@ -390,8 +390,8 @@ def course_page(slug, enrolled=False):
 
 
 def owns_course(user, session, slug):
-    # [ÖRNEK] Sipariş modeli yokken: bu oturumda satın alınanlar ve giriş yapmış hesabın örnek kursları.
-    return slug in session.get(PURCHASED_SESSION_KEY, []) or (user.is_authenticated and slug in LIBRARY_DONE)
+    # [ÖRNEK] Yalnız veritabanında olmayan örnek kurslar için; gerçek erişim kurs kaydıyla (page.views._enrolled).
+    return slug in session.get(PURCHASED_SESSION_KEY, [])
 
 
 def _lesson_icon(lesson, preview):
@@ -467,7 +467,8 @@ def _lesson_note(course, lesson):
 
 
 def cart_slugs(session):
-    return [slug for slug in session.get(CART_SESSION_KEY, []) if course_by_slug(slug)]
+    """Sepetteki kurs slug'ları; geçerlilik ve sahiplik page.content.cart_cards'ta denetlenir."""
+    return list(session.get(CART_SESSION_KEY, []))
 
 
 def cart_add(session, slug):

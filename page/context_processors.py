@@ -5,12 +5,11 @@ from django.utils.functional import SimpleLazyObject
 from core.models import SiteSettings
 from newsletter.models import Subscriber
 
+from page import content
 from page.catalog import (
     NAV,
     NEWSLETTER_SESSION_KEY,
     SHOP_URL_NAMES,
-    cart_slugs,
-    course_catalog,
 )
 
 
@@ -20,7 +19,8 @@ def site(request):
     match = request.resolver_match
     url_name = match.url_name if match else ""
     user = request.user
-    cart_count = len(cart_slugs(request.session))
+    cards = content.catalog_cards(user)
+    cart_count = len(content.cart_cards(request.session, user, cards))
     nav_items = []
     for item_id, label in NAV:
         if item_id == "egitimler":
@@ -29,7 +29,7 @@ def site(request):
             href = f"{index_url}#{item_id}"
         nav_items.append({"id": item_id, "href": href, "label": label})
     return {
-        "courses": course_catalog(),
+        "courses": cards,
         "nav_items": nav_items,
         "year": timezone.now().year,
         "login_url": reverse("page:login"),

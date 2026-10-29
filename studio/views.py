@@ -773,6 +773,7 @@ def newsletter_edit(request, issue_id):
             recipient_total=issue.recipients().count(),
             personalization_fields=list(PERSONALIZATION_FIELDS.items()),
             redirect_to=settings.EMAIL_REDIRECT_TO,
+            test_to=settings.EMAIL_TEST_TO,
             worker_online=_worker_online(),
         ),
     )
@@ -795,18 +796,18 @@ def newsletter_audience(request):
 @staff_required
 @require_POST
 def newsletter_send_test(request, issue_id):
-    """Kayıtlı taslağı örnek aboneyle yalnız yönlendirme adresine (EMAIL_REDIRECT_TO) gönderir."""
+    """Kayıtlı taslağı giriş yapanın adıyla yalnız test adresine (EMAIL_TEST_TO) gönderir."""
     from mailing.emails import send_email
     from newsletter.models import Issue
 
     issue = get_object_or_404(Issue, pk=issue_id)
-    if not settings.EMAIL_REDIRECT_TO:
-        return _toast(HttpResponse(), "warning", _("Yönlendirme adresi (EMAIL_REDIRECT_TO) yok; test gönderimi kapalı."))
+    if not settings.EMAIL_TEST_TO:
+        return _toast(HttpResponse(), "warning", _("Test adresi (EMAIL_TEST_TO) yok; test gönderimi kapalı."))
     try:
-        send_email("newsletter", settings.EMAIL_REDIRECT_TO, issue.email_context(_preview_subscriber(request.user)))
+        send_email("newsletter", settings.EMAIL_TEST_TO, issue.email_context(_preview_subscriber(request.user)))
     except (smtplib.SMTPException, OSError) as error:
         return _toast(HttpResponse(), "error", _("Gönderilemedi: %(error)s") % {"error": error})
-    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_REDIRECT_TO})
+    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_TEST_TO})
 
 
 @staff_required
@@ -984,6 +985,7 @@ def email_preview(request, key):
             lookup=request.GET.get("kullanici", ""),
             warning=warning,
             redirect_to=settings.EMAIL_REDIRECT_TO,
+            test_to=settings.EMAIL_TEST_TO,
         ),
     )
 
@@ -991,16 +993,16 @@ def email_preview(request, key):
 @staff_required
 @require_POST
 def email_send_test(request, key):
-    """Önizlenen e-postayı yalnız yönlendirme adresine (EMAIL_REDIRECT_TO) gönderir; adres yoksa göndermez."""
+    """Önizlenen e-postayı yalnız test adresine (EMAIL_TEST_TO) gönderir; adres yoksa göndermez."""
     from mailing.emails import EMAILS, send_email
 
     if key not in EMAILS:
         raise Http404
-    if not settings.EMAIL_REDIRECT_TO:
-        return _toast(HttpResponse(), "warning", _("Yönlendirme adresi (EMAIL_REDIRECT_TO) yok; test gönderimi kapalı."))
+    if not settings.EMAIL_TEST_TO:
+        return _toast(HttpResponse(), "warning", _("Test adresi (EMAIL_TEST_TO) yok; test gönderimi kapalı."))
     context, _user, _warning = _email_preview_context(request, key)
     try:
-        send_email(key, settings.EMAIL_REDIRECT_TO, context)
+        send_email(key, settings.EMAIL_TEST_TO, context)
     except (smtplib.SMTPException, OSError) as error:
         return _toast(HttpResponse(), "error", _("Gönderilemedi: %(error)s") % {"error": error})
-    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_REDIRECT_TO})
+    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_TEST_TO})

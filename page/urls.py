@@ -51,6 +51,6 @@ urlpatterns = [
     path("cookies/", views.cookies, name="cookies"),
     path("<slug:slug>/add-to-cart/", views.add_to_cart, name="add_to_cart"),
     path("<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
-    path("<slug:slug>/buy/", views.checkout, name="buy"),
+    path("<slug:slug>/buy/", views.buy, name="buy"),
     path("<slug:slug>/", views.course_detail, name="course_detail"),
 ]

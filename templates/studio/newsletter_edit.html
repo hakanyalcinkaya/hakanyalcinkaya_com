@@ -92,7 +92,7 @@
     {% if issue.is_draft %}
     <div class="border rounded p-3 mb-3 small">
       <div class="d-flex flex-wrap align-items-center gap-2">
-        <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:newsletter_send_test' issue.pk %}" hx-swap="none"{% if not redirect_to %} disabled{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>Test gönder{% if redirect_to %} ({{ redirect_to }}){% endif %}</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:newsletter_send_test' issue.pk %}" hx-swap="none"{% if not test_to %} disabled{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>Test gönder{% if test_to %} ({{ test_to }}){% endif %}</button>
         <button type="button" class="btn btn-success btn-sm" hx-post="{% url 'studio:newsletter_send' issue.pk %}" hx-confirm="Bülten {{ recipient_total }} onaylı aboneye gönderilecek{% if redirect_to %} (test modu: hepsi {{ redirect_to }} adresine gider){% endif %}. Gönderilsin mi?"{% if not recipient_total or not worker_online %} disabled{% endif %}><i class="bi bi-megaphone me-1" aria-hidden="true"></i>{{ recipient_total }} kişiye gönder</button>
       </div>
       <div class="form-text mb-0 mt-2">Test ve gönderim kayıtlı sürümle yapılır; değişiklikten sonra önce kaydet.{% if not worker_online %} <span class="text-danger">Celery işçisi çalışmıyor.</span>{% endif %}</div>

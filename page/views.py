@@ -20,18 +20,13 @@ from mailing.models import EmailLog
 from newsletter.models import Subscriber
 from page import content
 from page.catalog import (
-    COUPON_SESSION_KEY,
     NEWSLETTER_SESSION_KEY,
     ORDER_SESSION_KEY,
     RESET_SESSION_KEY,
     UNSUBSCRIBED_SESSION_KEY,
     cart_add,
-    cart_courses,
     cart_remove,
-    cart_suggestions,
     catalog_stats,
-    course_by_slug,
-    course_catalog,
     course_filters,
     course_page,
     courses_by_slugs,
@@ -39,16 +34,12 @@ from page.catalog import (
     filter_courses,
     find_lesson,
     legal_page,
-    library_page,
     order_summary,
     owns_course,
-    place_order,
     purchase_steps,
     reviews,
 )
 from page.forms import (
-    CheckoutForm,
-    CouponForm,
     EmailChangeForm,
     LoginForm,
     NewsletterForm,
@@ -80,6 +71,7 @@ def _newsletter(request):
 
 
 def index(request):
+    cards = content.catalog_cards(request.user)
     form, done = _newsletter(request)
     if done:
         return done
@@ -89,14 +81,15 @@ def index(request):
         {
             "form": form,
             **content.home_reviews(),
-            "courses": content.with_ratings(course_catalog()),
-            "stats": catalog_stats(course_catalog()),
+            "courses": content.with_ratings(cards),
+            "stats": catalog_stats(cards),
         },
     )
 
 
 def course_list(request):
-    topic, courses = filter_courses(request.GET.get("konu", ""))
+    cards = content.catalog_cards(request.user)
+    topic, courses = filter_courses(request.GET.get("konu", ""), cards)
     form, done = _newsletter(request)
     if done:
         return done
@@ -108,10 +101,10 @@ def course_list(request):
             "form": form,
             "topic": topic,
             "course_list": content.with_ratings(courses),
-            "filters": course_filters(topic),
+            "filters": course_filters(topic, cards),
             "result_text": f"{count} kurs",
             "empty": count == 0,
-            "stats": catalog_stats(course_catalog()),
+            "stats": catalog_stats(cards),
             **content.home_reviews(),
         },
     )
@@ -293,73 +286,59 @@ def lesson_favorite(request, lesson_id):
 
 @require_POST
 def add_to_cart(request, slug):
-    if course_by_slug(slug) is None:
+    """Herkes sepete ekleyebilir; sahip olunan kurs eklenmez, kursa yönlendirilir."""
+    card = content.card_by_slug(slug, request.user)
+    if card is None:
         raise Http404
+    if card["owned"]:
+        messages.info(request, "Bu eğitime zaten sahipsin.")
+        return redirect(card["url"])
     cart_add(request.session, slug)
     return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
 
 
 @require_POST
 def remove_from_cart(request, slug):
-    if course_by_slug(slug) is None:
-        raise Http404
     cart_remove(request.session, slug)
     return redirect(f"{reverse('page:cart')}?{urlencode({'cikarildi': slug})}")
 
 
+def buy(request, slug):
+    """"Hemen Kaydol": online ödeme açılana kadar kursu sepete ekler (sahip olunan kurs eklenmez)."""
+    card = content.card_by_slug(slug, request.user)
+    if card is None:
+        raise Http404
+    if card["owned"]:
+        messages.info(request, "Bu eğitime zaten sahipsin.")
+        return redirect(card["url"])
+    cart_add(request.session, slug)
+    return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
+
+
 def cart(request):
-    items = cart_courses(request.session)
-    added = course_by_slug(request.GET.get("eklendi", ""))
-    removed = course_by_slug(request.GET.get("cikarildi", ""))
+    cards = content.catalog_cards(request.user)
+    items = content.cart_cards(request.session, request.user, cards)
+    added = content.card_by_slug(request.GET.get("eklendi", ""), cards=cards)
+    removed = content.card_by_slug(request.GET.get("cikarildi", ""), cards=cards)
+    in_cart = {item["slug"] for item in items}
     return render(
         request,
         "page/cart.html",
         {
-            "summary": order_summary(items),
+            "summary": content.order_summary(items),
             "steps": purchase_steps(0),
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,
-            "suggestions": cart_suggestions(items),
+            "suggestions": [card for card in cards if card["slug"] not in in_cart and not card["owned"]],
+            "checkout_open": False,
         },
     )
 
 
-def checkout(request, slug=None):
-    if slug:
-        course = course_by_slug(slug)
-        if course is None:
-            raise Http404
-        items = [course]
-    else:
-        items = cart_courses(request.session)
-    user = request.user
-    checkout_form = CheckoutForm(initial={"email": user.email} if user.is_authenticated else None)
-    coupon_form = CouponForm()
-    if request.method == "POST" and items:
-        action = request.POST.get("action")
-        if action == "coupon":
-            coupon_form = CouponForm(request.POST)
-            if coupon_form.is_valid():
-                request.session[COUPON_SESSION_KEY] = coupon_form.cleaned_data["code"]
-                return redirect(request.path)
-        elif action == "coupon_remove":
-            request.session.pop(COUPON_SESSION_KEY, None)
-            return redirect(request.path)
-        else:
-            checkout_form = CheckoutForm(request.POST)
-            if checkout_form.is_valid():
-                place_order(request.session, items, checkout_form.cleaned_data["email"], from_cart=not slug)
-                return redirect("page:thanks")
-    return render(
-        request,
-        "page/checkout.html",
-        {
-            "summary": order_summary(items, request.session.get(COUPON_SESSION_KEY)),
-            "steps": purchase_steps(1),
-            "checkout_form": checkout_form,
-            "coupon_form": coupon_form,
-        },
-    )
+def checkout(request):
+    """Online ödeme henüz kapalı: sepete döner."""
+    messages.info(request, "Online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
+    return redirect("page:cart")
 
 
 def thanks(request):
@@ -397,7 +376,7 @@ def library(request):
         request,
         "page/library.html",
         {
-            **library_page(status),
+            **content.library_page(request.user, status),
             "favorites": Favorite.objects.for_user(request.user).for_library(),
             "review_items": _library_reviews(request),
         },

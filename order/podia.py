@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from django.db import transaction
 
 from account.models import User
+from core.models import Status
 from course.models import Course
 from learning.models import Enrollment, EnrollmentSource
 from order.models import Order, OrderItem, OrderStatus
@@ -142,3 +143,25 @@ def import_rows(rows, rules, dry_run=False):
         if dry_run:
             transaction.set_rollback(True)
     return report
+
+
+def invite_candidates(resend=False):
+    """Podia'dan aktarılan siparişi olan etkin kullanıcılar; resend değilse "Hesabın taşındı" e-postası daha önce
+    gönderilmiş olanlar (mailing.EmailLog) çıkarılır."""
+    from mailing.models import EmailLog, EmailStatus
+
+    users = User.objects.filter(is_active=True, orders__payment_provider=PROVIDER).distinct().order_by("date_joined", "pk")
+    if not resend:
+        invited = EmailLog.objects.filter(template="account_migrated", status=EmailStatus.SENT, user__isnull=False)
+        users = users.exclude(pk__in=invited.values("user"))
+    return users
+
+
+def unpublished_imported_courses():
+    """Podia siparişlerindeki kurslardan henüz yayında olmayanlar (davet öncesi uyarı)."""
+    return (
+        Course.objects.filter(order_items__order__payment_provider=PROVIDER)
+        .exclude(status=Status.PUBLISHED)
+        .distinct()
+        .order_by("title")
+    )
