@@ -185,12 +185,21 @@ class PasswordResetForm(StyledFormMixin, auth_forms.PasswordResetForm):
         self.helper.layout = Layout("email", submit("Sıfırlama bağlantısı gönder", icon="bi-send"))
 
     def send_link(self, request):
-        self.save(
-            request=request,
-            use_https=request.is_secure(),
-            subject_template_name="page/account/emails/password_reset_subject.txt",
-            email_template_name="page/account/emails/password_reset.txt",
-        )
+        self.save(request=request, use_https=request.is_secure())
+
+    def get_users(self, email):
+        """Django şifresi olmayan hesaplara bağlantı göndermez; Podia'dan aktarılan hesapların şifresi yok,
+        "Şifremi unuttum" onlar için de çalışmalı. Etkin ve e-postası eşleşen her hesap."""
+        return User.objects.with_email(email).filter(is_active=True)
+
+    def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
+        """Şablon: templates/emails/password_reset (HTML + düz metin, bkz. core.emails)."""
+        from core.emails import send_email
+        from order.emails import password_reset_context
+
+        path = reverse("page:password_reset_confirm", kwargs={"uidb64": context["uid"], "token": context["token"]})
+        reset_url = f"{context['protocol']}://{context['domain']}{path}"
+        send_email("password_reset", to_email, password_reset_context(context["user"], reset_url))
 
 
 class NewPasswordForm(StyledFormMixin, auth_forms.SetPasswordForm):

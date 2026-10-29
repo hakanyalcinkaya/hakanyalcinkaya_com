@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+Ödemen alındı ve eğitim{% if items|length > 1 %}ler{% endif %} hesabına tanımlandı. Sipariş no: {{ order_number }}{% if purchased_at %} · {{ purchased_at|date:"j F Y" }}{% endif %}
+
+{% include "emails/_items.txt" with show_prices=True %}
+Eğitime başla: {{ library_url }}{% endblock %}

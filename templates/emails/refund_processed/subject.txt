@@ -1,0 +1,1 @@
+İaden yapıldı — sipariş {{ order_number }}

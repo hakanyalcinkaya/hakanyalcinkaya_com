@@ -229,7 +229,7 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
 
     @property
     def preview_player(self):
-        """Tanıtım videosunun oynatıcı verisi: platform, adres (Bunny'de HLS, Vimeo'da gizli bağlantı) ve kapak görseli."""
+        """Tanıtım videosunun oynatıcı verisi: platform, adres (HLS; Vimeo vermezse gizli bağlantı) ve kapak görseli."""
         if not self.preview_video_id:
             return None
         return video_service.get(self.preview_video_platform).playback(self.preview_video_id, self.preview_video_key)
@@ -547,7 +547,7 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
 
     @property
     def player(self):
-        """Oynatıcı verisi: platform, adres (Bunny'de HLS, Vimeo'da gizli bağlantı) ve kapak görseli."""
+        """Oynatıcı verisi: platform, adres (HLS; Vimeo vermezse gizli bağlantı) ve kapak görseli."""
         return self.video_service.playback(self.video_id, self.video_key) if self.video_id else None
 
     @property

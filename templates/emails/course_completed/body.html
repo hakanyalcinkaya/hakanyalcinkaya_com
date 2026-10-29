@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Tebrikler, kursu bitirdin!{% endblock %}
+{% block preheader %}{{ course_title }} kursundaki tüm dersleri tamamladın.{% endblock %}
+{% block eyebrow %}{{ course_title }}{% endblock %}
+{% block heading %}Tebrikler, kursu bitirdin!{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ course_title }}</strong> kursundaki {% if lesson_total %}{{ lesson_total }} dersin {% endif %}tamamını bitirdin{% if completed_at %} ({{ completed_at|date:"j F Y" }}){% endif %}. Emeğin için tebrikler!</p>
+<p style="margin: 0 0 14px;">Öğrendiklerini kalıcı yapmanın en iyi yolu kendi projeni geliştirmek.</p>
+{% endblock %}
+{% block cta %}{% include "emails/modules/cta_card.html" with cta_title="Düşüncelerini paylaş" cta_text="Kurs hakkındaki değerlendirmen sonraki öğrencilere yol gösterir." url=review_url label="Kursu değerlendir" %}{% endblock %}

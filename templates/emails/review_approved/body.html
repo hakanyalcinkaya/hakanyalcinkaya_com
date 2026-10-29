@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Yorumun yayınlandı.{% endblock %}
+{% block preheader %}{{ course_title }} için yazdığın değerlendirme sitede görünüyor.{% endblock %}
+{% block eyebrow %}{{ course_title }}{% endblock %}
+{% block heading %}Yorumun yayınlandı.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ course_title }}</strong> için yaptığın değerlendirme onaylandı ve kurs sayfasında yayında. Teşekkürler!</p>
+<p style="margin: 0 0 14px;">{% if rating %}<span style="color: #f5a623; font-size: 18px;">{% for step in "12345" %}{% if forloop.counter <= rating %}★{% else %}☆{% endif %}{% endfor %}</span>{% endif %}{% if review_text %}<br><em>“{{ review_text }}”</em>{% endif %}</p>
+{% include "emails/modules/button.html" with url=course_url label="Kurs sayfasını gör" %}
+{% endblock %}

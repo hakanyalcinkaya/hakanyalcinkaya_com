@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}İaden yapıldı.{% endblock %}
+{% block preheader %}Siparişinin iadesi gerçekleştirildi.{% endblock %}
+{% block eyebrow %}Sipariş {{ order_number }}{% endblock %}
+{% block heading %}İaden yapıldı.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ order_number }}</strong> numaralı siparişin için <strong>{{ refund_amount }}</strong> iade edildi. Tutarın kartına yansıması bankana göre birkaç iş günü sürebilir.</p>
+{% include "emails/modules/items.html" with show_prices=True %}
+<p style="margin: 0 0 14px;">İade edilen eğitimlere erişimin kapatıldı.</p>
+{% endblock %}

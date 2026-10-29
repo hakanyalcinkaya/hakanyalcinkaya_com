@@ -1,0 +1,6 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{{ course_title }} eğitimi hesabına tanımlandı{% if grant_reason %} ({{ grant_reason }}{% if sender_name %}, {{ sender_name }} tarafından{% endif %}){% endif %}.
+
+Eğitime git: {{ course_url }}{% endblock %}

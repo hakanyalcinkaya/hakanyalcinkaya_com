@@ -188,14 +188,12 @@ def course_page(course, enrolled=False, staff=False):
 
 
 def _player(lesson):
-    """Ders oynatıcısının verisi: platform, adres, kapak görseli ve hazır altyazılar (Video.js <track>).
-
-    Vimeo altyazıları kendi oynatıcısında yüklendiği için yalnız Bunny videolarında <track> verilir.
-    """
+    """Ders oynatıcısının verisi: platform, adres, kapak görseli ve hazır altyazılar (Video.js <track>)."""
     player = lesson.player
     if player is None:
         return None
     service = lesson.video_service
+    # Bunny'de altyazılar yüklenen dosyalardan <track> olarak verilir; Vimeo'da HLS listesinin içinde gelir.
     tracks = []
     for subtitle in lesson.subtitles.all():
         src = service.caption_url(lesson.video_id, subtitle.language)

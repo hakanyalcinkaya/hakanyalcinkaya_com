@@ -1,0 +1,1 @@
+Tebrikler{% if first_name %} {{ first_name }}{% endif %}! {{ course_title }} kursunu bitirdin

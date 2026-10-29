@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Onay bekleyen yorum.{% endblock %}
+{% block preheader %}{{ reviewer_name }} · {{ course_title }}{% endblock %}
+{% block eyebrow %}Yönetici · {{ course_title }}{% endblock %}
+{% block heading %}Onay bekleyen yorum.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;"><strong>{{ reviewer_name }}</strong>, <strong>{{ course_title }}</strong> için {% if is_edit %}onaylı yorumunu değiştirdi{% else %}yeni bir değerlendirme yaptı{% endif %}.</p>
+<p style="margin: 0 0 14px;">{% if rating %}<span style="color: #f5a623; font-size: 18px;">{% for step in "12345" %}{% if forloop.counter <= rating %}★{% else %}☆{% endif %}{% endfor %}</span>{% endif %}{% if review_text %}<br><em>“{{ review_text }}”</em>{% else %}<br><span style="color: #9B9B9B;">Yorum yazılmamış (yalnız puan).</span>{% endif %}</p>
+{% include "emails/modules/button.html" with url=studio_url label="Stüdyo'da incele" %}
+{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

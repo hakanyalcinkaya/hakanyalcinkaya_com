@@ -51,6 +51,7 @@ INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + MY_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.CanonicalHostMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -150,8 +151,31 @@ STATICFILES_DIRS = [BASE_DIR / "static_files"]
 
 MEDIA_URL = "media/"
 
+# E-posta: SendGrid SMTP (kullanıcı adı her zaman "apikey", şifre API anahtarı). Anahtar yoksa e-postalar terminale yazılır.
+SENDGRID_API_KEY = env("SENDGRID_API_KEY", default="")
+# Tanımlıysa bütün e-postalar yalnız bu adrese gider (test; asıl alıcı konu satırında). Yayına çıkarken kaldırılır.
+EMAIL_REDIRECT_TO = env("EMAIL_REDIRECT_TO", default="")
 MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
+    "default": (
+        {
+            "BACKEND": "core.mail_backends.RedirectSMTPBackend",
+            "OPTIONS": {
+                "host": "smtp.sendgrid.net",
+                "port": 587,
+                "use_tls": True,
+                "username": "apikey",
+                "password": SENDGRID_API_KEY,
+                "timeout": 20,
+            },
+        }
+        if SENDGRID_API_KEY
+        else {"BACKEND": "core.mail_backends.RedirectConsoleBackend"}
+    ),
 }
+# E-postalardaki bağlantılar bu adresle kurulur (istek olmadan, ör. toplu gönderimde).
+SITE_URL = env("SITE_URL", default="https://hakanyalcinkaya.com")
+# Asıl alan adı; REDIRECT_HOSTS'tan gelen istekler buraya yönlendirilir (core.middleware). Boşsa yönlendirme yok.
+CANONICAL_HOST = ""
+REDIRECT_HOSTS = []
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Hakan Yalçınkaya <no-reply@hakanyalcinkaya.com>")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL

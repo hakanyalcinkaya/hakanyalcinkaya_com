@@ -1,5 +1,6 @@
 import json
-from urllib.parse import urlencode
+from functools import wraps
+from urllib.parse import urlencode, urlparse
 
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
@@ -13,7 +14,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from course.models import Course, Lesson, Review
-from learning.models import Favorite, LessonProgress, PlayerPreference
+from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
+from newsletter.models import Subscriber
 from page import content
 from page.catalog import (
     COUPON_SESSION_KEY,
@@ -63,6 +65,9 @@ def _newsletter(request):
     if request.method == "POST":
         form = NewsletterForm(request.POST)
         if form.is_valid():
+            # Form her sayfadan ana sayfaya gönderilir; kaynak olarak geldiği sayfa saklanır.
+            source = urlparse(request.META.get("HTTP_REFERER", "")).path or request.path
+            Subscriber.subscribe(form.cleaned_data["email"], name=form.cleaned_data["name"], source=source[:200])
             request.session[NEWSLETTER_SESSION_KEY] = form.cleaned_data["email"]
             return form, redirect("page:newsletter_confirm")
         return form, None
@@ -108,8 +113,16 @@ def course_list(request):
 
 
 def _enrolled(request, slug):
-    # Personel stüdyodan yüklediği içeriği kayıtlı öğrenci gibi görür.
-    return request.user.is_staff or owns_course(request.user, request.session, slug)
+    """Kursa erişim: personel her kursu görür; veritabanındaki kurslarda kurs kaydı (Enrollment) gerekir.
+
+    Yalnız örnek veride olan kurslar (henüz veritabanında yok) örnek kuralla çalışır.
+    """
+    if request.user.is_staff:
+        return True
+    course = Course.objects.filter(slug=slug).first()
+    if course is not None:
+        return Enrollment.objects.has_access(request.user, course)
+    return owns_course(request.user, request.session, slug)
 
 
 def course_detail(request, slug):
@@ -393,6 +406,19 @@ def _next_url(request, fallback):
     return fallback
 
 
+def anonymous_required(view):
+    """Giriş yapmış kullanıcı giriş, kayıt ve şifremi unuttum sayfalarını açarsa ana sayfaya gider."""
+
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("page:index")
+        return view(request, *args, **kwargs)
+
+    return wrapper
+
+
+@anonymous_required
 def login(request):
     form = LoginForm(request.POST if request.method == "POST" else None, request=request)
     if form.is_valid():
@@ -402,6 +428,7 @@ def login(request):
     return render(request, "page/account/login.html", {"form": form})
 
 
+@anonymous_required
 def signup(request):
     form = SignupForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
@@ -412,6 +439,7 @@ def signup(request):
     return render(request, "page/account/signup.html", {"form": form})
 
 
+@anonymous_required
 def password_reset(request):
     form = PasswordResetForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
@@ -421,6 +449,7 @@ def password_reset(request):
     return render(request, "page/account/password_reset.html", {"form": form})
 
 
+@anonymous_required
 def password_reset_sent(request):
     return render(
         request,
@@ -487,14 +516,26 @@ def player_preferences(request):
 
 
 def newsletter_confirmed(request):
-    # [ÖRNEK] Abonelik servisi bağlanınca e-postadaki onay bağlantısı buraya gelecek.
     return render(request, "page/newsletter_confirmed.html")
 
 
+def newsletter_activate(request, token):
+    """Onay e-postasındaki bağlantı: aboneliği başlatır. Bağlantı geçersizse açıklama gösterilir."""
+    subscriber = Subscriber.objects.filter(confirm_token=token).first()
+    if subscriber is None:
+        return render(request, "page/newsletter_confirmed.html", {"invalid": True}, status=404)
+    if not subscriber.is_confirmed:
+        subscriber.confirm()
+    return redirect("page:newsletter_confirmed")
+
+
 def newsletter_unsubscribe(request):
-    # [ÖRNEK] Servis bağlı değil; adres yalnız doğrulanır, bir listeden çıkarılmaz.
+    """E-posta adresiyle abonelikten çıkış. Adres listede olmasa da aynı sonuç gösterilir."""
     form = NewsletterUnsubscribeForm(request.POST if request.method == "POST" else None)
     if form.is_valid():
+        subscriber = Subscriber.objects.by_email(form.cleaned_data["email"])
+        if subscriber is not None:
+            subscriber.unsubscribe()
         request.session[UNSUBSCRIBED_SESSION_KEY] = form.cleaned_data["email"]
         return redirect("page:newsletter_unsubscribe")
     return render(
@@ -502,6 +543,19 @@ def newsletter_unsubscribe(request):
         "page/newsletter_unsubscribe.html",
         {"form": form, "unsubscribed": request.session.pop(UNSUBSCRIBED_SESSION_KEY, "")},
     )
+
+
+def newsletter_unsubscribe_link(request, token):
+    """E-postalardaki "abonelikten çık" bağlantısı. Bağlantıyı önceden açan e-posta tarayıcıları yanlışlıkla çıkarmasın
+    diye çıkış düğmeyle (POST) yapılır."""
+    subscriber = Subscriber.objects.filter(confirm_token=token).first()
+    if subscriber is None:
+        return redirect("page:newsletter_unsubscribe")
+    if request.method == "POST":
+        subscriber.unsubscribe()
+        request.session[UNSUBSCRIBED_SESSION_KEY] = subscriber.email
+        return redirect("page:newsletter_unsubscribe")
+    return render(request, "page/newsletter_unsubscribe.html", {"link_subscriber": subscriber})
 
 
 def newsletter_confirm(request):

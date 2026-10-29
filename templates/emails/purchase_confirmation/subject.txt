@@ -1,0 +1,1 @@
+Teşekkürler! {{ product_title }}{% if items|length > 1 %} ve {{ items|length|add:"-1" }} eğitim daha{% endif %} hesabında

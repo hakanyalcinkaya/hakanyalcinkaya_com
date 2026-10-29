@@ -1,0 +1,14 @@
+{# Ayrı CTA kartı (Call to Action 2): başlık, metin, düğme, alt not. Beklenen: cta_title, cta_text, url, label, cta_note. #}
+<table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation"><tbody><tr><td height="8" style="font-size: 1px; line-height: 1px;">&nbsp;</td></tr></tbody></table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+  <tbody>
+    <tr>
+      <td class="pc-sm-p-35-30 pc-xs-p-25-20" style="padding: 34px 40px; background-color: #ffffff; border-radius: 8px;" valign="top" bgcolor="#ffffff" align="center">
+        {% if cta_title %}<div class="pc-fb-font" style="font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 800; line-height: 34px; letter-spacing: -0.5px; color: #151515;">{{ cta_title }}</div>{% endif %}
+        {% if cta_text %}<div class="pc-fb-font" style="padding-top: 8px; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 300; line-height: 26px; color: #4B4B4B;">{{ cta_text }}</div>{% endif %}
+        {% include "emails/modules/button.html" %}
+        {% if cta_note %}<div class="pc-fb-font" style="padding-top: 6px; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 300; line-height: 20px; color: #9B9B9B;">{{ cta_note }}</div>{% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>

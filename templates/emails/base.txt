@@ -1,0 +1,7 @@
+{% autoescape off %}{% block content %}{% endblock %}
+
+—
+{{ site_name }}
+{{ site_url }}
+{% block footer %}Bu e-posta {{ email|default:"sana" }} adresine {{ site_name }} hesabınla ilgili olarak gönderildi.{% endblock %}
+{% endautoescape %}

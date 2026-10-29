@@ -1,0 +1,48 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{{ email.label }} · E-postalar{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+  <div>
+    <h1 class="h3 mb-1">{{ email.label }}</h1>
+    <p class="text-body-secondary mb-0">{{ email.description }}</p>
+  </div>
+  <form class="d-flex gap-2" hx-post="{% url 'studio:email_send_test' key %}" hx-swap="none">
+    <input type="hidden" name="kullanici" value="{{ lookup }}">
+    <button type="submit" class="btn btn-outline-secondary btn-sm"{% if not redirect_to %} disabled title="EMAIL_REDIRECT_TO tanımlı değil"{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>{% if redirect_to %}Test gönder ({{ redirect_to }}){% else %}Test gönderimi kapalı{% endif %}</button>
+  </form>
+</div>
+
+<form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
+  <label class="small text-body-secondary" for="preview-user">Gerçek veriyle önizle:</label>
+  <input type="email" name="kullanici" id="preview-user" value="{{ lookup }}" class="form-control form-control-sm w-auto" placeholder="kullanıcının e-postası">
+  <button type="submit" class="btn btn-outline-secondary btn-sm">Göster</button>
+  {% if lookup %}<a href="{% url 'studio:email_preview' key %}" class="btn btn-link btn-sm link-secondary">Örnek veriye dön</a>{% endif %}
+  <span class="small text-body-tertiary">{% if selected_user %}Gösterilen: {{ selected_user.email }}{% else %}Örnek veri gösteriliyor{% endif %}</span>
+</form>
+{% if warning %}<div class="alert alert-warning small py-2">{{ warning }}</div>{% endif %}
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="border rounded overflow-hidden">
+      <div class="small px-3 py-2 border-bottom bg-body-tertiary"><span class="text-body-secondary">Konu:</span> <strong>{{ subject }}</strong></div>
+      <iframe title="E-posta önizlemesi" srcdoc="{{ html }}" class="w-100 d-block bg-white" style="height: 900px; border: 0;" sandbox></iframe>
+    </div>
+    <details class="mt-3 border rounded">
+      <summary class="px-3 py-2 small fw-medium">Düz metin sürümü</summary>
+      <pre class="small px-3 pb-3 mb-0 text-wrap">{{ text }}</pre>
+    </details>
+  </div>
+  <div class="col-xl-4">
+    <h2 class="h6">Değişkenler</h2>
+    <p class="small text-body-secondary">Şablonda <code>{% templatetag openvariable %} first_name {% templatetag closevariable %}</code> gibi yazılır.</p>
+    <dl class="small mb-4">
+      {% for name, description in variables %}
+      <dt><code>{{ name }}</code></dt><dd class="text-body-secondary mb-2">{{ description }}</dd>
+      {% endfor %}
+    </dl>
+    <h2 class="h6">Dosyalar</h2>
+    <ul class="small list-unstyled mb-0">{% for name in files %}<li><code>templates/{{ name }}</code></li>{% endfor %}</ul>
+  </div>
+</div>
+{% endblock %}

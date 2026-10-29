@@ -1,0 +1,21 @@
+{# Üç sütunlu özellikler (Feature 1). Beklenen: features = [{"title", "text"}], features_title. #}
+<table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation"><tbody><tr><td height="8" style="font-size: 1px; line-height: 1px;">&nbsp;</td></tr></tbody></table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+  <tbody>
+    <tr>
+      <td class="pc-sm-p-35-10-15 pc-xs-p-25-0-5" style="padding: 34px 20px 20px; background-color: #ffffff; border-radius: 8px;" valign="top" bgcolor="#ffffff">
+        {% if features_title %}<div class="pc-fb-font" style="font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 700; line-height: 30px; letter-spacing: -0.4px; color: #151515; padding: 0 20px;">{{ features_title }}</div>{% endif %}
+        <div style="font-size: 0;">
+          {% for feature in features %}
+          <div class="pc-sm-mw-50pc pc-xs-mw-100pc" style="display: inline-block; width: 100%; max-width: 186px; vertical-align: top;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation"><tbody><tr><td style="padding: 18px 20px;" valign="top">
+              <div class="pc-fb-font" style="font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 500; line-height: 24px; color: #1B1B1B;">{{ feature.title }}</div>
+              <div class="pc-fb-font" style="padding-top: 6px; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 300; line-height: 20px; color: #4B4B4B;">{{ feature.text }}</div>
+            </td></tr></tbody></table>
+          </div>
+          {% endfor %}
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

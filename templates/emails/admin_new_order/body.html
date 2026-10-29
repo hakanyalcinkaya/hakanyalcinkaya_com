@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Yeni satış: {{ order_total }}{% endblock %}
+{% block preheader %}{{ full_name|default:email }} · {{ order_total }}{% endblock %}
+{% block eyebrow %}Yönetici · Sipariş {{ order_number }}{% endblock %}
+{% block heading %}Yeni satış: {{ order_total }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;"><strong>{{ full_name|default:email }}</strong> ({{ email }}) sipariş verdi{% if purchased_at %} · {{ purchased_at|date:"j F Y, H:i" }}{% endif %}.</p>
+{% include "emails/modules/items.html" with show_prices=True %}
+{% include "emails/modules/button.html" with url=admin_url label="Siparişi aç" %}
+{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

@@ -1,11 +1,24 @@
 import uuid
+from datetime import timedelta
+from functools import partial
 
-from django.db import models
+from django.conf import settings
+from django.db import IntegrityError, models, transaction
 from django.db.models.functions import Lower
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel
+
+
+# Abone olurken gösterilen metin; onayın kanıtı olarak abone kaydında saklanır (İYS / KVKK).
+CONSENT_TEXT = (
+    "Yeni yazılım kursları, faydalı kaynaklar ve geliştirici içerikleri e-posta kutuna gelsin. "
+    "İstediğin zaman abonelikten çıkabilirsin."
+)
+# Aynı adrese bu süre içinde ikinci onay e-postası gönderilmez (formu art arda göndermeye karşı).
+RESEND_AFTER = timedelta(minutes=1)
 
 
 class SubscriberStatus(models.TextChoices):
@@ -48,6 +61,65 @@ class Subscriber(BaseModel):
     def save(self, *args, **kwargs):
         self.email = self.email.strip().lower()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def subscribe(cls, email, name="", source="", consent_text=CONSENT_TEXT):
+        """Abonelik isteği: kayıt "onay bekliyor" olur ve onay e-postası sıraya alınır.
+
+        Onaylı adres değişmez ve e-posta gitmez; kullanıcıya her durumda aynı sayfa gösterildiği için adresin listede
+        olup olmadığı dışarıdan anlaşılmaz. Abonelikten çıkmış adres yeniden onaya düşer. Döner: (abone, e-posta gönderildi mi).
+        """
+        subscriber = cls.objects.by_email(email)
+        if subscriber is None:
+            try:
+                with transaction.atomic():
+                    subscriber = cls.objects.create(email=email, name=name, source=source, consent_text=consent_text)
+            except IntegrityError:
+                # Aynı adres eş zamanlı kaydedildi; var olan kayıtla devam edilir.
+                subscriber = cls.objects.by_email(email)
+            else:
+                subscriber.queue_confirmation()
+                return subscriber, True
+        if subscriber.status == SubscriberStatus.CONFIRMED:
+            return subscriber, False
+        if subscriber.status == SubscriberStatus.PENDING and subscriber.updated_at > timezone.now() - RESEND_AFTER:
+            return subscriber, False
+        subscriber.status = SubscriberStatus.PENDING
+        subscriber.unsubscribed_at = None
+        subscriber.name = name or subscriber.name
+        subscriber.source = source or subscriber.source
+        subscriber.consent_text = consent_text
+        subscriber.save()
+        subscriber.queue_confirmation()
+        return subscriber, True
+
+    def queue_confirmation(self):
+        from newsletter.tasks import send_confirmation
+
+        transaction.on_commit(partial(send_confirmation.delay, str(self.pk)))
+
+    @property
+    def is_confirmed(self):
+        return self.status == SubscriberStatus.CONFIRMED
+
+    def _absolute(self, name):
+        return settings.SITE_URL.rstrip("/") + reverse(name, kwargs={"token": self.confirm_token})
+
+    def confirm_url(self):
+        return self._absolute("page:newsletter_activate")
+
+    def unsubscribe_url(self):
+        return self._absolute("page:newsletter_unsubscribe_link")
+
+    def email_context(self):
+        """Bülten e-postalarının değişkenleri (bkz. core.emails: newsletter_confirm, newsletter)."""
+        return {
+            "name": self.name,
+            "email": self.email,
+            "confirm_url": self.confirm_url(),
+            "unsubscribe_url": self.unsubscribe_url(),
+            "site_url": settings.SITE_URL.rstrip("/"),
+        }
 
     def confirm(self):
         self.status = SubscriberStatus.CONFIRMED

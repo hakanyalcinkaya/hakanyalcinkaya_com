@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+Hesabının e-posta adresini {{ new_email }} olarak değiştirmek istedin. Onaylamak için bağlantıyı aç (onaylayana kadar eski adresin geçerli kalır):
+{{ confirm_url }}
+
+Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin.{% endblock %}

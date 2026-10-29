@@ -1,19 +1,28 @@
 """Vimeo API istemcisi (v3.4). Video yükleme tus protokolüyle parça parça yapılır; kesilirse kaldığı yerden sürer.
 
-Oynatma Video.js `<vimeo-video>` ile Vimeo'nun kendi oynatıcısından yapılır; videolar gizlidir ve yalnız izinli alan
-adlarında gömülür. Ortak platform arayüzünün Vimeo karşılığıdır (bkz. `course.video_service`).
+Oynatma kendi oynatıcımızla (Video.js + hls.js) yapılır: API'nin verdiği süreli HLS bağlantısı, kapak görseli ve
+altyazılar önbellekte tutulur. API bağlantı vermezse (plan, hata) Vimeo'nun kendi oynatıcısına (`<vimeo-video>`) dönülür;
+videolar gizlidir ve yalnız izinli alan adlarında gömülür. Ortak platform arayüzünün Vimeo karşılığıdır
+(bkz. `course.video_service`).
 """
 
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import logging
+from datetime import datetime
+
 import requests
 from django.conf import settings
+from django.core.cache import cache
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from course.bunny import as_webvtt
 from course.video_service import RemoteVideo, VideoServiceError, VideoServiceNotConfigured, missing_settings
+
+logger = logging.getLogger(__name__)
 
 LABEL = "Vimeo"
 # Kursun Vimeo'daki klasörü (API adresi, ör. /users/1/projects/2)
@@ -29,6 +38,10 @@ TUS_TIMEOUT = 300
 TUS_RETRIES = 3
 # Gizli video: vimeo.com'da açılmaz, yalnız izinli alan adlarına gömülür, indirilemez.
 UPLOAD_PRIVACY = {"view": "disable", "embed": "whitelist", "download": False}
+# HLS bağlantısı Vimeo'da süreli (yaklaşık 1 gün); önbellek bitimden önce yenilenir.
+PLAYBACK_CACHE_MARGIN = 15 * 60
+PLAYBACK_CACHE_MAX = 6 * 60 * 60
+POSTER_WIDTH = 1280
 # Dosya Vimeo'ya ulaştıktan sonraki aşamalar (videonun genel durumu); stüdyoda açıklanır.
 STATE_LABELS = {
     "uploading": _("Vimeo dosyayı alıyor"),
@@ -268,14 +281,56 @@ def upload_caption(video_id, language, label, path):
 # Oynatma adresleri
 
 
-def playback(video_id, key=""):
-    """Oynatıcı verisi: Vimeo bağlantısı (gizli videolarda anahtarla). Kapak görselini Vimeo oynatıcısı kendisi gösterir."""
+def embed_playback(video_id, key=""):
+    """Yedek: Vimeo'nun kendi oynatıcısı (gizli videolarda anahtarla). Kapak görselini Vimeo oynatıcısı gösterir."""
     src = f"https://vimeo.com/{video_id}?h={key}" if key else f"https://vimeo.com/{video_id}"
     return {"platform": "vimeo", "src": src, "poster": ""}
 
 
+def _poster(sizes):
+    sizes = sorted(sizes or [], key=lambda size: size.get("width") or 0)
+    wide = [size for size in sizes if (size.get("width") or 0) >= POSTER_WIDTH]
+    chosen = wide[0] if wide else (sizes[-1] if sizes else None)
+    return chosen["link"] if chosen else ""
+
+
+def hls_playback(video_id):
+    """Kendi oynatıcımız için: HLS listesi ve kapak (süreli Vimeo bağlantıları). Altyazılar HLS listesinin içinde gelir.
+
+    Bağlantı yoksa (None, 0); varsa (oynatıcı verisi, önbellek süresi).
+    """
+    data = api("GET", f"/videos/{video_id}", params={"fields": "play.hls,pictures.sizes.width,pictures.sizes.link"})
+    hls = (data.get("play") or {}).get("hls") or {}
+    if not hls.get("link"):
+        return None, 0
+    expires = hls.get("link_expiration_time")
+    seconds = PLAYBACK_CACHE_MAX
+    if expires:
+        remaining = (datetime.fromisoformat(expires) - timezone.now()).total_seconds() - PLAYBACK_CACHE_MARGIN
+        seconds = max(0, min(seconds, int(remaining)))
+    player = {"platform": "hls", "src": hls["link"], "poster": _poster((data.get("pictures") or {}).get("sizes"))}
+    return player, seconds
+
+
+def playback(video_id, key=""):
+    """Oynatıcı verisi: önce kendi oynatıcımız (HLS, önbellekten), olmazsa Vimeo'nun oynatıcısı."""
+    cache_key = f"vimeo:playback:{video_id}"
+    player = cache.get(cache_key)
+    if player is None:
+        try:
+            player, seconds = hls_playback(video_id)
+        except (VideoServiceError, ValueError, KeyError) as error:
+            logger.warning("Vimeo HLS bağlantısı alınamadı (%s): %s", video_id, error)
+            player, seconds = None, 0
+        if player is None:
+            return embed_playback(video_id, key)
+        if seconds:
+            cache.set(cache_key, player, seconds)
+    return player
+
+
 def caption_url(video_id, language):
-    """Altyazıları Vimeo oynatıcısı kendisi yükler; ayrı adres yok."""
+    """Altyazılar HLS listesinin içinde gelir; ayrı adres yok."""
     return ""
 
 

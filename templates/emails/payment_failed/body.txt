@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+Siparişin için ödeme alınamadı, bu yüzden kartından para çekilmedi. Sepetindeki ürünler duruyor:
+
+{% include "emails/_items.txt" with show_prices=True %}
+Ödemeyi yeniden dene: {{ retry_url }}{% endblock %}

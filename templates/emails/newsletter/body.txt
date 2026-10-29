@@ -1,0 +1,9 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if name %} {{ name }}{% endif %},
+
+{% if intro %}{{ intro }}
+
+{% endif %}{{ content_text }}
+{% if cta_url %}
+{{ cta_label|default:"Devamını oku" }}: {{ cta_url }}{% endif %}{% endblock %}
+{% block footer %}Bu bülteni {{ email }} adresiyle abone olduğun için alıyorsun. Abonelikten çık: {{ unsubscribe_url }}{% endblock %}

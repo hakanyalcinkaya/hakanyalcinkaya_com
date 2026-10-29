@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{{ site_name }} hesabının şifresi {% if changed_at %}{{ changed_at|date:"j F Y, H:i" }} tarihinde {% endif %}değiştirildi.
+
+Bu değişikliği sen yaptıysan bir şey yapmana gerek yok. Sen yapmadıysan hemen şifreni sıfırla:
+{{ reset_page_url }}{% endblock %}

@@ -21,6 +21,7 @@ INTERNAL_IPS = ["127.0.0.1", "::1"]
 # .dev alan adları tarayıcıda HTTPS'e zorlandığı için yerel adres .com altında.
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "local.hakanyalcinkaya.com"]
 VIMEO_EMBED_DOMAINS = [*VIMEO_EMBED_DOMAINS, "local.hakanyalcinkaya.com"]  # noqa: F405
+SITE_URL = env("SITE_URL", default="http://local.hakanyalcinkaya.com:8001")  # noqa: F405
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

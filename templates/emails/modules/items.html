@@ -1,0 +1,24 @@
+{# Ürün tablosu (Transactional 1). Beklenen: items (title, url, price, paid_price, discount, purchased_at), show_prices, order_total, coupon. #}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin: 18px 0 8px;">
+  <tbody>
+    <tr>
+      <th class="pc-fb-font" style="letter-spacing: -0.2px; line-height: 24px; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 15px; padding: 8px 10px 8px 0; border-bottom: 1px solid #E5E5E5; color: #151515;" align="left">Eğitim</th>
+      {% if show_prices %}<th class="pc-fb-font" style="letter-spacing: -0.2px; line-height: 24px; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 15px; border-bottom: 1px solid #E5E5E5; padding: 8px 0; width: 110px; color: #151515;" align="right">Tutar</th>{% endif %}
+    </tr>
+    {% for item in items %}
+    <tr>
+      <td style="padding: 14px 10px 14px 0; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; border-bottom: 1px solid #E5E5E5;" valign="top">
+        {% if item.url %}<a href="{{ item.url }}" style="text-decoration: none; letter-spacing: -0.3px; line-height: 24px; font-weight: 500; font-size: 16px; color: #151515;">{{ item.title }}</a>{% else %}<span style="letter-spacing: -0.3px; line-height: 24px; font-weight: 500; font-size: 16px; color: #151515;">{{ item.title }}</span>{% endif %}
+        {% if item.purchased_at %}<div style="font-size: 14px; line-height: 20px; color: #9B9B9B;">{{ item.purchased_at|date:"j F Y" }}</div>{% endif %}
+      </td>
+      {% if show_prices %}<td class="pc-fb-font" style="padding: 14px 0; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 1px solid #E5E5E5; color: #151515; white-space: nowrap;" valign="top" align="right">{% if item.discount %}<span style="color: #9B9B9B; text-decoration: line-through; font-size: 14px;">{{ item.price }}</span><br>{% endif %}<strong>{{ item.paid_price }}</strong></td>{% endif %}
+    </tr>
+    {% endfor %}
+    {% if show_prices and order_total %}
+    <tr>
+      <td class="pc-fb-font" style="padding: 14px 10px 0 0; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; color: #151515;">Toplam{% if coupon %} <span style="font-weight: 400; font-size: 14px; color: #9B9B9B;">· {{ coupon }} kodu</span>{% endif %}</td>
+      <td class="pc-fb-font" style="padding: 14px 0 0; font-family: 'Fira Sans', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; color: #151515; white-space: nowrap;" align="right">{{ order_total }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>

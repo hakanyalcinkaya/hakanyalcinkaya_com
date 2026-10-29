@@ -1,0 +1,4 @@
+{% for item in items %}- {{ item.title }}{% if show_prices %}: {{ item.paid_price }}{% if item.discount %} (liste fiyatı {{ item.price }}){% endif %}{% endif %}{% if item.url %}
+  {{ item.url }}{% endif %}
+{% endfor %}{% if show_prices and order_total %}Toplam: {{ order_total }}{% if coupon %} ({{ coupon }} kodu){% endif %}
+{% endif %}

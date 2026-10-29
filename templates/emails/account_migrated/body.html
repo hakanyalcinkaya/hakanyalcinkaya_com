@@ -1,0 +1,14 @@
+{% extends "emails/base.html" %}
+{% block title %}Eğitimlerin yeni adresinde.{% endblock %}
+{% block preheader %}Satın aldığın eğitimler hesabına tanımlandı; tek adım: şifreni belirle.{% endblock %}
+{% block eyebrow %}Yeni platform{% endblock %}
+{% block heading %}Eğitimlerin yeni adresinde.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">Eğitimlerimi kendi platformuma taşıdım. Daha önce satın aldığın eğitim{% if items|length > 1 %}ler{% endif %} <strong>{{ email }}</strong> adresiyle açılan hesabına tanımlandı:</p>
+{% include "emails/modules/items.html" with show_prices=False %}
+<p style="margin: 0 0 14px;">Başlamak için şifreni belirlemen yeterli.</p>
+{% include "emails/modules/button.html" with url=set_password_url label="Şifremi belirle" %}
+<p style="margin: 0 0 14px;">Şifreni belirledikten sonra eğitimlerin <a href="{{ library_url }}" style="color: #6366f1;">Kurslarım</a> sayfasında seni bekliyor; kaldığın yerden devam edebilir, ilerlemeni takip edebilirsin.</p>
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Bağlantı tek kullanımlık ve süreli; süresi dolarsa giriş sayfasındaki "Şifremi unuttum" ile yenisini isteyebilirsin. Bu e-postayı Podia'da eğitim satın aldığın için alıyorsun.</p>
+{% endblock %}

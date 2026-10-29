@@ -1,0 +1,1 @@
+Hoş geldin{% if first_name %} {{ first_name }}{% endif %} — hesabın hazır

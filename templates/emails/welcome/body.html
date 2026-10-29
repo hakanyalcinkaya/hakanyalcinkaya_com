@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block title %}Hesabın hazır.{% endblock %}
+{% block preheader %}Kurslara göz at, istediğin zaman öğrenmeye başla.{% endblock %}
+{% block eyebrow %}Hoş geldin{% endblock %}
+{% block heading %}Hesabın hazır.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">{{ site_name }} hesabın oluşturuldu. Giriş yaparken <strong>{{ email }}</strong> adresini kullanacaksın.</p>
+<p style="margin: 0 0 14px;">Projelerle ilerleyen kurslara göz atabilir, ücretsiz önizleme derslerini satın almadan izleyebilirsin.</p>
+{% include "emails/modules/button.html" with url=courses_url label="Kurslara göz at" %}
+{% endblock %}
+{% block after_content %}{% include "emails/modules/features.html" with features_title="Seni neler bekliyor?" %}{% endblock %}

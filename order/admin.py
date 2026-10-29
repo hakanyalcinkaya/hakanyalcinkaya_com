@@ -35,20 +35,22 @@ class OrderAdmin(admin.ModelAdmin):
         "total",
         "discount",
         "discount_code",
+        "currency",
         "paid_at",
         "created_at",
         "updated_at",
     )
     fieldsets = (
         (None, {"fields": ("number", "user", "email", "cart", "status")}),
-        (_("Tutarlar (₺, KDV dahil)"), {"fields": ("subtotal", "discount", "discount_code", "discount_total", "total")}),
+        (_("Tutarlar (KDV dahil)"), {"fields": ("currency", "subtotal", "discount", "discount_code", "discount_total", "total")}),
         (_("Ödeme"), {"fields": ("payment_provider", "payment_reference", "paid_at")}),
         (_("Kayıt"), {"fields": ("created_at", "updated_at")}),
     )
 
     @admin.display(description=_("toplam"), ordering="total")
     def total_display(self, obj):
-        return format_try(obj.total)
+        # Podia'dan aktarılan siparişler kendi para birimiyle (EUR) gösterilir.
+        return format_try(obj.total) if obj.currency == "TRY" else f"{obj.total} {obj.currency}"
 
     @admin.action(description=_("Seçili siparişleri ödendi olarak işaretle (kurs kayıtlarını açar)"))
     def mark_paid(self, request, queryset):

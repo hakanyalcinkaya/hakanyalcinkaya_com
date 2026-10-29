@@ -12,6 +12,7 @@ class EnrollmentSource(models.TextChoices):
     BUNDLE = "bundle", _("Paket satın alma")
     MANUAL = "manual", _("Manuel")
     GIFT = "gift", _("Hediye")
+    IMPORTED = "imported", _("Eski platformdan aktarıldı")
 
 
 class EnrollmentQuerySet(models.QuerySet):
@@ -25,6 +26,10 @@ class EnrollmentQuerySet(models.QuerySet):
 
     def finished(self):
         return self.filter(completed_at__isnull=False)
+
+    def has_access(self, user, course):
+        """Kullanıcının kursa erişimi var mı (satın alma, paket, hediye, manuel ya da eski platformdan aktarım)."""
+        return self.for_user(user).filter(course=course).exists()
 
 
 class Enrollment(BaseModel):

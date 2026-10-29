@@ -1,0 +1,10 @@
+{% extends "emails/base.html" %}
+{% block title %}Yeni bir eğitimin var.{% endblock %}
+{% block preheader %}{{ course_title }} hesabına tanımlandı.{% endblock %}
+{% block eyebrow %}{{ grant_reason|default:'Yeni eğitim' }}{% endblock %}
+{% block heading %}Yeni bir eğitimin var.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ course_title }}</strong> eğitimi hesabına tanımlandı{% if sender_name %} ({{ sender_name }} tarafından){% endif %}.</p>
+{% include "emails/modules/button.html" with url=course_url label="Eğitime git" %}
+{% endblock %}

@@ -1,11 +1,13 @@
 import json
+import smtplib
 from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch, Q
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.conf import settings
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -674,3 +676,75 @@ def review_edit(request, review_id):
     if request.method == "POST" and form.is_valid():
         return render(request, "studio/partials/_review_row.html", dict(review=form.save()))
     return render(request, "studio/partials/_review_edit.html", dict(review=review, form=form))
+
+
+# E-postalar: şablonların önizlemesi (gönderim yok; test yalnız yönlendirme adresine)
+def _email_preview_context(request, key):
+    """Örnek veri ya da ?kullanici=e-posta ile seçilen kullanıcının gerçek verisi."""
+    from account.models import User
+    from core.emails import sample_context
+    from order.emails import preview_context
+
+    lookup = request.GET.get("kullanici", "").strip() or request.POST.get("kullanici", "").strip()
+    if not lookup:
+        return sample_context(key), None, ""
+    user = User.objects.with_email(lookup).first()
+    if user is None:
+        return sample_context(key), None, _("Bu e-postayla kullanıcı yok; örnek veri gösteriliyor.")
+    return preview_context(key, user), user, ""
+
+
+@staff_required
+def emails(request):
+    from core.emails import EMAILS
+
+    groups = {}
+    for key, email in EMAILS.items():
+        groups.setdefault(email["group"], []).append(dict(email, key=key))
+    return render(request, "studio/emails.html", dict(groups=groups, redirect_to=settings.EMAIL_REDIRECT_TO))
+
+
+@staff_required
+def email_preview(request, key):
+    from core.emails import EMAILS, render_email, template_names
+
+    if key not in EMAILS:
+        raise Http404
+    context, user, warning = _email_preview_context(request, key)
+    subject, text, html = render_email(key, context)
+    return render(
+        request,
+        "studio/email_preview.html",
+        dict(
+            key=key,
+            email=EMAILS[key],
+            # Şablonda sözlük.items "items" değişkeniyle çakışır; liste olarak verilir.
+            variables=list(EMAILS[key]["variables"].items()),
+            subject=subject,
+            text=text,
+            html=html,
+            files=template_names(key).values(),
+            selected_user=user,
+            lookup=request.GET.get("kullanici", ""),
+            warning=warning,
+            redirect_to=settings.EMAIL_REDIRECT_TO,
+        ),
+    )
+
+
+@staff_required
+@require_POST
+def email_send_test(request, key):
+    """Önizlenen e-postayı yalnız yönlendirme adresine (EMAIL_REDIRECT_TO) gönderir; adres yoksa göndermez."""
+    from core.emails import EMAILS, send_email
+
+    if key not in EMAILS:
+        raise Http404
+    if not settings.EMAIL_REDIRECT_TO:
+        return _toast(HttpResponse(), "warning", _("Yönlendirme adresi (EMAIL_REDIRECT_TO) yok; test gönderimi kapalı."))
+    context, _user, _warning = _email_preview_context(request, key)
+    try:
+        send_email(key, settings.EMAIL_REDIRECT_TO, context)
+    except (smtplib.SMTPException, OSError) as error:
+        return _toast(HttpResponse(), "error", _("Gönderilemedi: %(error)s") % {"error": error})
+    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_REDIRECT_TO})

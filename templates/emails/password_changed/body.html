@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Şifren değiştirildi.{% endblock %}
+{% block preheader %}Hesabının şifresi az önce değiştirildi.{% endblock %}
+{% block eyebrow %}Hesap güvenliği{% endblock %}
+{% block heading %}Şifren değiştirildi.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">{{ site_name }} hesabının şifresi {% if changed_at %}{{ changed_at|date:"j F Y, H:i" }} tarihinde {% endif %}değiştirildi.</p>
+<p style="margin: 0 0 14px;">Bu değişikliği sen yaptıysan bir şey yapmana gerek yok. Sen yapmadıysan hemen şifreni sıfırla.</p>
+{% include "emails/modules/button.html" with url=reset_page_url label="Şifremi sıfırla" %}
+{% endblock %}

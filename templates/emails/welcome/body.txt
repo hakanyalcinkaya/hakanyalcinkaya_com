@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{{ site_name }} hesabın oluşturuldu. Giriş yaparken {{ email }} adresini kullanacaksın.
+
+Projelerle ilerleyen kurslara göz atabilir, ücretsiz önizleme derslerini satın almadan izleyebilirsin:
+{{ courses_url }}{% endblock %}

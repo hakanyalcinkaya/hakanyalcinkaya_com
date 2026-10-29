@@ -1,0 +1,1 @@
+Onay bekleyen yorum: {{ course_title }}{% if is_edit %} (değiştirildi){% endif %}

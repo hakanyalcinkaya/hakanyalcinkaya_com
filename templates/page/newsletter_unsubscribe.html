@@ -16,6 +16,16 @@
         <p class="small text-body-tertiary mb-0">Yanlışlıkla mı çıktın? <a href="{% url 'page:index' %}#bulten">Yeniden abone ol</a></p>
         <a href="{% url 'page:index' %}" class="btn btn-outline-secondary mt-4">Ana sayfa</a>
       </div>
+      {% elif link_subscriber %}
+      <div class="text-center">
+        <h1 class="h2 fw-semibold mb-1">Abonelikten çık</h1>
+        <p class="text-body-secondary"><b class="text-body">{{ link_subscriber.email }}</b> adresine bülten gönderilmesin mi?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-lg fs-6">Abonelikten çık</button>
+        </form>
+        <a href="{% url 'page:index' %}" class="btn btn-link link-secondary mt-2">Vazgeç</a>
+      </div>
       {% else %}
       <div class="text-center mb-4">
         <h1 class="h2 fw-semibold mb-1">Abonelikten çık</h1>
@@ -26,7 +36,6 @@
       </div>
       <p class="small text-body-tertiary text-center mt-4 mb-0">Hesabınla ilgili e-postalar (sipariş, şifre sıfırlama) bundan etkilenmez.</p>
       {% endif %}
-      <p class="small font-monospace text-body-tertiary text-center mt-2 mb-0">[PLACEHOLDER: abonelik servisi — adres listeden çıkarılmaz]</p>
     </div>
   </div>
 </div>

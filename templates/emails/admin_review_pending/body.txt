@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}{{ reviewer_name }}, {{ course_title }} için {% if is_edit %}onaylı yorumunu değiştirdi{% else %}yeni bir değerlendirme yaptı{% endif %}.
+{% if rating %}Puan: {{ rating }}/5{% endif %}{% if review_text %}
+“{{ review_text }}”{% endif %}
+
+Stüdyo'da incele: {{ studio_url }}{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

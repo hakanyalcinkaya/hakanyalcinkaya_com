@@ -1,0 +1,6 @@
+{% extends "emails/base.txt" %}
+{% block content %}{{ full_name|default:email }} ({{ email }}) sipariş verdi. Sipariş no: {{ order_number }}{% if purchased_at %} · {{ purchased_at|date:"j F Y, H:i" }}{% endif %}
+
+{% include "emails/_items.txt" with show_prices=True %}
+Sipariş: {{ admin_url }}{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

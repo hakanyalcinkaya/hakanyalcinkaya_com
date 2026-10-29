@@ -1,0 +1,28 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}E-postalar{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">E-postalar</h1>
+  <p class="text-body-secondary mb-0">Sitenin gönderebileceği e-postaların taslakları. Şablonlar <code>templates/emails/</code> klasöründe; ortak düzen <code>emails/base.html</code>, parçalar <code>emails/modules/</code>.</p>
+</div>
+{% if redirect_to %}
+<div class="alert alert-info small" role="alert"><i class="bi bi-shield-check me-2" aria-hidden="true"></i>Test modu: gönderilen bütün e-postalar yalnız <strong>{{ redirect_to }}</strong> adresine gider (<code>EMAIL_REDIRECT_TO</code>).</div>
+{% else %}
+<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Yönlendirme kapalı: e-postalar gerçek alıcılara gider.</div>
+{% endif %}
+{% for group, items in groups.items %}
+<h2 class="h6 text-body-secondary text-uppercase small mt-4 mb-2">{{ group }}</h2>
+<div class="list-group">
+  {% for email in items %}
+  <a href="{% url 'studio:email_preview' email.key %}" class="list-group-item list-group-item-action py-3">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="fw-medium">{{ email.label }}</span>
+      <code class="small text-body-tertiary">{{ email.key }}</code>
+      {% if email.recipient == "admin" %}<span class="badge border text-body-secondary fw-normal">Yöneticiye</span>{% elif email.recipient == "subscriber" %}<span class="badge border text-body-secondary fw-normal">Aboneye</span>{% endif %}
+    </div>
+    <div class="small text-body-secondary">{{ email.description }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,1 @@
+Yeni satış: {{ product_title }}{% if items|length > 1 %} +{{ items|length|add:"-1" }}{% endif %} — {{ order_total }}

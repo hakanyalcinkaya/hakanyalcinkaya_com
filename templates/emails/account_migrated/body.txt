@@ -1,0 +1,12 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+Eğitimlerimi kendi platformuma taşıdım. Daha önce satın aldığın eğitim{% if items|length > 1 %}ler{% endif %} {{ email }} adresiyle açılan hesabına tanımlandı:
+
+{% include "emails/_items.txt" with show_prices=False %}
+Başlamak için şifreni belirle (bağlantı tek kullanımlık ve süreli; süresi dolarsa giriş sayfasındaki "Şifremi unuttum"u kullanabilirsin):
+{{ set_password_url }}
+
+Eğitimlerin Kurslarım sayfasında: {{ library_url }}
+
+Bu e-postayı Podia'da eğitim satın aldığın için alıyorsun.{% endblock %}

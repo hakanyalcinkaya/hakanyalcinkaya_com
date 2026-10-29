@@ -1,0 +1,1 @@
+Yorumun yayınlandı — {{ course_title }}

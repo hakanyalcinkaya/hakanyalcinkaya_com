@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block title %}Aboneliğini onayla.{% endblock %}
+{% block preheader %}Bültene katılmak için tek tık kaldı.{% endblock %}
+{% block eyebrow %}Bülten{% endblock %}
+{% block heading %}Aboneliğini onayla.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if name %} {{ name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">Bültene abone olmak istediğin için teşekkürler. Aboneliğini başlatmak için adresini onayla.</p>
+{% include "emails/modules/button.html" with url=confirm_url label="Aboneliğimi onayla" %}
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; onaylamadıkça sana bülten gönderilmez.</p>
+{% endblock %}
+{% block footer %}Bu e-posta {{ email }} adresine bülten aboneliği isteği üzerine gönderildi.{% endblock %}

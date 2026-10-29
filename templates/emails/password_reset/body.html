@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Şifreni sıfırla.{% endblock %}
+{% block preheader %}Yeni şifreni belirlemek için bağlantıyı aç.{% endblock %}
+{% block eyebrow %}Hesap güvenliği{% endblock %}
+{% block heading %}Şifreni sıfırla.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">Hesabın için şifre sıfırlama isteği aldık. Yeni şifreni belirlemek için aşağıdaki düğmeye tıkla.</p>
+{% include "emails/modules/button.html" with url=reset_url label="Yeni şifre belirle" %}
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Bağlantı tek kullanımlıktır ve bir süre sonra geçersiz olur. Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; şifren değişmez.</p>
+{% endblock %}

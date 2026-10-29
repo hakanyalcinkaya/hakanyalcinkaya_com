@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+Hesabın için şifre sıfırlama isteği aldık. Yeni şifreni belirlemek için bağlantıyı aç:
+{{ reset_url }}
+
+Bağlantı tek kullanımlıktır ve bir süre sonra geçersiz olur. Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; şifren değişmez.{% endblock %}

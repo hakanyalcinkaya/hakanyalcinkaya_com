@@ -1,0 +1,7 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{{ course_title }} kursundaki {% if lesson_total %}{{ lesson_total }} dersin {% endif %}tamamını bitirdin{% if completed_at %} ({{ completed_at|date:"j F Y" }}){% endif %}. Emeğin için tebrikler!
+
+Kurs hakkındaki düşüncelerini paylaşırsan sonraki öğrencilere de yol gösterirsin:
+{{ review_url }}{% endblock %}

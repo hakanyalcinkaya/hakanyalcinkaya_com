@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block title %}Ödemen tamamlanamadı.{% endblock %}
+{% block preheader %}Siparişin için ödeme alınamadı; sepetin seni bekliyor.{% endblock %}
+{% block eyebrow %}Sipariş{% endblock %}
+{% block heading %}Ödemen tamamlanamadı.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">Siparişin için ödeme alınamadı, bu yüzden kartından para çekilmedi. Sepetindeki ürünler duruyor; dilediğin zaman yeniden deneyebilirsin.</p>
+{% include "emails/modules/items.html" with show_prices=True %}
+{% include "emails/modules/button.html" with url=retry_url label="Ödemeyi yeniden dene" %}
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Sorun devam ederse farklı bir kart dene ya da bu e-postayı yanıtla.</p>
+{% endblock %}

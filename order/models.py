@@ -54,6 +54,8 @@ class Order(BaseModel):
     payment_provider = models.CharField(_("ödeme sağlayıcı"), max_length=30, blank=True)
     payment_reference = models.CharField(_("ödeme referansı"), max_length=120, blank=True)
     paid_at = models.DateTimeField(_("ödeme tarihi"), null=True, blank=True)
+    # Sitedeki satışlar TL; eski platformdan (Podia) aktarılan siparişler kendi para birimiyle saklanır.
+    currency = models.CharField(_("para birimi"), max_length=3, default="TRY")
 
     objects = OrderQuerySet.as_manager()
 
@@ -61,6 +63,14 @@ class Order(BaseModel):
         verbose_name = _("sipariş")
         verbose_name_plural = _("siparişler")
         ordering = ("-created_at",)
+        constraints = [
+            # Aynı ödeme (ör. Podia faturası) iki kez kaydedilmez.
+            models.UniqueConstraint(
+                fields=("payment_provider", "payment_reference"),
+                condition=~Q(payment_reference=""),
+                name="order_unique_payment_reference",
+            ),
+        ]
 
     def __str__(self):
         return self.number
