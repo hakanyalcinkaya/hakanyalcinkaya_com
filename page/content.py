@@ -12,7 +12,9 @@ from django.urls import reverse
 
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
+from core.models import Status
 from course.models import Course, HighlightKind, Lesson, LessonKind, LessonSubtitle, SubtitleStatus
+from learning.models import LessonProgress
 from page import catalog
 
 FALLBACK_IMAGE = "img/courses/react.jpg"
@@ -22,6 +24,24 @@ LESSON_FORMAT_KEYS = {LessonKind.VIDEO: "video", LessonKind.FORM: "form", Lesson
 def visible_course(slug, user):
     courses = Course.objects.all() if user.is_staff else Course.objects.published()
     return courses.filter(slug=slug).first()
+
+
+def lesson_visible(lesson, staff=False):
+    """Ders sitede görünür mü: personel taslakları da görür, diğerleri yalnız yayındaki bölüm ve dersleri."""
+    return staff or (lesson.is_published and lesson.section.is_published)
+
+
+def visible_lessons(course, staff=False):
+    lessons = Lesson.objects.filter(section__course=course)
+    return lessons if staff else lessons.published().filter(section__status=Status.PUBLISHED)
+
+
+def progress_summary(course, user, staff=False):
+    """Kursta tamamlanan ders sayısı, toplam ve yüzde (ders sayfasındaki ilerleme çubuğu)."""
+    lessons = visible_lessons(course, staff)
+    total = lessons.count()
+    done = len(LessonProgress.completed_lesson_ids(user, lessons))
+    return dict(done=done, total=total, pct=round(done * 100 / total) if total else 0)
 
 
 def _sections(course, staff):
@@ -174,8 +194,8 @@ def _player(lesson):
     return {**player, "tracks_json": json.dumps(tracks)}
 
 
-def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False):
-    """Ders sayfası; örnek verideki `find_lesson()` ile aynı biçimde. İlerleme kaydı henüz bağlı değil."""
+def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False, completed=frozenset()):
+    """Ders sayfası; örnek verideki `find_lesson()` ile aynı biçimde. `completed`: kullanıcının tamamladığı ders kimlikleri."""
     sections, flat = curriculum(course, staff)
     current = next(
         (item for item in flat if item["section_slug"] == section_slug and item["lesson_slug"] == lesson_slug), None
@@ -188,10 +208,13 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False):
         section["open"] = section["current"]
         for item in section["lessons"]:
             item["current"] = item["n"] == current["n"]
-            item["done"] = False
+            item["done"] = not preview and item["object"].pk in completed
             item["locked"] = preview and not item["preview"]
-            item["icon"] = ("bi-lock" if item["locked"] else item["format_icon"]) if preview else "bi-circle"
-        section["completed"] = False
+            if preview:
+                item["icon"] = "bi-lock" if item["locked"] else item["format_icon"]
+            else:
+                item["icon"] = "bi-check-circle-fill" if item["done"] else "bi-circle"
+        section["completed"] = bool(section["lessons"]) and all(item["done"] for item in section["lessons"])
     previews = [item for item in flat if item["preview"]]
     index = current["n"] - 1
     if preview:
@@ -202,8 +225,11 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False):
         following = flat[index + 1] if index + 1 < len(flat) else None
     locked = preview and not current["preview"]
     current["video"] = None if locked else _player(current["object"])
+    # Ek bilgiler videoyla aynı kurala uyar: kilitli derste gösterilmez.
+    current["extra_html"] = "" if locked else current["object"].extra_content_html
     card = _course_card(course, flat)
     detail = _detail(course, card)
+    done = sum(1 for item in flat if item["done"])
     return {
         "course": card,
         "detail": detail,
@@ -212,8 +238,8 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False):
         "prev": prev,
         "next": following,
         "total": len(flat),
-        "done": 0,
-        "pct": 0,
+        "done": done,
+        "pct": round(done * 100 / len(flat)) if flat else 0,
         "section_count": len(sections),
         "note": None,
         "preview": preview,

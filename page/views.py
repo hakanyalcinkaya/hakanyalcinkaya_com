@@ -6,11 +6,13 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from course.models import Lesson
+from learning.models import Favorite, LessonProgress
 from page import content
 from page.catalog import (
     COUPON_SESSION_KEY,
@@ -132,20 +134,72 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     course = content.visible_course(course_slug, request.user)
     if course is not None:
         enrolled = _enrolled(request, course_slug)
-        page = content.find_lesson(course, section_slug, lesson_slug, enrolled=enrolled, staff=request.user.is_staff)
+        staff = request.user.is_staff
+        completed = (
+            LessonProgress.completed_lesson_ids(request.user, content.visible_lessons(course, staff)) if enrolled else set()
+        )
+        page = content.find_lesson(course, section_slug, lesson_slug, enrolled=enrolled, staff=staff, completed=completed)
     else:
         enrolled = owns_course(request.user, request.session, course_slug)
         page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
     if page is None:
         raise Http404
+    lesson = page["current"].get("object")
+    # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
+    favorite = None
+    if lesson is not None and not page["preview"] and request.user.is_authenticated:
+        favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
     return render(
         request,
         "page/lesson.html",
         {
             **page,
+            "favorite": favorite,
             "reviews": reviews()[:3],
         },
     )
+
+
+def _member_lesson(request, lesson_id):
+    """Kursa erişimi olan üyenin görebildiği ders; değilse 404."""
+    lesson = get_object_or_404(Lesson.objects.select_related("section__course"), pk=lesson_id)
+    course = content.visible_course(lesson.section.course.slug, request.user)
+    if course is None or not content.lesson_visible(lesson, request.user.is_staff) or not _enrolled(request, course.slug):
+        raise Http404
+    return lesson
+
+
+@login_required
+@require_POST
+def lesson_complete(request, lesson_id):
+    """Dersi tamamlandı (done=1) ya da tamamlanmadı (done=0) olarak işaretler.
+
+    Oynatıcı 5 sn kesintisiz oynayınca auto=1 ile çağırır: yalnız işaretler, kullanıcının kaldırdığı işareti geri koymaz
+    (istemci o sayfada elle seçim yapıldıysa göndermez). Yanıt düğme ve (OOB) kenar listesi ile ilerleme çubuğudur.
+    """
+    lesson = _member_lesson(request, lesson_id)
+    done = request.POST.get("done") == "1"
+    LessonProgress.set_completed(request.user, lesson, done)
+    if not request.htmx:
+        return redirect(lesson.get_absolute_url())
+    context = dict(
+        lesson_id=lesson.pk,
+        is_done=done,
+        manual=request.POST.get("auto") != "1",
+        progress=content.progress_summary(lesson.section.course, request.user, request.user.is_staff),
+    )
+    return render(request, "page/partials/complete_response.html", context)
+
+
+@login_required
+@require_POST
+def lesson_favorite(request, lesson_id):
+    """Dersi favorilere ekler ya da çıkarır; yalnız kursa erişimi olan üye için."""
+    lesson = _member_lesson(request, lesson_id)
+    is_favorite = Favorite.toggle(request.user, lesson)
+    if not request.htmx:
+        return redirect(lesson.get_absolute_url())
+    return render(request, "page/partials/favorite_button.html", dict(lesson_id=lesson.pk, is_favorite=is_favorite))
 
 
 @require_POST
@@ -246,7 +300,10 @@ def library(request):
     return render(
         request,
         "page/library.html",
-        library_page(status),
+        {
+            **library_page(status),
+            "favorites": Favorite.objects.for_user(request.user).for_library(),
+        },
     )
 
 

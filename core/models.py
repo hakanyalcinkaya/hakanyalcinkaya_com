@@ -126,6 +126,12 @@ class SiteSettings(BaseCreatedAtUpdatedAt):
     def __str__(self):
         return str(_("Site ayarları"))
 
+    lesson_notes_enabled = models.BooleanField(
+        _("derslerde not alma"),
+        default=False,
+        help_text=_("Açıksa öğrenciler derslere not ekleyebilir; notlar Kurslarım sayfasında da görünür."),
+    )
+
     @classmethod
     def load(cls):
         return cls.objects.get_or_create(pk=cls.SINGLETON_ID)[0]

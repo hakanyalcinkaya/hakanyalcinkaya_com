@@ -244,6 +244,29 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 /* İçerik düzenleyici: sürükleme tutamakları, bırakma alanları, boş kategori ipucu. */
 .studio-handle{cursor:grab;touch-action:none;padding:.125rem}
 .studio-bulk-bar{position:sticky;top:4rem;z-index:1020}
+.border-dashed{border-style:dashed!important}
+.studio-extra-bulk>summary{cursor:pointer}
+.studio-extra-bulk-list{max-height:16rem;overflow-y:auto}
+.studio-extra-drop.is-dragover{border-color:var(--bs-primary)!important;background:var(--bs-primary-bg-subtle)}
+.studio-dialog{width:min(56rem,95vw);height:min(44rem,90vh);padding:0;border:1px solid var(--bs-border-color);border-radius:var(--bs-border-radius-lg);background:var(--bs-body-bg);color:var(--bs-body-color)}
+.studio-dialog::backdrop{background:rgba(0,0,0,.6)}
+.studio-md-input{min-height:22rem;resize:vertical}
+/* Ders ek bilgileri (Markdown'dan): videonun altında ve stüdyo önizlemesinde aynı görünür. */
+.hy-prose{line-height:1.7;overflow-wrap:anywhere}
+.hy-prose>:first-child{margin-top:0}
+.hy-prose>:last-child{margin-bottom:0}
+.hy-prose h1,.hy-prose h2,.hy-prose h3,.hy-prose h4{font-size:1.125rem;font-weight:600;margin:1.75rem 0 .75rem}
+.hy-prose h3,.hy-prose h4{font-size:1rem}
+.hy-prose p,.hy-prose ul,.hy-prose ol,.hy-prose blockquote,.hy-prose pre,.hy-prose table{margin-bottom:1rem}
+.hy-prose li+li{margin-top:.375rem}
+.hy-prose hr{margin:1.5rem 0}
+.hy-prose code{font-size:.875em;background:var(--bs-tertiary-bg);padding:.1em .35em;border-radius:.25rem;color:var(--bs-emphasis-color)}
+.hy-prose pre{background:var(--bs-tertiary-bg);padding:1rem;border-radius:var(--bs-border-radius)}
+.hy-prose pre code{background:none;padding:0}
+.hy-prose blockquote{border-left:3px solid var(--bs-border-color);padding-left:1rem;color:var(--bs-secondary-color)}
+.hy-prose img{max-width:100%;height:auto}
+.hy-prose table{width:100%;border-collapse:collapse}
+.hy-prose th,.hy-prose td{border:1px solid var(--bs-border-color);padding:.375rem .5rem}
 .studio-dropzone{border-style:dashed!important;transition:background-color .15s,border-color .15s}
 .studio-dropzone.is-dragover{background:var(--bs-primary-bg-subtle);border-color:var(--bs-primary)!important}
 .studio-section.is-dragover{outline:2px dashed var(--bs-primary);outline-offset:2px}

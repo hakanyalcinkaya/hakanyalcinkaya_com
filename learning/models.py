@@ -111,6 +111,24 @@ class LessonProgress(BaseModel):
         self.completed_at = None
         self.save(update_fields=["completed_at", "updated_at"])
 
+    @classmethod
+    def set_completed(cls, user, lesson, done):
+        """Dersi tamamlandı ya da tamamlanmadı olarak işaretler; kaydı döner."""
+        progress = cls.objects.get_or_create(user=user, lesson=lesson)[0]
+        if done:
+            progress.mark_complete()
+        else:
+            progress.mark_incomplete()
+        return progress
+
+    @classmethod
+    def completed_lesson_ids(cls, user, lessons):
+        if not user.is_authenticated:
+            return set()
+        return set(
+            cls.objects.filter(user=user, lesson__in=lessons, completed_at__isnull=False).values_list("lesson_id", flat=True)
+        )
+
     def record_position(self, seconds):
         self.position_seconds = max(int(seconds), 0)
         self.save(update_fields=["position_seconds", "updated_at"])
@@ -141,3 +159,46 @@ class Note(BaseModel):
     @property
     def scope_label(self):
         return _("Bu ders") if self.lesson_id else _("Kurs geneli")
+
+
+class FavoriteQuerySet(models.QuerySet):
+    def for_user(self, user):
+        if not user.is_authenticated:
+            return self.none()
+        return self.filter(user=user)
+
+    def for_library(self):
+        """Kurslarım sayfası: kurs kurs, müfredat sırasıyla."""
+        return self.select_related("lesson__section__course").order_by(
+            "lesson__section__course__title", "lesson__section__sort_order", "lesson__sort_order", "id"
+        )
+
+
+class Favorite(BaseModel):
+    """Öğrencinin favorilerine aldığı ders (video); Kurslarım sayfasında kurs bazında listelenir."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favorites", verbose_name=_("kullanıcı"))
+    lesson = models.ForeignKey("course.Lesson", on_delete=models.CASCADE, related_name="favorites", verbose_name=_("ders"))
+
+    objects = FavoriteQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("favori")
+        verbose_name_plural = _("favoriler")
+        ordering = ("-created_at",)
+        constraints = [models.UniqueConstraint(fields=("user", "lesson"), name="favorite_unique_user_lesson")]
+
+    def __str__(self):
+        return f"{self.user} · {self.lesson}"
+
+    @classmethod
+    def is_favorite(cls, user, lesson):
+        return user.is_authenticated and cls.objects.filter(user=user, lesson=lesson).exists()
+
+    @classmethod
+    def toggle(cls, user, lesson):
+        """Favorideyse çıkarır, değilse ekler; yeni durumu (favoride mi) döner."""
+        if cls.objects.filter(user=user, lesson=lesson).delete()[0]:
+            return False
+        cls.objects.get_or_create(user=user, lesson=lesson)
+        return True

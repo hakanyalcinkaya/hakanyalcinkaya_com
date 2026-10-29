@@ -41,6 +41,14 @@
     </div>
     <p class="small text-body-secondary mt-1 mb-0">Vimeo başlığı oynatıcının içinde gösterir; Bunny'de başlık oynatıcıda görünmez, yalnız Bunny panelinde işe yarar. Kapalıyken başlık değişikliği yalnız sitede kalır. Yükleme sırasında video yine dersin adıyla açılır.</p>
   </fieldset>
+  <fieldset class="border-top pt-3 mt-1 mb-3">
+    <legend class="h5 mb-1">Öğrenci araçları</legend>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" name="lesson_notes_enabled" id="lesson-notes-enabled"{% if form.lesson_notes_enabled.value %} checked{% endif %}>
+      <label class="form-check-label" for="lesson-notes-enabled">Derslerde not alma</label>
+    </div>
+    <p class="small text-body-secondary mt-1 mb-0">Kapalıyken ders sayfasındaki “Not al” bölümü, Kurslarım'daki “Son notların” kutusu ve not alma tanıtımları tüm kullanıcılardan gizlenir.</p>
+  </fieldset>
   <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
 </form>
 {% endblock %}

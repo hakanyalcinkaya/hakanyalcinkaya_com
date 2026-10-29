@@ -21,6 +21,9 @@
 {% block studio_content %}{% endblock %}
 </div>
 {% endblock %}
-{% block footer %}{% endblock %}
+{% block footer %}
+{# Stüdyo penceresi (ör. ek içerik düzenleyicisi): içerik hx-target="#studio-dialog-body" ile yüklenince açılır (studio.js). #}
+<dialog class="studio-dialog" id="studio-dialog" aria-label="Düzenleyici"><div id="studio-dialog-body" class="h-100"></div></dialog>
+{% endblock %}
 {% block scripts %}<script src="{% static 'js/sortable.min.js' %}"></script>
 <script src="{% static 'js/studio.js' %}"></script>{% endblock %}

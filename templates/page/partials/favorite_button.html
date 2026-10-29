@@ -1,0 +1,4 @@
+{# Dersi favorilere ekle / çıkar; Kurslarım sayfasında kurs bazında listelenir. #}
+<button type="button" id="lesson-favorite" class="btn {% if is_favorite %}btn-outline-danger active{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'page:lesson_favorite' lesson_id %}" hx-swap="outerHTML" aria-pressed="{{ is_favorite|yesno:'true,false' }}" title="{% if is_favorite %}Favorilerden çıkar{% else %}Favorilere ekle{% endif %}">
+  <i class="bi {% if is_favorite %}bi-heart-fill{% else %}bi-heart{% endif %}" aria-hidden="true"></i><span class="ms-1 d-none d-sm-inline">{% if is_favorite %}Favorilerde{% else %}Favorilere ekle{% endif %}</span><span class="visually-hidden d-sm-none">{% if is_favorite %}Favorilerden çıkar{% else %}Favorilere ekle{% endif %}</span>
+</button>

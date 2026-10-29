@@ -45,7 +45,7 @@
   {% endif %}
 
   <div class="row g-4 g-lg-5 mt-1">
-    <section class="col-lg-8" aria-labelledby="kurslar-baslik">
+    <section class="{% if site_settings.lesson_notes_enabled %}col-lg-8{% else %}col-12{% endif %}" aria-labelledby="kurslar-baslik">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
         <h2 id="kurslar-baslik" class="h5 fw-semibold mb-0">Tüm kurslarım</h2>
         <div role="radiogroup" aria-label="Kurs filtresi" class="btn-group btn-group-sm">
@@ -62,7 +62,7 @@
         <a href="{% url 'page:library' %}" class="btn btn-outline-secondary btn-sm">Tüm kurslarımı göster</a>
       </div>
       {% else %}
-      <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+      <div class="row row-cols-1 row-cols-md-2{% if not site_settings.lesson_notes_enabled %} row-cols-xl-3{% endif %} g-3 mt-1">
         {% for course in owned %}
         <div class="col">
           <article class="card h-100 overflow-hidden hover-lift">
@@ -88,6 +88,7 @@
       {% endif %}
     </section>
 
+    {% if site_settings.lesson_notes_enabled %}
     <aside class="col-lg-4" aria-labelledby="not-baslik">
       <div class="d-flex align-items-center justify-content-between gap-2">
         <h2 id="not-baslik" class="h5 fw-semibold mb-0">Son notların</h2>
@@ -113,7 +114,47 @@
       </div>
       {% endif %}
     </aside>
+    {% endif %}
   </div>
+
+  <section class="mt-5 pt-4 border-top" id="favoriler" aria-labelledby="favori-baslik">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-2">
+      <div>
+        <h2 id="favori-baslik" class="h5 fw-semibold mb-1">Favorilerim</h2>
+        <p class="small text-body-secondary mb-0">Ders izlerken <i class="bi bi-heart" aria-hidden="true"></i> ile favorilerine aldığın videolar, kurs kurs.</p>
+      </div>
+      <span class="small text-body-tertiary">{{ favorites|length }} video</span>
+    </div>
+    {% if favorites %}
+    {% regroup favorites by lesson.section.course as favorite_groups %}
+    <div class="row row-cols-1 row-cols-lg-2 g-3 mt-1">
+      {% for group in favorite_groups %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-header bg-transparent d-flex align-items-center justify-content-between gap-2 py-2">
+            <h3 class="h6 fw-semibold mb-0 text-truncate"><a href="{{ group.grouper.get_absolute_url }}" class="link-body-emphasis text-decoration-none">{{ group.grouper.title }}</a></h3>
+            <span class="small text-body-tertiary flex-shrink-0">{{ group.list|length }} video</span>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for favorite in group.list %}
+            <a href="{{ favorite.lesson.get_absolute_url }}" class="list-group-item list-group-item-action d-flex align-items-start gap-2 py-2 small">
+              <i class="bi bi-heart-fill text-danger-emphasis mt-1" aria-hidden="true"></i>
+              <span class="min-w-0"><span class="d-block">{{ favorite.lesson.title }}</span><span class="d-block text-body-tertiary text-truncate">{{ favorite.lesson.section.title }}{% if favorite.lesson.duration_display %} · {{ favorite.lesson.duration_display }}{% endif %}</span></span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="border rounded p-4 mt-3 text-center">
+      <i class="bi bi-heart fs-3 text-body-tertiary" aria-hidden="true"></i>
+      <p class="fw-semibold small mt-2 mb-1">Henüz favori videon yok.</p>
+      <p class="small text-body-secondary mb-0">Ders sayfasında oynatıcının altındaki <i class="bi bi-heart" aria-hidden="true"></i> düğmesiyle videoları favorilerine alabilirsin.</p>
+    </div>
+    {% endif %}
+  </section>
 
   {% if others %}
   <section class="mt-5 pt-4 border-top" aria-labelledby="diger-baslik">

@@ -3,6 +3,6 @@
 
 {% block title %}Kayıt Ol — Hakan Yalçınkaya{% endblock %}
 {% block heading %}Hesap oluştur{% endblock %}
-{% block lead %}Satın aldığın kurslar, ilerlemen ve notların tek yerde.{% endblock %}
+{% block lead %}Satın aldığın kurslar{% if site_settings.lesson_notes_enabled %}, ilerlemen ve notların{% else %} ve ilerlemen{% endif %} tek yerde.{% endblock %}
 {% block form %}{% crispy form %}{% endblock %}
 {% block footnote %}Zaten hesabın var mı? <a href="{{ login_url }}">Giriş yap</a>{% endblock %}

@@ -45,6 +45,7 @@
 </div>
 {% url 'studio:course_videos' course.id as course_videos_url %}
 {% include "studio/partials/_upload_zone.html" with upload_url=course_videos_url hint="Bırakılan videolar Genel kategorisine eklenir; sonra kategorilere taşıyabilirsin." %}
+{% include "studio/partials/_extra_bulk.html" %}
 {% include "studio/partials/_lesson_bulk_bar.html" %}
 {% include "studio/partials/_course_sections.html" %}
 {% include "studio/partials/_section_create_form.html" %}

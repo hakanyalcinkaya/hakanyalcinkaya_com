@@ -1,0 +1,5 @@
+{# Dersi tamamlandı / tamamlanmadı olarak işaretler. Oynatıcı 5 sn kesintisiz oynayınca site.js otomatik işaretler; #}
+{# data-manual: bu sayfada kullanıcı elle seçim yaptı, otomatik işaretleme bir daha denemez. #}
+<button type="button" id="lesson-complete" class="btn btn-outline-secondary hy-lesson-nav-full order-last order-sm-0{% if is_done %} active{% endif %}" hx-post="{% url 'page:lesson_complete' lesson_id %}" hx-vals='{"done": "{% if is_done %}0{% else %}1{% endif %}"}' hx-swap="outerHTML" aria-pressed="{{ is_done|yesno:'true,false' }}" data-completed="{{ is_done|yesno:'true,false' }}"{% if manual %} data-manual{% endif %} title="{% if is_done %}Tamamlanmadı olarak işaretle{% else %}Tamamlandı olarak işaretle{% endif %}">
+  <i class="bi {% if is_done %}bi-check-circle-fill text-success{% else %}bi-circle{% endif %} me-2" aria-hidden="true"></i>{% if is_done %}Tamamlandı{% else %}Tamamlandı olarak işaretle{% endif %}
+</button>

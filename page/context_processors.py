@@ -1,5 +1,8 @@
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import SimpleLazyObject
+
+from core.models import SiteSettings
 
 from page.catalog import (
     NAV,
@@ -43,4 +46,6 @@ def site(request):
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
         "library_url": reverse("page:library"),
+        # Stüdyo "Ayarlar"ı (ör. not alma açık mı); yalnız şablonda kullanılırsa okunur.
+        "site_settings": SimpleLazyObject(SiteSettings.load),
     }

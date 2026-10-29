@@ -161,6 +161,7 @@ class LessonAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("section", "title", "slug", "kind", "is_preview")}),
         (_("Video"), {"fields": ("video_platform", "video_id", "video_key", "video_title", "duration_seconds")}),
+        (_("Ek bilgiler (videonun altında)"), {"fields": ("extra_content",), "classes": ("collapse",)}),
         (_("Diğer içerik"), {"fields": ("external_url", "body"), "classes": ("collapse",)}),
         PUBLISH_FIELDS,
     )

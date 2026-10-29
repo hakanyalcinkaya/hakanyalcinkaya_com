@@ -1,0 +1,4 @@
+<div id="lesson-progress-summary"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <div class="d-flex justify-content-between small mb-2"><span class="fw-semibold">İlerlemen</span><span class="text-body-secondary">%{{ pct }} · {{ done }}/{{ total }} ders</span></div>
+  <div class="progress" style="height:6px" role="progressbar" aria-label="Kurs ilerlemesi" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:{{ pct }}%"></div></div>
+</div>

@@ -43,7 +43,7 @@
     form.querySelectorAll("button").forEach(function (button) { button.disabled = false; });
   });
   window.addEventListener("beforeunload", function (event) {
-    if (!pending && !uploadQueue.length) return;
+    if (!pending && !uploadQueue.length && !bulkQueue.length && !bulkBusy) return;
     event.preventDefault();
     event.returnValue = "";
   });
@@ -57,6 +57,7 @@
 
   var VIDEO_FILE = /\.(mp4|mov|m4v|mkv|webm|avi)$/i;
   var SUBTITLE_FILE = /\.(srt|vtt)$/i;
+  var CONTENT_FILE = /\.(md|markdown|txt|html?)$/i;
 
   function csrfToken() {
     try {
@@ -324,17 +325,206 @@
     if (code) select.value = code;
   });
 
-  function openSubtitleForm(row, file) {
+  // "Ek içerik" paneli: solda altyazı, sağda ek bilgiler. Alana bırakılan dosya forma konup hemen gönderilir;
+  // altyazının dili önce dosya adından seçilir.
+  function submitDropped(form, file) {
+    var input = form.querySelector('input[type="file"]');
+    if (!input) return;
+    var transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    form.requestSubmit();
+  }
+
+  function dropKind(file) {
+    if (SUBTITLE_FILE.test(file.name)) return "subtitle";
+    if (CONTENT_FILE.test(file.name)) return "content";
+    return "";
+  }
+
+  // Satırın üstüne bırakılan altyazı ya da ek içerik dosyası: panel açılır, dosya ilgili alana gönderilir.
+  function openExtrasPanel(row, file) {
     var target = document.getElementById(row.id + "-form");
     window.htmx.ajax("GET", row.getAttribute("data-subtitle-url"), { target: target, swap: "innerHTML" }).then(function () {
-      var input = target.querySelector("[data-subtitle-file]");
-      if (!input) return;
-      var transfer = new DataTransfer();
-      transfer.items.add(file);
-      input.files = transfer.files;
-      input.dispatchEvent(new Event("change", { bubbles: true }));
+      var form = target.querySelector('[data-extra-drop="' + dropKind(file) + '"]');
+      if (form) submitDropped(form, file);
     });
   }
+
+  // Ek bilgileri toplu yükleme: dosyalar sırayla gönderilir, sunucu dosya adından dersi bulur.
+  // Her dosyanın sonucu listeye yazılır; eşleşen dersin satırındaki "Ek bilgi" rozeti yenilenir.
+  var bulkQueue = [];
+  var bulkBusy = false;
+
+  function bulkLine(box, name, status, message, lesson) {
+    var icons = { saved: "bi-check-circle text-success-emphasis", skipped: "bi-skip-forward text-body-secondary", error: "bi-x-circle text-danger-emphasis" };
+    var item = document.createElement("li");
+    item.className = "d-flex gap-2 py-1 border-bottom";
+    var icon = document.createElement("i");
+    icon.className = "bi " + icons[status];
+    icon.setAttribute("aria-hidden", "true");
+    var text = document.createElement("span");
+    text.className = "min-w-0";
+    text.textContent = name + (lesson && lesson !== name.replace(/\.[^.]+$/, "") ? " → " + lesson : "") + " · " + message;
+    item.append(icon, text);
+    box.querySelector("[data-extra-bulk-list]").prepend(item);
+    var counter = box.querySelector('[data-count="' + status + '"]');
+    counter.textContent = Number(counter.textContent) + 1;
+  }
+
+  function bulkProgress(box) {
+    var progress = box.querySelector("[data-extra-bulk-progress]");
+    progress.textContent = bulkBusy || bulkQueue.length ? "Gönderiliyor… " + bulkQueue.length + " dosya kaldı" : "Bitti";
+  }
+
+  function enqueueBulk(box, fileList) {
+    box.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
+    Array.prototype.forEach.call(fileList, function (file) {
+      if (CONTENT_FILE.test(file.name)) {
+        bulkQueue.push({ box: box, file: file });
+      } else {
+        bulkLine(box, file.name, "error", "Desteklenmeyen tür; Markdown, TXT ya da HTML olmalı.");
+      }
+    });
+    bulkProgress(box);
+    if (!bulkBusy) nextBulk();
+  }
+
+  function nextBulk() {
+    var job = bulkQueue.shift();
+    if (!job) {
+      bulkBusy = false;
+      return;
+    }
+    bulkBusy = true;
+    bulkProgress(job.box);
+    var data = new FormData();
+    data.append("file", job.file);
+    if (job.box.querySelector("[data-extra-bulk-overwrite]").checked) data.append("overwrite", "on");
+    fetch(job.box.getAttribute("data-url"), { method: "POST", body: data, headers: { "X-CSRFToken": csrfToken() } })
+      .then(function (response) {
+        if (!response.ok) throw new Error("Sunucu hatası (" + response.status + ")");
+        return response.json();
+      })
+      .then(function (result) {
+        bulkLine(job.box, job.file.name, result.status, result.message, result.lesson);
+        var badge = result.lesson_id && document.getElementById("lesson-" + result.lesson_id + "-extra");
+        if (badge && result.badge) {
+          badge.outerHTML = result.badge;
+          window.htmx.process(document.getElementById("lesson-" + result.lesson_id + "-extra"));
+        }
+      })
+      .catch(function (error) {
+        bulkLine(job.box, job.file.name, "error", error.message || "Bağlantı koptu");
+      })
+      .then(function () {
+        bulkBusy = bulkQueue.length > 0;
+        bulkProgress(job.box);
+        nextBulk();
+      });
+  }
+
+  document.addEventListener("change", function (event) {
+    var input = event.target;
+    if (!input.matches || !input.matches("[data-extra-bulk-input]") || !input.files.length) return;
+    enqueueBulk(input.closest("[data-extra-bulk]"), input.files);
+    input.value = "";
+  });
+
+  // Stüdyo penceresi: içerik yüklenince açılır; kaydedilince sunucu "hy:dialog-close" gönderir.
+  var dialog = document.getElementById("studio-dialog");
+  if (dialog) {
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event.detail.target.id === "studio-dialog-body" && event.detail.target.innerHTML.trim() && !dialog.open) {
+        dialog.showModal();
+        var input = dialog.querySelector("[data-md-input]");
+        if (input) input.focus();
+      }
+    });
+    document.body.addEventListener("hy:dialog-close", function () { dialog.close(); });
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog || event.target.closest("[data-dialog-close]")) dialog.close();
+    });
+    dialog.addEventListener("close", function () { document.getElementById("studio-dialog-body").innerHTML = ""; });
+  }
+
+  // Basit Markdown düzenleyici: Yaz / Önizleme sekmeleri ve seçili metni biçimlendiren araç çubuğu.
+  document.addEventListener("click", function (event) {
+    var tab = event.target.closest("[data-md-tab]");
+    if (!tab) return;
+    var editor = tab.closest("[data-md-editor]");
+    var name = tab.getAttribute("data-md-tab");
+    editor.querySelectorAll("[data-md-tab]").forEach(function (item) {
+      item.classList.toggle("active", item === tab);
+      item.setAttribute("aria-selected", item === tab ? "true" : "false");
+    });
+    editor.querySelectorAll("[data-md-pane]").forEach(function (pane) {
+      pane.hidden = pane.getAttribute("data-md-pane") !== name;
+    });
+    editor.querySelector("[data-md-toolbar]").classList.toggle("invisible", name !== "write");
+  });
+
+  var MD_WRAP = { bold: ["**", "**", "kalın metin"], italic: ["_", "_", "italik metin"], code: ["`", "`", "kod"] };
+  var MD_LINE = { h2: "## ", ul: "- ", ol: "1. ", quote: "> " };
+
+  function applyMarkdown(input, action) {
+    var start = input.selectionStart;
+    var end = input.selectionEnd;
+    var value = input.value;
+    var selected = value.slice(start, end);
+    var rangeStart = start;
+    var text;
+    var cursorStart;
+    var cursorEnd;
+    if (MD_WRAP[action]) {
+      var wrap = MD_WRAP[action];
+      var inner = selected || wrap[2];
+      text = wrap[0] + inner + wrap[1];
+      cursorStart = start + wrap[0].length;
+      cursorEnd = cursorStart + inner.length;
+    } else if (MD_LINE[action]) {
+      // Seçili her satırın başına eklenir; seçim yoksa imlecin olduğu satıra.
+      var lineStart = value.lastIndexOf("\n", start - 1) + 1;
+      rangeStart = lineStart;
+      selected = value.slice(lineStart, end);
+      text = selected.split("\n").map(function (line) { return MD_LINE[action] + line; }).join("\n");
+      cursorStart = lineStart;
+      cursorEnd = lineStart + text.length;
+    } else if (action === "link") {
+      var label = selected || "bağlantı metni";
+      text = "[" + label + "](https://)";
+      cursorStart = start + label.length + 3;
+      cursorEnd = cursorStart + 8;
+    } else if (action === "codeblock") {
+      text = "\n```\n" + (selected || "kod") + "\n```\n";
+      cursorStart = start + 5;
+      cursorEnd = cursorStart + (selected || "kod").length;
+    } else if (action === "hr") {
+      text = "\n\n---\n\n";
+      cursorStart = cursorEnd = start + text.length;
+    } else {
+      return;
+    }
+    input.focus();
+    input.setRangeText(text, rangeStart, end, "end");
+    input.setSelectionRange(cursorStart, cursorEnd);
+  }
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-md]");
+    if (!button) return;
+    var input = button.closest("[data-md-editor]").querySelector("[data-md-input]");
+    applyMarkdown(input, button.getAttribute("data-md"));
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (!(event.ctrlKey || event.metaKey) || !event.target.matches || !event.target.matches("[data-md-input]")) return;
+    var action = { b: "bold", i: "italic", k: "link" }[event.key.toLowerCase()];
+    if (!action) return;
+    event.preventDefault();
+    applyMarkdown(event.target, action);
+  });
 
   // Sürükle-bırak hedefleri: video satırı (altyazı), kategori bloğu ve yükleme alanları (video).
   // Hedef dışına bırakılan dosya tarayıcıda açılıp sayfadan çıkılmasın diye her dosya bırakma yakalanır.
@@ -354,7 +544,12 @@
 
   function dropTarget(event) {
     if (!event.target.closest) return null;
-    return event.target.closest("[data-subtitle-drop]") || event.target.closest("[data-upload-zone]");
+    return (
+      event.target.closest("[data-extra-bulk-zone]") ||
+      event.target.closest("[data-extra-drop]") ||
+      event.target.closest("[data-subtitle-drop]") ||
+      event.target.closest("[data-upload-zone]")
+    );
   }
 
   document.addEventListener("dragover", function (event) {
@@ -372,17 +567,33 @@
     event.preventDefault();
     highlight(null);
     var files = Array.prototype.slice.call(event.dataTransfer.files);
+    var bulkZone = event.target.closest && event.target.closest("[data-extra-bulk-zone]");
+    if (bulkZone) {
+      enqueueBulk(bulkZone.closest("[data-extra-bulk]"), files);
+      return;
+    }
+    var extraZone = event.target.closest && event.target.closest("[data-extra-drop]");
+    if (extraZone) {
+      var kind = extraZone.getAttribute("data-extra-drop");
+      var match = files.filter(function (file) { return dropKind(file) === kind; })[0];
+      if (match) {
+        submitDropped(extraZone, match);
+      } else {
+        toast("warning", kind === "subtitle" ? "Bu alana SRT ya da VTT dosyası bırak." : "Bu alana Markdown, TXT ya da HTML dosyası bırak.");
+      }
+      return;
+    }
     var row = event.target.closest && event.target.closest("[data-subtitle-drop]");
-    var subtitle = files.filter(function (file) { return SUBTITLE_FILE.test(file.name); })[0];
-    if (row && subtitle) {
-      openSubtitleForm(row, subtitle);
+    var extra = files.filter(function (file) { return dropKind(file); })[0];
+    if (row && extra) {
+      openExtrasPanel(row, extra);
       return;
     }
     var zone = event.target.closest && event.target.closest("[data-upload-zone]");
     if (zone) {
       enqueue(zone, files);
-    } else if (subtitle) {
-      toast("warning", "Altyazıyı eklemek istediğin videonun satırına bırak.");
+    } else if (extra) {
+      toast("warning", "Altyazıyı ya da ek içeriği eklemek istediğin videonun satırına bırak.");
     }
   });
 })();

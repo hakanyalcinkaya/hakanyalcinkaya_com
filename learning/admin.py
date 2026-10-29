@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from learning.models import Enrollment, LessonProgress, Note
+from learning.models import Enrollment, Favorite, LessonProgress, Note
 
 
 @admin.register(Enrollment)
@@ -29,3 +29,12 @@ class NoteAdmin(admin.ModelAdmin):
     search_fields = ("user__email", "text")
     list_select_related = ("user", "course", "lesson")
     autocomplete_fields = ("user", "course", "lesson")
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ("user", "lesson", "created_at")
+    list_filter = ("lesson__section__course", "created_at")
+    search_fields = ("user__email", "lesson__title")
+    list_select_related = ("user", "lesson")
+    autocomplete_fields = ("user", "lesson")

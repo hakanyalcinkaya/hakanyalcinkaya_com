@@ -5,8 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Prefetch, Q
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
@@ -24,7 +25,11 @@ from course.models import (
     Section,
     VideoUpload,
 )
+from core.markup import render_markdown
 from studio.forms import (
+    ExtraContentBulkForm,
+    ExtraContentForm,
+    ExtraContentUploadForm,
     LessonBulkForm,
     LessonTitleForm,
     NewVideoLessonForm,
@@ -441,17 +446,91 @@ def queue_clear(request):
 
 
 @staff_required
-def lesson_subtitles(request, lesson_id):
-    lesson = _lesson(lesson_id)
-    is_post = request.method == "POST"
-    form = SubtitleForm(
-        request.POST if is_post else None, request.FILES if is_post else None, lesson=lesson, auto_id=_auto_id(lesson)
+def _extras_panel(request, lesson, subtitle_form=None, content_form=None):
+    """Dersin "Ek içerik" paneli: solda altyazı (SRT/VTT), sağda Markdown/TXT/HTML içerik; ikisine de dosya bırakılır.
+
+    Satırdaki altyazı ve ek içerik rozetleri de (OOB) yenilenir.
+    """
+    context = dict(
+        lesson=lesson,
+        subtitle_form=subtitle_form or SubtitleForm(lesson=lesson, auto_id=_auto_id(lesson)),
+        content_form=content_form or ExtraContentUploadForm(lesson=lesson, auto_id=f"lesson-{lesson.pk}-content-%s"),
     )
-    if is_post and form.is_valid():
-        subtitle = form.save()
-        response = render(request, "studio/partials/_subtitle_queued.html", dict(lesson=_lesson(lesson_id)))
-        return _toast(response, "success", _("%(language)s altyazı kaydedildi.") % {"language": subtitle.get_language_display()})
-    return render(request, "studio/partials/_subtitle_form.html", dict(lesson=lesson, form=form))
+    return render(request, "studio/partials/_lesson_extras_panel.html", context)
+
+
+@staff_required
+def lesson_subtitles(request, lesson_id):
+    """GET paneli açar; POST altyazıyı kaydeder ve paneli yeniler."""
+    lesson = _lesson(lesson_id)
+    if request.method != "POST":
+        return _extras_panel(request, lesson)
+    form = SubtitleForm(request.POST, request.FILES, lesson=lesson, auto_id=_auto_id(lesson))
+    if not form.is_valid():
+        return _extras_panel(request, lesson, subtitle_form=form)
+    subtitle = form.save()
+    response = _extras_panel(request, _lesson(lesson_id))
+    return _toast(response, "success", _("%(language)s altyazı kaydedildi.") % {"language": subtitle.get_language_display()})
+
+
+@staff_required
+@require_POST
+def lesson_extra_content(request, lesson_id):
+    """Ek içerik dosyası (Markdown/TXT/HTML) yükler; varsa eskisinin yerine geçer."""
+    lesson = _lesson(lesson_id)
+    form = ExtraContentUploadForm(request.POST, request.FILES, lesson=lesson, auto_id=f"lesson-{lesson.pk}-content-%s")
+    if not form.is_valid():
+        return _extras_panel(request, lesson, content_form=form)
+    form.save()
+    return _toast(_extras_panel(request, lesson), "success", _("Ek içerik kaydedildi."))
+
+
+@staff_required
+def lesson_extra_content_edit(request, lesson_id):
+    """Ek içerik düzenleyicisi (pencerede). Kaydedince pencere kapanır, satırdaki rozet yenilenir."""
+    lesson = _lesson(lesson_id)
+    form = ExtraContentForm(request.POST or None, instance=lesson, auto_id=f"lesson-{lesson.pk}-editor-%s")
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        response = render(request, "studio/partials/_lesson_extra_saved.html", dict(lesson=lesson))
+        response = trigger_client_event(response, "hy:dialog-close", {})
+        text = _("Ek içerik kaydedildi.") if lesson.has_extra_content else _("Ek içerik kaldırıldı.")
+        return _toast(response, "success", text)
+    return render(request, "studio/partials/_extra_content_editor.html", dict(lesson=lesson, form=form))
+
+
+@staff_required
+@require_POST
+def course_extra_contents(request, course_id):
+    """Toplu ek içerik: tek dosya alır, dosya adından dersi bulup kaydeder. Tarayıcı dosyaları sırayla gönderir ve
+    sonucu listeye yazar; eşleşen dersin satırındaki rozet de yenilenir."""
+    course = get_object_or_404(Course, pk=course_id)
+    form = ExtraContentBulkForm(request.POST, request.FILES, course=course)
+    if not form.is_valid():
+        return JsonResponse(dict(status="error", message=str(_first_error(form))))
+    lesson = form.save()
+    badge = render_to_string("studio/partials/_lesson_extra.html", dict(lesson=lesson), request=request)
+    status = "skipped" if form.skipped else "saved"
+    message = _("Atlandı; derste ek içerik zaten var.") if form.skipped else _("Kaydedildi.")
+    return JsonResponse(dict(status=status, message=str(message), lesson=lesson.title, lesson_id=str(lesson.pk), badge=badge))
+
+
+@staff_required
+@require_POST
+def extra_content_preview(request):
+    """Düzenleyicideki metnin sayfada görüneceği hâli (kaydetmeden)."""
+    return render(
+        request, "studio/partials/_extra_content_preview.html", dict(html=render_markdown(request.POST.get("extra_content", "")))
+    )
+
+
+@staff_required
+@require_POST
+def lesson_extra_content_delete(request, lesson_id):
+    lesson = _lesson(lesson_id)
+    lesson.set_extra_content("")
+    response = render(request, "studio/partials/_lesson_extra.html", dict(lesson=lesson))
+    return _toast(response, "success", _("Ek içerik kaldırıldı."))
 
 
 @staff_required

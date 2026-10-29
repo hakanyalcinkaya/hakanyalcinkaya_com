@@ -18,6 +18,8 @@ from course.models import (
 )
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
+EXTRA_CONTENT_EXTENSIONS = (".md", ".markdown", ".txt", ".html", ".htm")
+EXTRA_CONTENT_MAX_BYTES = 1024 * 1024
 
 
 class LessonBulkAction(models.TextChoices):
@@ -72,7 +74,7 @@ class LessonBulkForm(forms.Form):
 class SiteSettingsForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
-        fields = ("video_platform", "sync_video_titles")
+        fields = ("video_platform", "sync_video_titles", "lesson_notes_enabled")
         widgets = {"video_platform": forms.RadioSelect}
 
     def clean_video_platform(self):
@@ -238,3 +240,94 @@ class SubtitleForm(forms.Form):
         subtitle.save()
         subtitle.schedule()
         return subtitle
+
+
+def read_extra_content(upload):
+    """Ek içerik dosyasını doğrular ve metnini döner (Markdown/TXT/HTML, UTF-8, en fazla 1 MB, boş olmayan)."""
+    if _extension(upload) not in EXTRA_CONTENT_EXTENSIONS:
+        raise forms.ValidationError(_("Desteklenen türler: %(types)s") % {"types": ", ".join(EXTRA_CONTENT_EXTENSIONS)})
+    if upload.size > EXTRA_CONTENT_MAX_BYTES:
+        raise forms.ValidationError(_("Ek içerik dosyası en fazla 1 MB olabilir."))
+    try:
+        text = upload.read().decode("utf-8-sig")
+    except UnicodeDecodeError:
+        raise forms.ValidationError(_("Dosya UTF-8 kodlamalı olmalı."))
+    if not text.strip():
+        raise forms.ValidationError(_("Dosya boş."))
+    return text
+
+
+class ExtraContentUploadForm(forms.Form):
+    """Dersin ek içeriği dosyadan: Markdown, düz metin ya da HTML. Varsa mevcut içeriğin yerine geçer."""
+
+    file = forms.FileField(
+        label=_("Markdown / TXT / HTML dosyası"),
+        widget=forms.FileInput(
+            attrs={
+                "class": "form-control form-control-sm",
+                "accept": ",".join(EXTRA_CONTENT_EXTENSIONS),
+                "data-extra-content-file": "",
+            }
+        ),
+    )
+
+    def __init__(self, *args, lesson, **kwargs):
+        self.lesson = lesson
+        super().__init__(*args, **kwargs)
+
+    def clean_file(self):
+        upload = self.cleaned_data["file"]
+        self.text = read_extra_content(upload)
+        return upload
+
+    def save(self):
+        self.lesson.set_extra_content(self.text)
+        return self.lesson
+
+
+class ExtraContentBulkForm(forms.Form):
+    """Toplu ek içerik: her istekte bir dosya gelir, kursun dersleriyle dosya adına göre eşleştirilir."""
+
+    file = forms.FileField()
+    overwrite = forms.BooleanField(required=False)
+
+    def __init__(self, *args, course, **kwargs):
+        self.course = course
+        self.lesson = None
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned = super().clean()
+        upload = cleaned.get("file")
+        if upload is None:
+            return cleaned
+        self.text = read_extra_content(upload)
+        self.lesson, reason = self.course.match_lesson_for_file(upload.name)
+        if self.lesson is None:
+            raise forms.ValidationError(reason)
+        # İçeriği olan ders, üzerine yazma seçilmediyse değişmez.
+        self.skipped = self.lesson.has_extra_content and not cleaned.get("overwrite")
+        return cleaned
+
+    def save(self):
+        if not self.skipped:
+            self.lesson.set_extra_content(self.text)
+        return self.lesson
+
+
+class ExtraContentForm(forms.ModelForm):
+    """Ek içeriği düzenleyicide yazma; boş bırakılırsa içerik kaldırılır."""
+
+    class Meta:
+        model = Lesson
+        fields = ("extra_content",)
+        widgets = {
+            "extra_content": forms.Textarea(
+                attrs={"class": "form-control font-monospace small studio-md-input", "rows": 18, "data-md-input": ""}
+            )
+        }
+        labels = {"extra_content": _("Ek içerik")}
+
+    def save(self, commit=True):
+        self.instance.set_extra_content(self.cleaned_data["extra_content"])
+        return self.instance

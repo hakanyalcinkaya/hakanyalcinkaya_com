@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from datetime import timedelta
 from decimal import Decimal
 from functools import partial
@@ -13,11 +15,14 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.duration import ceil_minutes, clock, hours_minutes, video_file_seconds
+from core.markup import render_markdown
 from core.models import BaseModel, BaseSortOrder, BaseStatus, SiteSettings, Status, StatusQuerySet, VideoPlatform
 from course import video_service
 from core.text import slugify_tr
 
 GENERAL_SECTION_SLUG = "genel"
+# Ders dosyalarının baştaki sıra numarası (ör. "018-014" ya da "007-022-003").
+LESSON_FILE_NUMBER = re.compile(r"^\d+(?:-\d+)*")
 PRICE_FIELD = {"max_digits": 10, "decimal_places": 2, "validators": [MinValueValidator(Decimal("0"))]}
 
 
@@ -346,6 +351,37 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
                 seen.add(lesson.pk)
                 lesson.move_to(own_sections[section_id], lesson_index)
 
+    def match_lesson_for_file(self, file_name, lessons=None):
+        """Dosyanın (ör. ders notu .md) ait olduğu dersi bulur; (ders, None) ya da (None, sebep) döner.
+
+        Önce dosya adı ders başlığı ya da slug'ıyla birebir karşılaştırılır (videolar dosya adıyla açıldığı için).
+        Bulunamazsa baştaki sıra numarası (ör. "018-014") yalnız tek bir dersle uyuşuyorsa kullanılır.
+        """
+        if lessons is None:
+            lessons = list(Lesson.objects.filter(section__course=self))
+
+        def key(text):
+            return unicodedata.normalize("NFC", text).strip().casefold()
+
+        stem = key(Path(file_name).stem)
+        exact = [lesson for lesson in lessons if key(lesson.title) == stem or lesson.slug == slugify_tr(stem)]
+        if len(exact) == 1:
+            return exact[0], None
+        if len(exact) > 1:
+            return None, _("Birden fazla ders aynı ada sahip.")
+        number = LESSON_FILE_NUMBER.match(stem)
+        if number:
+            numbered = [
+                lesson
+                for lesson in lessons
+                if (match := LESSON_FILE_NUMBER.match(key(lesson.title))) and match.group(0) == number.group(0)
+            ]
+            if len(numbered) == 1:
+                return numbered[0], None
+            if len(numbered) > 1:
+                return None, _("Bu numarayla birden fazla ders var; dosya adını ders adıyla aynı yap.")
+        return None, _("Bu adda ders bulunamadı.")
+
     def lessons_needing_video_title_sync(self):
         return Lesson.objects.filter(section__course=self).exclude(video_id="").exclude(video_title=F("title"))
 
@@ -477,6 +513,12 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         blank=True,
         help_text=_("Ders başlığından farklıysa platforma yeniden gönderilir."),
     )
+    # Videonun altında "Ek bilgiler" olarak görünür. Kaynak Markdown'dır (HTML de yazılabilir); kaydedilince temizlenmiş
+    # HTML'i üretilir, sayfa onu gösterir.
+    extra_content = models.TextField(
+        _("ek içerik (Markdown)"), blank=True, help_text=_("Videonun altında “Ek bilgiler” olarak görünür.")
+    )
+    extra_content_html = models.TextField(_("ek içerik (HTML)"), blank=True, editable=False)
     external_url = models.URLField(_("dış bağlantı"), blank=True, help_text=_("Form dersleri için."))
     body = models.TextField(_("metin içeriği"), blank=True)
 
@@ -561,6 +603,28 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
 
     def slug_siblings(self):
         return Lesson.objects.filter(section_id=self.section_id)
+
+    @property
+    def has_extra_content(self):
+        return bool(self.extra_content_html)
+
+    @property
+    def extra_content_words(self):
+        return len(self.extra_content.split())
+
+    def set_extra_content(self, text):
+        """Ek içeriği değiştirir (boşsa kaldırır); HTML'i yeniden üretilir."""
+        self.extra_content = text.replace("\r\n", "\n").strip()
+        self.save(update_fields=["extra_content", "updated_at"])
+
+    def save(self, *args, **kwargs):
+        # Admin'den düzenlenen kaynakla HTML her zaman uyumlu kalır.
+        update_fields = kwargs.get("update_fields")
+        if update_fields is None or "extra_content" in update_fields:
+            self.extra_content_html = render_markdown(self.extra_content)
+            if update_fields is not None:
+                kwargs["update_fields"] = {*update_fields, "extra_content_html"}
+        super().save(*args, **kwargs)
 
     def move_to(self, section_id, sort_order):
         """Dersi bölüme ve sıraya yerleştirir; hedef bölümde aynı slug varsa ders yeni slug alır."""

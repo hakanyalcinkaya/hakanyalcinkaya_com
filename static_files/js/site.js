@@ -666,8 +666,41 @@
       src: holder.getAttribute("data-lesson-video"),
       poster: holder.getAttribute("data-poster"),
       tracks: tracks,
+    }).then(function (media) {
+      if (media) watchCompletion(media);
     }).catch(playerFailed);
   });
+
+  // Ders tamamlama: video durdurulmadan 5 sn oynayınca ders "tamamlandı" olarak işaretlenir. Durdurulursa sayaç
+  // baştan başlar. Ders zaten tamamlandıysa ya da kullanıcı bu sayfada düğmeyle elle seçim yaptıysa denenmez.
+  var AUTO_COMPLETE_MS = 5000;
+  function watchCompletion(media) {
+    var timer = null;
+    function button() {
+      return document.getElementById("lesson-complete");
+    }
+    function stop() {
+      clearTimeout(timer);
+      timer = null;
+    }
+    media.addEventListener("playing", function () {
+      var target = button();
+      if (timer || !target || target.getAttribute("data-completed") === "true" || target.hasAttribute("data-manual")) return;
+      timer = setTimeout(function () {
+        timer = null;
+        var current = button();
+        if (media.paused || !current || current.getAttribute("data-completed") === "true" || current.hasAttribute("data-manual")) return;
+        // Kaynak düğme: CSRF başlığı (body hx-headers) ondan devralınır.
+        window.htmx.ajax("POST", current.getAttribute("hx-post"), {
+          source: current,
+          target: current,
+          swap: "outerHTML",
+          values: { done: "1", auto: "1" },
+        });
+      }, AUTO_COMPLETE_MS);
+    });
+    ["pause", "ended", "emptied"].forEach(function (name) { media.addEventListener(name, stop); });
+  }
 
   // Bildirimler: Django mesajları sağ üstte kendiliğinden kapanan toast olarak gösterilir (SweetAlert2).
   var toastIcons = { success: "success", info: "info", warning: "warning", error: "error", debug: "info" };

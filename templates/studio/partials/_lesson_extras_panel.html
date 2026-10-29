@@ -1,0 +1,46 @@
+{# Dersin "Ek içerik" paneli: solda altyazı (SRT/VTT), sağda videonun altında görünecek ek bilgiler (Markdown/TXT/HTML). #}
+{# İki alana da dosya sürüklenip bırakılabilir; bırakılan dosya hemen gönderilir (studio.js). Satırdaki rozetler de yenilenir. #}
+<div class="border rounded bg-body-tertiary p-3 mt-3">
+  <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+    <h3 class="h6 mb-0"><i class="bi bi-paperclip me-1" aria-hidden="true"></i>Ek içerik</h3>
+    <button type="button" class="btn-close btn-sm" data-form-close aria-label="Paneli kapat"></button>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <form class="studio-extra-drop h-100 border border-2 border-dashed rounded p-3" hx-post="{% url 'studio:lesson_subtitles' lesson.id %}" hx-encoding="multipart/form-data" hx-target="#lesson-{{ lesson.id }}-form" data-upload-form data-extra-drop="subtitle">
+        <div class="fw-medium small"><i class="bi bi-badge-cc me-1" aria-hidden="true"></i>Altyazı</div>
+        <p class="small text-body-secondary mb-2">SRT / VTT dosyasını buraya bırak; dil dosya adından seçilir.</p>
+        <div class="row g-2 align-items-end">
+          <div class="col-sm-5">
+            <label class="form-label small mb-1" for="{{ subtitle_form.language.id_for_label }}">{{ subtitle_form.language.label }}</label>
+            {{ subtitle_form.language }}
+          </div>
+          <div class="col-sm-7">
+            <label class="form-label small mb-1" for="{{ subtitle_form.file.id_for_label }}">{{ subtitle_form.file.label }}</label>
+            {{ subtitle_form.file }}
+          </div>
+        </div>
+        {% for field in subtitle_form %}{% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}{% endfor %}
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Altyazıyı kaydet</button>
+          <span class="form-text m-0">Aynı dilde altyazı varsa yenisi yerine geçer.{% if not lesson.video_id %} Video platformda hazır olunca gönderilir.{% endif %}</span>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <form class="studio-extra-drop h-100 border border-2 border-dashed rounded p-3" hx-post="{% url 'studio:lesson_extra_content' lesson.id %}" hx-encoding="multipart/form-data" hx-target="#lesson-{{ lesson.id }}-form" data-upload-form data-extra-drop="content">
+        <div class="fw-medium small"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Ek bilgiler <span class="fw-normal text-body-secondary">· videonun altında görünür</span></div>
+        <p class="small text-body-secondary mb-2">Markdown, TXT ya da HTML dosyasını buraya bırak{% if lesson.has_extra_content %}; mevcut içeriğin ({{ lesson.extra_content_words }} kelime) yerine geçer{% endif %}.</p>
+        <label class="form-label small mb-1" for="{{ content_form.file.id_for_label }}">{{ content_form.file.label }}</label>
+        {{ content_form.file }}
+        {% for error in content_form.file.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Dosyayı yükle</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_extra_content_edit' lesson.id %}" hx-target="#studio-dialog-body"><i class="bi bi-pencil me-1" aria-hidden="true"></i>{% if lesson.has_extra_content %}Düzenle{% else %}Düzenleyicide yaz{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% include "studio/partials/_lesson_subtitles.html" with oob=True %}
+{% include "studio/partials/_lesson_extra.html" with oob=True %}

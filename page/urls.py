@@ -18,6 +18,8 @@ urlpatterns = [
         views.lesson,
         name="lesson",
     ),
+    path("p/lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
+    path("p/lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
     path("account/login/", views.login, name="login"),
     path("account/signup/", views.signup, name="signup"),
     path("account/logout/", views.logout, name="logout"),
