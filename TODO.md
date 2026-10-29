@@ -16,7 +16,7 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 ## Video (Bunny Stream)
 - [ ] CDN token koruması: Bunny panelinde (Stream → kütüphane → Security) "Token Authentication" açılınca imzalı adresi gerçek CDN'de doğrula, sonra `.env`'de `BUNNY_CDN_TOKEN_AUTH=True` yap (kod hazır, `course/bunny.py` `_signed`). Koruma kapalıyken imzalı adres 404 veriyor (beklenen); koruma açılıp ayar açılmazsa videolar oynamaz, ikisi birlikte yapılmalı.
 - [ ] İzlenen süreyi her 5 saniyede bir veritabanına yaz ve dersi kaldığı saniyeden aç (`LessonProgress.position_seconds`). "Tamamlandı" işareti, kenar listesi ve ilerleme çubuğu artık gerçek veriden geliyor.
-- [ ] Kurs sayfasının tanıtım metinleri (neler öğreneceksin, kimler için ...) aynı slug'lı örnek kurstan geliyor; kurs maddeleri (CourseHighlight) doldurulunca örnek veri kaldırılabilir. Ana sayfa, kurs listesi, sepet ve kütüphane hâlâ örnek veride.
+- [ ] Kurs sayfasının tanıtım metinleri (neler öğreneceksin, kimler için ...) aynı slug'lı örnek kurstan geliyor; kurs maddeleri (CourseHighlight) doldurulunca örnek veri kaldırılabilir. Ana sayfa, kurs listesi, sepet ve Eğitimlerim gerçek veride; yayında kurs yokken örnek kurslar görünür.
 - [ ] Ders/tanıtım videosu değiştirilince eski video Bunny'de kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
 - [ ] Prod: Vimeo HLS bağlantıları önbellekte tutuluyor (`course/vimeo.py` `playback`); prod'da paylaşılan önbellek (Redis) kullanılmalı, şu an varsayılan bellek içi önbellek.
 - [ ] Gerçek videoda deneme: 5 sn sonra tamamlandı, oynatıcı tercihleri (hız/kalite/altyazı otomatik kayıt, tam ekran; iPhone Safari'de tam ekran desteklenmeyebilir). Yerelde `http://local.hakanyalcinkaya.com/` (80 portu) üzerinden.
