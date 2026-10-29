@@ -1,0 +1,14 @@
+{# Yönetim panelinin adresi bilerek yazılmaz: robots.txt herkese açıktır. Eski Podia adresleri (/p/courses/...) kapatılmaz; #}{# arama motorları kalıcı yönlendirmeyi izleyebilmeli. Grup içinde boş satır olmamalı (bazı tarayıcılar grubu böler). #}User-agent: *
+Disallow: /studio/
+Disallow: /e/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /thanks/
+Disallow: /account/
+Disallow: /newsletter/
+Disallow: /reviews/
+Disallow: /p/products/
+Disallow: /p/lessons/
+Disallow: /*/buy/
+
+Sitemap: {{ sitemap_url }}

@@ -17,7 +17,12 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
+from django.views.decorators.cache import cache_page
+
+from page.sitemaps import sitemaps
+from page.views import robots_txt
 
 urlpatterns = [
     # Gerçek yönetim paneli tahmin edilmesi zor bir adreste; /admin/ giriş denemelerini kaydeden sahte sayfa.
@@ -32,6 +37,9 @@ if settings.DEBUG:
     ]
 
 urlpatterns += [
+    path("robots.txt", robots_txt, name="robots_txt"),
+    # Kurs yayınlanınca/kaldırılınca en geç 1 saatte yansır.
+    path("sitemap.xml", cache_page(60 * 60)(sitemap), {"sitemaps": sitemaps}, name="sitemap"),
     path("studio/", include("studio.urls")),
     # E-posta açılma/tıklama takibi
     path("e/", include("mailing.urls")),
