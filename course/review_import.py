@@ -1,10 +1,12 @@
 """Başka platformdan (Udemy) çekilmiş yorumları kursa eski yorum olarak aktarır.
 
 Dosya biçimi (Markdown): başlıkta "Çekilme tarihi: GG.AA.YYYY", her yorum "### 1. Ad — ★★★★★ (5.0) — 2 yıl önce" başlığı
-ve altında metin. Kaynak yalnız göreli zaman verdiği için yorum tarihi çekilme tarihinden geriye hesaplanır (yaklaşık).
+ve altında metin; metnin altındaki "> **Eğitmen yanıtı**" bloğu alınmaz. Kaynak yalnız göreli zaman verdiği için yorum
+tarihi çekilme tarihinden geriye hesaplanır (yaklaşık).
 Yarım puanlar sitede tam sayı olduğu için aşağı yuvarlanır (4.5 → 4); puan şişirilmez.
 
-Tekrar çalıştırılabilir: aynı kursta aynı ad ve metinli yorum ikinci kez eklenmez. Aktarılan yorumlar onaylı yayımlanır.
+Tekrar çalıştırılabilir: aynı kursta aynı ad ve metinli yorum ikinci kez eklenmez; metni bu yorumla başlayan eski kayıt
+(eğitmen yanıtıyla birlikte aktarılmış) yerinde düzeltilir. Aktarılan yorumlar onaylı yayımlanır.
 """
 
 import math
@@ -20,6 +22,7 @@ from course.models import Review, ReviewSource
 FETCHED = re.compile(r"Çekilme tarihi:\s*(\d{1,2})\.(\d{1,2})\.(\d{4})")
 HEADING = re.compile(r"^###\s+\d+\.\s+(?P<name>.+?)\s+—\s+[★½☆]*\s*\((?P<rating>[\d.]+)\)\s+—\s+(?P<ago>.+?)\s*$")
 AGO = re.compile(r"(?P<amount>\d+|bir)\s+(?P<unit>yıl|ay|hafta|gün|saat|dakika)\s+önce")
+REPLY = re.compile(r"^>\s*\*\*Eğitmen yanıtı\*\*")
 UNIT_DAYS = {"yıl": 365, "ay": 30, "hafta": 7, "gün": 1, "saat": 1 / 24, "dakika": 1 / 1440}
 
 
@@ -50,7 +53,7 @@ def parse_reviews(text):
         raise ReviewFileError("Dosyada “Çekilme tarihi: GG.AA.YYYY” satırı yok.")
     day, month, year = (int(part) for part in found.groups())
     fetched = timezone.make_aware(datetime(year, month, day, 12))
-    reviews, current, lines = [], None, []
+    reviews, current, lines, in_reply = [], None, [], False
 
     def flush():
         if current is not None:
@@ -63,8 +66,10 @@ def parse_reviews(text):
             flush()
             rating = max(1, min(5, math.floor(float(match.group("rating")))))
             current = dict(name=match.group("name").strip(), rating=rating, written_at=_written_at(match.group("ago"), fetched))
-            lines = []
-        elif current is not None:
+            lines, in_reply = [], False
+        elif REPLY.match(line):
+            in_reply = True
+        elif current is not None and not in_reply:
             lines.append(line)
     flush()
     if not reviews:
@@ -73,13 +78,23 @@ def parse_reviews(text):
 
 
 def import_reviews(course, reviews, dry_run=False):
-    """Yorumları onaylı eski yorum olarak ekler; (eklenen, atlanan) döner."""
-    added = skipped = 0
+    """Yorumları onaylı eski yorum olarak ekler; (eklenen, düzeltilen, atlanan) döner."""
+    added = fixed = skipped = 0
     with transaction.atomic():
         next_order = (course.reviews.order_by("-sort_order").values_list("sort_order", flat=True).first() or 0) + 1
         for item in reviews:
             if course.reviews.filter(author_name=item.name, text=item.text).exists():
                 skipped += 1
+                continue
+            stale = course.reviews.filter(
+                author_name=item.name, source=ReviewSource.IMPORTED, text__startswith=item.text
+            ).first()
+            if stale is not None:
+                if stale.approved_text == stale.text:
+                    stale.approved_text = item.text
+                stale.text = item.text
+                stale.save(update_fields=["text", "approved_text", "updated_at"])
+                fixed += 1
                 continue
             review = Review.objects.create(
                 course=course,
@@ -95,4 +110,4 @@ def import_reviews(course, reviews, dry_run=False):
             added += 1
         if dry_run:
             transaction.set_rollback(True)
-    return added, skipped
+    return added, fixed, skipped

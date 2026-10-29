@@ -11,7 +11,7 @@ from course.review_import import ReviewFileError, import_reviews, parse_reviews
 
 
 class Command(BaseCommand):
-    help = "Yorum dosyasını kursa aktarır; tekrar çalıştırılabilir (aynı ad ve metin ikinci kez eklenmez)."
+    help = "Yorum dosyasını kursa aktarır; tekrar çalıştırılabilir (aynı ad ve metin ikinci kez eklenmez, eski kayıt düzeltilir)."
 
     def add_arguments(self, parser):
         parser.add_argument("path", help="Yorum dosyası (.md)")
@@ -29,9 +29,9 @@ class Command(BaseCommand):
             raise CommandError(f"Dosya okunamadı: {error}") from error
         except ReviewFileError as error:
             raise CommandError(str(error)) from error
-        added, skipped = import_reviews(target, reviews, dry_run=dry_run)
+        added, fixed, skipped = import_reviews(target, reviews, dry_run=dry_run)
         ratings = sorted({item.rating for item in reviews})
         self.stdout.write(
             ("[deneme, kaydedilmedi] " if dry_run else "")
-            + f"{target.title}: {len(reviews)} yorum okundu, {added} eklendi, {skipped} zaten vardı (puanlar: {ratings})."
+            + f"{target.title}: {len(reviews)} yorum okundu, {added} eklendi, {fixed} düzeltildi, {skipped} zaten vardı (puanlar: {ratings})."
         )
