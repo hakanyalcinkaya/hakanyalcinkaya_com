@@ -5,7 +5,8 @@
     {% if not on_section_page %}<span class="studio-handle studio-section-handle text-body-tertiary" title="Sürükleyerek sırala"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Kategoriyi taşı</span></span>{% endif %}
     <span class="font-monospace small text-body-tertiary" data-section-no>{{ section_no }}.</span>
     <div class="flex-grow-1">{% include "studio/partials/_section_title.html" %}</div>
-    <span class="small text-body-secondary" data-section-count>{{ section.lessons.all|length }} video</span>
+    <span class="small text-body-secondary" data-section-count>{{ section.lessons.all|length }} ders</span>
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:section_content_lesson' section.id %}{% if bulk %}?bulk=1{% endif %}" hx-target="#section-{{ section.id }}-lessons" hx-swap="beforeend" title="Videosuz ders: form bağlantısı, okuma, kaynaklar (Markdown)"><i class="bi bi-file-text me-1" aria-hidden="true"></i>İçerik ekle</button>
     {% include "studio/partials/_section_status.html" %}
     {% if not on_section_page %}
     <a href="{% url 'studio:section_detail' section.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Video yükle</a>

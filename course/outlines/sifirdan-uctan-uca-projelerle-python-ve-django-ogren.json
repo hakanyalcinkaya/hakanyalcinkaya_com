@@ -1,0 +1,2182 @@
+{
+ "source": "Podia (hakanyalcinkaya.dev/p/courses/sifirdan-uctan-uca-projelerle-python-ve-django-ogren/)",
+ "podia_slug": "sifirdan-uctan-uca-projelerle-python-ve-django-ogren",
+ "title": "Sıfırdan Uçtan Uca Projelerle Python ve Django Öğren",
+ "short_title": "Python ve Django",
+ "subtitle": "Python ve Django ile sıfırdan başlayıp uçtan uca projeler geliştirdiğin kurs.",
+ "description": "Python ve Django ile sıfırdan başlayıp uçtan uca projeler geliştirdiğin kurs.",
+ "image": "img/courses/django.jpg",
+ "technologies": [
+  "Python",
+  "Django",
+  "HTML",
+  "CSS",
+  "Git"
+ ],
+ "highlights": {
+  "learn": [
+   "Python temellerini projelerle pekiştireceksin.",
+   "Django ile uçtan uca web uygulaması kuracaksın.",
+   "Veritabanı, form ve şablon katmanını birlikte kullanacaksın.",
+   "Yaptığın projeleri yayına almayı göreceksin."
+  ],
+  "about": [
+   "Kurs sıfırdan başlar. Her bölümde öğrendiğini bir proje adımıyla uygularsın.",
+   "Amaç, Python ve Django ile kendi web uygulamanı baştan sona çıkarabilmen."
+  ],
+  "feature": [
+   {
+    "title": "Sıfırdan ilerler",
+    "text": "Önceden Django bilmene gerek yok. Bölümler birbirinin üstüne biner."
+   },
+   {
+    "title": "Proje odaklı",
+    "text": "Her bölümün sonunda öğrendiklerini çalışan bir parçaya dönüştürürsün."
+   }
+  ],
+  "topic": [
+   {
+    "title": "Python",
+    "text": "Dil temelleri, veri yapıları ve fonksiyonlarla düşünmek."
+   },
+   {
+    "title": "Django",
+    "text": "Modeller, view’lar, şablonlar ve formlarla web uygulaması."
+   },
+   {
+    "title": "Veritabanı",
+    "text": "İlişkiler, sorgular ve yönetim paneli."
+   }
+  ],
+  "outcome": [
+   {
+    "title": "Uçtan uca proje",
+    "text": "Kendi Django uygulamanı baştan sona kurabilme."
+   },
+   {
+    "title": "Python pratiği",
+    "text": "Günlük geliştirmede kullanabileceğin Python alışkanlığı."
+   }
+  ],
+  "audience": [
+   "Python ile web geliştirmek isteyenler",
+   "Django’ya sıfırdan başlamak isteyenler",
+   "Proje portföyü çıkarmak isteyenler"
+  ]
+ },
+ "access_note": "Kursa kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.",
+ "sections": [
+  {
+   "title": "Giriş",
+   "slug": "2407498-giris",
+   "lessons": [
+    {
+     "title": "Kurs Tanıtıtım Videosu",
+     "slug": "7678350-kurs-tanititim-videosu",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Kaç Yazılım Dili Bilmeliyim?",
+     "slug": "7676950-kac-yazilim-dili-bilmeliyim",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Frameworkler ve Yazılım Dillerindeki Versiyon Değişiklikleri Hakkında Genel Bilgi",
+     "slug": "8277869-frameworkler-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Yapay Zeka ve Biz",
+     "slug": "8278314-yapay-zeka-ve-biz",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074710-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "HTML",
+   "slug": "2407499-html",
+   "lessons": [
+    {
+     "title": "HTML'e Hoşgeldiniz",
+     "slug": "7675157-html-e-hosgeldiniz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "HTML Nedir?",
+     "slug": "7675164-html-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kod(Text) Editörlerine Genel Bakış",
+     "slug": "7675150-kod-text-editorlerine-genel-bakis",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "HTML - Demo -_- Arkanıza Yaslanın ;)",
+     "slug": "7675146-html-demo-_-arkaniza-yaslanin",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Visual Studio Code - Arayüz ve Genel Kullanım",
+     "slug": "7675151-visual-studio-code-arayuz-ve-genel-kullanim",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "En Çok Kullanılan HTML Etiketleri Nelerdir?",
+     "slug": "7675148-en-cok-kullanilan-html-etiketleri-nelerdir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "HTML'de Açıklama Satırı Eklemek",
+     "slug": "7675149-html-de-aciklama-satiri-eklemek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS-Code İçerisinde Dosyaları Kaydetmek",
+     "slug": "7675152-vs-code-icerisinde-dosyalari-kaydetmek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Başlıklar ve Paragraflarla Çalışmak",
+     "slug": "7675155-basliklar-ve-paragraflarla-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Listelerle Çalışmak",
+     "slug": "7675168-listelerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Emmet İle Çalışmak Bölüm-1",
+     "slug": "7675153-emmet-ile-calismak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Emmet İle Çalışmak Bölüm-2",
+     "slug": "7675158-emmet-ile-calismak-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Emmet İle Çalışmak Bölüm-3",
+     "slug": "7675156-emmet-ile-calismak-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "HTML Genel Yapısını Anlamak",
+     "slug": "7675163-html-genel-yapisini-anlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Linklerle Çalışmak",
+     "slug": "7675169-linklerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Motivasyon - Hergün Kendimizi Nasıl Geliştirebiliriz?",
+     "slug": "7675170-motivasyon-hergun-kendimizi-nasil-gelistirebiliriz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Görsellerle Çalışmak",
+     "slug": "7675174-gorsellerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "HTML Etiketlerine Ekstra Özellikler Eklemek",
+     "slug": "7675172-html-etiketlerine-ekstra-ozellikler-eklemek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Block Ve Inline Elementlerle Çalışmak",
+     "slug": "7675178-block-ve-inline-elementlerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Indentation Girintili Yapi İle Çalışmak",
+     "slug": "7675173-indentation-girintili-yapi-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Semantic Etiketlerle Çalışmak",
+     "slug": "7675182-semantic-etiketlerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Çalışması",
+     "slug": "7675179-bolum-sonu-calismasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Çalışmasını Yayına Almak",
+     "slug": "7675181-bolum-sonu-calismasini-yayina-almak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Classless CSS - İlham",
+     "slug": "9333533-classless-css-ilham",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074722-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Visual Studio Code Editör",
+   "slug": "2407500-visual-studio-code-editor",
+   "lessons": [
+    {
+     "title": "VS Code ve Diğer Kod Editorleri",
+     "slug": "7675183-vs-code-ve-diger-kod-editorleri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VSCode.dev Online Visual Studio Code ile Çalışmak",
+     "slug": "7675180-vscode-dev-online-visual-studio-code-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code Genel Görünümlerin Ayarlanması Bölüm-1",
+     "slug": "7675184-vs-code-genel-gorunumlerin-ayarlanmasi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code Genel Görünümlerin Ayarlanması Bölüm-2",
+     "slug": "7675191-vs-code-genel-gorunumlerin-ayarlanmasi-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Tema ve Icon Görünüm Ayarları",
+     "slug": "7675189-tema-ve-icon-gorunum-ayarlari",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code Help Menüsünü İncelemek",
+     "slug": "7675186-vs-code-help-menusunu-incelemek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code İçerisinde Birden Fazla Proje ile Çalışmak",
+     "slug": "7675187-vs-code-icerisinde-birden-fazla-proje-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code Ayarlar Menüsü",
+     "slug": "7675190-vs-code-ayarlar-menusu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code icerisinde Çoklu İmleç (Multi Cursor) özelliği",
+     "slug": "7675195-vs-code-icerisinde-coklu-imlec-multi-cursor-ozelligi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code Editor Playground İle Çalışmak",
+     "slug": "7675192-vs-code-editor-playground-ile-calismak",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "VS Code Klavye Kisayol Tuşları",
+     "slug": "7675200-vs-code-klavye-kisayol-tuslari",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code İçerisinde Terminal ile Çalışmak",
+     "slug": "7675197-vs-code-icerisinde-terminal-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Code Snippets İle İstediğiniz Yapıları Hızlıca Oluşturun",
+     "slug": "7675238-code-snippets-ile-istediginiz-yapilari-hizlica-olusturun",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Özeti",
+     "slug": "7675194-bolum-sonu-ozeti",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074725-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Git & GitHub",
+   "slug": "2407501-git-github",
+   "lessons": [
+    {
+     "title": "Versiyon Kontrol Sistemi Olmadan Projeleri Düzenleyebilir miyiz?",
+     "slug": "7675237-versiyon-kontrol-sistemi-olmadan-projeleri-duzenleyebilir-miyiz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Versiyon Kontrol Sisteminde İlk Ayarlar ve \"VS Code\" icinde \"Git Init\"",
+     "slug": "7675235-versiyon-kontrol-sisteminde-ilk-ayarlar-ve-vs-code-icinde-git-init",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Birden Fazla Projede \"Git\" Versiyon Kontrol Sisteminin Aktif Edilmesi",
+     "slug": "7675236-birden-fazla-projede-git-versiyon-kontrol-sisteminin-aktif-edilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Gitignore Versiyon Kontrol Sistemine Takip Edilmeyecek Dosyalarin Tanıtılması",
+     "slug": "7675247-gitignore-versiyon-kontrol-sistemine-takip-edilmeyecek-dosyalarin-tanitilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code İçerisinden Dosyaların Eklenmesi ve Yapılan Değisikliklerin Gözlenmesi",
+     "slug": "7675242-vs-code-icerisinden-dosyalarin-eklenmesi-ve-yapilan-degisikliklerin-gozlenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Diğer Uygulamalar İle Projedeki Versiyon Kontrol Sistemini Yönetmek",
+     "slug": "7675240-diger-uygulamalar-ile-projedeki-versiyon-kontrol-sistemini-yonetmek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "VS Code İçerisinde Terminalden Git Komutlarının Kullanımı",
+     "slug": "7675245-vs-code-icerisinde-terminalden-git-komutlarinin-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "GitHub İçerisinde Profil Oluşturulması Bölüm-1",
+     "slug": "7675244-github-icerisinde-profil-olusturulmasi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "GitHub İçerisinde Profil Oluşturulması Bölüm-2",
+     "slug": "7675249-github-icerisinde-profil-olusturulmasi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "MarkDown ile Çalışmak ve README Dosyasını Anlamak",
+     "slug": "7675259-markdown-ile-calismak-ve-readme-dosyasini-anlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Repo'nun GitHub'a Eklenmesi ve Düzenlenmesi Bölüm-1",
+     "slug": "7675299-repo-nun-github-a-eklenmesi-ve-duzenlenmesi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Repo'nun GitHub'a Eklenmesi ve Düzenlenmesi Bölüm-2",
+     "slug": "7675253-repo-nun-github-a-eklenmesi-ve-duzenlenmesi-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "GitExplorer ve Cheat.sh Sitesi Üzerinden Git Komutlarının İncelenmesi",
+     "slug": "7675251-gitexplorer-ve-cheat-sh-sitesi-uzerinden-git-komutlarinin-incelenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "GitHub Student Developer Pack",
+     "slug": "7675254-github-student-developer-pack",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "\"GitHub.io\" Üzerinde Kendi Web Sitemizi Oluşturmak Bölüm-1",
+     "slug": "7675306-github-io-uzerinde-kendi-web-sitemizi-olusturmak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "\"GitHub.io\" Üzerinde Kendi Web Sitemizi Oluşturmak Bölüm-2",
+     "slug": "7675257-github-io-uzerinde-kendi-web-sitemizi-olusturmak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074729-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "CSS",
+   "slug": "2407503-css",
+   "lessons": [
+    {
+     "title": "CSS Nedir?",
+     "slug": "7675295-css-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "CSS Genel Yapısını Anlamak",
+     "slug": "7675305-css-genel-yapisini-anlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "InlineCSS - InternalCSS - ExternalCSS - Yapılarının Kullanımı",
+     "slug": "7675310-inlinecss-internalcss-externalcss-yapilarinin-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Temel CSS Seçicilerle Çalışmak",
+     "slug": "7675312-temel-css-secicilerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Gelişmiş CSS Seçicilerle Çalışmak",
+     "slug": "7675315-gelismis-css-secicilerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "CSS Text Özellikleriyle Çalışmak - Bölüm-1",
+     "slug": "7675307-css-text-ozellikleriyle-calismak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "CSS Text Özellikleriyle Çalışmak - Bölüm-2",
+     "slug": "7675323-css-text-ozellikleriyle-calismak-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "CSS Kutu Özellikleri Bölüm-1",
+     "slug": "7675327-css-kutu-ozellikleri-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "CSS Kutu Özellikleri Bölüm-2",
+     "slug": "7675326-css-kutu-ozellikleri-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Çalışması",
+     "slug": "7675331-bolum-sonu-calismasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kopyalama Metodu ile CSS Konusunda Kendini Geliştir",
+     "slug": "7675324-kopyalama-metodu-ile-css-konusunda-kendini-gelistir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "CSS Yapılarıyla Bölüm Sonu Çalışmasının Güncellenmesi",
+     "slug": "7675330-css-yapilariyla-bolum-sonu-calismasinin-guncellenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074737-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "BOOTSTRAP",
+   "slug": "2407504-bootstrap",
+   "lessons": [
+    {
+     "title": "Bootstrap Nedir?",
+     "slug": "7675329-bootstrap-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap DEMO -_- Arkana Yaslan",
+     "slug": "7675334-bootstrap-demo-_-arkana-yaslan",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "12'lik Grid Sistemi Anlamak",
+     "slug": "7675333-12-lik-grid-sistemi-anlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Container Row ve Col ile Çalışmak",
+     "slug": "7675347-container-row-ve-col-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölümlendirme ve Kolon Yapısını Anlamak",
+     "slug": "7675342-bolumlendirme-ve-kolon-yapisini-anlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "\"Responsive\" Kolon Yapısı ile Çalışmak",
+     "slug": "7675340-responsive-kolon-yapisi-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "UI-UX Nedir? Neden Önemli?",
+     "slug": "7675343-ui-ux-nedir-neden-onemli",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Web Sitesi Genel Bilgiler",
+     "slug": "7675339-bootstrap-web-sitesi-genel-bilgiler",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Web Sitesi Dökümantasyon İnceleme 1.Bölüm",
+     "slug": "7675346-bootstrap-web-sitesi-dokumantasyon-inceleme-1-bolum",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Web Sitesi Dökümantasyon İnceleme 2.Bölüm",
+     "slug": "7675351-bootstrap-web-sitesi-dokumantasyon-inceleme-2-bolum",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bootstrap Web Sitesi Dökümantasyon İnceleme 3.Bölüm",
+     "slug": "7675355-bootstrap-web-sitesi-dokumantasyon-inceleme-3-bolum",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Renk Standartları Nelerdir?",
+     "slug": "7675353-bootstrap-renk-standartlari-nelerdir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Margin ve Padding Kullanımı",
+     "slug": "7675357-bootstrap-margin-ve-padding-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Responsive Hiding Elements",
+     "slug": "7675354-bootstrap-responsive-hiding-elements",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap Offset Kullanımı",
+     "slug": "7675352-bootstrap-offset-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bootstrap ReOrdering Kullanımı",
+     "slug": "7675365-bootstrap-reordering-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Diğer CSS Kütüphaneleri",
+     "slug": "7675356-diger-css-kutuphaneleri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-1",
+     "slug": "7675360-bolum-sonu-projesi-1-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-2",
+     "slug": "7675363-bolum-sonu-projesi-1-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-3",
+     "slug": "7675364-bolum-sonu-projesi-1-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-4",
+     "slug": "7675359-bolum-sonu-projesi-1-bolum-4",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-5",
+     "slug": "7675362-bolum-sonu-projesi-1-bolum-5",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-6",
+     "slug": "7675367-bolum-sonu-projesi-1-bolum-6",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 Bölüm-7",
+     "slug": "7675366-bolum-sonu-projesi-1-bolum-7",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-1 - Projeyi Yayınlamak",
+     "slug": "7675368-bolum-sonu-projesi-1-projeyi-yayinlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Bölüm-1",
+     "slug": "7675376-bolum-sonu-projesi-2-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Bölüm-2",
+     "slug": "7675374-bolum-sonu-projesi-2-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Bölüm-3",
+     "slug": "7675375-bolum-sonu-projesi-2-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Bölüm-4",
+     "slug": "7675370-bolum-sonu-projesi-2-bolum-4",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Bölüm-5",
+     "slug": "7675385-bolum-sonu-projesi-2-bolum-5",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-2 Projenin Yayınlanması",
+     "slug": "7675373-bolum-sonu-projesi-2-projenin-yayinlanmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-1",
+     "slug": "7675378-bolum-sonu-projesi-3-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-2",
+     "slug": "7675380-bolum-sonu-projesi-3-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-3",
+     "slug": "7675383-bolum-sonu-projesi-3-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-4",
+     "slug": "7675381-bolum-sonu-projesi-3-bolum-4",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-5",
+     "slug": "7675382-bolum-sonu-projesi-3-bolum-5",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-6",
+     "slug": "7675386-bolum-sonu-projesi-3-bolum-6",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-7",
+     "slug": "7675388-bolum-sonu-projesi-3-bolum-7",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Bölüm-8",
+     "slug": "7675391-bolum-sonu-projesi-3-bolum-8",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Projesi-3 Projenin Yayınlanması",
+     "slug": "7675387-bolum-sonu-projesi-3-projenin-yayinlanmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074744-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python Temelleri",
+   "slug": "2407505-python-temelleri",
+   "lessons": [
+    {
+     "title": "Python Nedir?",
+     "slug": "7675513-python-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python Kurulumu",
+     "slug": "7675486-python-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Hello World' ün Önemi ve Birçok Ortamda Hello World",
+     "slug": "7675487-hello-world-un-onemi-ve-bircok-ortamda-hello-world",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Print Kullanımı ve Açıklama Satırı Eklemek",
+     "slug": "7675502-print-kullanimi-ve-aciklama-satiri-eklemek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Aritmetik İşlemler Bölüm-1",
+     "slug": "7675511-aritmetik-islemler-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Aritmetik İşlemler Bölüm-2",
+     "slug": "7675507-aritmetik-islemler-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kesme İşaretleri ve Tırnak Kullanımı",
+     "slug": "7675506-kesme-isaretleri-ve-tirnak-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişken Tanımlama ve Değişken Tanımlama Kuralları",
+     "slug": "7675510-degisken-tanimlama-ve-degisken-tanimlama-kurallari",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python'ı Anlamak (Zen Of Python)",
+     "slug": "7675505-python-i-anlamak-zen-of-python",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'input' ile Kullanıcıdan Veri Almak",
+     "slug": "7675512-input-ile-kullanicidan-veri-almak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Temel Değişken Tipleri ve Tip Dönüşümleri",
+     "slug": "7675527-temel-degisken-tipleri-ve-tip-donusumleri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Boolean'ı Anlamak, Karşılaştırma Operatörleri ve Mantıksal Operatörler",
+     "slug": "7675479-boolean-i-anlamak-karsilastirma-operatorleri-ve-mantiksal-operatorler",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişkenlerin İçindeki Bilgiyi Değiştirmek, Birleştirmek, Arttırmak ve Azaltmak",
+     "slug": "7675474-degiskenlerin-icindeki-bilgiyi-degistirmek-birlestirmek-arttirmak-ve-azaltmak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Unutulmaması Gereken 5 Fonksiyon",
+     "slug": "7675481-unutulmamasi-gereken-5-fonksiyon",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metinsel İşlemler, Metin Denetimleri ve Bilinmesi Gereken Metodlar Bölüm-1",
+     "slug": "7675500-metinsel-islemler-metin-denetimleri-ve-bilinmesi-gereken-metodlar-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metinsel İşlemler, Metin Denetimleri ve Bilinmesi Gereken Metodlar Bölüm-2",
+     "slug": "7675477-metinsel-islemler-metin-denetimleri-ve-bilinmesi-gereken-metodlar-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "'fString' ile Metin Biçimlendirme Bölüm-1",
+     "slug": "7675482-fstring-ile-metin-bicimlendirme-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'fString' ile Metin Biçimlendirme Bölüm-2",
+     "slug": "7675473-fstring-ile-metin-bicimlendirme-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu Çalışması",
+     "slug": "7675484-bolum-sonu-calismasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074749-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: Karar Yapıları İle Çalışmak",
+   "slug": "2407506-python-karar-yapilari-ile-calismak",
+   "lessons": [
+    {
+     "title": "İlk Karar Yapısı ve Indentation ile Çalışmak",
+     "slug": "7675552-ilk-karar-yapisi-ve-indentation-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'else' Kullanımı ve Kullanırken Dikkat Etmeniz Gerekenler",
+     "slug": "7675529-else-kullanimi-ve-kullanirken-dikkat-etmeniz-gerekenler",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "İçiçe 'if' Kullanımı ve 'elif' Kullanımı",
+     "slug": "7675532-icice-if-kullanimi-ve-elif-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kısa (short) 'if' Kullanımı",
+     "slug": "7675531-kisa-short-if-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074750-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: list ile Calışmak",
+   "slug": "2407507-python-list-ile-calismak",
+   "lessons": [
+    {
+     "title": "List Nedir? Nasıl Tanımlanır?",
+     "slug": "7675538-list-nedir-nasil-tanimlanir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List İçine Öğe Eklemek, Çıkartmak ve Erişmek",
+     "slug": "7675544-list-icine-oge-eklemek-cikartmak-ve-erismek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'list' leri Kopyalamak, Birleştirmek ve İçiçe Liste Tanımlamak",
+     "slug": "7675537-list-leri-kopyalamak-birlestirmek-ve-icice-liste-tanimlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bilinmesi Gereken 'list' metodları",
+     "slug": "7675545-bilinmesi-gereken-list-metodlari",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "İçiçe Listelerle Çalışmak",
+     "slug": "7675553-icice-listelerle-calismak",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074756-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: Döngülerle Calışmak",
+   "slug": "2407508-python-dongulerle-calismak",
+   "lessons": [
+    {
+     "title": "'for' Döngüsü ile Çalışmak",
+     "slug": "7675557-for-dongusu-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'list' unpacking",
+     "slug": "7675554-list-unpacking",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "İçiçe Listeleri 'for' ile Döndürmek",
+     "slug": "7675550-icice-listeleri-for-ile-dondurmek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'while' Döngüsü İle Çalışmak",
+     "slug": "7675558-while-dongusu-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'continue' ve 'break' Kullanımı",
+     "slug": "7675555-continue-ve-break-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kısa (short) 'if' ve Kısa (short) 'for' Kullanımı",
+     "slug": "7675793-kisa-short-if-ve-kisa-short-for-kullanimi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074760-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: Fonksiyon Kullanımı",
+   "slug": "2407510-python-fonksiyon-kullanimi",
+   "lessons": [
+    {
+     "title": "Fonksiyon Tanımlamak",
+     "slug": "7675660-fonksiyon-tanimlamak",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Fonksiyonlara Değer Göndermek ve return ile Bilgi Almak",
+     "slug": "7675811-fonksiyonlara-deger-gondermek-ve-return-ile-bilgi-almak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kendi Kendini Çağıran fonksiyonlar Nasıl Kullanılır?",
+     "slug": "7675837-kendi-kendini-cagiran-fonksiyonlar-nasil-kullanilir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Fonksiyonlarda 'args' ve 'kwargs' Kullanımı",
+     "slug": "7675602-fonksiyonlarda-args-ve-kwargs-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074818-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: Kütüphaneler ve Modüller",
+   "slug": "2407511-python-kutuphaneler-ve-moduller",
+   "lessons": [
+    {
+     "title": "Kütüphaneler ve Modüller ile Çalışmak",
+     "slug": "7675777-kutuphaneler-ve-moduller-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kendi Modülümüzü Nasıl Oluştururuz?",
+     "slug": "7675970-kendi-modulumuzu-nasil-olustururuz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python Süpriz Yumurta",
+     "slug": "7675987-python-supriz-yumurta",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074765-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: dict ile Çalışmak",
+   "slug": "2407512-python-dict-ile-calismak",
+   "lessons": [
+    {
+     "title": "'dict' Nedir? Nasıl Tanımlanır?",
+     "slug": "7675972-dict-nedir-nasil-tanimlanir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'dict' - get Kullanımı",
+     "slug": "7675968-dict-get-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'dict' İçindeki Verilerin 'for' ile Kullanılması",
+     "slug": "7675969-dict-icindeki-verilerin-for-ile-kullanilmasi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "'dict' Tanımlamanın Alternatif Yolu",
+     "slug": "7675955-dict-tanimlamanin-alternatif-yolu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074768-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: tuple ile Çalışmak",
+   "slug": "2407515-python-tuple-ile-calismak",
+   "lessons": [
+    {
+     "title": "'tuple' ile Çalışmak",
+     "slug": "7675973-tuple-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074773-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python: set ile Çalışmak",
+   "slug": "2407518-python-set-ile-calismak",
+   "lessons": [
+    {
+     "title": "'set' ile Çalışmak",
+     "slug": "7675994-set-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074779-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django Kurulumu",
+   "slug": "2407519-django-kurulumu",
+   "lessons": [
+    {
+     "title": "Windows İşletim Sistemine Django Kurulumu",
+     "slug": "7675998-windows-isletim-sistemine-django-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "macOS İşletim Sistemine Django Kurulumu",
+     "slug": "7675992-macos-isletim-sistemine-django-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Windows İşletim Sisteminde VirtualEnv ile Django Kurulumu",
+     "slug": "7675995-windows-isletim-sisteminde-virtualenv-ile-django-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Windows VirtualEnv İsimlendirmesi Neden Önemli?",
+     "slug": "7675989-windows-virtualenv-isimlendirmesi-neden-onemli",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "macOS virtualenv ile Django Projelerinin Kurulması",
+     "slug": "7676009-macos-virtualenv-ile-django-projelerinin-kurulmasi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074784-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django Version 5.x'e Genel Bakış",
+   "slug": "2579509-django-version-5-x-e-genel-bakis",
+   "lessons": [
+    {
+     "title": "Django Version 5.x'e Genel Bakış",
+     "slug": "8278290-django-version-5-x-e-genel-bakis",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django: Proje1",
+   "slug": "2407520-django-proje1",
+   "lessons": [
+    {
+     "title": "Django'da ilk fonksiyonumuz",
+     "slug": "7676014-django-da-ilk-fonksiyonumuz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "startapp ile Yeni Bir App Oluşturulması",
+     "slug": "7676002-startapp-ile-yeni-bir-app-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "İlk HTML Sayfasının render ile Gösterilmesi",
+     "slug": "7676005-ilk-html-sayfasinin-render-ile-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "MVT Nedir?",
+     "slug": "7676007-mvt-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Anasayfayı Eski Projeden Alıp Hayata Geçirmek",
+     "slug": "7676012-anasayfayi-eski-projeden-alip-hayata-gecirmek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'urls' ve 'view' ile Hakkımızda ve iletişim Sayfası Yapıya Nasıl Eklenir?",
+     "slug": "7676234-urls-ve-view-ile-hakkimizda-ve-iletisim-sayfasi-yapiya-nasil-eklenir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Database Oluşturulması ve admin Panele Giriş",
+     "slug": "7676015-database-olusturulmasi-ve-admin-panele-giris",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Vizyonumuz Sayfasının Oluşturulması",
+     "slug": "7676013-vizyonumuz-sayfasinin-olusturulmasi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "'extends' ile 'base.html' Oluşturulması ve İletişim Sayfasına Eklenmesi",
+     "slug": "7676237-extends-ile-base-html-olusturulmasi-ve-iletisim-sayfasina-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Diğer Sayfaların 'Block' ile Kullanımı",
+     "slug": "7676235-diger-sayfalarin-block-ile-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Block Kısımlarının Optimize Edilmesi",
+     "slug": "7676238-block-kisimlarinin-optimize-edilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "DTL 'url' ve 'if' kullanımı",
+     "slug": "7676241-dtl-url-ve-if-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'include' ile Sayfaların Parçalanması",
+     "slug": "7676244-include-ile-sayfalarin-parcalanmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'include with' Kullanımı ile Sayfalarda Component Mantığının Oluşturulması",
+     "slug": "7676242-include-with-kullanimi-ile-sayfalarda-component-mantiginin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "DTL 'for' Kullanımı",
+     "slug": "7676246-dtl-for-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Ana Sayfa' da Carouselin Component Olarak Dönüştürülmesi",
+     "slug": "7676252-ana-sayfa-da-carouselin-component-olarak-donusturulmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'url' 'include' ile 'page_application' İçine Yapıların Eklenmesi",
+     "slug": "7676250-url-include-ile-page_application-icine-yapilarin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Static Dosyaların Oluşturulması",
+     "slug": "7676262-static-dosyalarin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'slug' ile Dinamik Sayfa Çağırılması",
+     "slug": "7676267-slug-ile-dinamik-sayfa-cagirilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Detay Sayfaların 'fakedb' ile Dinamikleştirilmesi",
+     "slug": "7676266-detay-sayfalarin-fakedb-ile-dinamiklestirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'product_detail' Sayfası ve Bilgilerin Getirilmesi",
+     "slug": "7676265-product_detail-sayfasi-ve-bilgilerin-getirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'product_detail' Sayfası ve Bilgilerin Getirilmesi",
+     "slug": "7676274-product_detail-sayfasi-ve-bilgilerin-getirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'context_processor' Kullanımı",
+     "slug": "7676263-context_processor-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Proje Bazlı 'template' Klasorünün Oluşturulması",
+     "slug": "7676271-proje-bazli-template-klasorunun-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074789-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django: Proje 2",
+   "slug": "2407521-django-proje-2",
+   "lessons": [
+    {
+     "title": "Todo App Genel Yapısının Tanıtımı",
+     "slug": "7676268-todo-app-genel-yapisinin-tanitimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "TodoList Projesinin virtualenv ile Kurulması",
+     "slug": "7676275-todolist-projesinin-virtualenv-ile-kurulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo App ve 'superuser' Oluşturulması",
+     "slug": "7676287-todo-app-ve-superuser-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo App İçine İlk Model Yapısının Oluşturulması ve Admin Panelde Gösterilmesi",
+     "slug": "7676285-todo-app-icine-ilk-model-yapisinin-olusturulmasi-ve-admin-panelde-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo Modeline 'created_at' ve 'updated_at' Eklenmesi",
+     "slug": "7676283-todo-modeline-created_at-ve-updated_at-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Database Nasıl Tekrar Oluşturulur ve 'migration' İşlemleri Nasıl Yapılır?",
+     "slug": "7676288-database-nasil-tekrar-olusturulur-ve-migration-islemleri-nasil-yapilir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Django 'shell' İçerisinde Sorguları Kullanmak",
+     "slug": "7676292-django-shell-icerisinde-sorgulari-kullanmak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Genel 'HTML' Yapısının Oluşturulması ve 'Bootstrap' Static Dosyaları Eklenmesi",
+     "slug": "7676304-genel-html-yapisinin-olusturulmasi-ve-bootstrap-static-dosyalari-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'navbar' ve 'footer' Eklendi",
+     "slug": "7676295-navbar-ve-footer-eklendi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Django 'ORM' 'Query' ile Todo'ların Ekranda Gösterilmesi",
+     "slug": "7676308-django-orm-query-ile-todo-larin-ekranda-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Django Models İçerisinde 'str' Tanımlanması ve 'query' 'exclude' Kullanımı",
+     "slug": "7676312-django-models-icerisinde-str-tanimlanmasi-ve-query-exclude-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Todo' Detay Sayfasının Oluşturulması",
+     "slug": "7676306-todo-detay-sayfasinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'get_object_or_404' Kullanımı ve 'todo' Yapısına Link Özelliğinin Atanması",
+     "slug": "7676302-get_object_or_404-kullanimi-ve-todo-yapisina-link-ozelliginin-atanmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Tablolar Arası İlişki Türleri 'OneToOne' 'ForeignKey' 'ManyToMany'",
+     "slug": "7676310-tablolar-arasi-iliski-turleri-onetoone-foreignkey-manytomany",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Category Modelinin Oluşturulması ve 'AutoSlug' Paketinin Eklenmesi",
+     "slug": "7676313-category-modelinin-olusturulmasi-ve-autoslug-paketinin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'ForeignKey' ile Category' nin Eklenmesi",
+     "slug": "7676311-foreignkey-ile-category-nin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Context_Prossessor' ile Category'nin Her Yerde Gözükmesi ve DTL ile Todo Detail",
+     "slug": "7676416-context_prossessor-ile-category-nin-her-yerde-gozukmesi-ve-dtl-ile-todo-detail",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo Detail Sayfasının Düzenlenmesi",
+     "slug": "7676316-todo-detail-sayfasinin-duzenlenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Category İçerisindeki Todo'ların Gösterilmesi",
+     "slug": "7676414-category-icerisindeki-todo-larin-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Category 'get_absolute_url' Kullanımı",
+     "slug": "7676412-category-get_absolute_url-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo Detay Sayfasının Düzenlemesi ve Todo'nun Category Altında Gozukmesi",
+     "slug": "7676421-todo-detay-sayfasinin-duzenlemesi-ve-todo-nun-category-altinda-gozukmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo İçerisine User' ın Eklenmesi",
+     "slug": "7676422-todo-icerisine-user-in-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcının Eklediği Todoları Görmesini Sağlamak ve 'login_required' Kullanımı",
+     "slug": "7676418-kullanicinin-ekledigi-todolari-gormesini-saglamak-ve-login_required-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'logout' Yapısının Eklenmesi",
+     "slug": "7676417-logout-yapisinin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'ManyToManyField' ile 'Tag' Yapısının Oluşturulması",
+     "slug": "7676428-manytomanyfield-ile-tag-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Tag' Yapısının 'URL' ile Kullanılabilir Hale Getirilmesi",
+     "slug": "7676429-tag-yapisinin-url-ile-kullanilabilir-hale-getirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074798-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django: Proje 3",
+   "slug": "2407522-django-proje-3",
+   "lessons": [
+    {
+     "title": "DjangoMania Projesinin Altyapısının Oluşturulması",
+     "slug": "7676432-djangomania-projesinin-altyapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo App Yapısının Proje Ayarlarına Eklenmesi ve Diğer Güncellemeler",
+     "slug": "7676430-todo-app-yapisinin-proje-ayarlarina-eklenmesi-ve-diger-guncellemeler",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Projeye Ana Sayfanın Adapte Edilmesi",
+     "slug": "7676431-projeye-ana-sayfanin-adapte-edilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "NavBar Login Olan Kullanıcı Kontrolünün Eklenmesi.",
+     "slug": "7676424-navbar-login-olan-kullanici-kontrolunun-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'TodoCategory' Yapısının 'Context Processors'e Eklenmesi",
+     "slug": "7676467-todocategory-yapisinin-context-processors-e-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Todo App İçin 'include' İçinde 'url namespace' Kullanımı ve 'get_absolute_url'",
+     "slug": "7676465-todo-app-icin-include-icinde-url-namespace-kullanimi-ve-get_absolute_url",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Page Modelinin Oluşturulması ve MEDIA_ROOT Yapısının Ayarlara Eklenmesi",
+     "slug": "7676475-page-modelinin-olusturulmasi-ve-media_root-yapisinin-ayarlara-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Page Context Düzenlemesi 'url namespace' ve 'get_absolute_url'",
+     "slug": "7676472-page-context-duzenlemesi-url-namespace-ve-get_absolute_url",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Page İçerisindeki Görselin Gösterilmesi ve Debug Mode ile Web Sunucusu",
+     "slug": "7676469-page-icerisindeki-gorselin-gosterilmesi-ve-debug-mode-ile-web-sunucusu",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "TinyMCE İle İçeriklerin Admin Panelde Düzenlenmesi ve Sayfa İçinde Gösterilmesi",
+     "slug": "7676471-tinymce-ile-iceriklerin-admin-panelde-duzenlenmesi-ve-sayfa-icinde-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Local Network İçerisinde Projelerimizin Görüntülenmesini Sağlamak",
+     "slug": "7676477-local-network-icerisinde-projelerimizin-goruntulenmesini-saglamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Model Yapısının Oluşturulması",
+     "slug": "7676478-blog-model-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Yapısının Admin Panele Eklenmesi",
+     "slug": "7676474-blog-yapisinin-admin-panele-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Shell' İçerisinden Blog Postlarının Oluşturulması ve 'Slug' Yapısının Eklenmesi",
+     "slug": "7676482-shell-icerisinden-blog-postlarinin-olusturulmasi-ve-slug-yapisinin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Post İçerisindeki 'Slug Field' Bilgisinin Unique Olmasını Sağlamak",
+     "slug": "7676479-blog-post-icerisindeki-slug-field-bilgisinin-unique-olmasini-saglamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Postlarının Proje İçerisinde Gösterilmesi",
+     "slug": "7676490-blog-postlarinin-proje-icerisinde-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Postlarının Kategori Bazlı Gösterilmesi",
+     "slug": "7676480-blog-postlarinin-kategori-bazli-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Postlarının Etiket Bazlı Gösterilmesi",
+     "slug": "7676481-blog-postlarinin-etiket-bazli-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Detail Sayfasının Oluşturulması",
+     "slug": "7676497-blog-detail-sayfasinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Blog Yapısına 'Pagination' Eklenmesi",
+     "slug": "7676502-blog-yapisina-pagination-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074804-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django: Proje 4",
+   "slug": "2407523-django-proje-4",
+   "lessons": [
+    {
+     "title": "'Medium Clone' Projesinin Kurulumu",
+     "slug": "7676483-medium-clone-projesinin-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Home_view' Eklendi ve Ayarlar Güncellendi",
+     "slug": "7676495-home_view-eklendi-ve-ayarlar-guncellendi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Ana Sayfanın 'Settings' İçerisinde Ayarlarının Yapılması",
+     "slug": "7676491-ana-sayfanin-settings-icerisinde-ayarlarinin-yapilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Projede Yapılacak İşlerin TODO List'e Aktarılması",
+     "slug": "7676494-projede-yapilacak-islerin-todo-list-e-aktarilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Login html' Yapısının Oluşturulması ve 'Login' Formunun Eklenmesi",
+     "slug": "7676507-login-html-yapisinin-olusturulmasi-ve-login-formunun-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Login' Bilgilerinin 'Authenticate' ile Kontrolü",
+     "slug": "7676500-login-bilgilerinin-authenticate-ile-kontrolu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Django 'Messages Framework' Yapısı ile Login Olan Kullanıcının Bilgilendirilmesi",
+     "slug": "7676499-django-messages-framework-yapisi-ile-login-olan-kullanicinin-bilgilendirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Logout View' Oluşturulması ve Urls'e Eklenmesi",
+     "slug": "7676498-logout-view-olusturulmasi-ve-urls-e-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Login Denetimlerinin Eklenmesi",
+     "slug": "7676503-login-denetimlerinin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Üye Ol 'Register' Sayfasının Oluşturulması Bölüm-1",
+     "slug": "7676512-uye-ol-register-sayfasinin-olusturulmasi-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Üye Ol 'Register' Sayfasının Oluşturulması Bölüm-2",
+     "slug": "7676510-uye-ol-register-sayfasinin-olusturulmasi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcı Profil Model Yapısının Oluşturulması",
+     "slug": "7676514-kullanici-profil-model-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'Register View' İçerisinde Kontrollerin Yapılması",
+     "slug": "7676511-register-view-icerisinde-kontrollerin-yapilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Register Olmak İsteyen Kullanıcının Kaydının Olup Olmadığının Kontrolü",
+     "slug": "7676518-register-olmak-isteyen-kullanicinin-kaydinin-olup-olmadiginin-kontrolu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcı Bilgilerinin 'Profile' Modeline Yazılması",
+     "slug": "7676515-kullanici-bilgilerinin-profile-modeline-yazilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Media Files Ayarlarının Yapılması",
+     "slug": "7676513-media-files-ayarlarinin-yapilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'abstract' Model Yapısı ile Blog Model Bilgilerinin Oluşturulması",
+     "slug": "7676517-abstract-model-yapisi-ile-blog-model-bilgilerinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "'ModelForm' ile 'Blog Post Create' Yapısının Oluşturulması",
+     "slug": "7676521-modelform-ile-blog-post-create-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Ana Sayfanın Düzenlenmesi ve Form Yapısının Django Form Class Olarak Düzenlenme",
+     "slug": "7676523-ana-sayfanin-duzenlenmesi-ve-form-yapisinin-django-form-class-olarak-duzenlenme",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "BlogPost Düzenlemeleri ve Crispy Forms Entegrasyonu",
+     "slug": "7676526-blogpost-duzenlemeleri-ve-crispy-forms-entegrasyonu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Form İçerisindeki Bilgilerin View ile Alınıp İşlenmesi",
+     "slug": "7676525-form-icerisindeki-bilgilerin-view-ile-alinip-islenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "TinyMCE Kullanımı ve PostModelForm içindeki Bilgilerin Kaydedilmesi",
+     "slug": "7676582-tinymce-kullanimi-ve-postmodelform-icindeki-bilgilerin-kaydedilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Form Validators ile Form içindeki Bilgilerin Kontrol Edilmesi",
+     "slug": "7676534-form-validators-ile-form-icindeki-bilgilerin-kontrol-edilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "TagifyJS ile Form-Yapisina Etiket Sisteminin Eklenmesi",
+     "slug": "7676528-tagifyjs-ile-form-yapisina-etiket-sisteminin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Tag Eklerken Many-To-Many ile Form Yapısının Oluşturulması ve Django Extensions",
+     "slug": "7676843-tag-eklerken-many-to-many-ile-form-yapisinin-olusturulmasi-ve-django-extensions",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Formun Kaydedilmesi ve The Messages Framework Kullanımı",
+     "slug": "7676527-formun-kaydedilmesi-ve-the-messages-framework-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Postların AnaSayfa'da Görünür Hale Getirilmesi ve Easy-Thumbnail Kullanımı",
+     "slug": "7676848-postlarin-anasayfa-da-gorunur-hale-getirilmesi-ve-easy-thumbnail-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Model Yapısına Ordering Eklenmesi ve AnaSayfa Düzenlemeleri",
+     "slug": "7676842-model-yapisina-ordering-eklenmesi-ve-anasayfa-duzenlemeleri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcıya Tüm BlogPostların Gösterilmesi",
+     "slug": "7676849-kullaniciya-tum-blogpostlarin-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcı Profiline get_absolute_url ile Ulaşılabilmesi",
+     "slug": "7676825-kullanici-profiline-get_absolute_url-ile-ulasilabilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Post Detay Sayfasının Oluşturulması",
+     "slug": "7676846-post-detay-sayfasinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "URL Bilgilerinin Düzeltilmesi ve with Yapısının Template içinde Kullanımı",
+     "slug": "7676858-url-bilgilerinin-duzeltilmesi-ve-with-yapisinin-template-icinde-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Profil Düzenleme Sayfasının Form ile Oluşturulması",
+     "slug": "7676851-profil-duzenleme-sayfasinin-form-ile-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Profil Düzenleme Sayfasının Form Düzenlemesi - Instance ve Initial Data Kullanımı",
+     "slug": "7676850-profil-duzenleme-sayfasinin-form-duzenlemesi-instance-ve-initial-data-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "NavBar Düzenlemesi ve Profil Url Bilgilerinin Zenginleştirilmesi",
+     "slug": "7676855-navbar-duzenlemesi-ve-profil-url-bilgilerinin-zenginlestirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Post Bilgilerinin Shell Ekranından Oluşturulması ve Shell içinde Sorgu Kullanımı",
+     "slug": "7676854-post-bilgilerinin-shell-ekranindan-olusturulmasi-ve-shell-icinde-sorgu-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Top Articles(En Çok Okunan Blok Postları) Yapısının Oluşturulması",
+     "slug": "7676856-top-articles-en-cok-okunan-blok-postlari-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Axios - Fav Yapısının Oluşturulması ve View içinde Gelen Request-Post Bilgileri",
+     "slug": "7676867-axios-fav-yapisinin-olusturulmasi-ve-view-icinde-gelen-request-post-bilgileri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "UserPostFav Model Yapısının Oluşturulması ve Alınan Bilgilerin İşlenmesi",
+     "slug": "7676861-userpostfav-model-yapisinin-olusturulmasi-ve-alinan-bilgilerin-islenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "User Profile içerisindeki Favorilere Eklenenlerin Gösterilmesi",
+     "slug": "7676869-user-profile-icerisindeki-favorilere-eklenenlerin-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kullanıcıya Ait Blog Post Bilgisinin Güncellenmesi",
+     "slug": "7676874-kullaniciya-ait-blog-post-bilgisinin-guncellenmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074807-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Full Stack Developer: Freelancer Olmak",
+   "slug": "2407524-full-stack-developer-freelancer-olmak",
+   "lessons": [
+    {
+     "title": "5M Kuralı ile Hayatınızı Pozitif Yönde Geliştirin",
+     "slug": "7676973-5m-kurali-ile-hayatinizi-pozitif-yonde-gelistirin",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Freelance İşlerde Minimum Maliyeti Nasıl Hesaplamalıyız",
+     "slug": "7676972-freelance-islerde-minimum-maliyeti-nasil-hesaplamaliyiz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Freelancer Olmak veya Maaşlı Çalışan Olmak",
+     "slug": "7676956-freelancer-olmak-veya-maasli-calisan-olmak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Freelance Projeleri Nasıl Buluruz",
+     "slug": "7676953-freelance-projeleri-nasil-buluruz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Bölüm Sonu İleri Bildirim Formu",
+     "slug": "8074813-bolum-sonu-ileri-bildirim-formu",
+     "kind": "text",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django 5.x ile Gelen Özelliklerin Kullanımı",
+   "slug": "2579510-django-5-x-ile-gelen-ozelliklerin-kullanimi",
+   "lessons": [
+    {
+     "title": "Django 5.x Kurulumu ve db_default Özelliğinin Kullanımı",
+     "slug": "8278286-django-5-x-kurulumu-ve-db_default-ozelliginin-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Geliştirilmiş Belirlenebilir Veri Seçim Opsiyonları (Declaring Field Choices)",
+     "slug": "8278283-gelistirilmis-belirlenebilir-veri-secim-opsiyonlari-declaring-field-choices",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Veritabanında Otomatik Oluşturulmuş/Hesaplanmış Alanlar (Generated Model Field)",
+     "slug": "8278287-veritabaninda-otomatik-olusturulmus-hesaplanmis-alanlar-generated-model-field",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Django Uygulamalarının DigitalOcean App Platform ile Yayına Alınması",
+   "slug": "2613666-django-uygulamalarinin-digitalocean-app-platform-ile-yayina-alinmasi",
+   "lessons": [
+    {
+     "title": "DigitalOcean App Platforma Django Uygulamasının Kurulması - Genel Bilgi",
+     "slug": "8405135-digitalocean-app-platforma-django-uygulamasinin-kurulmasi-genel-bilgi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Proje Yapısının Oluşturulması",
+     "slug": "8405144-proje-yapisinin-olusturulmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "App Yapısının Çalıştırılması ve AnaSayfanın Gösterilmesi",
+     "slug": "8405139-app-yapisinin-calistirilmasi-ve-anasayfanin-gosterilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sabit Dosyaların Projede Gösterilmesi (StaticFiles)",
+     "slug": "8405148-sabit-dosyalarin-projede-gosterilmesi-staticfiles",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Media Files Yapısının Eklenmesi",
+     "slug": "8405153-media-files-yapisinin-eklenmesi",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Birden Fazla Projenin Linux Sunucu Üzerine Kurulumu",
+   "slug": "2636429-birden-fazla-projenin-linux-sunucu-uzerine-kurulumu",
+   "lessons": [
+    {
+     "title": "Projelerin Linux Sunucu Üzerine Kurulumu Hakkında Genel Bilgilendirme",
+     "slug": "8489065-projelerin-linux-sunucu-uzerine-kurulumu-hakkinda-genel-bilgilendirme",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Güvenlik ve Diğer Konularla İlgili Uyarı (Lütfen İzleyin)",
+     "slug": "8489084-guvenlik-ve-diger-konularla-ilgili-uyari-lutfen-izleyin",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "GUI Nedir?",
+     "slug": "8489094-gui-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "SSH Nedir?",
+     "slug": "8489062-ssh-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Terminal Kullanımı - Bölüm 1",
+     "slug": "8489037-terminal-kullanimi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Terminal Kullanımı - Bölüm 2",
+     "slug": "8489100-terminal-kullanimi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Terminal Kullanımı - Bölüm 3",
+     "slug": "8489042-terminal-kullanimi-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "nano Text Editörü ile Çalışmak",
+     "slug": "8489057-nano-text-editoru-ile-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "sudo Nedir? root Kullanıcısı ile İşlemler Nasıl Yapılır?",
+     "slug": "8489082-sudo-nedir-root-kullanicisi-ile-islemler-nasil-yapilir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "DigitalOcean'da Linux Sunucu Kurulumu ve Uzak Sunucuya Bağlanmak",
+     "slug": "8489104-digitalocean-da-linux-sunucu-kurulumu-ve-uzak-sunucuya-baglanmak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Kendi Bilgisayarımızda Sanal Linux Sunucu Kurulumu",
+     "slug": "8489105-kendi-bilgisayarimizda-sanal-linux-sunucu-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "hosts Dosyası ile Local DNS Ayarı Nasıl Yapılır?",
+     "slug": "8489068-hosts-dosyasi-ile-local-dns-ayari-nasil-yapilir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sanal Sunucuya Django Projelerinin Kurulumu",
+     "slug": "8489038-sanal-sunucuya-django-projelerinin-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sanal Sunucuya NGINX ve uWSGI Kurulumu",
+     "slug": "8489051-sanal-sunucuya-nginx-ve-uwsgi-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sanal Sunucuya PostgreSQL Kurulumu",
+     "slug": "8489069-sanal-sunucuya-postgresql-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sıfırdan Projelerin Tekrar Oluşturulması ve Uzak Sunucu için Hazırlık",
+     "slug": "8489064-sifirdan-projelerin-tekrar-olusturulmasi-ve-uzak-sunucu-icin-hazirlik",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Projelere Media Files Ayarlarının Yapılması",
+     "slug": "8489023-projelere-media-files-ayarlarinin-yapilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "DigitalOcean'da Sanal Sunucunun Kurulumu",
+     "slug": "8489024-digitalocean-da-sanal-sunucunun-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "DigitalOcean Üzerindeki Projeler için PostgreSQL Kurulumu ve Yapılandırma",
+     "slug": "8489106-digitalocean-uzerindeki-projeler-icin-postgresql-kurulumu-ve-yapilandirma",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "NGINX ve uWSGI Düzenlemelerinin Yapılması ve Projelerin Çalışır Hale Getirilmesi",
+     "slug": "8489107-nginx-ve-uwsgi-duzenlemelerinin-yapilmasi-ve-projelerin-calisir-hale-getirilmesi",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  }
+ ]
+}

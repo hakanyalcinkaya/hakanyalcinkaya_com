@@ -383,6 +383,8 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False, 
     current["video"] = None if locked else _player(current["object"])
     # Ek bilgiler videoyla aynı kurala uyar: kilitli derste gösterilmez.
     current["extra_html"] = "" if locked else current["object"].extra_content_html
+    # İçerik dersinde (videosuz) oynatıcının yerinde bu içerik gösterilir.
+    current["content_lesson"] = not current["object"].is_video
     card = _course_card(course, flat)
     detail = _detail(course, card)
     done = sum(1 for item in flat if item["done"])
@@ -456,8 +458,11 @@ def with_ratings(cards):
     return [dict(card, rating=ratings.get(card["slug"])) for card in cards]
 
 
-def course_schema(course, detail, url):
-    """Kurs sayfasının schema.org Course verisi (JSON-LD); <script> içine güvenle yazılır."""
+def course_schema(course, detail, url, rating=None):
+    """Kurs sayfasının schema.org Course verisi (JSON-LD); <script> içine güvenle yazılır.
+
+    Puan yalnız sitede yazılan yorumlardan verilir: arama motorları başka platformdan aktarılan yorumları kabul etmez.
+    """
     data = {
         "@context": "https://schema.org",
         "@type": "Course",
@@ -471,7 +476,7 @@ def course_schema(course, detail, url):
     amount = course.get("amount")
     if amount is not None and course.get("price", "").startswith("₺"):
         data["offers"] = {"@type": "Offer", "category": "Paid", "price": f"{amount:.2f}", "priceCurrency": "TRY", "url": url}
-    rating = course.get("rating") or {}
+    rating = rating or {}
     if rating.get("count"):
         data["aggregateRating"] = {"@type": "AggregateRating", "ratingValue": rating["average"], "ratingCount": rating["count"]}
     return json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")

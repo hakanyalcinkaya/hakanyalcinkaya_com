@@ -467,6 +467,10 @@ class Section(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
     def next_lesson_order(self):
         return (self.lessons.aggregate(last=models.Max("sort_order"))["last"] or 0) + 1
 
+    def add_content_lesson(self, title):
+        """Video yerine Markdown içerikli ders (ör. form bağlantısı, okuma); taslak olarak bölümün sonuna eklenir."""
+        return self.lessons.create(title=title, kind=LessonKind.TEXT, sort_order=self.next_lesson_order())
+
     @property
     def can_delete(self):
         # Videoları olan bölüm silinmez; önce dersler başka bölüme taşınır ya da silinir.

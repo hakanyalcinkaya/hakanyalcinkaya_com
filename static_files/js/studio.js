@@ -82,7 +82,7 @@
       var sectionNo = section.querySelector("[data-section-no]");
       var count = section.querySelector("[data-section-count]");
       if (sectionNo) sectionNo.textContent = number + ".";
-      if (count) count.textContent = lessons.length + " video";
+      if (count) count.textContent = lessons.length + " ders";
       lessons.forEach(function (lesson, lessonIndex) {
         var lessonNo = lesson.querySelector("[data-lesson-no]");
         if (lessonNo) lessonNo.textContent = number + "." + (lessonIndex + 1);

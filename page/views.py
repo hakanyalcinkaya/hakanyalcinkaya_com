@@ -14,7 +14,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from course.models import Course, Lesson, Review
+from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
 from newsletter.models import Subscriber
@@ -130,7 +130,9 @@ def course_detail(request, slug):
     # Veritabanındaki kurs (müfredat, tanıtım videosu) önce gelir; yoksa örnek veri gösterilir.
     course = content.visible_course(slug, request.user)
     review_context = dict(reviews=reviews(), review_total=len(reviews()))
+    site_rating = None
     if course is not None:
+        site_rating = Review.objects.filter(course=course, source=ReviewSource.USER).rating_summary()
         enrolled = _enrolled(request, slug)
         page = content.course_page(course, enrolled=enrolled, staff=request.user.is_staff)
         review_context = content.course_reviews(course)
@@ -154,7 +156,9 @@ def course_detail(request, slug):
             **page,
             **review_context,
             "form": form,
-            "course_schema": content.course_schema(page["course"], page["detail"], request.build_absolute_uri(page["course"]["url"])),
+            "course_schema": content.course_schema(
+                page["course"], page["detail"], request.build_absolute_uri(page["course"]["url"]), site_rating
+            ),
         },
     )
 

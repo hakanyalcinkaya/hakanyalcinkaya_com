@@ -226,6 +226,16 @@ def section_create(request, course_id):
 
 
 @superuser_required
+@require_POST
+def section_content_lesson(request, section_id):
+    """Bölümün sonuna içerik dersi ekler ve düzenleyicisini açar (form bağlantısı, okuma gibi videosuz dersler)."""
+    section = get_object_or_404(Section, pk=section_id)
+    lesson = section.add_content_lesson(_("Yeni içerik"))
+    response = _video_lesson_response(request, lesson, bulk=request.GET.get("bulk") == "1")
+    return _toast(response, "success", _("İçerik dersi eklendi; başlığını ve içeriğini düzenle."))
+
+
+@superuser_required
 def section_title(request, section_id):
     section = get_object_or_404(Section.objects.select_related("course"), pk=section_id)
     if request.method == "POST":

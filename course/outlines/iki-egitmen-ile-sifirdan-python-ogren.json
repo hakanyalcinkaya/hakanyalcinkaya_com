@@ -1,0 +1,817 @@
+{
+ "source": "Podia (hakanyalcinkaya.dev/p/courses/iki-egitmen-ile-sifirdan-python-ogren/)",
+ "podia_slug": "iki-egitmen-ile-sifirdan-python-ogren",
+ "title": "İki Eğitmen ile Sıfırdan Python Öğren",
+ "short_title": "Sıfırdan Python",
+ "subtitle": "İki eğitmenin anlatımıyla Python’a sıfırdan başlangıç.",
+ "description": "İki eğitmenin anlatımıyla Python’a sıfırdan başlangıç.",
+ "image": "img/courses/python.png",
+ "technologies": [
+  "Python"
+ ],
+ "highlights": {
+  "learn": [
+   "Python sözdizimini sıfırdan öğreneceksin.",
+   "Küçük programlar yazarak konuları pekiştireceksin.",
+   "İki farklı anlatımla aynı konuyu başka açıdan göreceksin."
+  ],
+  "about": [
+   "Bu kurs Python’a hiç başlamamış ya da temeli tazelemek isteyenler için.",
+   "İki eğitmen aynı konuları farklı örneklerle anlatır."
+  ],
+  "feature": [
+   {
+    "title": "İki eğitmen",
+    "text": "Aynı konu iki anlatımla gelir; takıldığın yerde ikinci örneğe bakarsın."
+   },
+   {
+    "title": "Başlangıç temposu",
+    "text": "Ön bilgi gerekmez. Adımlar kısa ve uygulamalıdır."
+   }
+  ],
+  "topic": [
+   {
+    "title": "Python temelleri",
+    "text": "Değişkenler, koşullar, döngüler ve fonksiyonlar."
+   },
+   {
+    "title": "Pratik",
+    "text": "Küçük alıştırmalarla yazdığın kodu çalıştırma."
+   }
+  ],
+  "outcome": [
+   {
+    "title": "Python ile ilk programların",
+    "text": "Kendi başına küçük Python programları yazabilme."
+   },
+   {
+    "title": "Sonraki kursa hazırlık",
+    "text": "Django kursuna geçecek temel."
+   }
+  ],
+  "audience": [
+   "Python’a sıfırdan başlayanlar",
+   "Programlamaya yeni girenler",
+   "Temeli başka bir dille görüp Python’a geçenler"
+  ]
+ },
+ "access_note": "Kursa kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.",
+ "sections": [
+  {
+   "title": "Başlangıç",
+   "slug": "2356145-baslangic",
+   "lessons": [
+    {
+     "title": "Tanıtım Videosu",
+     "slug": "7496937-tanitim-videosu",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Neden İki Eğitmen",
+     "slug": "7497001-neden-iki-egitmen",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sıfiıdan Python Öğren Kursu Kimler İçindir",
+     "slug": "7496997-sifiidan-python-ogren-kursu-kimler-icindir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Framework ve Yazılım Dillerindeki Versiyon Değişiklikleri Hakkında Genel Bilgi",
+     "slug": "8277870-framework-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Bu Kursta Nelere Dikkat Etmeliyim? Nasıl Hazırlanmalıyım?",
+     "slug": "7496988-bu-kursta-nelere-dikkat-etmeliyim-nasil-hazirlanmaliyim",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sıfırdan Python Öğren Kursunda Neler Öğreneceğiz?",
+     "slug": "7497010-sifirdan-python-ogren-kursunda-neler-ogrenecegiz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Neden Python?",
+     "slug": "7497002-neden-python",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Python Kurulumu ve Çalışma Ortamının Oluşturulması",
+   "slug": "2356160-python-kurulumu-ve-calisma-ortaminin-olusturulmasi",
+   "lessons": [
+    {
+     "title": "Windows'a Python Kurulumu",
+     "slug": "7497074-windows-a-python-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "macOS'a Python Kurulumu",
+     "slug": "7497067-macos-a-python-kurulumu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Virtualbox ve Ubuntu Desktop ile Python Kurulumu",
+     "slug": "7497109-virtualbox-ve-ubuntu-desktop-ile-python-kurulumu",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Örnek Dosyaların Kullanımı",
+   "slug": "2356161-ornek-dosyalarin-kullanimi",
+   "lessons": [
+    {
+     "title": "Python Örnek Dosyaları IDLE ve Visual Studio Code ile Nasıl Açılır?",
+     "slug": "7497176-python-ornek-dosyalari-idle-ve-visual-studio-code-ile-nasil-acilir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Örnek Dosyaların Komut Satırında Çalıştırılması",
+     "slug": "7497163-ornek-dosyalarin-komut-satirinda-calistirilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Örnek Dosyaların Online Ortamda Çalıştırılması",
+     "slug": "7497178-ornek-dosyalarin-online-ortamda-calistirilmasi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Örnek Dosyaların Python Interpreter'da Çalıştırılması",
+     "slug": "7497157-ornek-dosyalarin-python-interpreter-da-calistirilmasi",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Aritmetik Operatörler, Print Kullanımı ve Açıklama Satırları Eklemek",
+   "slug": "2356162-aritmetik-operatorler-print-kullanimi-ve-aciklama-satirlari-eklemek",
+   "lessons": [
+    {
+     "title": "Aritmetik İşlemler Kategorisi - Tanıtım Videosu",
+     "slug": "7497261-aritmetik-islemler-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "IDLE ile Çalışmak ve Dosyaları Kaydetmek",
+     "slug": "7497273-idle-ile-calismak-ve-dosyalari-kaydetmek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Print Kullanımı",
+     "slug": "7497361-print-kullanimi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Temel Aritmetik İşlemler (Toplama, Çıkarma, Çarpma ve Bölme)",
+     "slug": "7497303-temel-aritmetik-islemler-toplama-cikarma-carpma-ve-bolme",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Aritmetik İşlemlerde İşlem Önceliği",
+     "slug": "7497277-aritmetik-islemlerde-islem-onceligi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python'da Açıklama Satırları Eklemek",
+     "slug": "7497344-python-da-aciklama-satirlari-eklemek",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python'da Kaçış Karakteri(Escape Character) Nedir?",
+     "slug": "7497406-python-da-kacis-karakteri-escape-character-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Print ile Shell Çıktısı Arasındaki Farklar Nelerdir?",
+     "slug": "7497358-print-ile-shell-ciktisi-arasindaki-farklar-nelerdir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Aritmetik İşlemler - Bölüm Sonu Özeti",
+     "slug": "7497342-aritmetik-islemler-bolum-sonu-ozeti",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Input Kullanımı, Metin(str) Veri Tipiyle Çalışmak ve Değişken Tanımlamak",
+   "slug": "2356163-input-kullanimi-metin-str-veri-tipiyle-calismak-ve-degisken-tanimlamak",
+   "lessons": [
+    {
+     "title": "Input Kullanımı, Str Veri Tipi ile Çalışmak Kategorisi - Tanıtım Videosu",
+     "slug": "7497367-input-kullanimi-str-veri-tipi-ile-calismak-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişken Nedir? Nasıl Tanımlanır? - Bölüm 1",
+     "slug": "7497634-degisken-nedir-nasil-tanimlanir-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişken Nedir? Nasıl Tanımlanır? - Bölüm 2",
+     "slug": "7497490-degisken-nedir-nasil-tanimlanir-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "String (str) Veri Tipi Nedir? Nasıl Tanımlanır?",
+     "slug": "7497400-string-str-veri-tipi-nedir-nasil-tanimlanir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Verilerin Birleştirilmesi",
+     "slug": "7497602-verilerin-birlestirilmesi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metinsel İşlemler",
+     "slug": "7497620-metinsel-islemler",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Input Kullanımı",
+     "slug": "7497581-input-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Input Kullanımı Bölümünde Neler Öğrendik?",
+     "slug": "7497494-input-kullanimi-bolumunde-neler-ogrendik",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Input Kullanımı - Kendini Sına",
+     "slug": "7497501-input-kullanimi-kendini-sina",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Input Kullanımı - Kendini Sına - Çözüm",
+     "slug": "7497640-input-kullanimi-kendini-sina-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Değişken Tanımlama Kuralları",
+   "slug": "2356164-degisken-tanimlama-kurallari",
+   "lessons": [
+    {
+     "title": "Değişken Tanımlama Kuralları Kategorisi - Tanıtım Videosu",
+     "slug": "7497587-degisken-tanimlama-kurallari-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişkenlere İsim Verilmesi - Bölüm 1",
+     "slug": "7497665-degiskenlere-isim-verilmesi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişkenlere İsim Verilmesi - Bölüm 2",
+     "slug": "7497675-degiskenlere-isim-verilmesi-bolum-2",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Visual Studio Code Kurulumu ve Kullanımı",
+   "slug": "2356495-visual-studio-code-kurulumu-ve-kullanimi",
+   "lessons": [
+    {
+     "title": "Visual Studio Code Kurulumu",
+     "slug": "7497860-visual-studio-code-kurulumu",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Değişkenlerle Çalışmak",
+   "slug": "2356497-degiskenlerle-calismak",
+   "lessons": [
+    {
+     "title": "Değişkenlerle Çalışmak Kategorisi - Tanıtım Videosu",
+     "slug": "7497779-degiskenlerle-calismak-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Tam Sayı(int) Veri Tipi - Bölüm 1",
+     "slug": "7497849-tam-sayi-int-veri-tipi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Tam Sayı(int) Veri Tipi - Bölüm 2",
+     "slug": "7497810-tam-sayi-int-veri-tipi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Virgüllü Sayı(float) Veri Tipi",
+     "slug": "7497925-virgullu-sayi-float-veri-tipi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Boolean Veri Tipi",
+     "slug": "7497850-boolean-veri-tipi",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Input ile Değişken Kullanımı",
+     "slug": "7497896-input-ile-degisken-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişkenlerle Çalışmak - Kendini Sına",
+     "slug": "7497854-degiskenlerle-calismak-kendini-sina",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Değişkenlerle Çalışmak - Kendini Sına - Çözüm",
+     "slug": "7498098-degiskenlerle-calismak-kendini-sina-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Karar Yapıları",
+   "slug": "2356498-karar-yapilari",
+   "lessons": [
+    {
+     "title": "Karar Yapıları Kategorisi - Tanıtım Videosu",
+     "slug": "7497923-karar-yapilari-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karşılaştırma Operatörlerine Neden İhtiyaç Duyarız?",
+     "slug": "7498090-karsilastirma-operatorlerine-neden-ihtiyac-duyariz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 1",
+     "slug": "7497954-karsilastirma-operatorleri-ile-calismak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 2",
+     "slug": "7497989-karsilastirma-operatorleri-ile-calismak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karşılaştırma Operatörleri ile Çalışmak - Bölüm 3",
+     "slug": "7498042-karsilastirma-operatorleri-ile-calismak-bolum-3",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "If - Else - Else IF(elif) Kullanımı - Bölüm 1",
+     "slug": "7498149-if-else-else-if-elif-kullanimi-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "If - Else - Else IF(elif) Kullanımı - Bölüm 2",
+     "slug": "7498140-if-else-else-if-elif-kullanimi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Mantıksal Operatörlerle Çalışmak - Bölüm 1",
+     "slug": "7498189-mantiksal-operatorlerle-calismak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Mantıksal Operatörlerle Çalışmak - Bölüm 2",
+     "slug": "7498275-mantiksal-operatorlerle-calismak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karar Yapıları Kategorisi - Kendini Sına",
+     "slug": "7498095-karar-yapilari-kategorisi-kendini-sina",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Karar Yapıları Kategorisi - Kendini Sına - Çözüm",
+     "slug": "7498164-karar-yapilari-kategorisi-kendini-sina-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "List Veri Tipiyle Çalışmak",
+   "slug": "2356499-list-veri-tipiyle-calismak",
+   "lessons": [
+    {
+     "title": "List Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "slug": "7498142-list-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Tanımlamak",
+     "slug": "7498219-list-tanimlamak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Elemanlarına Erişmek, Eklemek, Düzenlemek, Çıkarmak - Bölüm 1",
+     "slug": "7498216-list-elemanlarina-erismek-eklemek-duzenlemek-cikarmak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Elemanlarına Erişmek, Eklemek, Düzenlemek, Çıkarmak - Bölüm 2",
+     "slug": "7498341-list-elemanlarina-erismek-eklemek-duzenlemek-cikarmak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List İçerisindeki Elemanlara Ulaşmak - Arama Yapmak",
+     "slug": "7498195-list-icerisindeki-elemanlara-ulasmak-arama-yapmak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Str ve List'lerle Çalışmak",
+     "slug": "7498265-str-ve-list-lerle-calismak",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List'leri Birleştirmek, İç içe List Oluşturmak - Bölüm 1",
+     "slug": "7498257-list-leri-birlestirmek-ic-ice-list-olusturmak-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "List'leri Birleştirmek, İç içe List Oluşturmak - Bölüm 2",
+     "slug": "7498270-list-leri-birlestirmek-ic-ice-list-olusturmak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Metodları - Bölüm 1",
+     "slug": "7498286-list-metodlari-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Metodları - Bölüm 2",
+     "slug": "7498305-list-metodlari-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Veri Tipiyle Çalışmak Kategorisi - Kendini Sına",
+     "slug": "7498271-list-veri-tipiyle-calismak-kategorisi-kendini-sina",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "List Veri Tipiyle Çalışmak Kategorisi - Kendini Sına - Çözüm",
+     "slug": "7498289-list-veri-tipiyle-calismak-kategorisi-kendini-sina-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Döngüler",
+   "slug": "2356500-donguler",
+   "lessons": [
+    {
+     "title": "Döngüler Kategorisi - Tanıtım Videosu",
+     "slug": "7505595-donguler-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Neden Döngülere İhtiyaç Duyarız?",
+     "slug": "7505601-neden-dongulere-ihtiyac-duyariz",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "While Döngüsü Kullanımı",
+     "slug": "7505624-while-dongusu-kullanimi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "For Döngüsü Kullanımı - Bölüm 1",
+     "slug": "7505633-for-dongusu-kullanimi-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "For Döngüsü Kullanımı - Bölüm 2",
+     "slug": "7505636-for-dongusu-kullanimi-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Atlama İfadeleri - Bölüm 1",
+     "slug": "7505602-atlama-ifadeleri-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Atlama İfadeleri - Bölüm 2",
+     "slug": "7505594-atlama-ifadeleri-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Döngüler Kategorisi - Kendini Sına",
+     "slug": "7505588-donguler-kategorisi-kendini-sina",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Döngüler Kategorisi - Kendini Sına - Çözüm",
+     "slug": "7505637-donguler-kategorisi-kendini-sina-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Tuple Veri Tipiyle Çalışmak",
+   "slug": "2356501-tuple-veri-tipiyle-calismak",
+   "lessons": [
+    {
+     "title": "Tuple Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "slug": "7505623-tuple-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Tuple Veri Tipiyle Çalışmak - Bölüm 1",
+     "slug": "7505649-tuple-veri-tipiyle-calismak-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Tuple Veri Tipiyle Çalışmak - Bölüm 2",
+     "slug": "7505646-tuple-veri-tipiyle-calismak-bolum-2",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Sözlük(Dict) Veri Tipiyle Çalışmak",
+   "slug": "2356502-sozluk-dict-veri-tipiyle-calismak",
+   "lessons": [
+    {
+     "title": "Sözlük(Dict) Veri Tipiyle Çalışmak Kategorisi - Tanıtım Videosu",
+     "slug": "7505641-sozluk-dict-veri-tipiyle-calismak-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Dictionary(dict) Nedir?",
+     "slug": "7505650-dictionary-dict-nedir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Dictionary(dict) Nasıl Tanımlanır?",
+     "slug": "7505687-dictionary-dict-nasil-tanimlanir",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Dictionary(dict) İçerisinde Çalışmak - Bölüm 1",
+     "slug": "7505692-dictionary-dict-icerisinde-calismak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Dictionary(dict) İçerisinde Çalışmak - Bölüm 2",
+     "slug": "7505686-dictionary-dict-icerisinde-calismak-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Dictionary(dict) Metodları",
+     "slug": "7505697-dictionary-dict-metodlari",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Dictionary ve Döngülerle Çalışmak",
+     "slug": "7505710-dictionary-ve-dongulerle-calismak",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Metin Denetimleri ve Metin Biçimlendirme İşlemleri",
+   "slug": "2356503-metin-denetimleri-ve-metin-bicimlendirme-islemleri",
+   "lessons": [
+    {
+     "title": "Metin Denetimleri ve Metin Biçimlendirme İşlemleri - Tanıtım Videosu",
+     "slug": "7505682-metin-denetimleri-ve-metin-bicimlendirme-islemleri-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metin Denetimleri",
+     "slug": "7505754-metin-denetimleri",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metin Biçimlendirme - Bölüm 1",
+     "slug": "7505718-metin-bicimlendirme-bolum-1",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Metin Biçimlendirme - Bölüm 2",
+     "slug": "7505727-metin-bicimlendirme-bolum-2",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Metin Biçimlendirme Örnekleri",
+     "slug": "7505760-metin-bicimlendirme-ornekleri",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Fonksiyon ile Çalışmak",
+   "slug": "2356504-fonksiyon-ile-calismak",
+   "lessons": [
+    {
+     "title": "Fonksiyon ile Çalışmak - Tanıtım Videosu",
+     "slug": "7505723-fonksiyon-ile-calismak-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Fonksiyon Nedir? Nasıl Tanımlanır?",
+     "slug": "7505809-fonksiyon-nedir-nasil-tanimlanir",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Fonksiyon'a Değer Göndermek ve Değer Almak - Bölüm 1",
+     "slug": "7505791-fonksiyon-a-deger-gondermek-ve-deger-almak-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Fonksiyon'a Değer Göndermek ve Değer Almak - Bölüm 2",
+     "slug": "7505839-fonksiyon-a-deger-gondermek-ve-deger-almak-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Fonksiyon'larda Arküman(args) ve Anahtarlı Argüman / Keyword Arguments(kwargs)",
+     "slug": "7505795-fonksiyon-larda-arkuman-args-ve-anahtarli-arguman-keyword-arguments-kwargs",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Standart Kütüphaneler ve Modüllerle Çalışmak",
+   "slug": "2356505-standart-kutuphaneler-ve-modullerle-calismak",
+   "lessons": [
+    {
+     "title": "Standart Kütüphaneler ve Modüllerle Çalışmak - Tanıtım Videosu",
+     "slug": "7505811-standart-kutuphaneler-ve-modullerle-calismak-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python Kütüphanesinden Modül Yüklenmesi ve Random Modülünün Kullanımı - Bölüm 1",
+     "slug": "7505824-python-kutuphanesinden-modul-yuklenmesi-ve-random-modulunun-kullanimi-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Python Kütüphanesinden Modül Yüklenmesi ve Random Modülünün Kullanımı - Bölüm 2",
+     "slug": "7505831-python-kutuphanesinden-modul-yuklenmesi-ve-random-modulunun-kullanimi-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Kendi Modülümüzü Oluşturmak ve Kullanmak",
+     "slug": "7505843-kendi-modulumuzu-olusturmak-ve-kullanmak",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  },
+  {
+   "title": "Projeler",
+   "slug": "2356506-projeler",
+   "lessons": [
+    {
+     "title": "Projeler Kategorisi - Tanıtım Videosu",
+     "slug": "7505830-projeler-kategorisi-tanitim-videosu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Taş, Kağıt, Makas Oyunu",
+     "slug": "7505812-tas-kagit-makas-oyunu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Taş, Kağıt, Makas Oyunu - Çözüm - Bölüm 1",
+     "slug": "7505871-tas-kagit-makas-oyunu-cozum-bolum-1",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Taş, Kağıt, Makas Oyunu - Çözüm - Bölüm 2",
+     "slug": "7505876-tas-kagit-makas-oyunu-cozum-bolum-2",
+     "kind": "video",
+     "preview": true
+    },
+    {
+     "title": "Sayı Tahmin Oyunu",
+     "slug": "7505844-sayi-tahmin-oyunu",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "Sayı Tahmin Oyunu - Çözüm",
+     "slug": "7505868-sayi-tahmin-oyunu-cozum",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "FizzBuzz Testi",
+     "slug": "7505867-fizzbuzz-testi",
+     "kind": "video",
+     "preview": false
+    },
+    {
+     "title": "FizzBuzz Testi - Çözüm",
+     "slug": "7505869-fizzbuzz-testi-cozum",
+     "kind": "video",
+     "preview": false
+    }
+   ]
+  }
+ ]
+}

@@ -10,6 +10,13 @@
     {% if lesson.is_video %}
     <div class="col-12 col-md-4 col-xl-3">{% include "studio/partials/_lesson_video.html" %}</div>
     <div class="col-12 col-md-auto d-flex flex-wrap align-items-center gap-2">{% include "studio/partials/_lesson_subtitles.html" %}{% include "studio/partials/_lesson_extra.html" %}</div>
+    {% else %}
+    {# İçerik dersi: videonun yerinde Markdown içerik görünür. #}
+    <div class="col-12 col-md-auto d-flex flex-wrap align-items-center gap-2">
+      <span class="badge border fw-normal text-body-secondary"><i class="bi {{ lesson.icon }} me-1" aria-hidden="true"></i>{{ lesson.get_kind_display }}</span>
+      {% include "studio/partials/_lesson_extra.html" %}
+      <button type="button" class="btn btn-outline-primary btn-sm" hx-get="{% url 'studio:lesson_extra_content_edit' lesson.id %}" hx-target="#studio-dialog-body"><i class="bi bi-pencil me-1" aria-hidden="true"></i>İçeriği düzenle</button>
+    </div>
     {% endif %}
     <div class="col-12 col-md-auto d-flex flex-wrap align-items-center gap-1">
       {% include "studio/partials/_lesson_status.html" %}

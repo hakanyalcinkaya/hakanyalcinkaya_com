@@ -20,6 +20,7 @@ urlpatterns = [
     path("sections/<uuid:section_id>/", views.section_detail, name="section_detail"),
     path("sections/<uuid:section_id>/block/", views.section_block, name="section_block"),
     path("sections/<uuid:section_id>/videos/", views.section_videos, name="section_videos"),
+    path("sections/<uuid:section_id>/content/", views.section_content_lesson, name="section_content_lesson"),
     path("sections/<uuid:section_id>/title/", views.section_title, name="section_title"),
     path("sections/<uuid:section_id>/status/", views.section_status, name="section_status"),
     path("sections/<uuid:section_id>/delete/", views.section_delete, name="section_delete"),
