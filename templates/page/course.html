@@ -112,7 +112,7 @@
             <h2 id="mufredat-baslik" class="h3 fw-semibold mb-1">Müfredat</h2>
             <p class="small text-body-tertiary mb-0">{{ section_count }} bölüm · {{ course.lessons }} ders{% if preview_count %} · {{ preview_count }} ücretsiz önizleme{% endif %}</p>
           </div>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-fold-all="[data-curriculum] > details" aria-controls="mufredat-listesi" aria-expanded="false">Tümünü aç</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-fold-all="[data-curriculum] > details" aria-controls="mufredat-listesi" aria-expanded="true">Tümünü kapat</button>
         </div>
         {% if enrolled %}
         <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Bir dersi açmak için başlığına tıkla.</p>
@@ -121,8 +121,8 @@
         {% endif %}
         <div id="mufredat-listesi" class="border rounded mt-3" data-curriculum>
           {% for section in sections %}
-          {# Uzun müfredatta yalnız ilk bölüm açık gelir; "Tümünü aç" hepsini açar. #}
-          <details class="hy-fold border-bottom"{% if forloop.first %} open{% endif %}>
+          {# Bölümlerin hepsi açık gelir; "Tümünü kapat" hepsini kapatır. #}
+          <details class="hy-fold border-bottom" open>
             <summary class="px-3 py-3">
               <span class="d-block fw-semibold">{{ section.index }}. {{ section.name }}{% if section.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
               <span class="d-block small text-body-tertiary mt-1">{% if enrolled %}{{ section.meta_enrolled }}{% else %}{{ section.meta }}{% endif %}</span>
