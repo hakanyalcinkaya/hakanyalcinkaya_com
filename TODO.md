@@ -12,6 +12,7 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 - [ ] Sepeti boşaltan kullanıcılara ileride indirim bildirimi gönder (boşaltılan sepetler silinmeden `emptied` durumunda tutuluyor).
 - [ ] Bağlantıyla gelen indirim kodu: `?kod=KOD` oturumda beklet, sepet oluşunca uygula; kurs ve paket sayfalarında "KOD uygulandı" ile indirimli fiyatı göster.
 - [ ] iyzico kartla ödeme (TL, KDV dahil): ödeme sayfası hazır, kart seçeneği "Yakında" (`page/views.py` `checkout`, `card_payment_open=False`). Bağlanınca `Order.create_from_cart(cart, email, user, provider="card")` ile bekleyen sipariş, iyzico onayında `Order.mark_paid`, başarısızlıkta `mark_failed`. Anahtarlar `.env`'de (`IYZICO_API_KEY`, `IYZICO_SECRET_KEY`), önce sandbox.
+- [ ] Ödeme sayfası girişsiz (`page/views.py` `checkout`): misafir yalnız e-posta yazar (doğrulanmaz); o e-postayla hesap varsa sipariş o hesaba bağlanır (`content.checkout_buyer`). Hesap yoksa sipariş kullanıcısız açılır: iyzico onayından sonra teşekkür sayfasında ad soyad sorulup hesap açılmalı (şifre belirleme e-postasıyla), `order.user` atanıp kurs kayıtları açılmalı (`Order.mark_paid` kullanıcısız siparişte kayıt açmaz).
 - [ ] Havale/EFT yalnız yöneticide: Stüdyo → Siparişler → Sipariş oluştur (sepetten de). Sipariş onaylanınca üyeye "satın alma onayı" e-postası henüz gitmiyor (`templates/emails/purchase_confirmation` bağlanacak).
 - [ ] Örnek veride (veritabanında olmayan kurslar) sepet hâlâ oturumda (`page/catalog.py` `cart_add`); örnek veri kaldırılınca bu yol da silinmeli.
 

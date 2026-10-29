@@ -413,7 +413,8 @@ class CheckoutForm(StyledForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].help_text = "Kurslarına bu e-posta adresiyle erişeceksin."
+        # Adres doğrulanmaz ve kayıtlı olup olmadığı söylenmez; kayıtlıysa satın alma o hesaba bağlanır.
+        self.fields["email"].help_text = "Kurslar bu e-posta adresine tanımlanır; ödeme bilgilendirmesi de buraya gelir."
         # "Öde" düğmesi sipariş özetinde durur ve form="odeme-formu" ile bu forma bağlanır.
         self.helper.form_id = "odeme-formu"
         self.helper.layout = Layout(Hidden("action", "pay"), "email")

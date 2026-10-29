@@ -1,5 +1,5 @@
 {% extends "_base/base.html" %}
-{% load static %}
+{% load static crispy_forms_tags %}
 
 {% block title %}Ödeme — Hakan Yalçınkaya{% endblock %}
 {% block head %}<meta name="robots" content="noindex">{% endblock %}
@@ -13,8 +13,14 @@
     <div class="col-lg-7 d-grid gap-3 align-content-start">
       <section class="card" aria-labelledby="hesap-baslik">
         <div class="card-body p-4">
-          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>Hesap</h2>
+          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>{% if checkout_form %}E-posta{% else %}Hesap{% endif %}</h2>
+          {% if checkout_form %}
+          {% crispy checkout_form %}
+          <p class="small text-body-tertiary mb-0">Ödemeden sonra adını soracağız; kurslarına bu adresle giriş yapacaksın. Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>
+          {% else %}
+          <form method="post" id="odeme-formu">{% csrf_token %}</form>
           <p class="small text-body-secondary mb-0">Kurslar <b class="text-body">{{ request.user.email }}</b> hesabına açılacak.</p>
+          {% endif %}
         </div>
       </section>
 
@@ -52,7 +58,7 @@
           </ul>
           <hr>
           {% include "page/partials/order_totals.html" %}
-          <button type="button" class="btn btn-primary btn-lg fs-6 w-100 mt-3" disabled><i class="bi bi-lock me-2" aria-hidden="true"></i>{% if card_payment_open %}Öde {{ summary.total }}{% else %}Kartla ödeme yakında{% endif %}</button>
+          <button type="submit" form="odeme-formu" class="btn btn-primary btn-lg fs-6 w-100 mt-3"{% if not card_payment_open %} disabled{% endif %}><i class="bi bi-lock me-2" aria-hidden="true"></i>{% if card_payment_open %}Öde {{ summary.total }}{% else %}Kartla ödeme yakında{% endif %}</button>
           <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
         </div>
       </div>

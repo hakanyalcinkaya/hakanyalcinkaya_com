@@ -17,6 +17,7 @@ from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 
+from account.models import User
 from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
@@ -32,6 +33,7 @@ from course.models import (
     rating_summary,
 )
 from learning.models import Enrollment, LessonProgress
+from order.models import Order
 from page import catalog
 
 # Kurs taslakları (eski platformdaki adreslerle); eski kurs adreslerini yönlendirmek için okunur.
@@ -270,6 +272,20 @@ def cart_cards(request, cards=None):
     if sample != slugs:
         request.session[catalog.CART_SESSION_KEY] = sample
     return kept + [cards[slug] for slug in sample if cards[slug] not in kept]
+
+
+def checkout_buyer(request, email):
+    """Siparişin bağlanacağı hesap: giriş yapan üye; misafirde bu e-postayla kayıtlı hesap (doğrulama yok), yoksa None.
+    Hesabı olmayan alıcının adı soyadı ödemeden sonra sorulur ve hesabı o adımda açılır."""
+    if request.user.is_authenticated:
+        return request.user
+    return User.objects.with_email(email).first()
+
+
+def create_card_order(request, email):
+    """Kartla ödeme için bekleyen sipariş (sepetin o anki fiyatları); ödeme sağlayıcısı onaylayınca Order.mark_paid."""
+    cart = current_cart(request)
+    return Order.create_from_cart(cart, email, checkout_buyer(request, email), provider="card")
 
 
 def cart_add(request, slug):

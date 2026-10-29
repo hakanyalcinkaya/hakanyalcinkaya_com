@@ -40,6 +40,7 @@ from page.catalog import (
     reviews,
 )
 from page.forms import (
+    CheckoutForm,
     EmailChangeForm,
     LoginForm,
     NewsletterForm,
@@ -384,17 +385,31 @@ def cart(request):
     )
 
 
-@login_required
+# Kartla ödeme (iyzico) bağlanınca açılır; kapalıyken sipariş oluşturulmaz, sepet bekler.
+CARD_PAYMENT_OPEN = False
+
+
 def checkout(request):
-    """Ödeme adımı: kurs erişimi hesaba açıldığı için giriş gerekir (misafir sepeti girişte hesaba katılır).
-    Son kullanıcı yalnız kartla öder; kart ödemesi (iyzico) bağlanana kadar sipariş oluşturulmaz, sepet bekler."""
+    """Ödeme adımı, girişsiz: misafir yalnız e-posta yazar (doğrulanmaz). Giriş yapan üyenin e-postası hesabından gelir.
+    Satın alma, e-postayla kayıtlı hesaba bağlanır; hesap yoksa ad soyad ödemeden sonra sorulur.
+    Son kullanıcı yalnız kartla öder."""
     items = content.cart_cards(request)
     if not items:
+        return redirect("page:cart")
+    member = request.user.is_authenticated
+    form = None if member else CheckoutForm(request.POST or None)
+    if request.method == "POST" and (form is None or form.is_valid()):
+        if not CARD_PAYMENT_OPEN:
+            messages.info(request, "Kartla online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
+            return redirect("page:checkout")
+        email = request.user.email if member else form.cleaned_data["email"]
+        content.create_card_order(request, email)
+        # iyzico bağlanınca: ödeme sayfasına yönlendirme burada.
         return redirect("page:cart")
     return render(
         request,
         "page/checkout.html",
-        {"summary": content.order_summary(items), "steps": purchase_steps(1), "card_payment_open": False},
+        {"summary": content.order_summary(items), "steps": purchase_steps(1), "card_payment_open": CARD_PAYMENT_OPEN, "checkout_form": form},
     )
 
 
