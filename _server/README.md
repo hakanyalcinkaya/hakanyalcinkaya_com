@@ -24,11 +24,10 @@ Komutlar sudo yetkili bir kullanıcıyla çalıştırılır. Uygulama `www-data`
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y git python3.12-venv python3-dev build-essential postgresql redis-server nginx ufw
+sudo apt install -y git python3.12-venv postgresql redis-server nginx ufw
 ```
 
-`build-essential` ve `python3-dev` uWSGI'nin derlenmesi için gerekir. Kurulu olan paketler (ör. Nginx, PostgreSQL)
-atlanır. Celery ve uWSGI sistem paketi değildir; venv'e pip ile kurulur (adım 5). Celery'nin istediği sistem servisi
+Kurulu olan paketler (ör. Nginx, PostgreSQL) atlanır. Celery sistem paketi değildir; venv'e pip ile kurulur (adım 5). Celery'nin istediği sistem servisi
 Redis'tir.
 
 ## 2. Güvenlik duvarı
@@ -68,7 +67,7 @@ git clone git@github-hakanyalcinkaya:hakanyalcinkaya/hakanyalcinkaya_com.git /va
 ```bash
 python3.12 -m venv /var/Env/hakanyalcinkaya_312
 /var/Env/hakanyalcinkaya_312/bin/pip install --upgrade pip
-/var/Env/hakanyalcinkaya_312/bin/pip install -r /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/requirements.txt uwsgi
+/var/Env/hakanyalcinkaya_312/bin/pip install -r /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/requirements.txt
 ```
 
 ## 6. PostgreSQL
@@ -167,19 +166,27 @@ her 443 bloğuna `http2 on;` eklenir.
 
 ## 12. uWSGI
 
+Sunucudaki uWSGI Emperor (`uwsgi.service`) `/etc/uwsgi/sites` altındaki her .ini'yi ayrı bir site olarak çalıştırır
+ve `/var/Env/python_312/bin/uwsgi` (Python 3.12) kullanır; bu proje de 3.12 olduğu için aynı Emperor'a eklenir.
+`uwsgi.service` sunucunun ortak dosyasıdır, bu projeden değiştirilmez.
+
+Stüdyonun uzun yükleme süresi (`route = ^/studio/ harakiri:900`) uwsgi'nin PCRE desteğiyle derlenmesini ister. Logda
+`no internal routing support` yazıyorsa ortak uwsgi yeniden derlenir (Emperor'daki bütün siteler birkaç saniye
+yeniden başlar):
+
 ```bash
-sudo mkdir -p /etc/uwsgi/sites
-sudo ln -sf /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/_server/hakanyalcinkaya_uwsgi.ini /etc/uwsgi/sites/hakanyalcinkaya.ini
-touch /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/reload.txt
+sudo apt install -y libpcre2-dev build-essential python3-dev
+sudo /var/Env/python_312/bin/pip install --no-cache-dir --force-reinstall --no-deps "uwsgi==$(/var/Env/python_312/bin/uwsgi --version)"
+timeout 3 /var/Env/python_312/bin/uwsgi --route '^/x harakiri:900' --http-socket 127.0.0.1:39123 2>&1 | grep -i routing   # boş olmalı
+sudo systemctl restart uwsgi
 ```
 
-Sunucuda başka bir proje için uWSGI Emperor zaten çalışıyorsa servis kurulmaz; link yeterlidir (Emperor yeni dosyayı
-kendisi açar). Çalışmıyorsa:
-
 ```bash
-sudo ln -sf /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/_server/uwsgi/uwsgi.service /etc/systemd/system/uwsgi.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now uwsgi
+touch /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/reload.txt
+sudo ln -sf /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/_server/hakanyalcinkaya_uwsgi.ini /etc/uwsgi/sites/hakanyalcinkaya.ini
+systemctl status uwsgi --no-pager | head -6       # "governing N vassals" bir artmalı
+sudo journalctl -u uwsgi -n 50 --no-pager          # site açılmazsa Emperor'un hatası
+ls -l /run/uwsgi/hakanyalcinkaya.sock
 ```
 
 ## 13. Celery
@@ -231,7 +238,7 @@ sudo systemctl restart hakanyalcinkaya-celery     # süren video yüklemesi yar�
 ```
 
 `_server/` altındaki bir servis dosyası değiştiyse `sudo systemctl daemon-reload`, Nginx config'i değiştiyse
-`sudo nginx -t && sudo systemctl reload nginx`, uWSGI ini değiştiyse `touch /etc/uwsgi/sites/hakanyalcinkaya.ini`.
+`sudo nginx -t && sudo systemctl reload nginx`, uWSGI ini değiştiyse `touch /etc/uwsgi/sites/hakanyalcinkaya.ini` (Emperor siteyi yeniden açar).
 
 ## Yayından sonra
 
