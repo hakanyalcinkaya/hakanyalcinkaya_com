@@ -9,7 +9,7 @@
   </div>
   <div class="small text-body-secondary">
     {% for item in order.matched_items %}{{ item.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %} · {% if order.currency == "TRY" %}{{ item.paid_price|money }}{% else %}{{ item.paid_price }} {{ order.currency }}{% endif %}{% if not forloop.last %}; {% endif %}{% endfor %}
-    {% if order.payment_provider %}<span class="text-body-tertiary"> · {{ order.payment_provider }}</span>{% endif %}
+    {% if order.payment_provider %}<span class="text-body-tertiary"> · {{ order.payment_method_label }}</span>{% endif %}
   </div>
 </a>
 {% empty %}

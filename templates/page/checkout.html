@@ -1,5 +1,5 @@
 {% extends "_base/base.html" %}
-{% load static crispy_forms_tags %}
+{% load static %}
 
 {% block title %}Ödeme — Hakan Yalçınkaya{% endblock %}
 {% block head %}<meta name="robots" content="noindex">{% endblock %}
@@ -9,25 +9,30 @@
   {% include "page/partials/steps.html" %}
   <h1 class="h2 fw-semibold mb-4">Ödeme</h1>
 
-  {% if summary.items %}
   <div class="row g-4 g-lg-5">
     <div class="col-lg-7 d-grid gap-3 align-content-start">
-      <section class="card" aria-labelledby="iletisim-baslik">
+      <section class="card" aria-labelledby="hesap-baslik">
         <div class="card-body p-4">
-          <h2 id="iletisim-baslik" class="h6 fw-semibold mb-3"><span class="text-body-tertiary me-1">1.</span>İletişim bilgileri</h2>
-          {% crispy checkout_form %}
-          {% if not nav_member %}<p class="small text-body-tertiary mb-0">Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>{% endif %}
+          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>Hesap</h2>
+          <p class="small text-body-secondary mb-0">Kurslar <b class="text-body">{{ request.user.email }}</b> hesabına açılacak.</p>
         </div>
       </section>
 
       <section class="card" aria-labelledby="yontem-baslik">
         <div class="card-body p-4">
-          <h2 id="yontem-baslik" class="h6 fw-semibold mb-0"><span class="text-body-tertiary me-1">2.</span>Ödeme yöntemi</h2>
-          <div class="border rounded p-4 mt-3 text-center" style="border-style:dashed!important">
-            <i class="bi bi-credit-card fs-3 text-body-tertiary" aria-hidden="true"></i>
-            <p class="small text-body-secondary mt-2 mb-1">Kart bilgilerini ödeme sağlayıcısının güvenli alanında gireceksin.</p>
-            <p class="small font-monospace text-body-tertiary mb-0">[PLACEHOLDER: ödeme sağlayıcı alanı ve yöntemleri]</p>
+          <h2 id="yontem-baslik" class="h6 fw-semibold mb-3"><span class="text-body-tertiary me-1">2.</span>Ödeme yöntemi</h2>
+          {# Son kullanıcıya yalnız kartla ödeme; havale/EFT siparişlerini yönetici stüdyodan açar. #}
+          <div class="form-check border rounded p-3 ps-5 mb-0">
+            <input class="form-check-input" type="radio" name="payment_method" id="odeme-kart" value="card" checked{% if not card_payment_open %} disabled{% endif %}>
+            <label class="form-check-label d-block" for="odeme-kart">
+              <span class="fw-medium"><i class="bi bi-credit-card me-2" aria-hidden="true"></i>Kredi / banka kartı</span>
+              {% if not card_payment_open %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium ms-1">Yakında</span>{% endif %}
+              <span class="d-block small text-body-secondary mt-1">Kart bilgilerini ödeme sağlayıcısının güvenli sayfasında gireceksin; kart bilgilerin bu sitede saklanmaz.</span>
+            </label>
           </div>
+          {% if not card_payment_open %}
+          <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Kartla online ödeme çok yakında açılıyor. Sepetindeki kurslar hesabında bekliyor.</p>
+          {% endif %}
         </div>
       </section>
     </div>
@@ -45,44 +50,15 @@
             </li>
             {% endfor %}
           </ul>
-
-          <div class="mt-4">
-            {% if summary.coupon %}
-            <div class="small fw-medium text-body-secondary mb-2">İndirim kodu</div>
-            <form method="post" role="status" class="small">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="coupon_remove">
-              <span class="text-success"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ summary.coupon }}</b> uygulandı: %{{ summary.coupon_pct }} indirim</span>
-              <button type="submit" class="btn btn-link btn-sm p-0 ms-1 align-baseline">Kaldır</button>
-            </form>
-            {% else %}
-            {% crispy coupon_form %}
-            <p class="small text-body-tertiary mt-n2 mb-0">Örnek kod: <span class="font-monospace">ORNEK10</span></p>
-            {% endif %}
-          </div>
-
           <hr>
-          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam</span><span>{{ summary.subtotal }}</span></div>
-          {% if summary.coupon %}
-          <div class="d-flex justify-content-between small text-success mt-1"><span>İndirim</span><span>−{{ summary.discount }}</span></div>
-          {% endif %}
-          <div class="d-flex justify-content-between align-items-baseline mt-2"><span class="fw-semibold">Toplam</span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>
-
-          <button type="submit" form="odeme-formu" class="btn btn-primary btn-lg fs-6 w-100 mt-3"><i class="bi bi-lock me-2" aria-hidden="true"></i>Öde {{ summary.total }}</button>
-          <p class="small text-body-tertiary mt-3 mb-0">"Öde" düğmesine tıklayarak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
-          <p class="small font-monospace text-body-tertiary mt-2 mb-0">[PLACEHOLDER: ödeme entegrasyonu — tasarımda ödeme alınmaz]</p>
+          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam ({{ summary.count }} kurs)</span><span>{{ summary.subtotal }}</span></div>
+          <div class="d-flex justify-content-between align-items-baseline mt-2"><span class="fw-semibold">Toplam (KDV dahil)</span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>
+          <button type="button" class="btn btn-primary btn-lg fs-6 w-100 mt-3" disabled><i class="bi bi-lock me-2" aria-hidden="true"></i>{% if card_payment_open %}Öde {{ summary.total }}{% else %}Kartla ödeme yakında{% endif %}</button>
+          <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
         </div>
       </div>
       <a href="{{ cart_url }}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Sepete dön</a>
     </aside>
   </div>
-  {% else %}
-  <div class="text-center border rounded p-5">
-    <i class="bi bi-bag fs-1 text-body-tertiary" aria-hidden="true"></i>
-    <h2 class="h5 fw-semibold mt-3">Ödenecek kurs yok</h2>
-    <p class="text-body-secondary mb-4">Sepetin boş görünüyor. Bir kurs seçip yeniden dene.</p>
-    <a href="{% url 'page:course_list' %}" class="btn btn-primary">Kursları incele</a>
-  </div>
-  {% endif %}
 </div>
 {% endblock %}

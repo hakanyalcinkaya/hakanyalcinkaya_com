@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from account.models import InstructorProfile, User
+from cart.models import Cart, CartItem
 from core.models import SiteSettings
 from course import video_service
 from course.models import (
@@ -33,7 +34,7 @@ from course.models import (
 from discount.forms import DiscountTargetsMixin
 from discount.models import Discount
 from newsletter.models import AudienceKind, Issue
-from order.models import OrderStatus
+from order.models import ADMIN_PAYMENT_METHODS, PAYMENT_METHODS, Order, OrderStatus
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
 EXTRA_CONTENT_EXTENSIONS = (".md", ".markdown", ".txt", ".html", ".htm")
@@ -791,3 +792,78 @@ class OrderFilterForm(forms.Form):
     @property
     def is_filtered(self):
         return self.is_valid() and any(value for value in self.cleaned_data.values())
+
+
+class ManualOrderForm(forms.Form):
+    """Yöneticinin açtığı sipariş (ör. havale/EFT): üye, kurslar/paketler, ödeme yolu ve isteğe bağlı indirim kodu.
+    Tutarlar bugünkü fiyatlardan hesaplanır; "ödendi" seçilirse kurs erişimi hemen açılır, değilse sipariş bekler."""
+
+    email = forms.EmailField(label=_("Üye e-postası"), help_text=_("Kurslar bu hesaba açılır; üye önce siteye kayıt olmalı."))
+    courses = forms.ModelMultipleChoiceField(label=_("Kurslar"), queryset=Course.objects.none(), required=False, widget=forms.CheckboxSelectMultiple)
+    bundles = forms.ModelMultipleChoiceField(label=_("Paketler"), queryset=Bundle.objects.none(), required=False, widget=forms.CheckboxSelectMultiple)
+    payment_provider = forms.ChoiceField(label=_("Ödeme yolu"), widget=forms.RadioSelect)
+    discount_code = forms.CharField(label=_("İndirim kodu"), max_length=40, required=False)
+    mark_paid = forms.BooleanField(label=_("Ödeme alındı; erişimi şimdi aç"), required=False)
+    cart = forms.ModelChoiceField(queryset=Cart.objects.none(), required=False, widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["courses"].queryset = Course.objects.order_by("sort_order", "title")
+        self.fields["bundles"].queryset = Bundle.objects.order_by("sort_order", "title")
+        self.fields["payment_provider"].choices = [(key, PAYMENT_METHODS[key]) for key in ADMIN_PAYMENT_METHODS]
+        self.fields["payment_provider"].initial = "bank_transfer"
+        self.fields["cart"].queryset = Cart.objects.active()
+
+    def clean_email(self):
+        user = User.objects.with_email(self.cleaned_data["email"]).first()
+        if user is None:
+            raise forms.ValidationError(_("Bu e-postayla üye yok; üye önce siteye kayıt olmalı."))
+        self.user = user
+        return user.email
+
+    def clean_discount_code(self):
+        code = self.cleaned_data["discount_code"].strip()
+        if not code:
+            return None
+        discount = Discount.objects.by_code(code)
+        if discount is None:
+            raise forms.ValidationError(_("Bu kodla indirim yok."))
+        return discount
+
+    def clean(self):
+        cleaned = super().clean()
+        courses, bundles = cleaned.get("courses") or [], cleaned.get("bundles") or []
+        if not courses and not bundles:
+            raise forms.ValidationError(_("En az bir kurs ya da paket seç."))
+        user = getattr(self, "user", None)
+        if user is not None and courses:
+            owned = set(user.enrollments.filter(course__in=courses).values_list("course__title", flat=True))
+            if owned:
+                self.add_error("courses", _("Üye bu kurslara zaten sahip: %(names)s") % {"names": ", ".join(sorted(owned))})
+        cart = cleaned.get("cart")
+        if cart is not None and user is not None and cart.user_id != user.pk:
+            self.add_error("email", _("Sepet bu üyeye ait değil."))
+        return cleaned
+
+    def save(self):
+        data = self.cleaned_data
+        items = [CartItem(course=course) for course in data["courses"]] + [CartItem(bundle=bundle) for bundle in data["bundles"]]
+        with transaction.atomic():
+            order = Order.create_for_items(
+                items, self.user.email, self.user, discount=data["discount_code"], provider=data["payment_provider"], cart=data["cart"]
+            )
+            if data["mark_paid"]:
+                order.mark_paid(provider=data["payment_provider"])
+        return order
+
+    @classmethod
+    def initial_from_cart(cls, cart):
+        """Sepetten ön doldurma: üye, sepetteki kurslar/paketler ve uygulanan kod."""
+        items = list(cart.items.all())
+        return dict(
+            email=cart.user.email if cart.user_id else "",
+            courses=[item.course_id for item in items if item.course_id],
+            bundles=[item.bundle_id for item in items if item.bundle_id],
+            discount_code=cart.discount.code if cart.discount_id else "",
+            cart=cart.pk,
+        )

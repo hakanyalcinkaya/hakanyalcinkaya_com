@@ -1,0 +1,28 @@
+{% extends "studio/base.html" %}
+{% load crispy_forms_tags %}
+{% block studio_title %}Sipariş oluştur{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:orders' %}" class="link-secondary text-decoration-none">Siparişler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="mb-4">
+  <h1 class="h3 mb-1">Sipariş oluştur</h1>
+  <p class="text-body-secondary mb-0">Havale/EFT gibi site dışında alınan ödemeler için. Tutar bugünkü fiyatlardan ve indirim kodundan hesaplanır. Banka bilgisini üyeye e-postayla sen gönderirsin; ödeme gelince siparişi onaylayınca kurs erişimi açılır.</p>
+</div>
+<form method="post" class="border rounded p-3 p-lg-4" style="max-width: 46rem" novalidate>
+  {% csrf_token %}
+  {{ form.cart }}
+  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  {% if form.initial.cart %}<div class="alert alert-secondary small" role="status"><i class="bi bi-cart me-1" aria-hidden="true"></i>Üyenin sepetinden dolduruldu; sipariş ödenince sepet kapanır.</div>{% endif %}
+  {{ form.email|as_crispy_field }}
+  <div class="row g-3">
+    <div class="col-md-6">{{ form.courses|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.bundles|as_crispy_field }}</div>
+  </div>
+  {{ form.payment_provider|as_crispy_field }}
+  {{ form.discount_code|as_crispy_field }}
+  {{ form.mark_paid|as_crispy_field }}
+  <div class="d-flex gap-2 mt-2">
+    <button type="submit" class="btn btn-primary">Siparişi oluştur</button>
+    <a href="{% url 'studio:orders' %}" class="btn btn-outline-secondary">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

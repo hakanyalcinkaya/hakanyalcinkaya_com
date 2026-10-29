@@ -28,6 +28,7 @@ from course.models import (
     rating_summary,
 )
 from learning.models import Enrollment, LessonProgress
+from cart.request_cart import current_cart
 from page import catalog
 
 FALLBACK_IMAGE = "img/courses/react.jpg"
@@ -190,14 +191,42 @@ def card_by_slug(slug, user=None, cards=None):
     return next((card for card in (cards if cards is not None else catalog_cards(user)) if card["slug"] == slug), None)
 
 
-def cart_cards(session, user=None, cards=None):
-    """Sepetteki kurslar (sırasıyla). Listede olmayan ya da artık sahip olunan kurslar sepetten düşer."""
-    cards = {card["slug"]: card for card in (cards if cards is not None else catalog_cards(user))}
-    slugs = catalog.cart_slugs(session)
-    kept = [slug for slug in slugs if slug in cards and not cards[slug]["owned"]]
-    if kept != slugs:
-        session[catalog.CART_SESSION_KEY] = kept
-    return [cards[slug] for slug in kept]
+def cart_cards(request, cards=None):
+    """Sepetteki kurslar (eklenme sırasıyla). Veritabanındaki kurslar sepet kaydında (cart.Cart), yalnız örnek veride
+    olanlar oturumda tutulur. Listede olmayan ya da artık sahip olunan kurslar sepetten düşer."""
+    cards = {card["slug"]: card for card in (cards if cards is not None else catalog_cards(request.user))}
+    kept = []
+    cart = current_cart(request)
+    if cart is not None:
+        for item in cart.items.filter(course__isnull=False).select_related("course"):
+            card = cards.get(item.course.slug)
+            if card is not None and card["owned"]:
+                cart.remove_item(item)
+            elif card is not None:
+                kept.append(card)
+    slugs = catalog.cart_slugs(request.session)
+    sample = [slug for slug in slugs if slug in cards and not cards[slug]["owned"]]
+    if sample != slugs:
+        request.session[catalog.CART_SESSION_KEY] = sample
+    return kept + [cards[slug] for slug in sample if cards[slug] not in kept]
+
+
+def cart_add(request, slug):
+    """Kursu sepete ekler; veritabanındaki kursta sepet kaydına (sahip olunan ya da paketteki kurs eklenmez)."""
+    course = Course.objects.filter(slug=slug).first()
+    if course is None:
+        catalog.cart_add(request.session, slug)
+        return
+    current_cart(request, create=True).add_course(course)
+
+
+def cart_remove(request, slug):
+    cart = current_cart(request)
+    if cart is not None:
+        item = cart.items.filter(course__slug=slug).first()
+        if item is not None:
+            cart.remove_item(item)
+    catalog.cart_remove(request.session, slug)
 
 
 def order_summary(items):

@@ -21,7 +21,7 @@ from learning.models import Enrollment
 from newsletter.models import Subscriber
 from order.models import Order, OrderItem, OrderStatus
 from studio import course_stats
-from studio.forms import EnrollmentGrantForm, MemberAccessForm, OrderFilterForm
+from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
 
@@ -50,6 +50,26 @@ def orders(request):
     rows = filters.filter(base)
     page = _page(request, rows.select_related("user").prefetch_related("items").order_by("-created_at", "id"))
     return _list_response(request, "orders", dict(page=page, filters=filters, revenue=course_stats.revenue(rows.paid())))
+
+
+@superuser_required
+def order_create(request):
+    """Yöneticinin açtığı sipariş (havale/EFT vb.); ?sepet=<id> ile üyenin sepetinden doldurulur. Ödeme alındıysa
+    hemen "ödendi" yapılır, değilse sipariş bekler ve sipariş sayfasından onaylanır."""
+    initial = None
+    cart_id = request.GET.get("sepet")
+    if cart_id and request.method != "POST":
+        cart = Cart.objects.active().filter(pk=cart_id, user__isnull=False).select_related("user", "discount").first()
+        initial = ManualOrderForm.initial_from_cart(cart) if cart else None
+    form = ManualOrderForm(request.POST or None, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        order = form.save()
+        if order.is_paid:
+            messages.success(request, _("Sipariş %(number)s ödendi olarak açıldı; kurs erişimleri açıldı.") % {"number": order.number})
+        else:
+            messages.success(request, _("Sipariş %(number)s açıldı; ödeme gelince bu sayfadan onayla.") % {"number": order.number})
+        return redirect("studio:order_detail", order.pk)
+    return render(request, "studio/order_form.html", dict(form=form))
 
 
 def _order(order_id):

@@ -20,6 +20,16 @@ class OrderStatus(models.TextChoices):
     CANCELLED = "cancelled", _("İptal")
 
 
+# Ödeme yolu (payment_provider). Son kullanıcı yalnız kartla öder; havale/EFT ve elle kayıtları yönetici açar.
+PAYMENT_METHODS = {
+    "card": _("Kredi / banka kartı"),
+    "bank_transfer": _("Havale / EFT"),
+    "manual": _("Elle (yönetici)"),
+    "podia": _("Podia (eski platform)"),
+}
+ADMIN_PAYMENT_METHODS = ("bank_transfer", "card", "manual")
+
+
 class OrderQuerySet(models.QuerySet):
     def paid(self):
         return self.filter(status=OrderStatus.PAID)
@@ -94,12 +104,26 @@ class Order(BaseModel):
     def is_paid(self):
         return self.status == OrderStatus.PAID
 
+    @property
+    def payment_method_label(self):
+        return PAYMENT_METHODS.get(self.payment_provider, self.payment_provider)
+
     @classmethod
-    def create_from_cart(cls, cart, email, user=None):
+    def create_from_cart(cls, cart, email, user=None, provider=""):
         """Sepetin o anki fiyatlarıyla bekleyen bir sipariş oluşturur."""
         from cart.pricing import price_cart
 
-        summary = price_cart(cart, user)
+        return cls._create(price_cart(cart, user), email, user, cart=cart, discount=cart.discount, provider=provider)
+
+    @classmethod
+    def create_for_items(cls, items, email, user, discount=None, provider="", cart=None):
+        """Yöneticinin açtığı sipariş (ör. havale/EFT): ürünler (kaydedilmemiş CartItem) bugünkü fiyatlarıyla."""
+        from cart.pricing import price_items
+
+        return cls._create(price_items(items, user, discount), email, user, cart=cart, discount=discount, provider=provider)
+
+    @classmethod
+    def _create(cls, summary, email, user, cart=None, discount=None, provider=""):
         with transaction.atomic():
             order = cls.objects.create(
                 user=user if user and user.is_authenticated else None,
@@ -108,8 +132,9 @@ class Order(BaseModel):
                 subtotal=summary.subtotal,
                 discount_total=summary.discount_total,
                 total=summary.total,
-                discount=cart.discount,
-                discount_code=cart.discount.code if cart.discount_id else "",
+                discount=discount,
+                discount_code=discount.code if discount else "",
+                payment_provider=provider,
             )
             OrderItem.objects.bulk_create(
                 [

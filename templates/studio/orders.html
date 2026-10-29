@@ -1,9 +1,12 @@
 {% extends "studio/base.html" %}
 {% block studio_title %}Siparişler{% endblock %}
 {% block studio_content %}
-<div class="mb-4">
-  <h1 class="h3 mb-1">Siparişler</h1>
-  <p class="text-body-secondary mb-0">Sitedeki satışlar ve eski platformdan aktarılanlar. Tutarlar mali kayıttır, değiştirilmez; havale gibi elle onaylanan ödemeler sipariş sayfasından işaretlenir.</p>
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Siparişler</h1>
+    <p class="text-body-secondary mb-0">Sitedeki satışlar ve eski platformdan aktarılanlar. Tutarlar mali kayıttır, değiştirilmez; havale/EFT gibi ödemeler için siparişi sen açar, ödeme gelince onaylarsın.</p>
+  </div>
+  <a href="{% url 'studio:order_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Sipariş oluştur</a>
 </div>
 {% include "studio/partials/_orders_list.html" %}
 {% endblock %}

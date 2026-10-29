@@ -77,6 +77,7 @@ urlpatterns = [
     path("catalog/<slug:kind>/<uuid:item_id>/", views_catalog.catalog_edit, name="catalog_edit"),
     path("catalog/<slug:kind>/<uuid:item_id>/delete/", views_catalog.catalog_delete, name="catalog_delete"),
     path("orders/", views_sales.orders, name="orders"),
+    path("orders/new/", views_sales.order_create, name="order_create"),
     path("orders/<uuid:order_id>/", views_sales.order_detail, name="order_detail"),
     path("orders/<uuid:order_id>/mark-paid/", views_sales.order_mark_paid, name="order_mark_paid"),
     path("carts/", views_sales.carts, name="carts"),

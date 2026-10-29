@@ -10,7 +10,7 @@
   </div>
   <div class="d-flex flex-wrap gap-2 small text-body-secondary">
     <span class="text-truncate">{% for item in order.items.all %}{{ item.title }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
-    <span class="ms-auto text-body-tertiary">{% if order.payment_provider %}{{ order.payment_provider }} · {% endif %}{{ order.paid_at|default:order.created_at|date:"d.m.Y H:i" }}</span>
+    <span class="ms-auto text-body-tertiary">{% if order.payment_provider %}{{ order.payment_method_label }} · {% endif %}{{ order.paid_at|default:order.created_at|date:"d.m.Y H:i" }}</span>
   </div>
 </a>
 {% empty %}

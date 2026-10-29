@@ -7,6 +7,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -25,8 +26,6 @@ from page.catalog import (
     RESET_SESSION_KEY,
     TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
-    cart_add,
-    cart_remove,
     catalog_stats,
     course_filters,
     course_page,
@@ -307,13 +306,17 @@ def add_to_cart(request, slug):
     if card["owned"]:
         messages.info(request, "Bu eğitime zaten sahipsin.")
         return redirect(card["url"])
-    cart_add(request.session, slug)
+    try:
+        content.cart_add(request, slug)
+    except ValidationError as error:
+        messages.info(request, error.messages[0])
+        return redirect("page:cart")
     return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
 
 
 @require_POST
 def remove_from_cart(request, slug):
-    cart_remove(request.session, slug)
+    content.cart_remove(request, slug)
     return redirect(f"{reverse('page:cart')}?{urlencode({'cikarildi': slug})}")
 
 
@@ -325,13 +328,17 @@ def buy(request, slug):
     if card["owned"]:
         messages.info(request, "Bu eğitime zaten sahipsin.")
         return redirect(card["url"])
-    cart_add(request.session, slug)
+    try:
+        content.cart_add(request, slug)
+    except ValidationError as error:
+        messages.info(request, error.messages[0])
+        return redirect("page:cart")
     return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
 
 
 def cart(request):
     cards = content.catalog_cards(request.user)
-    items = content.cart_cards(request.session, request.user, cards)
+    items = content.cart_cards(request, cards)
     added = content.card_by_slug(request.GET.get("eklendi", ""), cards=cards)
     removed = content.card_by_slug(request.GET.get("cikarildi", ""), cards=cards)
     in_cart = {item["slug"] for item in items}
@@ -344,15 +351,23 @@ def cart(request):
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,
             "suggestions": [card for card in cards if card["slug"] not in in_cart and not card["owned"]],
-            "checkout_open": False,
+            "checkout_open": True,
         },
     )
 
 
+@login_required
 def checkout(request):
-    """Online ödeme henüz kapalı: sepete döner."""
-    messages.info(request, "Online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
-    return redirect("page:cart")
+    """Ödeme adımı: kurs erişimi hesaba açıldığı için giriş gerekir (misafir sepeti girişte hesaba katılır).
+    Son kullanıcı yalnız kartla öder; kart ödemesi (iyzico) bağlanana kadar sipariş oluşturulmaz, sepet bekler."""
+    items = content.cart_cards(request)
+    if not items:
+        return redirect("page:cart")
+    return render(
+        request,
+        "page/checkout.html",
+        {"summary": content.order_summary(items), "steps": purchase_steps(1), "card_payment_open": False},
+    )
 
 
 def thanks(request):

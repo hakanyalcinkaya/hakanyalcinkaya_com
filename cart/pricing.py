@@ -60,11 +60,14 @@ def paid_amount_for(user, course):
 
 
 def price_cart(cart, user=None):
-    user = user or cart.user
-    discount = cart.discount
+    return price_items(cart.items.select_related("course", "bundle"), user or cart.user, cart.discount)
+
+
+def price_items(items, user=None, discount=None):
+    """Sepet ürünleri (kayıtlı ya da kaydedilmemiş CartItem) için fiyat; yönetici siparişi sepet olmadan da hesaplanır."""
     owned = set(user.enrollments.values_list("course_id", flat=True)) if user and user.is_authenticated else set()
     lines = []
-    for item in cart.items.select_related("course", "bundle"):
+    for item in items:
         product = item.product
         base = product.price
         compare = max(product.compare_price or base, base)

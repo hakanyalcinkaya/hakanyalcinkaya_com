@@ -6,6 +6,7 @@
     <span class="badge rounded-1 border text-body-secondary fw-medium">{{ cart.get_status_display }}</span>
     {% if cart.discount %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace">{{ cart.discount.code }}</span>{% endif %}
     <time class="ms-auto small text-body-tertiary" datetime="{{ cart.updated_at|date:'c' }}" title="{{ cart.updated_at|date:'d.m.Y H:i' }}">{{ cart.updated_at|ago }}</time>
+    {% if cart.user_id and cart.is_active %}<a href="{% url 'studio:order_create' %}?sepet={{ cart.id }}" class="btn btn-outline-primary btn-sm py-0">Sipariş oluştur</a>{% endif %}
   </div>
   <div class="small text-body-secondary">{% for item in cart.items.all %}{{ item.product.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
 </div>

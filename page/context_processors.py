@@ -20,7 +20,7 @@ def site(request):
     url_name = match.url_name if match else ""
     user = request.user
     cards = content.catalog_cards(user)
-    cart_count = len(content.cart_cards(request.session, user, cards))
+    cart_count = len(content.cart_cards(request, cards))
     nav_items = []
     for item_id, label in NAV:
         if item_id == "egitimler":
