@@ -1131,6 +1131,15 @@ class ReviewQuerySet(StatusQuerySet):
         reviews = self.with_text().select_related("user", "course")
         return reviews.filter(course=course) if course is not None else reviews
 
+    def course_counts(self):
+        """Sitede yorumu olan kurslar ve yorum sayıları ("Tüm yorumlar" penceresindeki kurs filtresi)."""
+        return (
+            self.with_text()
+            .values("course__slug", "course__short_title")
+            .annotate(count=Count("pk"))
+            .order_by("course__short_title")
+        )
+
     def awaiting(self):
         """Stüdyoda onay bekleyen: yeni ya da onaydan sonra değiştirilmiş yorumlar."""
         return self.filter(needs_review=True).exclude(status=Status.ARCHIVED)

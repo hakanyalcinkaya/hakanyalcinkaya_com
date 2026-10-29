@@ -1,4 +1,4 @@
-{# "Tüm yorumlar" penceresi: onaylı yorumlar, en yeni önce. show_course: ana sayfadan açılınca kurs adı da yazılır. #}
+{# "Tüm yorumlar" penceresi: onaylı yorumlar, en yeni önce. show_course: ana sayfadan açılınca kurs adı da yazılır; course_filter: kurs seçimi pencereyi yeniden yükler. #}
 {% load core_tags %}
 <div class="d-flex align-items-start justify-content-between gap-3 border-bottom px-3 px-md-4 py-3">
   <div>
@@ -7,6 +7,15 @@
   </div>
   <button type="button" class="btn-close" data-dialog-close aria-label="Kapat"></button>
 </div>
+{% if course_filter %}
+{% url 'page:all_reviews' as all_reviews_url %}
+<nav class="d-flex flex-wrap gap-2 border-bottom px-3 px-md-4 py-2" aria-label="Kursa göre">
+  <button type="button" class="btn btn-sm {% if not selected %}btn-secondary{% else %}btn-outline-secondary{% endif %}" hx-get="{{ all_reviews_url }}" hx-target="#site-dialog-body"{% if not selected %} aria-current="true"{% endif %}>Tümü <span class="opacity-75">{{ total }}</span></button>
+  {% for item in course_filter %}
+  <button type="button" class="btn btn-sm {% if selected == item.course__slug %}btn-secondary{% else %}btn-outline-secondary{% endif %}" hx-get="{{ all_reviews_url }}?kurs={{ item.course__slug }}" hx-target="#site-dialog-body"{% if selected == item.course__slug %} aria-current="true"{% endif %}>{{ item.course__short_title }} <span class="opacity-75">{{ item.count }}</span></button>
+  {% endfor %}
+</nav>
+{% endif %}
 <div class="overflow-y-auto px-3 px-md-4 py-2 hy-site-dialog-scroll">
   {% for review in reviews %}
   <article class="py-3{% if not forloop.last %} border-bottom{% endif %}">

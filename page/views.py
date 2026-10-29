@@ -175,11 +175,21 @@ def course_detail(request, slug):
 
 
 def all_reviews(request):
-    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır."""
-    items = Review.objects.all_for().order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
-    return render(
-        request, "page/partials/reviews_dialog.html", dict(reviews=[item.card() for item in items], show_course=True)
+    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır. ?kurs=<slug> o kursa daraltır."""
+    courses = Review.objects.course_counts()
+    selected = request.GET.get("kurs", "")
+    course = Course.objects.filter(slug=selected).first() if selected else None
+    items = Review.objects.all_for(course).order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
+    context = dict(
+        reviews=[item.card() for item in items],
+        show_course=course is None,
+        course_filter=courses,
+        total=sum(item["count"] for item in courses),
+        selected=course.slug if course else "",
+        course=course,
+        rating=Review.objects.filter(course=course).rating_summary() if course else None,
     )
+    return render(request, "page/partials/reviews_dialog.html", context)
 
 
 def course_reviews(request, slug):
