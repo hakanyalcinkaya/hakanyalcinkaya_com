@@ -1,0 +1,46 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{{ log.subject }}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span> <a href="{% url 'studio:email_log' %}" class="link-secondary text-decoration-none">Gönderim günlüğü</a> <span class="text-body-tertiary">/</span></nav>
+<div class="mb-4">
+  <h1 class="h4 mb-1">{{ log.subject }}</h1>
+  <p class="text-body-secondary mb-0">{{ label }} <code class="small text-body-tertiary">{{ log.template }}</code></p>
+</div>
+<div class="row g-4">
+  <div class="col-lg-4 order-lg-2">
+    <dl class="small mb-4">
+      <dt class="text-body-secondary fw-normal">Alıcı</dt>
+      <dd>{{ log.to_email }}{% if log.user %} <span class="text-body-tertiary">({{ log.user.get_full_name|default:"üye" }})</span>{% endif %}</dd>
+      {% if log.delivered_to != log.to_email %}<dt class="text-body-secondary fw-normal">Gönderildiği adres</dt><dd>{{ log.delivered_to }} <span class="text-body-tertiary">(test yönlendirmesi)</span></dd>{% endif %}
+      <dt class="text-body-secondary fw-normal">Durum</dt>
+      <dd>{% if log.status == "failed" %}<span class="badge text-bg-danger">{{ log.get_status_display }}</span>{% else %}{{ log.get_status_display }}{% endif %}{% if log.sent_at %} · {{ log.sent_at|date:"d.m.Y H:i" }}{% endif %}</dd>
+      {% if log.error %}<dt class="text-body-secondary fw-normal">Hata</dt><dd><code class="small">{{ log.error }}</code></dd>{% endif %}
+      <dt class="text-body-secondary fw-normal">Açılma</dt>
+      <dd>{{ log.open_count }}{% if log.first_opened_at %} · ilk {{ log.first_opened_at|date:"d.m.Y H:i" }}{% endif %}</dd>
+      <dt class="text-body-secondary fw-normal">Tıklama</dt>
+      <dd>{{ log.click_count }}{% if log.first_clicked_at %} · ilk {{ log.first_clicked_at|date:"d.m.Y H:i" }}{% endif %}</dd>
+    </dl>
+    <h2 class="h6 text-body-secondary text-uppercase small mb-2">Olaylar</h2>
+    <ol class="list-group small">
+      {% for event in events %}
+      <li class="list-group-item">
+        <div class="d-flex gap-2"><span class="fw-medium">{{ event.get_kind_display }}</span><span class="ms-auto text-body-tertiary">{{ event.created_at|date:"d.m.Y H:i:s" }}</span></div>
+        {% if event.url %}<div class="text-break"><a href="{{ event.url }}" class="link-secondary" rel="noopener noreferrer" target="_blank">{{ event.url }}</a></div>{% endif %}
+        {% if event.user_agent %}<div class="text-body-tertiary text-truncate" title="{{ event.user_agent }}">{{ event.user_agent }}</div>{% endif %}
+      </li>
+      {% empty %}
+      <li class="list-group-item text-body-secondary">Olay yok.</li>
+      {% endfor %}
+    </ol>
+  </div>
+  <div class="col-lg-8 order-lg-1">
+    <div class="border rounded overflow-hidden">
+      <iframe title="E-posta içeriği" srcdoc="{{ log.html_body }}" class="w-100 d-block bg-white" style="height: 900px; border: 0;" sandbox></iframe>
+    </div>
+    <details class="mt-3 border rounded">
+      <summary class="px-3 py-2 small fw-medium">Düz metin sürümü</summary>
+      <pre class="small px-3 pb-3 mb-0 text-wrap">{{ log.text_body }}</pre>
+    </details>
+  </div>
+</div>
+{% endblock %}

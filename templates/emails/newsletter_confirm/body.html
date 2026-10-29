@@ -9,4 +9,4 @@
 {% include "emails/modules/button.html" with url=confirm_url label="Aboneliğimi onayla" %}
 <p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; onaylamadıkça sana bülten gönderilmez.</p>
 {% endblock %}
-{% block footer %}Bu e-posta {{ email }} adresine bülten aboneliği isteği üzerine gönderildi.{% endblock %}
+{% block footer %}Bu e-posta {{ email }} adresine bülten aboneliği isteği üzerine gönderildi.{% if unsubscribe_url %} <a href="{{ unsubscribe_url }}" style="color: #D8D8D8;">Bülten aboneliğinden çık</a>{% endif %}{% endblock %}

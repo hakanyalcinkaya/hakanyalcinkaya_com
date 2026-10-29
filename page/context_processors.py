@@ -3,9 +3,11 @@ from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 
 from core.models import SiteSettings
+from newsletter.models import Subscriber
 
 from page.catalog import (
     NAV,
+    NEWSLETTER_SESSION_KEY,
     SHOP_URL_NAMES,
     cart_slugs,
     course_catalog,
@@ -48,4 +50,8 @@ def site(request):
         "library_url": reverse("page:library"),
         # Stüdyo "Ayarlar"ı (ör. not alma açık mı); yalnız şablonda kullanılırsa okunur.
         "site_settings": SimpleLazyObject(SiteSettings.load),
+        # Bülten kutusu: form yerine gösterilecek durum (abonesin / onay bekliyor / gönderildi); yoksa form.
+        "newsletter_state": SimpleLazyObject(
+            lambda: Subscriber.state_for(user, request.session.get(NEWSLETTER_SESSION_KEY, "")) or {}
+        ),
     }

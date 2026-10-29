@@ -93,6 +93,25 @@ class Subscriber(BaseModel):
         subscriber.queue_confirmation()
         return subscriber, True
 
+    @classmethod
+    def state_for(cls, user, session_email=""):
+        """Bülten kutusunda form yerine gösterilecek durum.
+
+        Giriş yapmış kullanıcının kendi adresinin durumu gösterilir ("subscribed" / "pending"). Giriş yapmamış
+        ziyaretçide yalnız bu tarayıcıdan az önce abone olunduysa "sent" döner; adresin onaylı olup olmadığı
+        söylenmez (başkasının adresi yazılmış olabilir). Diğer herkes formu görür (None).
+        """
+        if user.is_authenticated:
+            subscriber = cls.objects.by_email(user.email)
+            if subscriber is not None and subscriber.status == SubscriberStatus.CONFIRMED:
+                return {"status": "subscribed", "email": subscriber.email, "unsubscribe_path": subscriber.unsubscribe_path()}
+            if subscriber is not None and subscriber.status == SubscriberStatus.PENDING:
+                return {"status": "pending", "email": subscriber.email}
+            return None
+        if session_email:
+            return {"status": "sent", "email": session_email}
+        return None
+
     def queue_confirmation(self):
         from newsletter.tasks import send_confirmation
 
@@ -108,11 +127,14 @@ class Subscriber(BaseModel):
     def confirm_url(self):
         return self._absolute("page:newsletter_activate")
 
+    def unsubscribe_path(self):
+        return reverse("page:newsletter_unsubscribe_link", kwargs={"token": self.confirm_token})
+
     def unsubscribe_url(self):
-        return self._absolute("page:newsletter_unsubscribe_link")
+        return settings.SITE_URL.rstrip("/") + self.unsubscribe_path()
 
     def email_context(self):
-        """Bülten e-postalarının değişkenleri (bkz. core.emails: newsletter_confirm, newsletter)."""
+        """Bülten e-postalarının değişkenleri (bkz. mailing.emails: newsletter_confirm, newsletter)."""
         return {
             "name": self.name,
             "email": self.email,

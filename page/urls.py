@@ -42,6 +42,7 @@ urlpatterns = [
     path("account/player-preferences/", views.player_preferences, name="player_preferences"),
     path("newsletter/confirm/", views.newsletter_confirm, name="newsletter_confirm"),
     path("newsletter/confirm/<uuid:token>/", views.newsletter_activate, name="newsletter_activate"),
+    path("newsletter/resend/", views.newsletter_resend, name="newsletter_resend"),
     path("newsletter/unsubscribe/<uuid:token>/", views.newsletter_unsubscribe_link, name="newsletter_unsubscribe_link"),
     path("newsletter/confirmed/", views.newsletter_confirmed, name="newsletter_confirmed"),
     path("newsletter/unsubscribe/", views.newsletter_unsubscribe, name="newsletter_unsubscribe"),

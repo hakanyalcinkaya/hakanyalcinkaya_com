@@ -193,8 +193,8 @@ class PasswordResetForm(StyledFormMixin, auth_forms.PasswordResetForm):
         return User.objects.with_email(email).filter(is_active=True)
 
     def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
-        """Şablon: templates/emails/password_reset (HTML + düz metin, bkz. core.emails)."""
-        from core.emails import send_email
+        """Şablon: templates/emails/password_reset (HTML + düz metin, bkz. mailing.emails)."""
+        from mailing.emails import send_email
         from order.emails import password_reset_context
 
         path = reverse("page:password_reset_confirm", kwargs={"uidb64": context["uid"], "token": context["token"]})

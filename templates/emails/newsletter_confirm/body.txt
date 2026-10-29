@@ -5,4 +5,4 @@ Bültene abone olmak istediğin için teşekkürler. Aboneliğini başlatmak iç
 {{ confirm_url }}
 
 Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; onaylamadıkça sana bülten gönderilmez.{% endblock %}
-{% block footer %}Bu e-posta {{ email }} adresine bülten aboneliği isteği üzerine gönderildi.{% endblock %}
+{% block footer %}Bu e-posta {{ email }} adresine bülten aboneliği isteği üzerine gönderildi.{% if unsubscribe_url %} Bülten aboneliğinden çık: {{ unsubscribe_url }}{% endif %}{% endblock %}

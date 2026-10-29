@@ -11,10 +11,12 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from course.models import Course, Lesson, Review
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
+from mailing.models import EmailLog
 from newsletter.models import Subscriber
 from page import content
 from page.catalog import (
@@ -71,7 +73,10 @@ def _newsletter(request):
             request.session[NEWSLETTER_SESSION_KEY] = form.cleaned_data["email"]
             return form, redirect("page:newsletter_confirm")
         return form, None
-    return NewsletterForm(), None
+    # Giriş yapmış kullanıcıda ad ve e-posta hazır gelir; tek tıkla abone olur.
+    user = request.user
+    initial = {"name": user.get_full_name(), "email": user.email} if user.is_authenticated else None
+    return NewsletterForm(initial=initial), None
 
 
 def index(request):
@@ -545,14 +550,32 @@ def newsletter_unsubscribe(request):
     )
 
 
+@login_required
+@require_POST
+def newsletter_resend(request):
+    """Giriş yapmış ve onayı bekleyen kullanıcıya onay e-postasını yeniden gönderir (dakikada bir)."""
+    _subscriber, sent = Subscriber.subscribe(request.user.email, name=request.user.get_full_name(), source="/tekrar-gonder/")
+    if sent:
+        messages.success(request, "Onay e-postasını yeniden gönderdik; gelen kutunu kontrol et.")
+    else:
+        messages.info(request, "Onay e-postasını az önce gönderdik; birkaç dakika sonra yeniden deneyebilirsin.")
+    return redirect(f"{_next_url(request, reverse('page:index'))}#bulten")
+
+
+@csrf_exempt
 def newsletter_unsubscribe_link(request, token):
     """E-postalardaki "abonelikten çık" bağlantısı. Bağlantıyı önceden açan e-posta tarayıcıları yanlışlıkla çıkarmasın
-    diye çıkış düğmeyle (POST) yapılır."""
+    diye çıkış düğmeyle (POST) yapılır. E-posta istemcilerinin tek tıkla çıkışı (List-Unsubscribe-Post) da buraya POST
+    eder; CSRF anahtarı taşıyamadığı için muaftır, yetkiyi bağlantıdaki tahmin edilemez anahtar verir.
+    `?e=` hangi e-postadan çıkıldığını gösterir (mailing.EmailLog)."""
     subscriber = Subscriber.objects.filter(confirm_token=token).first()
     if subscriber is None:
         return redirect("page:newsletter_unsubscribe")
     if request.method == "POST":
         subscriber.unsubscribe()
+        log = EmailLog.objects.for_token(request.GET.get("e", "")).filter(to_email__iexact=subscriber.email).first()
+        if log is not None:
+            log.record_unsubscribe()
         request.session[UNSUBSCRIBED_SESSION_KEY] = subscriber.email
         return redirect("page:newsletter_unsubscribe")
     return render(request, "page/newsletter_unsubscribe.html", {"link_subscriber": subscriber})

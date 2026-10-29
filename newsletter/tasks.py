@@ -4,7 +4,7 @@ import smtplib
 
 from celery import shared_task
 
-from core.emails import send_email
+from mailing.emails import send_email
 from newsletter.models import Subscriber, SubscriberStatus
 
 

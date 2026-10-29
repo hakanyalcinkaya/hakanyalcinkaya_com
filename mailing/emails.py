@@ -5,7 +5,10 @@ sözdizimiyle yazılır ({{ first_name }}, {% for item in items %} ...). Hangi e
 EMAILS listesinde yazılıdır; stüdyodaki önizleme sayfası bu listeyi gösterir.
 """
 
+from urllib.parse import urlencode
+
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
@@ -118,7 +121,13 @@ EMAILS = {
         "Bülten aboneliği onayı",
         "Bülten",
         "Abone olunca onay bağlantısı (çift onay).",
-        {"name": "Abonenin adı", "email": "Abonenin e-postası", "confirm_url": "Onay bağlantısı", "site_url": "Sitenin adresi"},
+        {
+            "name": "Abonenin adı",
+            "email": "Abonenin e-postası",
+            "confirm_url": "Onay bağlantısı",
+            "unsubscribe_url": "Abonelikten çıkış bağlantısı",
+            "site_url": "Sitenin adresi",
+        },
         recipient="subscriber",
     ),
     "newsletter": _email(
@@ -190,11 +199,39 @@ def render_email(key, context):
     return subject, render_to_string(names["body.txt"], context).strip() + "\n", render_to_string(names["body.html"], context)
 
 
-def send_email(key, to, context):
+def _with_query(url, **params):
+    return f"{url}{'&' if '?' in url else '?'}{urlencode(params)}"
+
+
+def send_email(key, to, context, user=None):
+    """E-postayı gönderir ve kaydeder (mailing.EmailLog): içerik gizli bağlantılar maskelenerek saklanır; HTML'e açılma
+    görseli ve tıklama yönlendirmeleri eklenir. Bülten e-postalarına tek tıkla abonelikten çıkma başlıkları konur."""
+    from mailing.models import EmailLog
+    from mailing.tracking import add_tracking, mask, sensitive_values
+
+    if user is None:
+        user = get_user_model().objects.filter(email__iexact=to).first()
+    log = EmailLog(template=key, to_email=to, user=user, delivered_to=getattr(settings, "EMAIL_REDIRECT_TO", "") or to)
+    unsubscribe_url = context.get("unsubscribe_url") if EMAILS[key]["recipient"] == "subscriber" else None
+    if unsubscribe_url:
+        # Abonelikten çıkışın hangi e-postadan geldiği kaydedilsin.
+        unsubscribe_url = _with_query(unsubscribe_url, e=log.token)
+        context = {**context, "unsubscribe_url": unsubscribe_url}
     subject, text, html = render_email(key, context)
+    secrets = sensitive_values(context)
     message = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL, [to])
-    message.attach_alternative(html, "text/html")
-    message.send()
+    message.attach_alternative(add_tracking(html, log.token, skip=secrets), "text/html")
+    if unsubscribe_url:
+        message.extra_headers["List-Unsubscribe"] = f"<{unsubscribe_url}>"
+        message.extra_headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+    log.subject, log.text_body, log.html_body = subject[:300], mask(text, secrets), mask(html, secrets)
+    log.save()
+    try:
+        message.send()
+    except Exception as error:
+        log.mark_failed(error)
+        raise
+    log.mark_sent()
     return message
 
 

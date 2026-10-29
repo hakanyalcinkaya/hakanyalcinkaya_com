@@ -7,11 +7,43 @@
         <p class="text-body-secondary mb-0">Yeni yazılım kursları, faydalı kaynaklar ve geliştirici içerikleri e-posta kutuna gelsin.</p>
       </div>
       <div class="col-lg-7">
+        {# Durumu bildiğimizde form yerine mesaj: giriş yapmış kullanıcının kendi aboneliği ya da bu tarayıcıdan az önce #}
+        {# yapılan abonelik. Başkasının adresinin durumu gösterilmez. ?bulten=form ile form yeniden açılır. #}
+        {% if newsletter_state.status and request.GET.bulten != "form" %}
+        <div class="d-flex gap-3 align-items-start" role="status">
+          {% if newsletter_state.status == "subscribed" %}
+          <i class="bi bi-check-circle-fill text-success fs-3 lh-1" aria-hidden="true"></i>
+          <div>
+            <p class="fw-semibold mb-1">Bültene abonesin</p>
+            <p class="text-body-secondary mb-2"><b class="text-body">{{ newsletter_state.email }}</b> adresine yeni kurslar ve içerikler geldiğinde haber veriyoruz.</p>
+            <a href="{{ newsletter_state.unsubscribe_path }}" class="small link-secondary">Abonelikten çık</a>
+          </div>
+          {% else %}
+          <i class="bi bi-envelope-check text-primary fs-3 lh-1" aria-hidden="true"></i>
+          <div>
+            <p class="fw-semibold mb-1">Onay e-postası gönderildi</p>
+            <p class="text-body-secondary mb-2"><b class="text-body">{{ newsletter_state.email }}</b> adresine gönderdiğimiz bağlantıyla aboneliğini onayla. Gelmediyse İstenmeyen ve Promosyonlar klasörlerine bak.</p>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              {% if newsletter_state.status == "pending" %}
+              <form method="post" action="{% url 'page:newsletter_resend' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Tekrar gönder</button>
+              </form>
+              {% else %}
+              <a href="?bulten=form#bulten" class="small link-secondary">Başka bir adresle abone ol</a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
         <form method="post" action="{% url 'page:index' %}#bulten" novalidate aria-describedby="bulten-not">
           {% csrf_token %}
           {% crispy form %}
           <p id="bulten-not" class="small text-body-tertiary mt-3 mb-0">İstediğin zaman abonelikten çıkabilirsin. <a href="{{ privacy_url }}">Gizlilik Politikası</a></p>
         </form>
+        {% endif %}
       </div>
     </div>
   </div>

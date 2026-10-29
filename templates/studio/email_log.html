@@ -1,0 +1,38 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Gönderim günlüğü{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span></nav>
+<div class="mb-4">
+  <h1 class="h3 mb-1">Gönderim günlüğü</h1>
+  <p class="text-body-secondary mb-0">Sistemden giden her e-posta içeriğiyle saklanır. Şifre, onay ve abonelik bağlantıları kayıtta gizlenir. Açılma, e-posta istemcisi görselleri yüklediğinde; tıklama, bağlantıya basıldığında sayılır.</p>
+</div>
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Toplam</div><div class="fs-4 fw-semibold">{{ totals.total }}</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Gönderildi</div><div class="fs-4 fw-semibold">{{ totals.sent }}</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Hata</div><div class="fs-4 fw-semibold{% if totals.failed %} text-danger{% endif %}">{{ totals.failed }}</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Açılma</div><div class="fs-4 fw-semibold">%{{ totals.open_rate }}</div><div class="small text-body-tertiary">{{ totals.opened }} e-posta</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Tıklama</div><div class="fs-4 fw-semibold">%{{ totals.click_rate }}</div><div class="small text-body-tertiary">{{ totals.clicked }} e-posta</div></div></div>
+</div>
+{% if stats %}
+<h2 class="h6 text-body-secondary text-uppercase small mb-2">Şablonlara göre</h2>
+<div class="table-responsive mb-4">
+  <table class="table table-sm align-middle small mb-0">
+    <thead><tr><th scope="col">Şablon</th><th scope="col" class="text-end">Toplam</th><th scope="col" class="text-end">Gönderildi</th><th scope="col" class="text-end">Hata</th><th scope="col" class="text-end">Açılma</th><th scope="col" class="text-end">Tıklama</th></tr></thead>
+    <tbody>
+      {% for row in stats %}
+      <tr>
+        <td><a href="?sablon={{ row.template }}" class="text-decoration-none">{{ row.label }}</a> <code class="text-body-tertiary">{{ row.template }}</code></td>
+        <td class="text-end">{{ row.total }}</td>
+        <td class="text-end">{{ row.sent }}</td>
+        <td class="text-end{% if row.failed %} text-danger{% endif %}">{{ row.failed }}</td>
+        <td class="text-end">%{{ row.open_rate }} <span class="text-body-tertiary">({{ row.opened }})</span></td>
+        <td class="text-end">%{{ row.click_rate }} <span class="text-body-tertiary">({{ row.clicked }})</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+<h2 class="h6 text-body-secondary text-uppercase small mb-2">E-postalar</h2>
+{% include "studio/partials/_email_log_list.html" %}
+{% endblock %}

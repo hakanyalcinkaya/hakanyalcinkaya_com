@@ -5,6 +5,7 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch, Q
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
@@ -682,7 +683,7 @@ def review_edit(request, review_id):
 def _email_preview_context(request, key):
     """Örnek veri ya da ?kullanici=e-posta ile seçilen kullanıcının gerçek verisi."""
     from account.models import User
-    from core.emails import sample_context
+    from mailing.emails import sample_context
     from order.emails import preview_context
 
     lookup = request.GET.get("kullanici", "").strip() or request.POST.get("kullanici", "").strip()
@@ -696,7 +697,7 @@ def _email_preview_context(request, key):
 
 @staff_required
 def emails(request):
-    from core.emails import EMAILS
+    from mailing.emails import EMAILS
 
     groups = {}
     for key, email in EMAILS.items():
@@ -704,9 +705,64 @@ def emails(request):
     return render(request, "studio/emails.html", dict(groups=groups, redirect_to=settings.EMAIL_REDIRECT_TO))
 
 
+EMAIL_LOG_PAGE_SIZE = 50
+
+
+@staff_required
+def email_log(request):
+    """Giden e-postalar: şablon başına istatistik ve liste. Filtre (şablon, durum, adres) GET parametresinde; HTMX
+    isteğinde yalnız liste döner."""
+    from mailing.emails import EMAILS
+    from mailing.models import EmailLog, EmailStatus
+
+    labels = {key: email["label"] for key, email in EMAILS.items()}
+    template = request.GET.get("sablon", "")
+    status = request.GET.get("durum", "")
+    query = request.GET.get("q", "").strip()
+    logs = EmailLog.objects.all()
+    if template:
+        logs = logs.filter(template=template)
+    if status in EmailStatus.values:
+        logs = logs.filter(status=status)
+    if query:
+        logs = logs.filter(Q(to_email__icontains=query) | Q(subject__icontains=query))
+    page = Paginator(logs.select_related("user").order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    for log in page:
+        log.label = labels.get(log.template, log.template)
+    context = dict(
+        page=page,
+        template=template,
+        status=status,
+        query=query,
+        statuses=EmailStatus.choices,
+        templates=list(labels.items()),
+    )
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "studio/partials/_email_log_list.html", context)
+    stats = EmailLog.objects.stats_by_template()
+    for row in stats:
+        row["label"] = labels.get(row["template"], row["template"])
+    context.update(stats=stats, totals=EmailLog.objects.stats())
+    return render(request, "studio/email_log.html", context)
+
+
+@staff_required
+def email_log_detail(request, log_id):
+    """Bir e-postanın saklanan içeriği (gizli bağlantılar maskeli) ve olayları (gönderim, açılma, tıklama, çıkış)."""
+    from mailing.emails import EMAILS
+    from mailing.models import EmailLog
+
+    log = get_object_or_404(EmailLog.objects.select_related("user"), pk=log_id)
+    return render(
+        request,
+        "studio/email_log_detail.html",
+        dict(log=log, label=EMAILS.get(log.template, {}).get("label", log.template), events=log.events.all()),
+    )
+
+
 @staff_required
 def email_preview(request, key):
-    from core.emails import EMAILS, render_email, template_names
+    from mailing.emails import EMAILS, render_email, template_names
 
     if key not in EMAILS:
         raise Http404
@@ -736,7 +792,7 @@ def email_preview(request, key):
 @require_POST
 def email_send_test(request, key):
     """Önizlenen e-postayı yalnız yönlendirme adresine (EMAIL_REDIRECT_TO) gönderir; adres yoksa göndermez."""
-    from core.emails import EMAILS, send_email
+    from mailing.emails import EMAILS, send_email
 
     if key not in EMAILS:
         raise Http404

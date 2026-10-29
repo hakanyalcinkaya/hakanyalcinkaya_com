@@ -2,7 +2,10 @@
 {% block studio_title %}E-postalar{% endblock %}
 {% block studio_content %}
 <div class="mb-4">
-  <h1 class="h3 mb-1">E-postalar</h1>
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+    <h1 class="h3 mb-0 me-auto">E-postalar</h1>
+    <a href="{% url 'studio:email_log' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-graph-up me-1" aria-hidden="true"></i>Gönderim günlüğü</a>
+  </div>
   <p class="text-body-secondary mb-0">Sitenin gönderebileceği e-postaların taslakları. Şablonlar <code>templates/emails/</code> klasöründe; ortak düzen <code>emails/base.html</code>, parçalar <code>emails/modules/</code>.</p>
 </div>
 {% if redirect_to %}

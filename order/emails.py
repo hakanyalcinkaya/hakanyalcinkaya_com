@@ -1,4 +1,4 @@
-"""E-posta değişkenleri: alıcı bilgileri ve siparişlerden ürün/tutar listesi (bkz. core.emails)."""
+"""E-posta değişkenleri: alıcı bilgileri ve siparişlerden ürün/tutar listesi (bkz. mailing.emails)."""
 
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -89,7 +89,7 @@ def preview_context(key, user):
 
     Kullanıcıya ait olmayan değişkenler (ör. kurs bitirme tarihi) örnek veriden gelir.
     """
-    from core.emails import sample_context
+    from mailing.emails import sample_context
     from order.models import Order
 
     context = {**sample_context(key), **recipient_context(user)}

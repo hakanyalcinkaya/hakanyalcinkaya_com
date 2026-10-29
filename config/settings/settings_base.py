@@ -43,6 +43,7 @@ MY_APPS = [
     "cart",
     "order",
     "newsletter",
+    "mailing",
     "page",
     "studio",
 ]
@@ -158,7 +159,7 @@ EMAIL_REDIRECT_TO = env("EMAIL_REDIRECT_TO", default="")
 MAILERS = {
     "default": (
         {
-            "BACKEND": "core.mail_backends.RedirectSMTPBackend",
+            "BACKEND": "mailing.backends.RedirectSMTPBackend",
             "OPTIONS": {
                 "host": "smtp.sendgrid.net",
                 "port": 587,
@@ -169,7 +170,7 @@ MAILERS = {
             },
         }
         if SENDGRID_API_KEY
-        else {"BACKEND": "core.mail_backends.RedirectConsoleBackend"}
+        else {"BACKEND": "mailing.backends.RedirectConsoleBackend"}
     ),
 }
 # E-postalardaki bağlantılar bu adresle kurulur (istek olmadan, ör. toplu gönderimde).
