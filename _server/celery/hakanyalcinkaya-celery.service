@@ -1,0 +1,25 @@
+[Unit]
+Description=Celery (hakanyalcinkaya.com)
+After=network.target redis-server.service postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/hakanyalcinkaya/hakanyalcinkaya_dj
+Environment="PATH=/var/Env/hakanyalcinkaya_312/bin"
+Environment="PYTHONPATH=/var/www/hakanyalcinkaya/hakanyalcinkaya_dj"
+Environment="DJANGO_SETTINGS_MODULE=config.settings"
+# Video işleri (Bunny/Vimeo'ya yükleme, işleme takibi, altyazı) ve bülten gönderimi. Yükleme dakikalar sürer;
+# prefetch 1 (CELERY_WORKER_PREFETCH_MULTIPLIER) ile sıradaki iş boştaki sürece gider.
+# CELERY_BROKER_URL vb. ayarlar projenin .env dosyasından okunur (config/settings/__init__.py).
+# Linux'ta varsayılan prefork havuzu çalışır; config/celery.py'deki -P threads notu macOS içindir.
+ExecStart=/var/Env/hakanyalcinkaya_312/bin/celery -A config worker --concurrency=2 -n hakanyalcinkaya@%%h --loglevel=info --logfile=/var/log/celery/hakanyalcinkaya.log
+Restart=always
+RestartSec=5
+KillMode=mixed
+# Süren yükleme durdurulurken yarım kalabilir; görev tekrar çalıştırılabilir (stüdyoda "Yeniden dene").
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

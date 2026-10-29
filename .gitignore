@@ -2,6 +2,9 @@
 video/
 # ENV
 .env
+# Sunucu: sertifika anahtarları ve uWSGI'nin izlediği yeniden yükleme dosyası
+_server/ssl/
+reload.txt
 
 # AI
 .cursor

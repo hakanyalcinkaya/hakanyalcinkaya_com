@@ -1,0 +1,29 @@
+[Unit]
+Description=uWSGI Emperor service
+After=network.target postgresql.service redis-server.service
+
+[Service]
+Type=notify
+PermissionsStartOnly=true
+
+# now this runs as root
+ExecStartPre=/bin/bash -c 'mkdir -p /run/uwsgi; chown www-data:www-data /run/uwsgi'
+
+# main uwsgi will run as www-data
+User=www-data
+Group=www-data
+# Emperor /etc/uwsgi/sites altındaki bütün siteleri çalıştırır. Sunucuda zaten bir Emperor servisi varsa bu dosya
+# kurulmaz; yalnız site dosyası linklenir: /etc/uwsgi/sites/hakanyalcinkaya.ini -> _server/hakanyalcinkaya_uwsgi.ini
+# Kod güncellemesinde servisi yeniden başlatmak yerine: touch /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/reload.txt
+# (touch-reload, _server/hakanyalcinkaya_uwsgi.ini). .ini değişikliği için: touch /etc/uwsgi/sites/hakanyalcinkaya.ini
+# uWSGI requirements.txt'te yok; sunucuda venv'e ayrıca kurulur: pip install uwsgi
+ExecStart=/var/Env/hakanyalcinkaya_312/bin/uwsgi --emperor /etc/uwsgi/sites
+Restart=always
+# uWSGI SIGTERM'i "yeniden başla" olarak yorumlar; kapatma için SIGQUIT
+KillSignal=SIGQUIT
+NotifyAccess=all
+# Durdurma takılırsa varsayılan 90 sn yerine 20 sn sonra zorla kapatılır
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
