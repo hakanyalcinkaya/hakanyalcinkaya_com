@@ -9,7 +9,7 @@ from django.urls import reverse
 
 # Bağlantısı tek kullanımlık anahtar taşıyan değişkenler: saklanan kopyada maskelenir; tıklamaları sayılır ama adresleri
 # kaydedilmez. Çıkış bağlantısı takibe hiç sokulmaz (çıkış ayrıca kaydedilir).
-SENSITIVE_VARIABLES = ("reset_url", "set_password_url", "confirm_url", "unsubscribe_url")
+SENSITIVE_VARIABLES = ("reset_url", "set_password_url", "confirm_url", "unsubscribe_url", "manage_url")
 MASK = "[gizli bağlantı]"
 CLICK_SALT = "mailing.click"
 

@@ -144,6 +144,7 @@ EMAILS = {
             "cta_label": "Düğme yazısı (isteğe bağlı)",
             "cta_url": "Düğme bağlantısı (isteğe bağlı)",
             "unsubscribe_url": "Abonelikten çıkış bağlantısı (zorunlu)",
+            "manage_url": "Aboneliği düzenleme bağlantısı",
             "site_url": "Sitenin adresi",
         },
         recipient="subscriber",
@@ -326,6 +327,7 @@ def sample_context(key):
             "cta_label": "Kurslara göz at",
             "cta_url": f"{site}/courses/",
             "unsubscribe_url": f"{site}/newsletter/unsubscribe/?ornek",
+            "manage_url": f"{site}/newsletter/manage/?ornek",
         },
         "admin_new_order": {"admin_url": f"{site}/admin/order/order/"},
         "admin_review_pending": {

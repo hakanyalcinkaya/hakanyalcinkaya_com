@@ -151,6 +151,14 @@ class Subscriber(BaseModel):
     def unsubscribe_url(self):
         return settings.SITE_URL.rstrip("/") + self.unsubscribe_path()
 
+    def manage_url(self):
+        """E-postalardaki "Aboneliği düzenle": adı güncelleme, çıkma ya da yeniden abone olma (anahtarla, girişsiz)."""
+        return self._absolute("page:newsletter_manage")
+
+    def update_name(self, name):
+        self.name = name.strip()
+        self.save(update_fields=["name", "updated_at"])
+
     def email_context(self):
         """Bülten e-postalarının değişkenleri (bkz. mailing.emails: newsletter_confirm, newsletter)."""
         return {
@@ -158,6 +166,7 @@ class Subscriber(BaseModel):
             "email": self.email,
             "confirm_url": self.confirm_url(),
             "unsubscribe_url": self.unsubscribe_url(),
+            "manage_url": self.manage_url(),
             "site_url": settings.SITE_URL.rstrip("/"),
         }
 

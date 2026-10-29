@@ -15,8 +15,8 @@
           <i class="bi bi-check-circle-fill text-success fs-3 lh-1" aria-hidden="true"></i>
           <div>
             <p class="fw-semibold mb-1">Bültene abonesin</p>
-            <p class="text-body-secondary mb-2"><b class="text-body">{{ newsletter_state.email }}</b> adresine yeni kurslar ve içerikler geldiğinde haber veriyoruz.</p>
-            <a href="{{ newsletter_state.unsubscribe_path }}" class="small link-secondary">Abonelikten çık</a>
+            {# Abonelikten çıkma ve aboneliği düzenleme bağlantıları bülten e-postalarında. #}
+            <p class="text-body-secondary mb-0"><b class="text-body">{{ newsletter_state.email }}</b> adresine yeni kurslar ve içerikler geldiğinde haber veriyoruz.</p>
           </div>
           {% else %}
           <i class="bi bi-envelope-check text-primary fs-3 lh-1" aria-hidden="true"></i>

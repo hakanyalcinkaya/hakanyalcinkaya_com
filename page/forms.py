@@ -213,6 +213,17 @@ class NewPasswordForm(StyledFormMixin, auth_forms.SetPasswordForm):
         self.helper.layout = Layout("new_password1", "new_password2", submit("Şifremi kaydet", icon="bi-check-lg"))
 
 
+class NewsletterManageForm(StyledForm):
+    """E-postadaki "Aboneliği düzenle" sayfası: bültenlerde kullanılan ad."""
+
+    name = name_field(label="İsim")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_tag = False
+        self.helper.layout = Layout("name", submit("Kaydet", icon="bi-check2", css_class="btn-primary btn-lg fs-6 w-100"))
+
+
 class NewsletterUnsubscribeForm(StyledForm):
     email = email_field()
 

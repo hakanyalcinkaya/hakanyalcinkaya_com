@@ -4,4 +4,6 @@
 {% endif %}{{ content_text }}
 {% if cta_url %}
 {{ cta_label|default:"Devamını oku" }}: {{ cta_url }}{% endif %}{% endblock %}
-{% block footer %}Bu bülteni {{ email }} adresiyle abone olduğun için alıyorsun. Abonelikten çık: {{ unsubscribe_url }}{% endblock %}
+{% block footer %}Bu bülteni {{ email }} adresiyle abone olduğun için alıyorsun.{% if manage_url %}
+Aboneliği düzenle: {{ manage_url }}{% endif %}
+Abonelikten çık: {{ unsubscribe_url }}{% endblock %}

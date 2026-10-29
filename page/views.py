@@ -44,6 +44,7 @@ from page.forms import (
     EmailChangeForm,
     LoginForm,
     NewsletterForm,
+    NewsletterManageForm,
     NewsletterUnsubscribeForm,
     PasswordChangeForm,
     PasswordResetForm,
@@ -566,6 +567,30 @@ def newsletter_unsubscribe_link(request, token):
         request.session[UNSUBSCRIBED_SESSION_KEY] = subscriber.email
         return redirect("page:newsletter_unsubscribe")
     return render(request, "page/newsletter_unsubscribe.html", {"link_subscriber": subscriber})
+
+
+def newsletter_manage(request, token):
+    """E-postalardaki "Aboneliği düzenle" bağlantısı: adı günceller, abonelikten çıkar ya da yeniden abone eder.
+    Yetkiyi bağlantıdaki tahmin edilemez anahtar verir; adres değişikliği için yeni adresle abone olunur."""
+    subscriber = Subscriber.objects.filter(confirm_token=token).first()
+    if subscriber is None:
+        return redirect("page:newsletter_unsubscribe")
+    action = request.POST.get("action") if request.method == "POST" else None
+    form = NewsletterManageForm(request.POST if action == "save" else None, initial={"name": subscriber.name})
+    if action == "save" and form.is_valid():
+        subscriber.update_name(form.cleaned_data["name"])
+        messages.success(request, "Bilgilerin kaydedildi.")
+        return redirect("page:newsletter_manage", token=token)
+    if action == "unsubscribe":
+        subscriber.unsubscribe()
+        messages.success(request, "Abonelikten çıktın; artık bülten gönderilmeyecek.")
+        return redirect("page:newsletter_manage", token=token)
+    if action == "resubscribe":
+        # Bağlantı adresin sahibine gittiği için ayrıca onay istenmez.
+        subscriber.confirm()
+        messages.success(request, "Yeniden abone oldun.")
+        return redirect("page:newsletter_manage", token=token)
+    return render(request, "page/newsletter_manage.html", {"subscriber": subscriber, "form": form})
 
 
 def newsletter_confirm(request):

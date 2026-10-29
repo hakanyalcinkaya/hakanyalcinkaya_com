@@ -8,4 +8,4 @@
 <div>{{ content_html|safe }}</div>
 {% if cta_url %}{% include "emails/modules/button.html" with url=cta_url label=cta_label|default:"Devamını oku" %}{% endif %}
 {% endblock %}
-{% block footer %}Bu bülteni {{ email }} adresiyle abone olduğun için alıyorsun. <a href="{{ unsubscribe_url }}" style="color: #D8D8D8;">Abonelikten çık</a>{% endblock %}
+{% block footer %}Bu bülteni {{ email }} adresiyle abone olduğun için alıyorsun.<br>{% if manage_url %}<a href="{{ manage_url }}" style="color: #D8D8D8;">Aboneliği düzenle</a> &nbsp;·&nbsp; {% endif %}<a href="{{ unsubscribe_url }}" style="color: #D8D8D8;">Abonelikten çık</a>{% endblock %}
