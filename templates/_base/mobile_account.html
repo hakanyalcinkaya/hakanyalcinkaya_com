@@ -1,0 +1,24 @@
+{# Mobil menüdeki hesap bölümü: giriş yapan üyede masaüstündeki hesap menüsünün yerini alır (tek menü). #}
+{% if nav_member %}
+<div class="d-lg-none border-top pt-3 pb-3" aria-label="Hesap">
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials flex-shrink-0" aria-hidden="true">{{ account_user.initials }}</span>
+    <span class="min-w-0"><span class="d-block fw-semibold small text-truncate">{{ account_user.display_name }}</span><span class="d-block small text-body-tertiary text-truncate">{{ account_user.email }}</span></span>
+  </div>
+  <ul class="navbar-nav">
+    {% if show_library is not False %}<li class="nav-item"><a href="{{ library_url }}" class="nav-link d-flex align-items-center gap-2"><i class="bi bi-collection-play text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Kurslarım</span><i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>{% endif %}
+    <li class="nav-item"><a href="{{ settings_url }}" class="nav-link d-flex align-items-center gap-2"><i class="bi bi-gear text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Ayarlar</span><i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
+    {% if request.user.is_superuser %}<li class="nav-item"><a href="{% url 'studio:course_list' %}" class="nav-link d-flex align-items-center gap-2"><i class="bi bi-camera-reels text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Stüdyo</span><i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>{% endif %}
+    <li class="nav-item">
+      <details class="hy-fold">
+        <summary class="nav-link d-flex align-items-center gap-2"><i class="bi bi-palette text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Görünüm</span><i class="bi bi-chevron-down small text-body-tertiary hy-fold-icon" aria-hidden="true"></i></summary>
+        <div class="pt-1 pb-2" role="group" aria-label="Görünüm ayarları">{% include "_base/theme_controls.html" %}</div>
+      </details>
+    </li>
+  </ul>
+  <form method="post" action="{{ logout_url }}" class="mt-2">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-secondary w-100"><i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Oturumu kapat</button>
+  </form>
+</div>
+{% endif %}

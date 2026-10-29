@@ -16,7 +16,7 @@
       {% elif show_explore %}
       <a href="{% url 'page:course_list' %}" class="btn btn-primary d-none d-sm-inline-flex align-items-center gap-2 text-nowrap">Kursları Keşfet <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
       {% endif %}
-      <button type="button" class="btn btn-outline-secondary d-lg-none" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu"><i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
+      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
     </div>
 
     <div id="mobil-menu" class="collapse navbar-collapse hy-nav-center">
@@ -26,13 +26,12 @@
         {% endfor %}
       </ul>
       <div class="row g-2 py-3 d-lg-none">
-        {% if nav_member %}
-        <div class="col-6"><a href="{{ library_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-collection-play me-2" aria-hidden="true"></i>Kurslarım</a></div>
-        {% else %}
+        {% if not nav_member %}
         <div class="col-6"><a href="{{ login_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
         {% endif %}
-        <div class="col-6"><a href="{% url 'page:course_list' %}" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
+        <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{% url 'page:course_list' %}" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
       </div>
+      {% include "_base/mobile_account.html" %}
     </div>
   </div>
 </nav>

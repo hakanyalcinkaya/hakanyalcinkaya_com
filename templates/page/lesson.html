@@ -35,7 +35,7 @@
       {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
       {% include "_base/account_menu.html" %}
       {% endif %}
-      <button type="button" class="btn btn-outline-secondary d-lg-none" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu"><i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
+      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
     </div>
   </div>
   {# Mobil menü: geniş ekranda üst çubukta görünen bağlantılar ve düğmeler. #}
@@ -58,6 +58,7 @@
         <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 w-100">Satın al · {{ course.price }}</a></div>
         {% endif %}
       </div>
+      {% include "_base/mobile_account.html" with show_library=False %}
     </div>
   </div>
 </nav>
