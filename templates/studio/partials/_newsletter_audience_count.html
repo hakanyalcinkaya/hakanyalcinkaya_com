@@ -1,0 +1,5 @@
+{# Kitle sayısı: kitle alanları her değiştiğinde (kaydetmeden) yenilenir. #}
+<div id="audience-count" class="alert {% if count %}alert-info{% elif count == 0 %}alert-warning{% else %}alert-danger{% endif %} small py-2 mb-0" role="status" aria-live="polite">
+  {% if count is None %}<i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Seçimi düzelt: {{ errors|join:" " }}
+  {% else %}<i class="bi bi-people me-1" aria-hidden="true"></i>Bu seçimle <strong>{{ count }}</strong> onaylı aboneye gidecek.{% endif %}
+</div>

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from newsletter.models import Subscriber
+from newsletter.models import Issue, Subscriber
 
 
 @admin.register(Subscriber)
@@ -21,3 +21,19 @@ class SubscriberAdmin(admin.ModelAdmin):
     def unsubscribe(self, request, queryset):
         for subscriber in queryset:
             subscriber.unsubscribe()
+
+
+@admin.register(Issue)
+class IssueAdmin(admin.ModelAdmin):
+    """Bülten sayıları Stüdyo → Bültenler'de yazılır ve gönderilir; burada yalnız görüntülenir."""
+
+    list_display = ("headline", "status", "sent_at", "created_at")
+    list_filter = ("status",)
+    search_fields = ("headline",)
+    readonly_fields = ("status", "batch", "sent_at", "created_at", "updated_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

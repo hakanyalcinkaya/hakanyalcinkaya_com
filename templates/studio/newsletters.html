@@ -1,0 +1,27 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Bültenler{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+  <div class="me-auto">
+    <h1 class="h3 mb-1">Bültenler</h1>
+    <p class="text-body-secondary mb-0">Yaz, önizle, kendine test gönder, sonra seçtiğin kitleye gönder. <a href="{% url 'studio:subscribers' %}?durum=confirmed" class="link-secondary">{{ confirmed_total }} onaylı abone</a></p>
+  </div>
+  <a href="{% url 'studio:newsletter_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Yeni bülten</a>
+</div>
+<div class="list-group">
+  {% for issue in issues %}
+  <a href="{{ issue.get_absolute_url }}" class="list-group-item list-group-item-action py-3">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="fw-medium">{{ issue.headline }}</span>
+      {% if issue.status == "draft" %}<span class="badge rounded-1 border text-body-secondary fw-medium">Taslak</span>
+      {% elif issue.status == "sending" %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">Gönderiliyor</span>
+      {% else %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">Gönderildi</span>{% endif %}
+      <span class="ms-auto small text-body-tertiary">{% if issue.sent_at %}{{ issue.sent_at|date:"d.m.Y H:i" }} gönderildi{% else %}{{ issue.updated_at|date:"d.m.Y H:i" }} düzenlendi{% endif %}</span>
+    </div>
+    <div class="small text-body-secondary">{{ issue.get_audience_display }}{% if issue.batch %} · {{ issue.batch.planned }} kişi{% endif %}</div>
+  </a>
+  {% empty %}
+  <div class="list-group-item text-body-secondary small py-4 text-center">Henüz bülten yok.</div>
+  {% endfor %}
+</div>
+{% endblock %}

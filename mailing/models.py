@@ -24,6 +24,10 @@ class EmailEventKind(models.TextChoices):
 
 
 class EmailLogQuerySet(models.QuerySet):
+    def single(self):
+        """Tekil e-postalar (toplu gönderimin parçası olmayanlar)."""
+        return self.filter(batch__isnull=True)
+
     def for_token(self, value):
         """Takip anahtarıyla eşleşen kayıt; anahtar geçersizse boş."""
         try:
@@ -59,6 +63,59 @@ class EmailLogQuerySet(models.QuerySet):
         return self._with_rates(self.aggregate(**self._counts()))
 
 
+class EmailBatchQuerySet(models.QuerySet):
+    def with_stats(self):
+        """Alıcı, gönderilen, hata, açılan ve tıklanan e-posta sayıları (her alıcı bir kez sayılır)."""
+        return self.annotate(
+            # Olaylar da birleştirildiği için satırlar çoğalır; her kayıt bir kez sayılsın diye distinct.
+            recipients=Count("logs", distinct=True),
+            sent=Count("logs", distinct=True, filter=Q(logs__status=EmailStatus.SENT)),
+            failed=Count("logs", distinct=True, filter=Q(logs__status=EmailStatus.FAILED)),
+            opened=Count("logs", distinct=True, filter=Q(logs__first_opened_at__isnull=False)),
+            clicked=Count("logs", distinct=True, filter=Q(logs__first_clicked_at__isnull=False)),
+            unsubscribed=Count("logs", distinct=True, filter=Q(logs__events__kind=EmailEventKind.UNSUBSCRIBED)),
+        )
+
+
+class EmailBatch(BaseModel):
+    """Toplu gönderim (ör. bir bülten sayısı): aynı e-posta birçok alıcıya; her alıcının kaydı ayrı EmailLog."""
+
+    template = models.CharField(_("şablon"), max_length=60, db_index=True)
+    subject = models.CharField(_("konu"), max_length=300)
+    planned = models.PositiveIntegerField(_("planlanan alıcı"), default=0)
+    finished_at = models.DateTimeField(_("bitiş"), null=True, blank=True)
+
+    objects = EmailBatchQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("toplu gönderim")
+        verbose_name_plural = _("toplu gönderimler")
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.subject
+
+    def rate(self, count):
+        sent = getattr(self, "sent", 0)
+        return round(count * 100 / sent) if sent else 0
+
+    @property
+    def open_rate(self):
+        return self.rate(getattr(self, "opened", 0))
+
+    @property
+    def click_rate(self):
+        return self.rate(getattr(self, "clicked", 0))
+
+    def finish(self, subject=""):
+        """Gönderimi bitirir; konu verilmediyse ilk alıcının konusu (kişiselleştirilmemiş varsayılır) yazılır."""
+        first = self.logs.order_by("created_at").first()
+        if not subject and first:
+            self.subject = first.subject
+        self.finished_at = timezone.now()
+        self.save(update_fields=["subject", "finished_at", "updated_at"])
+
+
 class EmailLog(BaseModel):
     """Sistemden giden bir e-posta: içeriği (gizli bağlantılar maskelenmiş), durumu ve açılma/tıklama sayıları.
 
@@ -66,6 +123,15 @@ class EmailLog(BaseModel):
     """
 
     token = models.UUIDField(_("takip anahtarı"), default=uuid.uuid4, unique=True, editable=False)
+    batch = models.ForeignKey(
+        EmailBatch,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="logs",
+        verbose_name=_("toplu gönderim"),
+        help_text=_("Boşsa tekil e-posta (şifre, satın alma vb.)."),
+    )
     template = models.CharField(_("şablon"), max_length=60, db_index=True)
     to_email = models.EmailField(_("alıcı"))
     delivered_to = models.EmailField(_("gönderildiği adres"), help_text=_("Test yönlendirmesi açıksa alıcıdan farklıdır."))

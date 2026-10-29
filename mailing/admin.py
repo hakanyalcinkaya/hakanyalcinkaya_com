@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from mailing.models import EmailEvent, EmailLog
+from mailing.models import EmailBatch, EmailEvent, EmailLog
 
 
 class EmailEventInline(admin.TabularInline):
@@ -24,6 +24,7 @@ class EmailLogAdmin(admin.ModelAdmin):
     list_select_related = ("user",)
     inlines = (EmailEventInline,)
     readonly_fields = (
+        "batch",
         "token",
         "template",
         "to_email",
@@ -42,6 +43,22 @@ class EmailLogAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(EmailBatch)
+class EmailBatchAdmin(admin.ModelAdmin):
+    """Toplu gönderimler yalnız görüntülenir (alıcılar ve oranlar Stüdyo → Gönderim günlüğü → Toplu)."""
+
+    list_display = ("subject", "template", "planned", "created_at", "finished_at")
+    list_filter = ("template", "created_at")
+    search_fields = ("subject",)
+    readonly_fields = ("template", "subject", "planned", "finished_at", "created_at", "updated_at")
 
     def has_add_permission(self, request):
         return False

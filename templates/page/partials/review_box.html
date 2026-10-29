@@ -1,4 +1,5 @@
 {# Kullanıcının bu kurs için değerlendirmesi. place: lesson / course / library. #}
+{% load core_tags %}
 {# Ders sayfasında yalnız henüz değerlendirmemiş kullanıcıya sorulur; kaydedince teşekkür gösterilir, düzenleme Kurslarım'dan. #}
 {% url 'page:course_review' course.slug as review_url %}
 <div id="course-{{ course.pk }}-review" class="card{% if place == 'lesson' %} border-primary-subtle{% endif %}">
@@ -20,7 +21,7 @@
           {% if review.needs_review %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">Onay bekliyor</span>
           {% elif review.is_visible %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">Yayında</span>
           {% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">Yayınlanmadı</span>{% endif %}
-          <span class="small text-body-tertiary">{{ review.written_at|date:"j F Y" }}</span>
+          <time class="small text-body-tertiary" datetime="{{ review.written_at|date:'c' }}" title="{{ review.written_at|date:'j F Y' }}">{{ review.written_at|ago }}</time>
         </div>
       </div>
       <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{{ review_url }}?edit=1&place={{ place }}" hx-target="#course-{{ course.pk }}-review" hx-swap="outerHTML"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Düzenle</button>

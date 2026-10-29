@@ -34,6 +34,23 @@ class SubscriberQuerySet(models.QuerySet):
     def by_email(self, email):
         return self.filter(email__iexact=(email or "").strip()).first()
 
+    def status_counts(self):
+        """Durum başına abone sayısı ve toplam: {"all": .., "confirmed": .., ...}."""
+        counts = {value: models.Count("pk", filter=models.Q(status=value)) for value in SubscriberStatus.values}
+        return self.aggregate(all=models.Count("pk"), **counts)
+
+    def with_unsubscribe_email(self):
+        """Abonelikten çıkılan e-posta (en son; bağlantıyla çıkıldıysa): unsubscribe_log_id, unsubscribe_log_subject."""
+        from mailing.models import EmailEvent, EmailEventKind
+
+        events = EmailEvent.objects.filter(
+            kind=EmailEventKind.UNSUBSCRIBED, log__to_email__iexact=models.OuterRef("email")
+        ).order_by("-created_at")
+        return self.annotate(
+            unsubscribe_log_id=models.Subquery(events.values("log_id")[:1]),
+            unsubscribe_log_subject=models.Subquery(events.values("log__subject")[:1]),
+        )
+
 
 class Subscriber(BaseModel):
     """Bülten abonesi. Ticari e-posta için onay metni saklanır (İYS kaydı TODO.md)."""
@@ -153,3 +170,100 @@ class Subscriber(BaseModel):
         self.status = SubscriberStatus.UNSUBSCRIBED
         self.unsubscribed_at = timezone.now()
         self.save(update_fields=["status", "unsubscribed_at", "updated_at"])
+
+
+class AudienceKind(models.TextChoices):
+    ALL = "all", _("Tüm aboneler")
+    BUYERS = "buyers", _("Yalnız satın alanlar")
+    NON_BUYERS = "non_buyers", _("Yalnız satın almayanlar")
+
+
+class IssueStatus(models.TextChoices):
+    DRAFT = "draft", _("Taslak")
+    SENDING = "sending", _("Gönderiliyor")
+    SENT = "sent", _("Gönderildi")
+
+
+class Issue(BaseModel):
+    """Bülten sayısı: Stüdyo'da yazılır, onaylı abonelere toplu gönderilir (mailing.EmailBatch). Gönderildikten sonra
+    değiştirilmez; alıcılar ve oranlar toplu gönderim kaydındadır."""
+
+    headline = models.CharField(_("başlık"), max_length=200, help_text=_("E-postanın konusu da budur."))
+    intro = models.TextField(_("giriş"), blank=True)
+    content = models.TextField(_("içerik"), blank=True, help_text=_("Markdown."))
+    cta_label = models.CharField(_("düğme yazısı"), max_length=60, blank=True)
+    cta_url = models.URLField(_("düğme bağlantısı"), blank=True)
+    audience = models.CharField(_("kitle"), max_length=12, choices=AudienceKind, default=AudienceKind.ALL)
+    courses = models.ManyToManyField(
+        "course.Course", blank=True, related_name="+", verbose_name=_("eğitimler"), help_text=_("Boşsa bütün eğitimler.")
+    )
+    categories = models.ManyToManyField("course.Category", blank=True, related_name="+", verbose_name=_("kategoriler"))
+    min_progress = models.PositiveSmallIntegerField(_("en az bitirme (%)"), null=True, blank=True)
+    max_progress = models.PositiveSmallIntegerField(_("en çok bitirme (%)"), null=True, blank=True)
+    status = models.CharField(_("durum"), max_length=10, choices=IssueStatus, default=IssueStatus.DRAFT, db_index=True)
+    batch = models.OneToOneField(
+        "mailing.EmailBatch",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="issue",
+        verbose_name=_("toplu gönderim"),
+    )
+    sent_at = models.DateTimeField(_("gönderim"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("bülten sayısı")
+        verbose_name_plural = _("bülten sayıları")
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.headline
+
+    def get_absolute_url(self):
+        return reverse("studio:newsletter_edit", kwargs={"issue_id": self.pk})
+
+    @property
+    def is_draft(self):
+        return self.status == IssueStatus.DRAFT
+
+    def recipients(self):
+        """Gideceği onaylı aboneler (kitle, eğitim/kategori ve bitirme oranına göre; bkz. newsletter.audience)."""
+        from newsletter import audience
+
+        return audience.subscribers(
+            self.audience, self.courses.all(), self.categories.all(), self.min_progress, self.max_progress
+        )
+
+    def email_context(self, subscriber):
+        """Bir abone için "newsletter" e-postasının değişkenleri (bkz. mailing.emails)."""
+        from core.markup import render_markdown
+
+        return {
+            **subscriber.email_context(),
+            "headline": self.headline,
+            "intro": self.intro,
+            "content_html": render_markdown(self.content),
+            "content_text": self.content,
+            "cta_label": self.cta_label,
+            "cta_url": self.cta_url,
+        }
+
+    def start_sending(self):
+        """Taslağı "gönderiliyor"a alır ve toplu gönderim kaydını açar; zaten başlamışsa False (çift tıklamaya karşı)."""
+        from mailing.models import EmailBatch
+
+        with transaction.atomic():
+            issue = Issue.objects.select_for_update().get(pk=self.pk)
+            if issue.status != IssueStatus.DRAFT:
+                return False
+            batch = EmailBatch.objects.create(
+                template="newsletter", subject=self.headline, planned=self.recipients().count()
+            )
+            Issue.objects.filter(pk=self.pk).update(status=IssueStatus.SENDING, batch=batch, updated_at=timezone.now())
+        self.refresh_from_db()
+        return True
+
+    def mark_sent(self):
+        self.status = IssueStatus.SENT
+        self.sent_at = timezone.now()
+        self.save(update_fields=["status", "sent_at", "updated_at"])

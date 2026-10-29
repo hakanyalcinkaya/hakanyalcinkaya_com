@@ -1,11 +1,12 @@
 {# Yorum satırı: durum, puan, metin; değiştirilmiş onaylı yorumda sitedeki (onaylı) hali de gösterilir. #}
+{% load core_tags %}
 <div class="list-group-item py-3" id="review-{{ review.id }}">
   <div class="d-flex flex-wrap align-items-start gap-2">
     <div class="flex-grow-1 min-w-0">
       <div class="d-flex flex-wrap align-items-center gap-2 small">
         <span class="fw-semibold">{{ review.display_name|default:"—" }}</span>
         {% if review.user %}<span class="text-body-tertiary">{{ review.user.email }}</span>{% else %}<span class="badge rounded-1 border text-body-secondary fw-normal">Eski yorum</span>{% endif %}
-        <span class="text-body-tertiary">· {{ review.course.short_title }} · {{ review.written_at|date:"d.m.Y" }}</span>
+        <span class="text-body-tertiary">· {{ review.course.short_title }} · <time datetime="{{ review.written_at|date:'c' }}" title="{{ review.written_at|date:'d.m.Y H:i' }}">{{ review.written_at|ago }}</time></span>
         {% if review.has_pending_changes %}<span class="badge bg-warning-subtle text-warning-emphasis fw-normal">Değiştirildi · onay bekliyor</span>
         {% elif review.needs_review %}<span class="badge bg-warning-subtle text-warning-emphasis fw-normal">Onay bekliyor</span>
         {% else %}<span class="badge {% if review.is_visible %}bg-success-subtle text-success-emphasis{% else %}border text-body-secondary{% endif %} fw-normal">{{ review.status_label }}</span>{% endif %}

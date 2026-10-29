@@ -1,11 +1,12 @@
 import json
 import smtplib
-from functools import wraps
+from functools import partial, wraps
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
@@ -15,7 +16,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_GET, require_POST
-from django_htmx.http import reswap, trigger_client_event
+from django_htmx.http import HttpResponseClientRedirect, reswap, trigger_client_event
 
 from config.celery import worker_online
 from core.models import SiteSettings, Status, VideoPlatform
@@ -35,10 +36,11 @@ from studio.forms import (
     ExtraContentBulkForm,
     ExtraContentForm,
     ExtraContentUploadForm,
+    IssueForm,
     LessonBulkForm,
     LessonTitleForm,
-    ReviewImportForm,
     NewVideoLessonForm,
+    ReviewImportForm,
     SectionCreateForm,
     SectionTitleForm,
     SiteSettingsForm,
@@ -705,21 +707,174 @@ def emails(request):
     return render(request, "studio/emails.html", dict(groups=groups, redirect_to=settings.EMAIL_REDIRECT_TO))
 
 
-EMAIL_LOG_PAGE_SIZE = 50
+# Bültenler: Stüdyo'da yazılır, önizlenir, yönlendirme adresine test edilir, onaylı abonelere toplu gönderilir (Celery).
+def _sample_subscriber():
+    from newsletter.models import Subscriber
+
+    return Subscriber(email="ayse@example.com", name="Ayşe")
 
 
 @staff_required
-def email_log(request):
-    """Giden e-postalar: şablon başına istatistik ve liste. Filtre (şablon, durum, adres) GET parametresinde; HTMX
-    isteğinde yalnız liste döner."""
-    from mailing.emails import EMAILS
-    from mailing.models import EmailLog, EmailStatus
+def newsletters(request):
+    from newsletter.models import Issue, Subscriber
 
-    labels = {key: email["label"] for key, email in EMAILS.items()}
+    issues = Issue.objects.select_related("batch").order_by("-created_at", "id")
+    return render(request, "studio/newsletters.html", dict(issues=issues, confirmed_total=Subscriber.objects.confirmed().count()))
+
+
+@staff_required
+def newsletter_create(request):
+    form = IssueForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        issue = form.save()
+        messages.success(request, _("Taslak kaydedildi."))
+        return redirect(issue)
+    from newsletter.models import Subscriber
+
+    return render(
+        request,
+        "studio/newsletter_edit.html",
+        dict(form=form, issue=None, confirmed_total=Subscriber.objects.confirmed().count(), recipient_total=Subscriber.objects.confirmed().count()),
+    )
+
+
+@staff_required
+def newsletter_edit(request, issue_id):
+    """Taslak düzenlenir ve önizlenir; gönderilmiş sayı yalnız görüntülenir (alıcılar toplu gönderim sayfasında)."""
+    from mailing.emails import render_email
+    from newsletter.models import Issue, Subscriber
+
+    issue = get_object_or_404(Issue.objects.select_related("batch"), pk=issue_id)
+    form = IssueForm(request.POST or None, instance=issue) if issue.is_draft else None
+    if form is not None and request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Taslak kaydedildi."))
+        return redirect(issue)
+    subject, text, html = render_email("newsletter", issue.email_context(_sample_subscriber()))
+    return render(
+        request,
+        "studio/newsletter_edit.html",
+        dict(
+            form=form,
+            issue=issue,
+            subject=subject,
+            html=html,
+            text=text,
+            confirmed_total=Subscriber.objects.confirmed().count(),
+            recipient_total=issue.recipients().count(),
+            redirect_to=settings.EMAIL_REDIRECT_TO,
+            worker_online=_worker_online(),
+        ),
+    )
+
+
+@staff_required
+@require_GET
+def newsletter_audience(request):
+    """Formdaki kitle seçimine göre kaç onaylı aboneye gideceği (kaydetmeden, HTMX ile her değişiklikte)."""
+    from newsletter import audience
+
+    form = IssueForm(request.GET)
+    form.is_valid()
+    kwargs = form.audience_kwargs()
+    count = audience.subscribers(**kwargs).count() if kwargs else None
+    errors = [error for name in form.AUDIENCE_FIELDS for error in form.errors.get(name, [])]
+    return render(request, "studio/partials/_newsletter_audience_count.html", dict(count=count, errors=errors))
+
+
+@staff_required
+@require_POST
+def newsletter_send_test(request, issue_id):
+    """Kayıtlı taslağı örnek aboneyle yalnız yönlendirme adresine (EMAIL_REDIRECT_TO) gönderir."""
+    from mailing.emails import send_email
+    from newsletter.models import Issue
+
+    issue = get_object_or_404(Issue, pk=issue_id)
+    if not settings.EMAIL_REDIRECT_TO:
+        return _toast(HttpResponse(), "warning", _("Yönlendirme adresi (EMAIL_REDIRECT_TO) yok; test gönderimi kapalı."))
+    try:
+        send_email("newsletter", settings.EMAIL_REDIRECT_TO, issue.email_context(_sample_subscriber()))
+    except (smtplib.SMTPException, OSError) as error:
+        return _toast(HttpResponse(), "error", _("Gönderilemedi: %(error)s") % {"error": error})
+    return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_REDIRECT_TO})
+
+
+@staff_required
+@require_POST
+def newsletter_send(request, issue_id):
+    """Kitledeki onaylı abonelere toplu gönderimi başlatır (bir kez); gönderim Celery işçisinde yapılır."""
+    from newsletter.models import Issue
+    from newsletter.tasks import send_issue
+
+    issue = get_object_or_404(Issue, pk=issue_id)
+    if not _worker_online():
+        messages.error(request, _("Celery işçisi çalışmıyor; gönderim başlatılmadı."))
+    elif not issue.recipients().exists():
+        messages.warning(request, _("Seçilen kitlede onaylı abone yok; gönderim başlatılmadı."))
+    elif issue.start_sending():
+        transaction.on_commit(partial(send_issue.delay, issue.pk))
+        messages.success(request, _("Gönderim başladı."))
+    else:
+        messages.info(request, _("Bu bülten zaten gönderildi ya da gönderiliyor."))
+    return HttpResponseClientRedirect(issue.get_absolute_url()) if request.htmx else redirect(issue)
+
+
+@staff_required
+@require_POST
+def newsletter_delete(request, issue_id):
+    """Yalnız taslak silinir."""
+    from newsletter.models import Issue
+
+    issue = get_object_or_404(Issue, pk=issue_id, status="draft")
+    issue.delete()
+    messages.success(request, _("Taslak silindi."))
+    return HttpResponseClientRedirect(reverse("studio:newsletters")) if request.htmx else redirect("studio:newsletters")
+
+
+SUBSCRIBER_PAGE_SIZE = 50
+
+
+@staff_required
+def subscribers(request):
+    """Bülten aboneleri: durum filtresi ve adres/ad araması GET parametresinde; HTMX isteğinde yalnız liste döner.
+    Çıkanlarda hangi e-postadaki bağlantıyla çıktığı gösterilir."""
+    from newsletter.models import Subscriber, SubscriberStatus
+
+    status = request.GET.get("durum", "")
+    if status not in SubscriberStatus.values:
+        status = ""
+    query = request.GET.get("q", "").strip()
+    base = Subscriber.objects.all()
+    if query:
+        base = base.filter(Q(email__icontains=query) | Q(name__icontains=query))
+    counts = base.status_counts()
+    items = base.filter(status=status) if status else base
+    page = Paginator(items.with_unsubscribe_email().order_by("-created_at", "id"), SUBSCRIBER_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    filters = [dict(key="", label=_("Tümü"), count=counts["all"])] + [
+        dict(key=value, label=label, count=counts[value]) for value, label in SubscriberStatus.choices
+    ]
+    context = dict(page=page, status=status, query=query, filters=filters)
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "studio/partials/_subscriber_list.html", context)
+    return render(request, "studio/subscribers.html", context)
+
+
+EMAIL_LOG_PAGE_SIZE = 50
+
+
+def _email_labels():
+    from mailing.emails import EMAILS
+
+    return {key: email["label"] for key, email in EMAILS.items()}
+
+
+def _email_log_list(request, logs, list_url, labels):
+    """Gönderim listesi bağlamı: şablon, durum ve adres/konu filtresi GET parametresinde, sayfalı."""
+    from mailing.models import EmailStatus
+
     template = request.GET.get("sablon", "")
     status = request.GET.get("durum", "")
     query = request.GET.get("q", "").strip()
-    logs = EmailLog.objects.all()
     if template:
         logs = logs.filter(template=template)
     if status in EmailStatus.values:
@@ -729,34 +884,69 @@ def email_log(request):
     page = Paginator(logs.select_related("user").order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("sayfa"))
     for log in page:
         log.label = labels.get(log.template, log.template)
-    context = dict(
+    return dict(
         page=page,
+        list_url=list_url,
         template=template,
         status=status,
         query=query,
         statuses=EmailStatus.choices,
         templates=list(labels.items()),
     )
+
+
+@staff_required
+def email_log(request):
+    """Gönderim günlüğü, iki sekme: tekil e-postalar (şifre, satın alma vb.; tek alıcı) ve toplu gönderimler (bülten;
+    çok alıcı). Tekil listede filtre (şablon, durum, adres) GET parametresinde; HTMX isteğinde yalnız liste döner."""
+    from mailing.models import EmailBatch, EmailLog
+
+    labels = _email_labels()
+    if request.GET.get("tur") == "toplu":
+        batches = Paginator(EmailBatch.objects.with_stats().order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+        for batch in batches:
+            batch.label = labels.get(batch.template, batch.template)
+        return render(
+            request,
+            "studio/email_log.html",
+            dict(tab="toplu", batches=batches, single_total=EmailLog.objects.single().count(), batch_total=batches.paginator.count),
+        )
+    single = EmailLog.objects.single()
+    context = _email_log_list(request, single, reverse("studio:email_log"), labels)
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_email_log_list.html", context)
-    stats = EmailLog.objects.stats_by_template()
+    stats = single.stats_by_template()
     for row in stats:
         row["label"] = labels.get(row["template"], row["template"])
-    context.update(stats=stats, totals=EmailLog.objects.stats())
+    context.update(tab="tekil", stats=stats, totals=single.stats(), single_total=single.count(), batch_total=EmailBatch.objects.count())
     return render(request, "studio/email_log.html", context)
+
+
+@staff_required
+def email_batch_detail(request, batch_id):
+    """Toplu gönderim: kaç alıcıya gittiği, açılma/tıklama/çıkış oranları ve alıcı listesi (filtreli, sayfalı)."""
+    from mailing.models import EmailBatch
+
+    batch = get_object_or_404(EmailBatch.objects.with_stats(), pk=batch_id)
+    labels = _email_labels()
+    context = _email_log_list(request, batch.logs.all(), reverse("studio:email_batch_detail", args=[batch.pk]), labels)
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "studio/partials/_email_log_list.html", context)
+    context.update(batch=batch, label=labels.get(batch.template, batch.template), in_batch=True)
+    return render(request, "studio/email_batch_detail.html", context)
 
 
 @staff_required
 def email_log_detail(request, log_id):
     """Bir e-postanın saklanan içeriği (gizli bağlantılar maskeli) ve olayları (gönderim, açılma, tıklama, çıkış)."""
-    from mailing.emails import EMAILS
     from mailing.models import EmailLog
 
-    log = get_object_or_404(EmailLog.objects.select_related("user"), pk=log_id)
+    log = get_object_or_404(EmailLog.objects.select_related("user", "batch"), pk=log_id)
+    batch_size = log.batch.logs.count() if log.batch else 0
     return render(
         request,
         "studio/email_log_detail.html",
-        dict(log=log, label=EMAILS.get(log.template, {}).get("label", log.template), events=log.events.all()),
+        dict(log=log, label=_email_labels().get(log.template, log.template), events=log.events.all(), batch_size=batch_size),
     )
 
 

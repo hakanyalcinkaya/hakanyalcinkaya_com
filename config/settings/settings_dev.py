@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from .settings_base import *  # noqa: F403
 
 MEDIA_ROOT = BASE_DIR / "media_files"
@@ -22,6 +24,8 @@ INTERNAL_IPS = ["127.0.0.1", "::1"]
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "local.hakanyalcinkaya.com"]
 VIMEO_EMBED_DOMAINS = [*VIMEO_EMBED_DOMAINS, "local.hakanyalcinkaya.com"]  # noqa: F405
 SITE_URL = env("SITE_URL", default="http://local.hakanyalcinkaya.com:8001")  # noqa: F405
+if EMAIL_TRACKING_URL:  # noqa: F405
+    ALLOWED_HOSTS.append(urlparse(EMAIL_TRACKING_URL).hostname)  # noqa: F405
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

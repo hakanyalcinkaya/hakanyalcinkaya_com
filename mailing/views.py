@@ -1,6 +1,6 @@
 import base64
 
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 
 from mailing.models import EmailLog
@@ -26,10 +26,11 @@ def email_open(request, token):
 @never_cache
 def email_click(request, token):
     """Tıklama yönlendirmesi: hedef adres imzalıdır, imzasız adrese yönlendirilmez."""
-    url = unsign_click(request.GET.get("u", ""))
+    url, secret = unsign_click(request.GET.get("u", ""))
     if not url:
-        raise Http404
+        return HttpResponseNotFound()
     log = EmailLog.objects.filter(token=token).first()
     if log is not None:
-        log.record_click(url, _user_agent(request))
+        # Şifre/onay bağlantısı gibi gizli adresler kaydedilmez; yalnız tıklandığı bilinir.
+        log.record_click("" if secret else url, _user_agent(request))
     return HttpResponseRedirect(url)

@@ -9,6 +9,8 @@ from course import video_service
 from course.models import (
     SUBTITLE_EXTENSIONS,
     VIDEO_EXTENSIONS,
+    Category,
+    Course,
     Lesson,
     LessonKind,
     LessonSubtitle,
@@ -18,6 +20,7 @@ from course.models import (
     SubtitleLanguage,
     VideoUpload,
 )
+from newsletter.models import AudienceKind, Issue
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
 EXTRA_CONTENT_EXTENSIONS = (".md", ".markdown", ".txt", ".html", ".htm")
@@ -370,3 +373,70 @@ class ReviewImportForm(forms.ModelForm):
         if self.cleaned_data["approve_now"]:
             review.approve()
         return review
+
+
+class IssueForm(forms.ModelForm):
+    """Bülten sayısı (yalnız taslak düzenlenir) ve hedef kitlesi. "Tüm aboneler"de eğitim/kategori, "satın alanlar"
+    dışında bitirme oranı yok sayılır."""
+
+    AUDIENCE_FIELDS = ("audience", "courses", "categories", "min_progress", "max_progress")
+
+    class Meta:
+        model = Issue
+        fields = ("headline", "intro", "content", "cta_label", "cta_url", "audience", "courses", "categories", "min_progress", "max_progress")
+        widgets = {
+            "audience": forms.RadioSelect(attrs={"class": "form-check-input"}),
+            "courses": forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+            "categories": forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
+            "min_progress": forms.NumberInput(attrs={"class": "form-control form-control-sm", "min": 0, "max": 100, "placeholder": "0"}),
+            "max_progress": forms.NumberInput(attrs={"class": "form-control form-control-sm", "min": 0, "max": 100, "placeholder": "100"}),
+            "headline": forms.TextInput(attrs={"class": "form-control", "placeholder": _("Ör. Yeni kurs: Django ile API")}),
+            "intro": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "content": forms.Textarea(attrs={"class": "form-control font-monospace small", "rows": 14}),
+            "cta_label": forms.TextInput(attrs={"class": "form-control", "placeholder": _("Ör. Kursa göz at")}),
+            "cta_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://hakanyalcinkaya.com/..."}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["courses"].queryset = Course.objects.order_by("title")
+        self.fields["categories"].queryset = Category.objects.order_by("sort_order", "name")
+
+    def clean_min_progress(self):
+        return self._percent("min_progress")
+
+    def clean_max_progress(self):
+        return self._percent("max_progress")
+
+    def _percent(self, name):
+        value = self.cleaned_data.get(name)
+        if value is not None and value > 100:
+            raise forms.ValidationError(_("0 ile 100 arasında olmalı."))
+        return value
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("cta_url") and not cleaned.get("cta_label"):
+            self.add_error("cta_label", _("Düğme bağlantısı varsa yazısı da girilmeli."))
+        audience = cleaned.get("audience")
+        if audience == AudienceKind.ALL:
+            cleaned["courses"], cleaned["categories"] = Course.objects.none(), Category.objects.none()
+        if audience != AudienceKind.BUYERS:
+            cleaned["min_progress"] = cleaned["max_progress"] = None
+        low, high = cleaned.get("min_progress"), cleaned.get("max_progress")
+        if low is not None and high is not None and low > high:
+            self.add_error("max_progress", _("En çok oran en az orandan küçük olamaz."))
+        return cleaned
+
+    def audience_kwargs(self):
+        """Kayıt beklemeden kitle hesabı için (sayım): geçerli kitle alanları; hatalıysa None."""
+        if any(name in self.errors for name in self.AUDIENCE_FIELDS):
+            return None
+        data = self.cleaned_data
+        return dict(
+            kind=data.get("audience") or AudienceKind.ALL,
+            courses=data.get("courses") or (),
+            categories=data.get("categories") or (),
+            min_progress=data.get("min_progress"),
+            max_progress=data.get("max_progress"),
+        )

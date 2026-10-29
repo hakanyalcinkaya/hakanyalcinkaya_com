@@ -203,7 +203,7 @@ def _with_query(url, **params):
     return f"{url}{'&' if '?' in url else '?'}{urlencode(params)}"
 
 
-def send_email(key, to, context, user=None):
+def send_email(key, to, context, user=None, batch=None):
     """E-postayı gönderir ve kaydeder (mailing.EmailLog): içerik gizli bağlantılar maskelenerek saklanır; HTML'e açılma
     görseli ve tıklama yönlendirmeleri eklenir. Bülten e-postalarına tek tıkla abonelikten çıkma başlıkları konur."""
     from mailing.models import EmailLog
@@ -211,7 +211,7 @@ def send_email(key, to, context, user=None):
 
     if user is None:
         user = get_user_model().objects.filter(email__iexact=to).first()
-    log = EmailLog(template=key, to_email=to, user=user, delivered_to=getattr(settings, "EMAIL_REDIRECT_TO", "") or to)
+    log = EmailLog(batch=batch, template=key, to_email=to, user=user, delivered_to=getattr(settings, "EMAIL_REDIRECT_TO", "") or to)
     unsubscribe_url = context.get("unsubscribe_url") if EMAILS[key]["recipient"] == "subscriber" else None
     if unsubscribe_url:
         # Abonelikten çıkışın hangi e-postadan geldiği kaydedilsin.
@@ -220,7 +220,7 @@ def send_email(key, to, context, user=None):
     subject, text, html = render_email(key, context)
     secrets = sensitive_values(context)
     message = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL, [to])
-    message.attach_alternative(add_tracking(html, log.token, skip=secrets), "text/html")
+    message.attach_alternative(add_tracking(html, log.token, skip=[unsubscribe_url], secrets=secrets), "text/html")
     if unsubscribe_url:
         message.extra_headers["List-Unsubscribe"] = f"<{unsubscribe_url}>"
         message.extra_headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
@@ -233,6 +233,23 @@ def send_email(key, to, context, user=None):
         raise
     log.mark_sent()
     return message
+
+
+def send_batch(key, recipients, subject="", batch=None):
+    """Toplu gönderim: recipients (e-posta, bağlam) çiftleri; her alıcı ayrı kaydedilir, biri başarısız olsa da diğerlerine
+    gönderilir. Önceden açılmış bir EmailBatch verilebilir. Uzun listede Celery görevinden çağrılır. EmailBatch döner."""
+    from mailing.models import EmailBatch
+
+    recipients = list(recipients)
+    if batch is None:
+        batch = EmailBatch.objects.create(template=key, subject=subject or EMAILS[key]["label"], planned=len(recipients))
+    for to, context in recipients:
+        try:
+            send_email(key, to, context, batch=batch)
+        except Exception:  # Hata EmailLog'a yazıldı; sıradaki alıcıya geçilir.
+            continue
+    batch.finish(subject=subject)
+    return batch
 
 
 def sample_context(key):

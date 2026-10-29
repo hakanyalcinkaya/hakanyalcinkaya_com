@@ -53,6 +53,7 @@ INSTALLED_APPS = BASE_APPS + THIRD_PARTY_APPS + MY_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.CanonicalHostMiddleware",
+    "mailing.middleware.TrackingHostMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -175,6 +176,9 @@ MAILERS = {
 }
 # E-postalardaki bağlantılar bu adresle kurulur (istek olmadan, ör. toplu gönderimde).
 SITE_URL = env("SITE_URL", default="https://hakanyalcinkaya.com")
+# E-posta açılma/tıklama takibinin adresi; boşsa SITE_URL. Geliştirmede Gmail'in ulaşabildiği geçici tünel adresi
+# verilebilir (bu adres yalnız /e/ yollarını sunar, bkz. mailing.middleware).
+EMAIL_TRACKING_URL = env("EMAIL_TRACKING_URL", default="")
 # Asıl alan adı; REDIRECT_HOSTS'tan gelen istekler buraya yönlendirilir (core.middleware). Boşsa yönlendirme yok.
 CANONICAL_HOST = ""
 REDIRECT_HOSTS = []

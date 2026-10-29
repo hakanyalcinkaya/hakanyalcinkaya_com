@@ -1,0 +1,9 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Aboneler{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Bülten aboneleri</h1>
+  <p class="text-body-secondary mb-0">Bülten yalnız onaylı abonelere gider. Abonelikten çıkış bülten e-postalarındaki bağlantıyla yapılır; hesap e-postaları (şifre, satın alma vb.) abonelikten bağımsızdır.</p>
+</div>
+{% include "studio/partials/_subscriber_list.html" %}
+{% endblock %}

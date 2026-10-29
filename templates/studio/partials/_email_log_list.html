@@ -1,38 +1,42 @@
-{# Gönderim listesi; filtreler GET parametresinde (şablon, durum, adres), HTMX ile yalnız bu blok yenilenir. #}
-{% url 'studio:email_log' as log_url %}
+{# Gönderim listesi (tekil e-postalar ya da toplu gönderimin alıcıları); filtreler GET'te, HTMX ile yalnız bu blok yenilenir. #}
 <div id="email-log-list">
-  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ log_url }}" hx-get="{{ log_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    {% if not in_batch %}
     <select name="sablon" class="form-select form-select-sm w-auto" aria-label="Şablon">
       <option value="">Tüm şablonlar</option>
       {% for key, label in templates %}<option value="{{ key }}"{% if key == template %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
+    {% endif %}
     <select name="durum" class="form-select form-select-sm w-auto" aria-label="Durum">
       <option value="">Tüm durumlar</option>
       {% for value, label in statuses %}<option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Alıcı ya da konu" aria-label="Alıcı ya da konu ara">
   </form>
-  <div class="list-group">
-    {% for log in page %}
-    <a href="{% url 'studio:email_log_detail' log.pk %}" class="list-group-item list-group-item-action py-2">
-      <div class="d-flex flex-wrap align-items-center gap-2">
-        <span class="fw-medium text-truncate" style="max-width: 32rem;">{{ log.subject }}</span>
-        {% if log.status == "failed" %}<span class="badge text-bg-danger">Hata</span>{% elif log.status == "queued" %}<span class="badge text-bg-secondary">Gönderiliyor</span>{% endif %}
-        {% if log.first_opened_at %}<span class="badge border text-body-secondary fw-normal" title="Açılma"><i class="bi bi-envelope-open me-1" aria-hidden="true"></i>{{ log.open_count }}</span>{% endif %}
-        {% if log.first_clicked_at %}<span class="badge border text-body-secondary fw-normal" title="Tıklama"><i class="bi bi-cursor me-1" aria-hidden="true"></i>{{ log.click_count }}</span>{% endif %}
-        <span class="ms-auto small text-body-tertiary">{{ log.created_at|date:"d.m.Y H:i" }}</span>
-      </div>
-      <div class="small text-body-secondary">{{ log.to_email }}{% if log.delivered_to != log.to_email %} <span class="text-body-tertiary">→ {{ log.delivered_to }}</span>{% endif %} · {{ log.label }}</div>
-    </a>
-    {% empty %}
-    <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede e-posta yok.</div>
-    {% endfor %}
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle small mb-0">
+      <thead><tr><th scope="col">Gönderim</th><th scope="col">Alıcı</th>{% if not in_batch %}<th scope="col">Konu</th>{% endif %}<th scope="col">Durum</th><th scope="col" class="text-end">Açılma</th><th scope="col" class="text-end">Tıklama</th></tr></thead>
+      <tbody>
+        {% for log in page %}
+        <tr>
+          <td class="text-nowrap"><a href="{% url 'studio:email_log_detail' log.pk %}" class="text-decoration-none">{{ log.sent_at|default:log.created_at|date:"d.m.Y H:i" }}</a></td>
+          <td>{{ log.to_email }}{% if log.delivered_to != log.to_email %}<div class="text-body-tertiary">→ {{ log.delivered_to }} (test)</div>{% endif %}</td>
+          {% if not in_batch %}<td><a href="{% url 'studio:email_log_detail' log.pk %}" class="fw-medium text-decoration-none">{{ log.subject }}</a><div class="text-body-tertiary">{{ log.label }}</div></td>{% endif %}
+          <td>{% if log.status == "failed" %}<span class="badge text-bg-danger">Hata</span>{% elif log.status == "queued" %}<span class="badge text-bg-secondary">Gönderiliyor</span>{% else %}<span class="text-body-secondary">Gönderildi</span>{% endif %}</td>
+          <td class="text-end">{% if log.first_opened_at %}<i class="bi bi-envelope-open me-1" aria-hidden="true"></i>{{ log.open_count }}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+          <td class="text-end">{% if log.first_clicked_at %}<i class="bi bi-cursor me-1" aria-hidden="true"></i>{{ log.click_count }}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-body-secondary text-center py-4">Bu filtrede e-posta yok.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
   {% if page.has_other_pages %}
   <nav class="d-flex justify-content-between align-items-center mt-3 small" aria-label="Sayfalar">
-    {% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-get="{{ log_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Önceki</a>{% else %}<span></span>{% endif %}
+    {% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="{{ list_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-get="{{ list_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Önceki</a>{% else %}<span></span>{% endif %}
     <span class="text-body-secondary">{{ page.number }} / {{ page.paginator.num_pages }}</span>
-    {% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-get="{{ log_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Sonraki</a>{% else %}<span></span>{% endif %}
+    {% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="{{ list_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-get="{{ list_url }}?sablon={{ template }}&durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Sonraki</a>{% else %}<span></span>{% endif %}
   </nav>
   {% endif %}
 </div>

@@ -1,0 +1,84 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{% if issue %}{{ issue.headline }}{% else %}Yeni bülten{% endif %}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:newsletters' %}" class="link-secondary text-decoration-none">Bültenler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+  <h1 class="h4 mb-0 me-auto">{% if issue %}{{ issue.headline }}{% else %}Yeni bülten{% endif %}</h1>
+  {% if issue %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ issue.get_status_display }}</span>{% endif %}
+</div>
+{% if issue and not issue.is_draft %}
+<div class="alert alert-success small">
+  {% if issue.status == "sending" %}Gönderiliyor…{% else %}{{ issue.sent_at|date:"d.m.Y H:i" }} tarihinde gönderildi.{% endif %}
+  Kitle: {{ issue.get_audience_display }}.
+  {% if issue.batch %}<a href="{% url 'studio:email_batch_detail' issue.batch.pk %}" class="alert-link">Alıcılar ve oranlar ({{ issue.batch.planned }} kişi)</a>{% endif %}
+</div>
+{% endif %}
+<div class="row g-4">
+  {% if form %}
+  <div class="col-lg-6">
+    <form method="post" action="{% if issue %}{{ issue.get_absolute_url }}{% else %}{% url 'studio:newsletter_create' %}{% endif %}" novalidate>
+      {% csrf_token %}
+      {% for field in form %}{% if field.name not in form.AUDIENCE_FIELDS %}
+      <div class="mb-3">
+        <label class="form-label small mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      {% endif %}{% endfor %}
+      <fieldset id="audience-fields" class="border rounded p-3 mb-3" hx-get="{% url 'studio:newsletter_audience' %}" hx-include="#audience-fields" hx-target="#audience-count" hx-swap="outerHTML" hx-trigger="change, input delay:400ms" hx-sync="this:replace">
+        <legend class="fs-6 fw-semibold float-none w-auto px-1 mb-2">Kime gidecek?</legend>
+        <div class="mb-3">
+          {% for radio in form.audience %}<div class="form-check form-check-inline">{{ radio.tag }}<label class="form-check-label small" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label></div>{% endfor %}
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <div class="small fw-medium mb-1">Eğitimler</div>
+            <div class="border rounded px-2 py-1 overflow-auto small" style="max-height: 12rem;">
+              {% for box in form.courses %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Eğitim yok.</span>{% endfor %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="small fw-medium mb-1">Kategoriler</div>
+            <div class="border rounded px-2 py-1 overflow-auto small" style="max-height: 12rem;">
+              {% for box in form.categories %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Kategori yok.</span>{% endfor %}
+            </div>
+          </div>
+          <div class="col-12 form-text mt-1">Eğitim ya da kategori seçmezsen bütün eğitimler sayılır. "Tüm aboneler"de bu seçim yok sayılır. "Satın almayanlar": seçilen eğitimlerin hiçbirine sahip olmayan aboneler.</div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small">
+          <span class="fw-medium">Bitirme oranı</span>
+          <span class="input-group input-group-sm w-auto"><span class="input-group-text">en az %</span>{{ form.min_progress }}</span>
+          <span class="input-group input-group-sm w-auto"><span class="input-group-text">en çok %</span>{{ form.max_progress }}</span>
+          <span class="form-text m-0">Yalnız "satın alanlar"da; seçilen eğitimlerden en az birinde bu aralıkta olanlar.</span>
+          {% for error in form.max_progress.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          {% for error in form.min_progress.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        {% include "studio/partials/_newsletter_audience_count.html" with count=recipient_total %}
+      </fieldset>
+      <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-floppy me-1" aria-hidden="true"></i>Kaydet</button>
+        {% if issue %}<button type="button" class="btn btn-outline-danger btn-sm ms-auto" hx-post="{% url 'studio:newsletter_delete' issue.pk %}" hx-confirm="Taslak silinsin mi?">Taslağı sil</button>{% endif %}
+      </div>
+    </form>
+  </div>
+  {% endif %}
+  {% if issue %}
+  <div class="col-lg-{% if form %}6{% else %}12{% endif %}">
+    {% if issue.is_draft %}
+    <div class="border rounded p-3 mb-3 small">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:newsletter_send_test' issue.pk %}" hx-swap="none"{% if not redirect_to %} disabled{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>Test gönder{% if redirect_to %} ({{ redirect_to }}){% endif %}</button>
+        <button type="button" class="btn btn-success btn-sm" hx-post="{% url 'studio:newsletter_send' issue.pk %}" hx-confirm="Bülten {{ recipient_total }} onaylı aboneye gönderilecek{% if redirect_to %} (test modu: hepsi {{ redirect_to }} adresine gider){% endif %}. Gönderilsin mi?"{% if not recipient_total or not worker_online %} disabled{% endif %}><i class="bi bi-megaphone me-1" aria-hidden="true"></i>{{ recipient_total }} kişiye gönder</button>
+      </div>
+      <div class="form-text mb-0 mt-2">Test ve gönderim kayıtlı sürümle yapılır; değişiklikten sonra önce kaydet.{% if not worker_online %} <span class="text-danger">Celery işçisi çalışmıyor.</span>{% endif %}</div>
+    </div>
+    {% endif %}
+    <div class="border rounded overflow-hidden">
+      <div class="small px-3 py-2 border-bottom bg-body-tertiary"><span class="text-body-secondary">Konu:</span> <strong>{{ subject }}</strong> <span class="text-body-tertiary">· örnek abone</span></div>
+      <iframe title="Bülten önizlemesi" srcdoc="{{ html|force_escape }}" class="w-100 d-block bg-white" style="height: 900px; border: 0;" sandbox></iframe>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

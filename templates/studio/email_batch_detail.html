@@ -1,0 +1,19 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{{ batch.subject }}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span> <a href="{% url 'studio:email_log' %}?tur=toplu" class="link-secondary text-decoration-none">Toplu gönderimler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="mb-4">
+  <h1 class="h4 mb-1">{{ batch.subject }}</h1>
+  <p class="text-body-secondary mb-0">{{ label }} · <time datetime="{{ batch.created_at|date:'c' }}">{{ batch.created_at|date:"d.m.Y H:i" }}</time>{% if batch.finished_at %} – {{ batch.finished_at|date:"H:i" }}{% else %} · <span class="badge text-bg-secondary">Sürüyor</span>{% endif %}</p>
+</div>
+<div class="row row-cols-2 row-cols-md-6 g-3 mb-4">
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Alıcı</div><div class="fs-4 fw-semibold">{{ batch.recipients }}</div>{% if batch.planned and batch.planned != batch.recipients %}<div class="small text-body-tertiary">planlanan {{ batch.planned }}</div>{% endif %}</div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Gönderildi</div><div class="fs-4 fw-semibold">{{ batch.sent }}</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Hata</div><div class="fs-4 fw-semibold{% if batch.failed %} text-danger{% endif %}">{{ batch.failed }}</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Açılma</div><div class="fs-4 fw-semibold">%{{ batch.open_rate }}</div><div class="small text-body-tertiary">{{ batch.opened }} kişi</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Tıklama</div><div class="fs-4 fw-semibold">%{{ batch.click_rate }}</div><div class="small text-body-tertiary">{{ batch.clicked }} kişi</div></div></div>
+  <div class="col"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Abonelikten çıktı</div><div class="fs-4 fw-semibold">{{ batch.unsubscribed }}</div></div></div>
+</div>
+<h2 class="h6 text-body-secondary text-uppercase small mb-2">Alıcılar</h2>
+{% include "studio/partials/_email_log_list.html" %}
+{% endblock %}
