@@ -13,7 +13,7 @@
     <div class="col-lg-7 d-grid gap-3 align-content-start">
       <section class="card" aria-labelledby="hesap-baslik">
         <div class="card-body p-4">
-          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>{% if checkout_form %}E-posta{% else %}Hesap{% endif %}</h2>
+          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>{% if checkout_form %}İletişim bilgileri{% else %}Hesap{% endif %}</h2>
           {% if checkout_form %}
           {% crispy checkout_form %}
           <p class="small text-body-tertiary mb-0">Ödemeden sonra adını soracağız; kurslarına bu adresle giriş yapacaksın. Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>
