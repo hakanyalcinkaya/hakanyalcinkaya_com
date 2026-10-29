@@ -1,12 +1,9 @@
+{% load static %}
 <section id="hakkimda" aria-labelledby="hakkimda-baslik" class="py-5">
   <div class="container py-lg-5">
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-md-5 col-lg-4">
-        <div class="ratio rounded-3 border bg-body-tertiary" style="--bs-aspect-ratio:125%;max-width:360px" role="img" aria-label="Profil fotoğrafı için yer tutucu — gerçek fotoğraf eklenecek">
-          <div class="d-flex flex-column align-items-center justify-content-center gap-2 text-body-tertiary small">
-            <i class="bi bi-person-bounding-box fs-2" aria-hidden="true"></i>Profil fotoğrafı eklenecek
-          </div>
-        </div>
+        <img src="{% static 'img/hakan-yalcinkaya.webp' %}" alt="Hakan Yalçınkaya" width="952" height="1268" loading="lazy" decoding="async" class="d-block w-100 h-auto rounded-3 border" style="max-width:360px">
       </div>
       <div class="col-md-7 col-lg-8">
         <h2 id="hakkimda-baslik" class="display-6 fw-semibold">Hakan Yalçınkaya</h2>
