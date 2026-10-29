@@ -642,10 +642,10 @@ def settings_check(request, platform):
 
 # Yorumlar: kullanıcı yorumları onaya düşer; eski yorumlar buradan elle eklenir.
 REVIEW_FILTERS = {
-    "bekleyen": (gettext_lazy("Onay bekleyen"), lambda reviews: reviews.awaiting()),
-    "yayinda": (gettext_lazy("Yayında"), lambda reviews: reviews.visible()),
-    "gizli": (gettext_lazy("Gizli"), lambda reviews: reviews.filter(status=Status.ARCHIVED)),
-    "tumu": (gettext_lazy("Tümü"), lambda reviews: reviews),
+    "pending": (gettext_lazy("Onay bekleyen"), lambda reviews: reviews.awaiting()),
+    "published": (gettext_lazy("Yayında"), lambda reviews: reviews.visible()),
+    "hidden": (gettext_lazy("Gizli"), lambda reviews: reviews.filter(status=Status.ARCHIVED)),
+    "all": (gettext_lazy("Tümü"), lambda reviews: reviews),
 }
 REVIEW_ACTIONS = {
     "approve": (Review.approve, gettext_lazy("Yorum onaylandı; sitede görünüyor.")),
@@ -654,12 +654,12 @@ REVIEW_ACTIONS = {
     "home": (Review.toggle_home, ""),
 }
 # Puan filtresi: 5…1 yıldız ya da puansız (yalnız yorum).
-REVIEW_RATING_FILTERS = {str(value): dict(rating=value) for value in range(5, 0, -1)} | {"yok": dict(rating__isnull=True)}
+REVIEW_RATING_FILTERS = {str(value): dict(rating=value) for value in range(5, 0, -1)} | {"none": dict(rating__isnull=True)}
 
 
 def _review_filter(request):
-    key = request.GET.get("durum", "bekleyen")
-    return key if key in REVIEW_FILTERS else "bekleyen"
+    key = request.GET.get("status", "pending")
+    return key if key in REVIEW_FILTERS else "pending"
 
 
 @superuser_required
@@ -667,10 +667,10 @@ def reviews(request):
     """Yorumlar: filtre (durum, kurs, puan) GET parametresinde; HTMX isteğinde yalnız liste döner."""
     key = _review_filter(request)
     base = Review.objects.select_related("course", "user")
-    course_id = request.GET.get("kurs", "")
+    course_id = request.GET.get("course", "")
     if course_id:
         base = base.filter(course_id=course_id) if Course.objects.filter(pk=course_id).exists() else base.none()
-    rating = request.GET.get("puan", "")
+    rating = request.GET.get("rating", "")
     if rating in REVIEW_RATING_FILTERS:
         base = base.filter(**REVIEW_RATING_FILTERS[rating])
     else:
@@ -688,7 +688,7 @@ def reviews(request):
         rating=rating,
         ratings=[(str(value), stars) for value, stars in reversed(REVIEW_RATINGS)],
         # Durum sekmeleri diğer filtreleri korur.
-        filter_query=urlencode({name: value for name, value in (("kurs", course_id), ("puan", rating)) if value}),
+        filter_query=urlencode({name: value for name, value in (("course", course_id), ("rating", rating)) if value}),
         courses=Course.objects.order_by("title"),
     )
     if request.htmx and not request.htmx.boosted:
@@ -724,7 +724,7 @@ def review_create(request):
     if request.method == "POST" and form.is_valid():
         review = form.save()
         messages.success(request, _("Yorum eklendi.") if not review.is_visible else _("Yorum eklendi ve yayınlandı."))
-        return redirect(f"{reverse('studio:reviews')}?durum={'yayinda' if review.is_visible else 'bekleyen'}")
+        return redirect(f"{reverse('studio:reviews')}?status={'published' if review.is_visible else 'pending'}")
     return render(request, "studio/reviews.html", dict(import_form=form, filters=[], reviews=[], import_open=True))
 
 
@@ -740,12 +740,12 @@ def review_edit(request, review_id):
 
 # E-postalar: şablonların önizlemesi (gönderim yok; test yalnız yönlendirme adresine)
 def _email_preview_context(request, key):
-    """Örnek veri ya da ?kullanici=e-posta ile seçilen kullanıcının gerçek verisi."""
+    """Örnek veri ya da ?user=e-posta ile seçilen kullanıcının gerçek verisi."""
     from account.models import User
     from mailing.emails import sample_context
     from order.emails import preview_context
 
-    lookup = request.GET.get("kullanici", "").strip() or request.POST.get("kullanici", "").strip()
+    lookup = request.GET.get("user", "").strip() or request.POST.get("user", "").strip()
     if not lookup:
         return sample_context(key), None, ""
     user = User.objects.with_email(lookup).first()
@@ -908,7 +908,7 @@ def subscribers(request):
     Çıkanlarda hangi e-postadaki bağlantıyla çıktığı gösterilir."""
     from newsletter.models import Subscriber, SubscriberStatus
 
-    status = request.GET.get("durum", "")
+    status = request.GET.get("status", "")
     if status not in SubscriberStatus.values:
         status = ""
     query = request.GET.get("q", "").strip()
@@ -917,7 +917,7 @@ def subscribers(request):
         base = base.filter(Q(email__icontains=query) | Q(name__icontains=query))
     counts = base.status_counts()
     items = base.filter(status=status) if status else base
-    page = Paginator(items.with_unsubscribe_email().order_by("-created_at", "id"), SUBSCRIBER_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    page = Paginator(items.with_unsubscribe_email().order_by("-created_at", "id"), SUBSCRIBER_PAGE_SIZE).get_page(request.GET.get("page"))
     filters = [dict(key="", label=_("Tümü"), count=counts["all"])] + [
         dict(key=value, label=label, count=counts[value]) for value, label in SubscriberStatus.choices
     ]
@@ -942,8 +942,8 @@ def _email_log_list(request, logs, list_url, labels):
     """Gönderim listesi bağlamı: şablon, durum ve adres/konu filtresi GET parametresinde, sayfalı."""
     from mailing.models import EmailStatus
 
-    template = request.GET.get("sablon", "")
-    status = request.GET.get("durum", "")
+    template = request.GET.get("template", "")
+    status = request.GET.get("status", "")
     query = request.GET.get("q", "").strip()
     if template:
         logs = logs.filter(template=template)
@@ -951,7 +951,7 @@ def _email_log_list(request, logs, list_url, labels):
         logs = logs.filter(status=status)
     if query:
         logs = logs.filter(Q(to_email__icontains=query) | Q(subject__icontains=query))
-    page = Paginator(logs.select_related("user").order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    page = Paginator(logs.select_related("user").order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("page"))
     for log in page:
         log.label = labels.get(log.template, log.template)
     return dict(
@@ -972,14 +972,14 @@ def email_log(request):
     from mailing.models import EmailBatch, EmailLog
 
     labels = _email_labels()
-    if request.GET.get("tur") == "toplu":
-        batches = Paginator(EmailBatch.objects.with_stats().order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    if request.GET.get("type") == "batch":
+        batches = Paginator(EmailBatch.objects.with_stats().order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("page"))
         for batch in batches:
             batch.label = labels.get(batch.template, batch.template)
         return render(
             request,
             "studio/email_log.html",
-            dict(tab="toplu", batches=batches, single_total=EmailLog.objects.single().count(), batch_total=batches.paginator.count),
+            dict(tab="batch", batches=batches, single_total=EmailLog.objects.single().count(), batch_total=batches.paginator.count),
         )
     single = EmailLog.objects.single()
     context = _email_log_list(request, single, reverse("studio:email_log"), labels)
@@ -990,7 +990,7 @@ def email_log(request):
     stats = single.stats_by_template()
     for row in stats:
         row["label"] = labels.get(row["template"], row["template"])
-    context.update(tab="tekil", stats=stats, totals=single.stats(), single_total=single.count(), batch_total=EmailBatch.objects.count())
+    context.update(tab="single", stats=stats, totals=single.stats(), single_total=single.count(), batch_total=EmailBatch.objects.count())
     return render(request, "studio/email_log.html", context)
 
 
@@ -1046,7 +1046,7 @@ def email_preview(request, key):
             html=html,
             files=template_names(key).values(),
             selected_user=user,
-            lookup=request.GET.get("kullanici", ""),
+            lookup=request.GET.get("user", ""),
             warning=warning,
             redirect_to=settings.EMAIL_REDIRECT_TO,
             test_to=settings.EMAIL_TEST_TO,

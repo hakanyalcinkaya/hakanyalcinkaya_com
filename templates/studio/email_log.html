@@ -8,10 +8,10 @@
 </div>
 {% url 'studio:email_log' as log_url %}
 <ul class="nav nav-underline mb-4">
-  <li class="nav-item"><a class="nav-link{% if tab == 'tekil' %} active{% endif %}" href="{{ log_url }}"{% if tab == 'tekil' %} aria-current="page"{% endif %}>Tekil e-postalar <span class="text-body-tertiary small">{{ single_total }}</span></a></li>
-  <li class="nav-item"><a class="nav-link{% if tab == 'toplu' %} active{% endif %}" href="{{ log_url }}?tur=toplu"{% if tab == 'toplu' %} aria-current="page"{% endif %}>Toplu gönderimler <span class="text-body-tertiary small">{{ batch_total }}</span></a></li>
+  <li class="nav-item"><a class="nav-link{% if tab == 'single' %} active{% endif %}" href="{{ log_url }}"{% if tab == 'single' %} aria-current="page"{% endif %}>Tekil e-postalar <span class="text-body-tertiary small">{{ single_total }}</span></a></li>
+  <li class="nav-item"><a class="nav-link{% if tab == 'batch' %} active{% endif %}" href="{{ log_url }}?type=batch"{% if tab == 'batch' %} aria-current="page"{% endif %}>Toplu gönderimler <span class="text-body-tertiary small">{{ batch_total }}</span></a></li>
 </ul>
-{% if tab == "toplu" %}
+{% if tab == "batch" %}
 <p class="small text-body-secondary">Bülten gibi aynı e-postanın birçok alıcıya gönderimi. Oranlar gönderilen e-postalara göre.</p>
 <div class="table-responsive">
   <table class="table table-sm align-middle small">
@@ -35,9 +35,9 @@
 </div>
 {% if batches.has_other_pages %}
 <nav class="d-flex justify-content-between align-items-center small" aria-label="Sayfalar">
-  {% if batches.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?tur=toplu&sayfa={{ batches.previous_page_number }}">Önceki</a>{% else %}<span></span>{% endif %}
+  {% if batches.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?type=batch&page={{ batches.previous_page_number }}">Önceki</a>{% else %}<span></span>{% endif %}
   <span class="text-body-secondary">{{ batches.number }} / {{ batches.paginator.num_pages }}</span>
-  {% if batches.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?tur=toplu&sayfa={{ batches.next_page_number }}">Sonraki</a>{% else %}<span></span>{% endif %}
+  {% if batches.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?type=batch&page={{ batches.next_page_number }}">Sonraki</a>{% else %}<span></span>{% endif %}
 </nav>
 {% endif %}
 {% else %}
@@ -57,7 +57,7 @@
     <tbody>
       {% for row in stats %}
       <tr>
-        <td><a href="{{ log_url }}?sablon={{ row.template }}" class="text-decoration-none">{{ row.label }}</a> <code class="text-body-tertiary">{{ row.template }}</code></td>
+        <td><a href="{{ log_url }}?template={{ row.template }}" class="text-decoration-none">{{ row.label }}</a> <code class="text-body-tertiary">{{ row.template }}</code></td>
         <td class="text-end">{{ row.total }}</td>
         <td class="text-end">{{ row.sent }}</td>
         <td class="text-end{% if row.failed %} text-danger{% endif %}">{{ row.failed }}</td>

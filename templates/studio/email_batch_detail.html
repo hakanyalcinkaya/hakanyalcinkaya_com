@@ -1,7 +1,7 @@
 {% extends "studio/base.html" %}
 {% block studio_title %}{{ batch.subject }}{% endblock %}
 {% block studio_content %}
-<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span> <a href="{% url 'studio:email_log' %}?tur=toplu" class="link-secondary text-decoration-none">Toplu gönderimler</a> <span class="text-body-tertiary">/</span></nav>
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:emails' %}" class="link-secondary text-decoration-none">E-postalar</a> <span class="text-body-tertiary">/</span> <a href="{% url 'studio:email_log' %}?type=batch" class="link-secondary text-decoration-none">Toplu gönderimler</a> <span class="text-body-tertiary">/</span></nav>
 <div class="mb-4">
   <h1 class="h4 mb-1">{{ batch.subject }}</h1>
   <p class="text-body-secondary mb-0">{{ label }} · <time datetime="{{ batch.created_at|date:'c' }}">{{ batch.created_at|date:"d.m.Y H:i" }}</time>{% if batch.finished_at %} – {{ batch.finished_at|date:"H:i" }}{% else %} · <span class="badge text-bg-secondary">Sürüyor</span>{% endif %}</p>

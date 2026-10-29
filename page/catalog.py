@@ -258,7 +258,7 @@ def course_filters(selected, courses=None):
     for key, label in TOPIC_FILTERS:
         if key:
             count = sum(1 for course in courses if course["topic"] == key)
-            url = f"{reverse('page:course_list')}?konu={key}"
+            url = f"{reverse('page:course_list')}?topic={key}"
         else:
             count = len(courses)
             url = reverse("page:course_list")
@@ -376,7 +376,7 @@ def _copy(course):
         "audience": detail.get("audience") or list(course.get("audience", ())),
         "access": detail.get("access")
         or "Kursa kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.",
-        # Örnek verideki indirim bağlantısı eski platforma gidiyor; sitedeki kod akışı (?kod=) gelene kadar gösterilmez.
+        # Örnek verideki indirim bağlantısı eski platforma gidiyor; sitedeki kod akışı (?code=) gelene kadar gösterilmez.
         "discount": None,
     }
 
@@ -628,9 +628,9 @@ def library_page(status):
             others.append(course)
             continue
         owned.append(_owned_row(course, flat, done))
-    if status == "devam":
+    if status == "in-progress":
         shown = [course for course in owned if not course["finished"]]
-    elif status == "bitti":
+    elif status == "done":
         shown = [course for course in owned if course["finished"]]
     else:
         status = ""
@@ -638,12 +638,12 @@ def library_page(status):
     filters = []
     for key, label, rows in (
         ("", "Tümü", owned),
-        ("devam", "Devam", [course for course in owned if not course["finished"]]),
-        ("bitti", "Tamamlanan", [course for course in owned if course["finished"]]),
+        ("in-progress", "Devam", [course for course in owned if not course["finished"]]),
+        ("done", "Tamamlanan", [course for course in owned if course["finished"]]),
     ):
         url = reverse("page:library")
         if key:
-            url = f"{url}?durum={key}"
+            url = f"{url}?status={key}"
         filters.append(
             {
                 "label": label,

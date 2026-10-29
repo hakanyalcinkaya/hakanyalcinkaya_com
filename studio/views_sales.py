@@ -29,7 +29,7 @@ PAGE_SIZE = 50
 
 
 def _page(request, rows):
-    return Paginator(rows, PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    return Paginator(rows, PAGE_SIZE).get_page(request.GET.get("page"))
 
 
 def _list_response(request, name, context):
@@ -54,10 +54,10 @@ def orders(request):
 
 @superuser_required
 def order_create(request):
-    """Yöneticinin açtığı sipariş (havale/EFT vb.); ?sepet=<id> ile üyenin sepetinden doldurulur. Ödeme alındıysa
+    """Yöneticinin açtığı sipariş (havale/EFT vb.); ?cart=<id> ile üyenin sepetinden doldurulur. Ödeme alındıysa
     hemen "ödendi" yapılır, değilse sipariş bekler ve sipariş sayfasından onaylanır."""
     initial = None
-    cart_id = request.GET.get("sepet")
+    cart_id = request.GET.get("cart")
     if cart_id and request.method != "POST":
         cart = Cart.objects.active().filter(pk=cart_id, user__isnull=False).select_related("user", "discount").first()
         initial = ManualOrderForm.initial_from_cart(cart) if cart else None
@@ -104,19 +104,19 @@ def order_mark_paid(request, order_id):
 
 # Sepetler
 CART_FILTERS = {
-    "acik": (gettext_lazy("Açık"), Q(status=CartStatus.ACTIVE)),
-    "bosaltilan": (gettext_lazy("Boşaltılan"), Q(status=CartStatus.EMPTIED)),
-    "donusen": (gettext_lazy("Siparişe dönüşen"), Q(status=CartStatus.CONVERTED)),
-    "tumu": (gettext_lazy("Tümü"), Q()),
+    "active": (gettext_lazy("Açık"), Q(status=CartStatus.ACTIVE)),
+    "emptied": (gettext_lazy("Boşaltılan"), Q(status=CartStatus.EMPTIED)),
+    "converted": (gettext_lazy("Siparişe dönüşen"), Q(status=CartStatus.CONVERTED)),
+    "all": (gettext_lazy("Tümü"), Q()),
 }
 
 
 @superuser_required
 def carts(request):
     """İçinde ürün olan sepetler: açık, boşaltılan, siparişe dönüşen; e-posta araması."""
-    key = request.GET.get("durum", "acik")
+    key = request.GET.get("status", "active")
     if key not in CART_FILTERS:
-        key = "acik"
+        key = "active"
     query = request.GET.get("q", "").strip()
     base = Cart.objects.filter(items__isnull=False).distinct()
     if query:
@@ -131,20 +131,20 @@ def carts(request):
 
 # Öğrenciler (üyeler)
 STUDENT_FILTERS = {
-    "kayitli": (gettext_lazy("Kursu olan"), Q(enrollment_total__gt=0)),
-    "kayitsiz": (gettext_lazy("Kursu olmayan"), Q(enrollment_total=0)),
-    "tumu": (gettext_lazy("Tümü"), Q()),
+    "enrolled": (gettext_lazy("Kursu olan"), Q(enrollment_total__gt=0)),
+    "not-enrolled": (gettext_lazy("Kursu olmayan"), Q(enrollment_total=0)),
+    "all": (gettext_lazy("Tümü"), Q()),
 }
 
 
 @superuser_required
 def students(request):
     """Üyeler: kurs sayısı ve ödenen sipariş sayısıyla; ad/e-posta araması, kurs filtresi."""
-    key = request.GET.get("durum", "kayitli")
+    key = request.GET.get("status", "enrolled")
     if key not in STUDENT_FILTERS:
-        key = "kayitli"
+        key = "enrolled"
     query = request.GET.get("q", "").strip()
-    course_id = request.GET.get("kurs", "")
+    course_id = request.GET.get("course", "")
     base = User.objects.annotate(
         enrollment_total=Count("enrollments", distinct=True),
         paid_order_total=Count("orders", filter=Q(orders__status=OrderStatus.PAID), distinct=True),

@@ -8,7 +8,7 @@
       </div>
       <div class="col-lg-7">
         {# Durumu bildiğimizde form yerine mesaj: giriş yapmış kullanıcının kendi aboneliği ya da bu tarayıcıdan az önce #}
-        {# yapılan abonelik. Başkasının adresinin durumu gösterilmez. ?bulten=form ile form yeniden açılır. #}
+        {# yapılan abonelik. Başkasının adresinin durumu gösterilmez. ?newsletter=form ile form yeniden açılır. #}
         {% if newsletter_state.status and request.GET.bulten != "form" %}
         <div class="d-flex gap-3 align-items-start" role="status">
           {% if newsletter_state.status == "subscribed" %}
@@ -31,7 +31,7 @@
                 <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Tekrar gönder</button>
               </form>
               {% else %}
-              <a href="?bulten=form#bulten" class="small link-secondary">Başka bir adresle abone ol</a>
+              <a href="?newsletter=form#bulten" class="small link-secondary">Başka bir adresle abone ol</a>
               {% endif %}
             </div>
           </div>

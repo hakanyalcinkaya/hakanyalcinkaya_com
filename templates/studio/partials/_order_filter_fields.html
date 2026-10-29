@@ -1,3 +1,3 @@
 {# OrderFilterForm alanları tek satırda; değişince liste HTMX ile yenilenir. #}
-{% for field in filters %}{% if field.name == "baslangic" or field.name == "bitis" %}<label class="d-flex align-items-center gap-1 small text-body-secondary">{{ field.label }}{{ field }}</label>{% else %}{{ field }}{% endif %}{% endfor %}
+{% for field in filters %}{% if field.name == "date_from" or field.name == "date_to" %}<label class="d-flex align-items-center gap-1 small text-body-secondary">{{ field.label }}{{ field }}</label>{% else %}{{ field }}{% endif %}{% endfor %}
 {% if filters.is_filtered %}<a href="?{% if tab %}sekme={{ tab }}{% endif %}" class="btn btn-link btn-sm link-secondary">Temizle</a>{% endif %}

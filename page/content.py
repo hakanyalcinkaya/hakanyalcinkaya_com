@@ -333,7 +333,7 @@ def order_summary(items, cart=None):
     }
 
 
-LIBRARY_FILTERS = (("", "Tümü"), ("devam", "Devam"), ("bitti", "Tamamlanan"))
+LIBRARY_FILTERS = (("", "Tümü"), ("in-progress", "Devam"), ("done", "Tamamlanan"))
 
 
 def _library_row(enrollment, card, flat, done):
@@ -380,13 +380,13 @@ def library_page(user, status):
         owned.append(_library_row(enrollment, _course_card(enrollment.course, flat), flat, done))
     groups = {
         "": owned,
-        "devam": [row for row in owned if not row["finished"]],
-        "bitti": [row for row in owned if row["finished"]],
+        "in-progress": [row for row in owned if not row["finished"]],
+        "done": [row for row in owned if row["finished"]],
     }
     status = status if status in groups else ""
     url = reverse("page:library")
     filters = [
-        dict(label=label, count=len(groups[key]), checked=key == status, url=f"{url}?durum={key}" if key else url)
+        dict(label=label, count=len(groups[key]), checked=key == status, url=f"{url}?status={key}" if key else url)
         for key, label in LIBRARY_FILTERS
     ]
     shown = groups[status]

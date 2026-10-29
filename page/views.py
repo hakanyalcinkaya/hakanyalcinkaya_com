@@ -93,7 +93,7 @@ def index(request):
 
 def course_list(request):
     cards = content.catalog_cards(request.user)
-    topic, courses = filter_courses(request.GET.get("konu", ""), cards)
+    topic, courses = filter_courses(request.GET.get("topic", ""), cards)
     form, done = _newsletter(request)
     if done:
         return done
@@ -175,9 +175,9 @@ def course_detail(request, slug):
 
 
 def all_reviews(request):
-    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır. ?kurs=<slug> o kursa daraltır."""
+    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır. ?course=<slug> o kursa daraltır."""
     courses = Review.objects.course_counts()
-    selected = request.GET.get("kurs", "")
+    selected = request.GET.get("course", "")
     course = Course.objects.filter(slug=selected).first() if selected else None
     items = Review.objects.all_for(course).order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
     context = dict(
@@ -352,13 +352,13 @@ def add_to_cart(request, slug):
     except ValidationError as error:
         messages.info(request, error.messages[0])
         return redirect("page:cart")
-    return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
+    return redirect(f"{reverse('page:cart')}?{urlencode({'added': slug})}")
 
 
 @require_POST
 def remove_from_cart(request, slug):
     content.cart_remove(request, slug)
-    return redirect(f"{reverse('page:cart')}?{urlencode({'cikarildi': slug})}")
+    return redirect(f"{reverse('page:cart')}?{urlencode({'removed': slug})}")
 
 
 def buy(request, slug):
@@ -374,7 +374,7 @@ def buy(request, slug):
     except ValidationError as error:
         messages.info(request, error.messages[0])
         return redirect("page:cart")
-    return redirect(f"{reverse('page:cart')}?{urlencode({'eklendi': slug})}")
+    return redirect(f"{reverse('page:cart')}?{urlencode({'added': slug})}")
 
 
 def _coupon(request, cart, items, action, next_url):
@@ -405,8 +405,8 @@ def cart(request):
     coupon_form, done = _coupon(request, current_cart(request), items, action, "page:cart")
     if done:
         return done
-    added = content.card_by_slug(request.GET.get("eklendi", ""), cards=cards)
-    removed = content.card_by_slug(request.GET.get("cikarildi", ""), cards=cards)
+    added = content.card_by_slug(request.GET.get("added", ""), cards=cards)
+    removed = content.card_by_slug(request.GET.get("removed", ""), cards=cards)
     in_cart = {item["slug"] for item in items}
     return render(
         request,
@@ -491,8 +491,8 @@ def _library_reviews(request):
 
 @login_required
 def library(request):
-    status = request.GET.get("durum", "")
-    if status not in {"devam", "bitti"}:
+    status = request.GET.get("status", "")
+    if status not in {"in-progress", "done"}:
         status = ""
     return render(
         request,

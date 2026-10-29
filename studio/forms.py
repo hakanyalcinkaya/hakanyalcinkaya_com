@@ -745,31 +745,31 @@ class OrderFilterForm(forms.Form):
     """Sipariş listesi filtreleri (GET): durum, kurs/paket, ödeme sağlayıcı, para birimi, indirim kodu, tarih ve arama.
     Tarih aralığı ödeme tarihine, ödenmemişlerde oluşturulma tarihine bakar (yerel gün)."""
 
-    DISCOUNT_CHOICES = (("", _("Kod: tümü")), ("var", _("Kodlu")), ("yok", _("Kodsuz")))
+    DISCOUNT_CHOICES = (("", _("Kod: tümü")), ("with", _("Kodlu")), ("without", _("Kodsuz")))
 
     q = forms.CharField(label=_("Ara"), required=False)
-    durum = forms.ChoiceField(label=_("Durum"), required=False)
-    kurs = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
-    paket = forms.ModelChoiceField(label=_("Paket"), queryset=Bundle.objects.none(), required=False, empty_label=_("Tüm paketler"))
-    saglayici = forms.ChoiceField(label=_("Ödeme yolu"), required=False)
-    para = forms.ChoiceField(label=_("Para birimi"), required=False)
-    kod = forms.ChoiceField(label=_("İndirim kodu"), required=False, choices=DISCOUNT_CHOICES)
-    baslangic = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
-    bitis = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    status = forms.ChoiceField(label=_("Durum"), required=False)
+    course = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
+    bundle = forms.ModelChoiceField(label=_("Paket"), queryset=Bundle.objects.none(), required=False, empty_label=_("Tüm paketler"))
+    provider = forms.ChoiceField(label=_("Ödeme yolu"), required=False)
+    currency = forms.ChoiceField(label=_("Para birimi"), required=False)
+    code = forms.ChoiceField(label=_("İndirim kodu"), required=False, choices=DISCOUNT_CHOICES)
+    date_from = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    date_to = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
 
     def __init__(self, *args, orders, with_status=True, with_course=True, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["durum"].choices = [("", _("Tüm durumlar"))] + list(OrderStatus.choices)
-        self.fields["kurs"].queryset = Course.objects.order_by("sort_order", "title")
-        self.fields["paket"].queryset = Bundle.objects.order_by("sort_order", "title")
+        self.fields["status"].choices = [("", _("Tüm durumlar"))] + list(OrderStatus.choices)
+        self.fields["course"].queryset = Course.objects.order_by("sort_order", "title")
+        self.fields["bundle"].queryset = Bundle.objects.order_by("sort_order", "title")
         providers = orders.exclude(payment_provider="").order_by().values_list("payment_provider", flat=True).distinct()
-        self.fields["saglayici"].choices = [("", _("Tüm ödeme yolları"))] + [(name, name) for name in sorted(providers)]
+        self.fields["provider"].choices = [("", _("Tüm ödeme yolları"))] + [(name, name) for name in sorted(providers)]
         currencies = orders.order_by().values_list("currency", flat=True).distinct()
-        self.fields["para"].choices = [("", _("Tüm para birimleri"))] + [(code, code) for code in sorted(currencies)]
+        self.fields["currency"].choices = [("", _("Tüm para birimleri"))] + [(code, code) for code in sorted(currencies)]
         if not with_status:
-            del self.fields["durum"]
+            del self.fields["status"]
         if not with_course:
-            del self.fields["kurs"]
+            del self.fields["course"]
         for name, field in self.fields.items():
             css = "form-select form-select-sm w-auto" if isinstance(field, (forms.ChoiceField, forms.ModelChoiceField)) else "form-control form-control-sm w-auto"
             field.widget.attrs.setdefault("class", css)
@@ -782,27 +782,27 @@ class OrderFilterForm(forms.Form):
         data = self.cleaned_data
         if data.get("q"):
             orders = orders.filter(Q(email__icontains=data["q"]) | Q(number__icontains=data["q"]) | Q(user__email__icontains=data["q"]))
-        if data.get("durum"):
-            orders = orders.filter(status=data["durum"])
-        if data.get("kurs"):
-            orders = orders.containing(data["kurs"])
-        if data.get("paket"):
-            orders = orders.filter(items__bundle=data["paket"]).distinct()
-        if data.get("saglayici"):
-            orders = orders.filter(payment_provider=data["saglayici"])
-        if data.get("para"):
-            orders = orders.filter(currency=data["para"])
-        if data.get("kod") == "var":
+        if data.get("status"):
+            orders = orders.filter(status=data["status"])
+        if data.get("course"):
+            orders = orders.containing(data["course"])
+        if data.get("bundle"):
+            orders = orders.filter(items__bundle=data["bundle"]).distinct()
+        if data.get("provider"):
+            orders = orders.filter(payment_provider=data["provider"])
+        if data.get("currency"):
+            orders = orders.filter(currency=data["currency"])
+        if data.get("code") == "with":
             orders = orders.exclude(discount_code="")
-        elif data.get("kod") == "yok":
+        elif data.get("code") == "without":
             orders = orders.filter(discount_code="")
-        if data.get("baslangic") or data.get("bitis"):
+        if data.get("date_from") or data.get("date_to"):
             orders = orders.annotate(sale_at=Coalesce("paid_at", F("created_at")))
             zone = timezone.get_current_timezone()
-            if data.get("baslangic"):
-                orders = orders.filter(sale_at__gte=datetime.combine(data["baslangic"], time.min, tzinfo=zone))
-            if data.get("bitis"):
-                orders = orders.filter(sale_at__lte=datetime.combine(data["bitis"], time.max, tzinfo=zone))
+            if data.get("date_from"):
+                orders = orders.filter(sale_at__gte=datetime.combine(data["date_from"], time.min, tzinfo=zone))
+            if data.get("date_to"):
+                orders = orders.filter(sale_at__lte=datetime.combine(data["date_to"], time.max, tzinfo=zone))
         return orders
 
     @property

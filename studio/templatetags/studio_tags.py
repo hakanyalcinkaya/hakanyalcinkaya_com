@@ -49,16 +49,16 @@ def video_platform_label():
 
 
 # Kaydırınca yüklenen listeler: sayfanın sonundaki gözcü satır görünür olunca sonraki sayfanın satırları istenir.
-ROWS_PARAM = "parca"
+ROWS_PARAM = "part"
 
 
 @register.simple_tag(takes_context=True)
 def next_rows_url(context, page):
-    """Geçerli filtrelerle sonraki sayfanın yalnız satırlarını isteyen adres (?...&sayfa=N&parca=satir)."""
+    """Geçerli filtrelerle sonraki sayfanın yalnız satırlarını isteyen adres (?...&page=N&part=satir)."""
     request = context["request"]
     params = request.GET.copy()
-    params["sayfa"] = page.next_page_number()
-    params[ROWS_PARAM] = "satir"
+    params["page"] = page.next_page_number()
+    params[ROWS_PARAM] = "rows"
     return f"{request.path}?{params.urlencode()}"
 
 

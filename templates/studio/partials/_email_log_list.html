@@ -2,12 +2,12 @@
 <div id="email-log-list">
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
     {% if not in_batch %}
-    <select name="sablon" class="form-select form-select-sm w-auto" aria-label="Şablon">
+    <select name="template" class="form-select form-select-sm w-auto" aria-label="Şablon">
       <option value="">Tüm şablonlar</option>
       {% for key, label in templates %}<option value="{{ key }}"{% if key == template %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
     {% endif %}
-    <select name="durum" class="form-select form-select-sm w-auto" aria-label="Durum">
+    <select name="status" class="form-select form-select-sm w-auto" aria-label="Durum">
       <option value="">Tüm durumlar</option>
       {% for value, label in statuses %}<option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>

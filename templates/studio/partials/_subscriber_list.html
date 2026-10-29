@@ -3,10 +3,10 @@
 {% url 'studio:subscribers' as subscribers_url %}
 <div id="subscriber-list">
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ subscribers_url }}" hx-get="{{ subscribers_url }}" hx-target="#subscriber-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
-    <input type="hidden" name="durum" value="{{ status }}">
+    <input type="hidden" name="status" value="{{ status }}">
     <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
       {% for item in filters %}
-      <a href="{{ subscribers_url }}?durum={{ item.key }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ subscribers_url }}?durum={{ item.key }}&q={{ query|urlencode }}" hx-target="#subscriber-list" hx-swap="outerHTML" hx-push-url="true"{% if item.key == status %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+      <a href="{{ subscribers_url }}?status={{ item.key }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ subscribers_url }}?status={{ item.key }}&q={{ query|urlencode }}" hx-target="#subscriber-list" hx-swap="outerHTML" hx-push-url="true"{% if item.key == status %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
     </div>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="E-posta ya da ad" aria-label="E-posta ya da ad ara">

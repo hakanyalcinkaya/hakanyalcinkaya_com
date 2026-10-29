@@ -4,7 +4,7 @@
 <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
   <div class="me-auto">
     <h1 class="h3 mb-1">Bültenler</h1>
-    <p class="text-body-secondary mb-0">Yaz, önizle, kendine test gönder, sonra seçtiğin kitleye gönder. <a href="{% url 'studio:subscribers' %}?durum=confirmed" class="link-secondary">{{ confirmed_total }} onaylı abone</a></p>
+    <p class="text-body-secondary mb-0">Yaz, önizle, kendine test gönder, sonra seçtiğin kitleye gönder. <a href="{% url 'studio:subscribers' %}?status=confirmed" class="link-secondary">{{ confirmed_total }} onaylı abone</a></p>
   </div>
   <a href="{% url 'studio:newsletter_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Yeni bülten</a>
 </div>

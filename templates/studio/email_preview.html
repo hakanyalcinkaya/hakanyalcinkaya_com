@@ -8,14 +8,14 @@
     <p class="text-body-secondary mb-0">{{ email.description }}</p>
   </div>
   <form class="d-flex gap-2" hx-post="{% url 'studio:email_send_test' key %}" hx-swap="none">
-    <input type="hidden" name="kullanici" value="{{ lookup }}">
+    <input type="hidden" name="user" value="{{ lookup }}">
     <button type="submit" class="btn btn-outline-secondary btn-sm"{% if not test_to %} disabled title="EMAIL_TEST_TO tanımlı değil"{% endif %}><i class="bi bi-send me-1" aria-hidden="true"></i>{% if test_to %}Test gönder ({{ test_to }}){% else %}Test gönderimi kapalı{% endif %}</button>
   </form>
 </div>
 
 <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
   <label class="small text-body-secondary" for="preview-user">Gerçek veriyle önizle:</label>
-  <input type="email" name="kullanici" id="preview-user" value="{{ lookup }}" class="form-control form-control-sm w-auto" placeholder="kullanıcının e-postası">
+  <input type="email" name="user" id="preview-user" value="{{ lookup }}" class="form-control form-control-sm w-auto" placeholder="kullanıcının e-postası">
   <button type="submit" class="btn btn-outline-secondary btn-sm">Göster</button>
   {% if lookup %}<a href="{% url 'studio:email_preview' key %}" class="btn btn-link btn-sm link-secondary">Örnek veriye dön</a>{% endif %}
   <span class="small text-body-tertiary">{% if selected_user %}Gösterilen: {{ selected_user.email }}{% else %}Örnek veri gösteriliyor{% endif %}</span>

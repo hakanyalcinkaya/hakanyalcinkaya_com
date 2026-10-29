@@ -6,7 +6,7 @@
     <span class="badge rounded-1 border text-body-secondary fw-medium">{{ item.cart.get_status_display }}</span>
     {% if item.bundle_id %}<span class="small text-body-secondary">{{ item.bundle.title }} paketiyle</span>{% endif %}
     <time class="ms-auto small text-body-tertiary" datetime="{{ item.created_at|date:'c' }}" title="{{ item.created_at|date:'d.m.Y H:i' }}">{{ item.created_at|ago }} ekledi</time>
-    {% if item.cart.user_id and item.cart.is_active %}<a href="{% url 'studio:order_create' %}?sepet={{ item.cart_id }}" class="btn btn-outline-primary btn-sm py-0">Sipariş oluştur</a>{% endif %}
+    {% if item.cart.user_id and item.cart.is_active %}<a href="{% url 'studio:order_create' %}?cart={{ item.cart_id }}" class="btn btn-outline-primary btn-sm py-0">Sipariş oluştur</a>{% endif %}
   </div>
 </div>
 {% empty %}

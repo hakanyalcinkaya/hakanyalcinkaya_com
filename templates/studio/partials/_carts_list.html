@@ -1,10 +1,10 @@
 {% url 'studio:carts' as carts_url %}
 <div id="cart-list">
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ carts_url }}" hx-get="{{ carts_url }}" hx-target="#cart-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
-    <input type="hidden" name="durum" value="{{ status }}">
+    <input type="hidden" name="status" value="{{ status }}">
     <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
       {% for item in filters %}
-      <a href="{{ carts_url }}?durum={{ item.key }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ carts_url }}?durum={{ item.key }}&q={{ query|urlencode }}" hx-target="#cart-list" hx-swap="outerHTML" hx-push-url="true">{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+      <a href="{{ carts_url }}?status={{ item.key }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ carts_url }}?status={{ item.key }}&q={{ query|urlencode }}" hx-target="#cart-list" hx-swap="outerHTML" hx-push-url="true">{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
     </div>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Üye e-postası" aria-label="Üye e-postası ara">

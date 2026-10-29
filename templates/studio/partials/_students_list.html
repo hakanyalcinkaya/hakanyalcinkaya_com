@@ -1,13 +1,13 @@
 {% url 'studio:students' as students_url %}
 <div id="student-list">
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ students_url }}" hx-get="{{ students_url }}" hx-target="#student-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
-    <input type="hidden" name="durum" value="{{ status }}">
+    <input type="hidden" name="status" value="{{ status }}">
     <div class="btn-group btn-group-sm" role="group" aria-label="Kurs durumu">
       {% for item in filters %}
-      <a href="{{ students_url }}?durum={{ item.key }}&kurs={{ course_id }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ students_url }}?durum={{ item.key }}&kurs={{ course_id }}&q={{ query|urlencode }}" hx-target="#student-list" hx-swap="outerHTML" hx-push-url="true">{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+      <a href="{{ students_url }}?status={{ item.key }}&course={{ course_id }}&q={{ query|urlencode }}" class="btn btn-outline-secondary{% if item.key == status %} active{% endif %}" hx-get="{{ students_url }}?status={{ item.key }}&course={{ course_id }}&q={{ query|urlencode }}" hx-target="#student-list" hx-swap="outerHTML" hx-push-url="true">{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
     </div>
-    <select name="kurs" class="form-select form-select-sm w-auto" aria-label="Kurs">
+    <select name="course" class="form-select form-select-sm w-auto" aria-label="Kurs">
       <option value="">Tüm kurslar</option>
       {% for course in courses %}<option value="{{ course.id }}"{% if course_id == course.id|stringformat:"s" %} selected{% endif %}>{{ course.title }}</option>{% endfor %}
     </select>

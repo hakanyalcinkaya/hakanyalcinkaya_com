@@ -13,12 +13,12 @@ from order.models import Order, OrderItem, OrderStatus
 
 # (anahtar, etiket, en az %, en çok %)
 PROGRESS_BUCKETS = (
-    ("baslamadi", _("Başlamadı"), 0, 0),
+    ("not-started", _("Başlamadı"), 0, 0),
     ("1-25", _("%1–25"), 1, 25),
     ("26-50", _("%26–50"), 26, 50),
     ("51-75", _("%51–75"), 51, 75),
     ("76-99", _("%76–99"), 76, 99),
-    ("bitirdi", _("Bitirdi (%100)"), 100, 100),
+    ("completed", _("Bitirdi (%100)"), 100, 100),
 )
 
 

@@ -41,7 +41,7 @@
   <h2 id="progress-title" class="h6 mb-3">İzleme oranı dağılımı</h2>
   <div class="d-grid gap-2">
     {% for bucket in stats.buckets %}
-    <a href="?sekme=ogrenciler&oran={{ bucket.key }}" class="row g-2 align-items-center small text-decoration-none link-body-emphasis" hx-get="{% url 'studio:course_stats' course.id %}?sekme=ogrenciler&oran={{ bucket.key }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true">
+    <a href="?tab=students&progress={{ bucket.key }}" class="row g-2 align-items-center small text-decoration-none link-body-emphasis" hx-get="{% url 'studio:course_stats' course.id %}?tab=students&progress={{ bucket.key }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true">
       <span class="col-4 col-md-2">{{ bucket.label }}</span>
       <span class="col"><span class="studio-bar d-block" role="img" aria-label="%{{ bucket.percent }}"><span style="width: {{ bucket.percent }}%"></span></span></span>
       <span class="col-3 col-md-2 text-end text-body-secondary">{{ bucket.count }} kişi · %{{ bucket.percent }}</span>

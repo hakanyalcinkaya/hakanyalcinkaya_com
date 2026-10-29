@@ -96,20 +96,20 @@ def course_edit(request, course_id):
 
 
 STATS_TABS = {
-    "ogrenciler": gettext_lazy("Öğrenciler"),
-    "satin-alanlar": gettext_lazy("Satın alanlar"),
-    "sepette": gettext_lazy("Sepette bırakanlar"),
+    "students": gettext_lazy("Öğrenciler"),
+    "buyers": gettext_lazy("Satın alanlar"),
+    "in-cart": gettext_lazy("Sepette bırakanlar"),
 }
 
 
 def _page(request, rows):
-    return Paginator(rows, STATS_PAGE_SIZE).get_page(request.GET.get("sayfa"))
+    return Paginator(rows, STATS_PAGE_SIZE).get_page(request.GET.get("page"))
 
 
 def _stats_list(request, course, tab):
     query = request.GET.get("q", "").strip()
     context = dict(tab=tab, query=query, list_url=reverse("studio:course_stats", args=[course.pk]))
-    if tab == "satin-alanlar":
+    if tab == "buyers":
         orders = course_stats.buyer_orders(course)
         filters = OrderFilterForm(request.GET, orders=orders, with_status=False, with_course=False)
         rows = filters.filter(orders).select_related("user").prefetch_related("items__bundle__courses")
@@ -120,13 +120,13 @@ def _stats_list(request, course, tab):
                 if item.course_id == course.pk or (item.bundle_id and course in item.bundle.courses.all())
             ]
         return dict(context, page=page, filters=filters, revenue=course_stats.revenue(rows))
-    if tab == "sepette":
+    if tab == "in-cart":
         rows = course_stats.left_in_cart(course).select_related("cart__user", "bundle")
         if query:
             rows = rows.filter(cart__user__email__icontains=query)
         unfinished = course_stats.unfinished_orders(course).select_related("user").order_by("-created_at", "id")[:STATS_PAGE_SIZE]
         return dict(context, page=_page(request, rows.order_by("-created_at", "id")), unfinished=unfinished)
-    bucket = request.GET.get("oran", "")
+    bucket = request.GET.get("progress", "")
     rows = course_stats.enrollments(course).select_related("user", "last_lesson", "order")
     condition = course_stats.bucket_filter(bucket)
     if condition is not None:
@@ -144,9 +144,9 @@ def course_stats_view(request, course_id):
     """Kurs istatistikleri: kayıt ve izleme oranı özeti; sekmelerde öğrenciler, satın alanlar, sepette bırakanlar.
     Sekme, oran, filtre ve arama GET parametresinde; HTMX isteğinde yalnız liste, kaydırınca yalnız yeni satırlar döner."""
     course = get_object_or_404(Course, pk=course_id)
-    tab = request.GET.get("sekme", "ogrenciler")
+    tab = request.GET.get("tab", "students")
     if tab not in STATS_TABS:
-        tab = "ogrenciler"
+        tab = "students"
     context = _stats_list(request, course, tab)
     context.update(course=course, tabs=list(STATS_TABS.items()))
     if request.htmx and request.GET.get(ROWS_PARAM):
