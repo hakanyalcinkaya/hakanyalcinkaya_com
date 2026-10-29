@@ -24,10 +24,12 @@ Komutlar sudo yetkili bir kullanıcıyla çalıştırılır. Uygulama `www-data`
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y git python3.12-venv python3-dev build-essential postgresql redis-server nginx certbot ufw
+sudo apt install -y git python3.12-venv python3-dev build-essential postgresql redis-server nginx ufw
 ```
 
-`build-essential` ve `python3-dev` uWSGI'nin derlenmesi için gerekir.
+`build-essential` ve `python3-dev` uWSGI'nin derlenmesi için gerekir. Kurulu olan paketler (ör. Nginx, PostgreSQL)
+atlanır. Celery ve uWSGI sistem paketi değildir; venv'e pip ile kurulur (adım 5). Celery'nin istediği sistem servisi
+Redis'tir.
 
 ## 2. Güvenlik duvarı
 
@@ -40,7 +42,7 @@ sudo ufw enable
 ## 3. Klasörler
 
 ```bash
-sudo mkdir -p /var/www/hakanyalcinkaya/{log,static_cdn/static_files,static_cdn/media_files} /var/www/letsencrypt /var/Env
+sudo mkdir -p /var/www/hakanyalcinkaya/{log,static_cdn/static_files,static_cdn/media_files} /var/Env
 sudo chown -R $USER:$USER /var/www/hakanyalcinkaya /var/Env
 # Uygulamanın yazdığı yerler: yüklenen dosyalar ve log
 sudo chown -R www-data:www-data /var/www/hakanyalcinkaya/static_cdn/media_files /var/www/hakanyalcinkaya/log
@@ -117,25 +119,38 @@ $PY manage.py createsuperuser
 
 Yönetim paneli `/verona/` adresindedir (`/admin/` sahte giriş sayfası).
 
-## 10. SSL sertifikası (Let's Encrypt)
+## 10. SSL sertifikası
 
-Nginx config'i sertifika dosyalarına bağlı olduğu için ilk sertifika Nginx kapalıyken alınır, sonra yenileme
-Nginx'in sunduğu `/.well-known/acme-challenge/` klasörüne çevrilir:
+Sertifika `hakanyalcinkaya.com` ve `www.hakanyalcinkaya.com`'u kapsamalıdır. Nginx dosyaları doğrudan bu klasörden
+okur (kopya ya da link yok); `_server/ssl/` git'te takip edilmez (`.gitignore`):
+
+| Dosya | İçerik |
+|---|---|
+| `_server/ssl/hakanyalcinkaya_2026.crt` | Alan adı sertifikası + ara sertifika(lar), bu sırayla; kök sertifika eklenmez |
+| `_server/ssl/hakanyalcinkaya_2026.key` | Özel anahtar |
+| `_server/ssl/hakanyalcinkaya_2026.csr` | Sertifika isteği (yalnız sağlayıcıya verilir) |
+
+CSR ve anahtar sunucuda üretilir (`-subj` değerleri sağlayıcının istediği bilgilerle):
 
 ```bash
-sudo systemctl stop nginx
-sudo certbot certonly --standalone -d hakanyalcinkaya.com -d www.hakanyalcinkaya.com -m hakanyalcinkaya@gmail.com --agree-tos
-sudo systemctl start nginx
+cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj/_server/ssl
+openssl req -new -newkey rsa:2048 -nodes -keyout hakanyalcinkaya_2026.key -out hakanyalcinkaya_2026.csr -subj "/C=TR/ST=Istanbul/L=Istanbul/O=Hakan Yalcinkaya/CN=hakanyalcinkaya.com/emailAddress=admin@hakanyalcinkaya.com" -addext "subjectAltName=DNS:hakanyalcinkaya.com,DNS:www.hakanyalcinkaya.com"
+chmod 600 hakanyalcinkaya_2026.key
 ```
 
-Adım 11'den sonra (Nginx yeni config'le çalışırken) yenileme yöntemi değiştirilir ve denenir:
+Sertifika gelince kontrol:
 
 ```bash
-sudo certbot reconfigure --cert-name hakanyalcinkaya.com --webroot -w /var/www/letsencrypt
-sudo certbot renew --dry-run
-echo 'systemctl reload nginx' | sudo tee /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
-sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+openssl x509 -noout -subject -issuer -dates -ext subjectAltName -in hakanyalcinkaya_2026.crt
+openssl crl2pkcs7 -nocrl -certfile hakanyalcinkaya_2026.crt | openssl pkcs7 -print_certs -noout   # zincir; son sertifikada subject = issuer ise kök, çıkarılır
+# Anahtar ile sertifika eşleşiyor mu (iki satır aynı olmalı):
+openssl x509 -noout -pubkey -in hakanyalcinkaya_2026.crt | openssl sha256
+openssl pkey -pubout -in hakanyalcinkaya_2026.key | openssl sha256
 ```
+
+Yenilemede (DV sertifika en fazla 200 gün; 2026 sertifikası 15 Mayıs 2027'de biter) yeni dosyalar yeni yıl adıyla
+bu klasöre konur, `hakanyalcinkaya_nginx.conf`'taki dört `ssl_certificate*` satırı güncellenir ve
+`sudo nginx -t && sudo systemctl reload nginx` çalıştırılır.
 
 ## 11. Nginx
 
