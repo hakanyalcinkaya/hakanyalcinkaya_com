@@ -11,7 +11,9 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 ## Sepet ve indirim
 - [ ] Sepeti boşaltan kullanıcılara ileride indirim bildirimi gönder (boşaltılan sepetler silinmeden `emptied` durumunda tutuluyor).
 - [ ] Bağlantıyla gelen indirim kodu: `?kod=KOD` oturumda beklet, sepet oluşunca uygula; kurs ve paket sayfalarında "KOD uygulandı" ile indirimli fiyatı göster.
-- [ ] iyzico ödeme entegrasyonu (TL, KDV dahil fiyatlar).
+- [ ] iyzico kartla ödeme (TL, KDV dahil): ödeme sayfası hazır, kart seçeneği "Yakında" (`page/views.py` `checkout`, `card_payment_open=False`). Bağlanınca `Order.create_from_cart(cart, email, user, provider="card")` ile bekleyen sipariş, iyzico onayında `Order.mark_paid`, başarısızlıkta `mark_failed`. Anahtarlar `.env`'de (`IYZICO_API_KEY`, `IYZICO_SECRET_KEY`), önce sandbox.
+- [ ] Havale/EFT yalnız yöneticide: Stüdyo → Siparişler → Sipariş oluştur (sepetten de). Sipariş onaylanınca üyeye "satın alma onayı" e-postası henüz gitmiyor (`templates/emails/purchase_confirmation` bağlanacak).
+- [ ] Örnek veride (veritabanında olmayan kurslar) sepet hâlâ oturumda (`page/catalog.py` `cart_add`); örnek veri kaldırılınca bu yol da silinmeli.
 
 ## Video (Bunny Stream)
 - [ ] CDN token koruması: Bunny panelinde (Stream → kütüphane → Security) "Token Authentication" açılınca imzalı adresi gerçek CDN'de doğrula, sonra `.env`'de `BUNNY_CDN_TOKEN_AUTH=True` yap (kod hazır, `course/bunny.py` `_signed`). Koruma kapalıyken imzalı adres 404 veriyor (beklenen); koruma açılıp ayar açılmazsa videolar oynamaz, ikisi birlikte yapılmalı.
@@ -25,7 +27,6 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 ## Öğrenci araçları (giriş yapmış ve kursu satın almış kullanıcı)
 - [ ] Video notu: oynatıcıda "Not ekle" düğmesi; not videonun o anki saniyesine kaydedilir. Oynatıcının ilerleme çubuğunda notların yerinde işaret (mark) görünür; işarete tıklanınca o saniyeye gidilir. `learning.Note` modeline saniye alanı (ör. `position_seconds`) eklenecek.
 - [ ] Derslerde not alma şu an kapalı (Studio → Ayarlar); açılmadan önce not kaydetme bağlanmalı (ders sayfasındaki alan örnek, `learning.Note` kullanılmıyor).
-- [ ] Veritabanındaki kurslarda erişim artık kurs kaydına (`Enrollment`) bağlı; sepet/ödeme akışı hâlâ örnek (oturumdaki "satın alma"). iyzico ödemesi onaylanınca `Order.mark_paid` kurs kaydını açacak.
 
 ## Podia'dan geçiş
 - [ ] Django ve Python kurslarını veritabanında aç, sonra aktar: `python manage.py import_podia <dosya.xlsx> --map "React 18.x=<react-slug>" --map "Python ve Django=<django-slug>" --map "İki Eğitmen=<python-slug>" --dry-run`, rapor temizse `--dry-run` olmadan. Tekrar çalıştırılabilir (aynı fatura ikinci kez yazılmaz); geçiş bitene kadar Podia'daki yeni satışlar için yeniden çalıştır.
