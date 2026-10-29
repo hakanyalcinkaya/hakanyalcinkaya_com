@@ -1,4 +1,4 @@
-{% if enrolled or course.owned %}
+{% if course.owned %}
 <div class="d-grid gap-2 mt-3">
   <a href="{% if first_lesson_url %}{{ first_lesson_url }}{% else %}{{ course.url }}#mufredat{% endif %}" class="btn btn-primary btn-lg fs-6"><i class="bi bi-play-circle me-2" aria-hidden="true"></i>Eğitime git</a>
   <p class="small text-body-secondary text-center mb-0">Bu eğitime sahipsin.</p>

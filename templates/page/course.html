@@ -169,7 +169,7 @@
           </div>
           <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 p-4">
             <span class="text-body-secondary small" style="max-width:44ch">{{ detail.access }}</span>
-            {% if enrolled %}<a href="#mufredat" class="btn btn-primary">Derslere git <i class="bi bi-arrow-up ms-1" aria-hidden="true"></i></a>{% else %}<a href="{{ course.buy_url }}" class="btn btn-primary">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endif %}
+            {% if course.owned %}<a href="#mufredat" class="btn btn-primary">Derslere git <i class="bi bi-arrow-up ms-1" aria-hidden="true"></i></a>{% else %}<a href="{{ course.buy_url }}" class="btn btn-primary">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endif %}
           </div>
         </div>
       </section>
@@ -218,7 +218,7 @@
     {% include "components/newsletter.html" %}
   </div>
 </section>
-{% if not enrolled and not course.owned %}
+{% if not course.owned %}
 {# Mobil: fiyat kartı ekrandan çıkınca altta sabit satın alma çubuğu (site.js data-buy-bar). #}
 <div class="hy-buy-bar d-lg-none fixed-bottom border-top bg-body px-3 py-2" data-buy-bar hidden>
   <div class="d-flex align-items-center gap-3">

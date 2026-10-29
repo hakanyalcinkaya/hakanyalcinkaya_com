@@ -392,7 +392,9 @@ def course_page(slug, enrolled=False):
         lesson["icon"] = "bi-lock" if lesson["locked"] else lesson["format_icon"]
     previews = [lesson for lesson in flat if lesson["preview"]]
     return {
-        "course": course,
+        # Örnek kartın "Kurslarım" demosundaki sahipliği kurs sayfasında kullanılmaz; sahiplik oturumdaki satın almadır.
+        "course": dict(course, owned=enrolled),
+        "first_lesson_url": flat[0]["url"] if flat else "",
         "detail": _copy(course),
         "sections": sections,
         "lessons": flat,
