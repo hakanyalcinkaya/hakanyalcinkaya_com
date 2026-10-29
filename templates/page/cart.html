@@ -36,7 +36,7 @@
             <div class="flex-grow-1 min-w-0">
               <div class="d-flex flex-wrap justify-content-between gap-2">
                 <h2 class="h6 fw-semibold mb-1"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h2>
-                <span class="fw-semibold">{{ course.price }}</span>
+                <span class="fw-semibold">{{ course.price }}{% include "components/list_price.html" %}</span>
               </div>
               <p class="small text-body-tertiary mb-2">{{ course.meta_line }}</p>
               <form method="post" action="{{ course.remove_url }}">

@@ -179,6 +179,8 @@ def _course_card(course, flat):
         title=course.title,
         short=course.short_title,
         price=format_try(course.price),
+        list_price=format_try(course.list_price) if course.has_list_discount else "",
+        discount_percent=course.discount_percent,
         amount=course.price,
         lessons=len(flat),
         minutes=minutes,

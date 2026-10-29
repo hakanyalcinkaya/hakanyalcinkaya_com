@@ -276,6 +276,12 @@
       carousel.querySelector("[data-hero-duration]").textContent = current.getAttribute("data-duration");
       carousel.querySelector("[data-hero-lessons]").textContent = current.getAttribute("data-lessons") + " ders";
       carousel.querySelector("[data-hero-price]").textContent = current.getAttribute("data-price");
+      var listPrice = current.getAttribute("data-list-price");
+      var discount = current.getAttribute("data-discount");
+      carousel.querySelector("[data-hero-list-value]").textContent = listPrice;
+      carousel.querySelector("[data-hero-list-price]").classList.toggle("d-none", !listPrice);
+      carousel.querySelector("[data-hero-discount]").textContent = "%" + discount;
+      carousel.querySelector("[data-hero-discount]").classList.toggle("d-none", !listPrice || !discount || discount === "0");
       carousel.querySelector("[data-hero-inspect]").href = current.getAttribute("href");
       var cart = carousel.querySelector("[data-hero-cart]");
       cart.form.action = current.getAttribute("data-cart");

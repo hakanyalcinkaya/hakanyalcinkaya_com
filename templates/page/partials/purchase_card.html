@@ -2,7 +2,7 @@
 <div class="card {{ card_class|default:'shadow' }} overflow-hidden">
   {% include "page/partials/preview_media.html" with media_class=" border-bottom" %}
   <div class="card-body p-4">
-    <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+    <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}{% include "components/list_price.html" %}</div>
     {% include "page/partials/buy_actions.html" %}
     <ul class="list-unstyled d-grid gap-2 small text-body-secondary mt-4 mb-0">
       <li><i class="bi bi-clock me-2 text-body-tertiary" aria-hidden="true"></i>{{ course.duration }} detaylı video</li>

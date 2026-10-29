@@ -1,0 +1,2 @@
+{# Liste fiyatı satış fiyatından yüksekse üstü çizili ve indirim yüzdesiyle (fiyatın hemen yanında). #}
+{% if course.list_price %} <s class="fs-6 fw-normal text-body-tertiary ms-1"><span class="visually-hidden">Liste fiyatı: </span>{{ course.list_price }}</s>{% if course.discount_percent %} <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium fs-6 align-middle">%{{ course.discount_percent }}</span>{% endif %}{% endif %}

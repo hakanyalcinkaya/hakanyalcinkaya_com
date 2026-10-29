@@ -41,8 +41,8 @@ def site(request):
         "cookies_url": reverse("page:cookies"),
         "nav_member": user.is_authenticated,
         "account_user": user if user.is_authenticated else None,
-        # Ziyaretçi sepeti her zaman görür; üye yalnız sepetinde kurs varken.
-        "show_cart": not user.is_authenticated or cart_count > 0,
+        # Sepet simgesi herkese, her zaman (boşken de) üst menüde görünür.
+        "show_cart": True,
         # "Kursları Keşfet" yalnız ziyaretçiye ve mağaza sayfaları dışında.
         "show_explore": not user.is_authenticated and url_name not in SHOP_URL_NAMES,
         "cart_url": reverse("page:cart"),

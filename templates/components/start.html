@@ -11,7 +11,7 @@
           <span class="d-block fw-semibold">{{ course.short }}</span>
           <span class="d-block small text-body-tertiary">{{ course.meta_line }}</span>
         </span>
-        <span class="fs-5 fw-semibold d-none d-sm-inline">{{ course.price }}</span>
+        <span class="fs-5 fw-semibold d-none d-sm-inline">{{ course.price }}{% include "components/list_price.html" %}</span>
         <span class="btn btn-primary" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
       </a>
       {% endfor %}

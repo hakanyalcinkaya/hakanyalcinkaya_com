@@ -145,8 +145,8 @@ def course_detail(request, slug):
         page["first_lesson_url"] = resume.get_absolute_url() if resume else (page["lessons"][0]["url"] if page["lessons"] else "")
         review_context = content.course_reviews(course)
         page["course"]["rating"] = review_context["rating"]
-        # Kursu alan üye kendi puanını ve yorumunu burada verir ya da düzenler.
-        if enrolled and request.user.is_authenticated:
+        # Kursu satın alan üye kendi puanını ve yorumunu burada verir ya da düzenler (personel erişimi yetmez).
+        if page["course"]["owned"]:
             review_context.update(
                 review_course=course, my_review=Review.objects.filter(course=course, user=request.user).first()
             )
@@ -217,8 +217,8 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     review_course = None
     if lesson is not None and not page["preview"] and request.user.is_authenticated:
         favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
-        # Kursu değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
-        if not Review.objects.filter(course=course, user=request.user).exists():
+        # Kursu satın alıp değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
+        if Enrollment.objects.has_access(request.user, course) and not Review.objects.filter(course=course, user=request.user).exists():
             review_course = course
     return render(
         request,
@@ -256,7 +256,8 @@ def course_review(request, slug):
     kullanıcıya orada bir daha sorulmaz; yorumunu Kurslarım'da görüp düzenler.
     """
     course = content.visible_course(slug, request.user)
-    if course is None or not _enrolled(request, slug):
+    # Yalnız kursu satın alan (kurs kaydı olan) değerlendirir; personelin izleme erişimi yetmez.
+    if course is None or not Enrollment.objects.has_access(request.user, course):
         raise Http404
     place = request.POST.get("place") or request.GET.get("place")
     place = place if place in REVIEW_PLACES else "course"
@@ -399,9 +400,9 @@ def thanks(request):
 
 
 def _library_reviews(request):
-    """Kurslarım → Değerlendirmelerim: erişimi olan her kurs ve kullanıcının o kurstaki değerlendirmesi (varsa)."""
+    """Kurslarım → Değerlendirmelerim: satın alınan (kurs kaydı olan) her kurs ve kullanıcının değerlendirmesi (varsa)."""
     reviews = {review.course_id: review for review in Review.objects.filter(user=request.user)}
-    courses = [course for course in Course.objects.published().order_by("title") if _enrolled(request, course.slug)]
+    courses = Course.objects.published().filter(enrollments__user=request.user).order_by("title")
     return [dict(course=course, review=reviews.get(course.pk)) for course in courses]
 
 
