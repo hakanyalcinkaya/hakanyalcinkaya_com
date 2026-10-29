@@ -1,5 +1,4 @@
-{# Video satırı. Tutamaktan sürüklenir; üstüne SRT/VTT ya da Markdown/TXT/HTML bırakılınca "Ek içerik" paneli açılıp dosya gönderilir,
-   tek video bırakılınca o dersin videosu olarak yükleme sırasına girer (studio.js). #}
+{# Video satırı. Tutamaktan sürüklenir; üstüne SRT/VTT ya da Markdown/TXT/HTML bırakılınca "Ek içerik" paneli açılıp dosya gönderilir; tek video bırakılınca o dersin videosu olarak yükleme sırasına girer (studio.js). #}
 <div class="list-group-item py-2 studio-lesson" id="lesson-{{ lesson.id }}" data-lesson-id="{{ lesson.id }}"{% if lesson.is_video %} data-subtitle-drop data-subtitle-url="{% url 'studio:lesson_subtitles' lesson.id %}" data-video-url="{% url 'studio:lesson_video' lesson.id %}"{% endif %}>
   <div class="row g-2 align-items-center">
     <div class="col-auto d-flex align-items-center gap-2">

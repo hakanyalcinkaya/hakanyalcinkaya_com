@@ -1,5 +1,4 @@
-{# Hedef: kurs verilmişse tanıtım videosu, değilse ders videosu. Video ayarlarda seçili platforma gider.
-   Ders videosu formu dosyayı kendisi göndermez; studio.js dosyayı yükleme sırasına koyar ve formu kapatır. #}
+{# Hedef: kurs verilmişse tanıtım videosu, değilse ders videosu. Video ayarlarda seçili platforma gider. Ders videosu formu dosyayı kendisi göndermez; studio.js dosyayı yükleme sırasına koyar ve formu kapatır. #}
 {% load studio_tags %}{% video_platform_label as platform_label %}
 {% if course %}{% url 'studio:course_preview' course.id as form_url %}{% else %}{% url 'studio:lesson_video' lesson.id as form_url %}{% endif %}
 <form class="border rounded bg-body-tertiary p-3 mt-3" hx-post="{{ form_url }}" hx-encoding="multipart/form-data" hx-target="{% if course %}#course-preview-form{% else %}#lesson-{{ lesson.id }}-form{% endif %}" data-upload-form{% if not course %} data-upload-queue{% endif %}>
