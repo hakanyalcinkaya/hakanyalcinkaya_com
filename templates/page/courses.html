@@ -3,11 +3,8 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block description %}Front-End, React, Python ve Django kursları: Front-End ve React 18.x, Python ve Django, Sıfırdan Python. Sıfırdan başla, projelerle öğren.{% endblock %}
-{% block head %}
-<meta property="og:title" content="{{ page_title }}">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-<link rel="canonical" href="{{ request.build_absolute_uri }}">
-{% endblock %}
+{% block og_title %}{{ page_title }}{% endblock %}
+{% block og_description %}Front-End, React, Python ve Django kursları. Sıfırdan başla, projelerle öğren.{% endblock %}
 
 {% block content %}
 <header class="py-5 border-bottom">

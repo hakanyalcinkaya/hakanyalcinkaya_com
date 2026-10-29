@@ -3,7 +3,8 @@
   <div class="container pt-2 pt-lg-5 pb-lg-5">
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
-        <h1 id="hero-baslik" class="display-4 fw-semibold lh-1">Kodla. Üret. <span class="text-primary-emphasis">Kendini Geliştir.</span></h1>
+        {# Slogan aramada bir şey anlatmaz; konu (arama terimi) başlığın ilk satırında, küçük yazıyla. #}
+        <h1 id="hero-baslik" class="display-4 fw-semibold lh-1"><span class="d-block fs-6 fw-semibold text-body-secondary mb-3" style="letter-spacing:normal">Python, Django ve React kursları</span>Kodla. Üret. <span class="text-primary-emphasis">Kendini Geliştir.</span></h1>
         <p class="lead text-body-secondary mt-4 mb-0">Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren. Teoriyi pratiğe dönüştür, kendi projelerini geliştir.</p>
         <div class="d-grid d-sm-flex gap-2 mt-4 pt-2">
           <a href="#egitimler" class="btn btn-primary btn-lg fs-6 px-4">Kursları Keşfet <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
@@ -25,7 +26,7 @@
               <div class="d-flex h-100" data-hero-track style="transform:translateX(0);transition:transform .55s cubic-bezier(.22,.8,.24,1)">
                 {% for item in courses %}
                 <a href="{{ item.url }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ courses|length }}: {{ item.title }}" aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}" {% if not forloop.first %}tabindex="-1"{% endif %} draggable="false" class="d-block flex-shrink-0 w-100 h-100" data-title="{{ item.title }}" data-duration="{{ item.duration }}" data-lessons="{{ item.lessons }}" data-price="{{ item.price }}" data-cart="{{ item.cart_url }}" data-cart-label="{{ item.cart_label }}" data-tags="{{ item.tags_attr }}" data-owned="{% if item.owned %}1{% endif %}" data-list-price="{{ item.list_price }}">
-                  <img src="{% static item.image %}" alt="{{ item.alt }}" width="1280" height="720" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async" draggable="false" class="w-100 h-100 object-fit-cover user-select-none">
+                  <img src="{% static item.image %}" alt="{{ item.alt }}" width="1280" height="720" {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" draggable="false" class="w-100 h-100 object-fit-cover user-select-none">
                 </a>
                 {% endfor %}
               </div>

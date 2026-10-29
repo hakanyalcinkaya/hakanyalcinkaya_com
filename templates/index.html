@@ -1,13 +1,6 @@
 {% extends "_base/base.html" %}
 
-{% block head %}
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Hakan Yalçınkaya">
-<meta property="og:title" content="Hakan Yalçınkaya — [Kodla] => Üret">
-<meta property="og:description" content="Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren.">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-<link rel="canonical" href="{{ request.build_absolute_uri }}">
-{% endblock %}
+{% block og_title %}Hakan Yalçınkaya — [Kodla] => Üret{% endblock %}
 
 {% block content %}
 {% include "components/hero.html" %}

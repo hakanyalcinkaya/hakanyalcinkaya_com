@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 
 from core.models import SiteSettings
+from core.site_url import absolute_url
 from newsletter.models import Subscriber
 
 from page import content
@@ -29,6 +30,8 @@ def site(request):
             href = f"{index_url}#{item_id}"
         nav_items.append({"id": item_id, "href": href, "label": label})
     return {
+        # Sorgu parametresiz asıl adres: filtre, utm ve e-posta takibi parametreli adresler aynı sayfaya bağlanır.
+        "canonical_url": absolute_url(request.path),
         "courses": cards,
         "nav_items": nav_items,
         "year": timezone.now().year,

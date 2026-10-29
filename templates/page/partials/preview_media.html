@@ -2,13 +2,13 @@
 {% if course.preview_video %}
 <button type="button" class="ratio ratio-16x9 d-block w-100 border-0 p-0 bg-black hy-preview{{ media_class }}" data-preview-video="{{ course.preview_video }}" data-video-platform="{{ course.preview_platform }}"{% if course.preview_poster %} data-poster="{{ course.preview_poster }}"{% endif %} data-course-url="{{ course.url }}#genel"{% if first_preview %} data-previews-url="{{ first_preview.url }}"{% endif %} data-player-src="{% static 'js/videojs/player.js' %}" aria-label="{{ course.title }} — tanıtım videosunu oynat">
   <span class="d-block">
-    <img src="{% static course.image %}" alt="" width="1280" height="720" decoding="async" class="w-100 h-100 object-fit-cover">
+    <img src="{% static course.image %}" alt="" width="1280" height="720" fetchpriority="high" decoding="async" class="w-100 h-100 object-fit-cover">
     <span class="position-absolute top-50 start-50 translate-middle btn btn-primary btn-lg rounded-circle d-inline-flex align-items-center justify-content-center hy-preview-play" aria-hidden="true"><i class="bi bi-play-fill fs-2 lh-1"></i></span>
     <span class="position-absolute bottom-0 start-0 m-3 badge rounded-1 bg-black bg-opacity-75 fw-medium" aria-hidden="true"><i class="bi bi-camera-video me-1"></i>Tanıtım videosu</span>
   </span>
 </button>
 {% else %}
 <a href="{{ course.url }}#mufredat" class="ratio ratio-16x9 bg-body-secondary d-block{{ media_class }}" aria-label="Müfredata git">
-  <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" decoding="async" class="object-fit-cover">
+  <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" fetchpriority="high" decoding="async" class="object-fit-cover">
 </a>
 {% endif %}

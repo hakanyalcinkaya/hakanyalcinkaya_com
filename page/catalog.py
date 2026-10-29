@@ -69,7 +69,7 @@ _COURSES = (
         "duration": "52+ saat",
         "lessons": 335,
         "price": "€99.90",
-        "image": "img/courses/react.jpg",
+        "image": "img/courses/react.webp",
     },
     {
         "slug": "sifirdan-uctan-uca-projelerle-python-ve-django-ogren",
@@ -81,7 +81,7 @@ _COURSES = (
         "duration": "51+ saat",
         "lessons": 327,
         "price": "€99.90",
-        "image": "img/courses/django.jpg",
+        "image": "img/courses/django.webp",
         "subtitle": "Python ve Django ile sıfırdan başlayıp uçtan uca projeler geliştirdiğin kurs.",
         "stack": ("Python", "Django", "HTML", "CSS", "Git"),
         "learn": (
@@ -123,7 +123,7 @@ _COURSES = (
         "duration": "Süre: [eklenecek]",
         "lessons": 109,
         "price": "€99.90",
-        "image": "img/courses/python.png",
+        "image": "img/courses/python.webp",
         "subtitle": "İki eğitmenin anlatımıyla Python’a sıfırdan başlangıç.",
         "stack": ("Python",),
         "learn": (

@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 
 from core.duration import clock, hours_minutes
 from core.money import format_try
+from core.site_url import absolute_url
 
 register = template.Library()
 
@@ -34,3 +35,15 @@ def ago(value):
     if timezone.now() - value < timedelta(minutes=1):
         return _("az önce")
     return _("%(delta)s önce") % {"delta": timesince(value, depth=1)}
+
+
+@register.filter
+def absolute(path):
+    """Statik ya da site içi yolu SITE_URL ile mutlak adrese çevirir (og:image, canonical)."""
+    return absolute_url(path)
+
+
+@register.filter
+def share_image(image):
+    """Paylaşım görseli (og:image): sayfadaki WebP kapağın aynı adlı JPEG'i; bazı platformlar WebP önizleme göstermez."""
+    return image.removesuffix(".webp") + ".jpg" if image.endswith(".webp") else image

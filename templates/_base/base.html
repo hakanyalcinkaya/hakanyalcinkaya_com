@@ -1,4 +1,4 @@
-{% load static %}
+{% load static core_tags %}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -6,6 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}Hakan Yalçınkaya — Yazılım ve Üretkenlik Odaklı Kurslar{% endblock %}</title>
 <meta name="description" content="{% block description %}Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren. Hakan Yalçınkaya'nın yazılım ve üretkenlik odaklı kursları.{% endblock %}">
+{# Paylaşım önizlemesi (Open Graph / X). Başlık ve açıklama blokları şablonda iki kez kullanılamadığı için sayfalar #}
+{# og_title / og_description'ı ayrıca verir; vermeyen sayfada sitenin genel metni görünür. #}
+<link rel="canonical" href="{{ canonical_url }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hakan Yalçınkaya">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{% block og_title %}Hakan Yalçınkaya — Yazılım ve Üretkenlik Odaklı Kurslar{% endblock %}">
+<meta property="og:description" content="{% block og_description %}Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren.{% endblock %}">
+{% block og_image %}{% static 'img/hakan-yalcinkaya-share.jpg' as share_url %}
+<meta property="og:image" content="{{ share_url|absolute }}">
+<meta property="og:image:width" content="600">
+<meta property="og:image:height" content="600">
+<meta property="og:image:alt" content="Hakan Yalçınkaya">
+<meta name="twitter:card" content="summary">{% endblock %}
 {% block head %}{% endblock %}
 <link rel="icon" href="{% static 'favicon.ico' %}" sizes="48x48">
 <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">

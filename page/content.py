@@ -12,9 +12,9 @@ from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
-from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch
+from django.templatetags.static import static
 from django.urls import reverse
 
 from account.models import User
@@ -23,6 +23,8 @@ from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
 from core.models import Status
+from core.site_url import absolute_url
+from core.templatetags.core_tags import share_image
 from course.models import (
     Course,
     HighlightKind,
@@ -40,9 +42,9 @@ from page import catalog
 # Kurs taslakları (eski platformdaki adreslerle); eski kurs adreslerini yönlendirmek için okunur.
 OUTLINE_DIR = Path(__file__).resolve().parent.parent / "course" / "outlines"
 
-FALLBACK_IMAGE = "img/courses/react.jpg"
+FALLBACK_IMAGE = "img/courses/react.webp"
 # Örnek veride karşılığı olmayan kursun kapağı: slug'da geçen kelimeye göre (kapak yükleme henüz yok).
-FALLBACK_IMAGES = (("django", "img/courses/django.jpg"), ("python", "img/courses/python.png"), ("react", "img/courses/react.jpg"))
+FALLBACK_IMAGES = (("django", "img/courses/django.webp"), ("python", "img/courses/python.webp"), ("react", "img/courses/react.webp"))
 LESSON_FORMAT_KEYS = {LessonKind.VIDEO: "video", LessonKind.FORM: "form", LessonKind.TEXT: "text"}
 
 
@@ -576,20 +578,28 @@ def with_ratings(cards):
     return [dict(card, rating=ratings.get(card["slug"])) for card in cards]
 
 
-def course_schema(course, detail, url, rating=None):
+def course_schema(course, detail, rating=None):
     """Kurs sayfasının schema.org Course verisi (JSON-LD); <script> içine güvenle yazılır.
 
     Puan yalnız sitede yazılan yorumlardan verilir: arama motorları başka platformdan aktarılan yorumları kabul etmez.
+    Google'ın kurs sonucu için CourseInstance'ta courseMode ile courseWorkload (ISO 8601 süre) birlikte gerekir.
     """
+    url = absolute_url(course["url"])
+    teacher = {"@type": "Person", "name": "Hakan Yalçınkaya", "url": absolute_url("/")}
+    instance = {"@type": "CourseInstance", "courseMode": "online", "instructor": teacher}
+    if course.get("minutes"):
+        hours, minutes = divmod(course["minutes"], 60)
+        instance["courseWorkload"] = f"PT{hours}H{minutes}M" if minutes else f"PT{hours}H"
     data = {
         "@context": "https://schema.org",
         "@type": "Course",
         "name": course["title"],
         "description": detail["subtitle"],
         "url": url,
+        "image": absolute_url(static(share_image(course["image"]))),
         "inLanguage": "tr",
-        "provider": {"@type": "Person", "name": "Hakan Yalçınkaya", "url": settings.SITE_URL},
-        "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online"},
+        "provider": teacher,
+        "hasCourseInstance": instance,
     }
     amount = course.get("amount")
     if amount is not None and course.get("price", "").startswith("₺"):

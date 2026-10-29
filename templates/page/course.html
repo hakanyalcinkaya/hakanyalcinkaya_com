@@ -3,12 +3,11 @@
 
 {% block title %}{{ course.title }} — Hakan Yalçınkaya{% endblock %}
 {% block description %}{{ detail.subtitle }}{% endblock %}
+{% block og_title %}{{ course.title }} — Hakan Yalçınkaya{% endblock %}
+{% block og_description %}{{ detail.subtitle }}{% endblock %}
+{% block og_image %}{% include "page/partials/og_course_image.html" %}{% endblock %}
 {% block head %}
 {% include "page/partials/video_referrer.html" %}
-<meta property="og:title" content="{{ course.title }} — Hakan Yalçınkaya">
-<meta property="og:description" content="{{ detail.subtitle }}">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-<link rel="canonical" href="{{ request.build_absolute_uri }}">
 <script type="application/ld+json">{{ course_schema|safe }}</script>
 {% endblock %}
 
