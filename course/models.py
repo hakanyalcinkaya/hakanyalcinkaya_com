@@ -1067,8 +1067,56 @@ class ReviewSource(models.TextChoices):
     USER = "user", _("Kullanıcı yorumu")
 
 
+REVIEW_RATINGS = [(value, "★" * value) for value in range(1, 6)]
+# Stüdyoda yorum durumu: yayında = onaylı sürüm sitede görünür, taslak = henüz onaylanmadı, arşiv = gizlendi.
+REVIEW_STATUS_LABELS = {Status.DRAFT: _("Onay bekliyor"), Status.PUBLISHED: _("Yayında"), Status.ARCHIVED: _("Gizli")}
+
+
+def rating_summary(average, count):
+    """Ortalama (bir ondalık), sayı ve dolu yıldız sayısı."""
+    average = round(average, 1) if average else None
+    return dict(average=average, count=count, stars=round(average) if average else 0)
+
+
+class ReviewQuerySet(StatusQuerySet):
+    def visible(self):
+        """Sitede görünen: onaylanmış ve gizlenmemiş. Sitede onaylı sürüm (approved_*) gösterilir."""
+        return self.filter(status=Status.PUBLISHED, approved_at__isnull=False)
+
+    def with_text(self):
+        return self.visible().exclude(approved_text="")
+
+    def for_home(self):
+        return self.with_text().filter(show_on_home=True).select_related("user", "course")
+
+    def featured_for(self, course):
+        return self.with_text().filter(course=course, featured=True).select_related("user", "course")
+
+    def all_for(self, course=None):
+        reviews = self.with_text().select_related("user", "course")
+        return reviews.filter(course=course) if course is not None else reviews
+
+    def awaiting(self):
+        """Stüdyoda onay bekleyen: yeni ya da onaydan sonra değiştirilmiş yorumlar."""
+        return self.filter(needs_review=True).exclude(status=Status.ARCHIVED)
+
+    def rating_summary(self):
+        """Onaylı puanların ortalaması ve sayısı."""
+        rated = self.visible().filter(approved_rating__isnull=False)
+        data = rated.aggregate(average=models.Avg("approved_rating"), count=Count("pk"))
+        return rating_summary(data["average"], data["count"])
+
+    def ordered(self):
+        return self.order_by("sort_order", "-approved_written_at", "id")
+
+
 class Review(BaseModel, BaseStatus, BaseSortOrder):
-    """Kurs yorumu. Dışarıdan aktarılanlarda kullanıcı boş, ad elle girilir."""
+    """Kurs değerlendirmesi: puan (1-5) ve isteğe bağlı yorum.
+
+    Kursu alan kullanıcı yazar; her değişiklik yeniden onaya gider. Sitede yalnız onaylı sürüm (approved_*) görünür,
+    yani onaylı yorum değiştirildiğinde yeni hali onaylanana kadar eskisi kalır. Eski (dışarıdan aktarılan) yorumlarda
+    kullanıcı boştur, ad elle yazılır ve stüdyodan eklenince doğrudan onaylanabilir.
+    """
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="reviews", verbose_name=_("kurs"))
     user = models.ForeignKey(
@@ -1079,17 +1127,28 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
         related_name="reviews",
         verbose_name=_("kullanıcı"),
     )
-    author_name = models.CharField(_("yazan"), max_length=120, blank=True)
-    text = models.TextField(_("yorum"))
+    author_name = models.CharField(_("yazan"), max_length=120, blank=True, help_text=_("Eski yorumlarda elle yazılır."))
     rating = models.PositiveSmallIntegerField(
-        _("puan"), null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(5)]
+        _("puan"), null=True, blank=True, choices=REVIEW_RATINGS, validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
+    text = models.TextField(_("yorum"), blank=True)
+    written_at = models.DateTimeField(_("yorum tarihi"), default=timezone.now)
     source = models.CharField(_("kaynak"), max_length=20, choices=ReviewSource, default=ReviewSource.IMPORTED)
+    # Sitede görünen (onaylanmış) sürüm
+    approved_rating = models.PositiveSmallIntegerField(_("onaylı puan"), null=True, blank=True)
+    approved_text = models.TextField(_("onaylı yorum"), blank=True)
+    approved_written_at = models.DateTimeField(_("onaylı yorumun tarihi"), null=True, blank=True)
+    approved_at = models.DateTimeField(_("onay tarihi"), null=True, blank=True)
+    needs_review = models.BooleanField(_("onay bekliyor"), default=True, db_index=True)
+    featured = models.BooleanField(_("kurs sayfasında öne çıkar"), default=False)
+    show_on_home = models.BooleanField(_("ana sayfada göster"), default=False)
+
+    objects = ReviewQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("yorum")
         verbose_name_plural = _("yorumlar")
-        ordering = ("sort_order", "-created_at")
+        ordering = ("sort_order", "-written_at")
         constraints = [
             models.UniqueConstraint(
                 fields=("course", "user"), condition=Q(user__isnull=False), name="review_one_per_user_course"
@@ -1101,13 +1160,76 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
 
     @property
     def display_name(self):
-        if self.user_id and not self.author_name:
-            return self.user.display_name
-        return self.author_name
+        """Elle yazılan ad; yoksa "Ad S." ya da ad bilgisi yoksa e-postanın ilk üç harfi (ilki büyük)."""
+        if self.author_name:
+            return self.author_name
+        if not self.user_id:
+            return ""
+        first, last = self.user.first_name.strip(), self.user.last_name.strip()
+        if first:
+            return f"{first} {last[0].upper()}." if last else first
+        return self.user.email[:3].capitalize()
 
     @property
     def initial(self):
         return self.display_name[:1].upper()
+
+    @property
+    def status_label(self):
+        return REVIEW_STATUS_LABELS[self.status]
+
+    @property
+    def is_visible(self):
+        return self.status == Status.PUBLISHED and self.approved_at is not None
+
+    @property
+    def has_pending_changes(self):
+        """Onaylı sürümü sitede görünürken değiştirildi; yeni hali onay bekliyor."""
+        return self.is_visible and self.needs_review
+
+    def submit(self, rating, text):
+        """Kullanıcı puanı ya da yorumu yazdı/değiştirdi: yeniden onaya gider. Onaylı sürüm sitede kalır."""
+        self.rating = rating
+        self.text = text.strip()
+        self.written_at = timezone.now()
+        self.needs_review = True
+        self.source = ReviewSource.USER
+        self.save()
+
+    def approve(self):
+        """Son hali onaylanır ve sitede görünür."""
+        self.approved_rating = self.rating
+        self.approved_text = self.text
+        self.approved_written_at = self.written_at
+        self.approved_at = timezone.now()
+        self.needs_review = False
+        self.status = Status.PUBLISHED
+        self.save()
+
+    def hide(self):
+        """Yorum sitede gösterilmez (onaylı sürüm de)."""
+        self.status = Status.ARCHIVED
+        self.needs_review = False
+        self.save(update_fields=["status", "needs_review", "updated_at"])
+
+    def toggle_featured(self):
+        self.featured = not self.featured
+        self.save(update_fields=["featured", "updated_at"])
+
+    def toggle_home(self):
+        self.show_on_home = not self.show_on_home
+        self.save(update_fields=["show_on_home", "updated_at"])
+
+    def card(self):
+        """Sitedeki yorum kartının verisi (onaylı sürüm)."""
+        return dict(
+            name=self.display_name,
+            initial=self.initial,
+            text=self.approved_text,
+            rating=self.approved_rating,
+            date=self.approved_written_at,
+            course=self.course.short_title,
+        )
 
 
 class BundleQuerySet(StatusQuerySet):

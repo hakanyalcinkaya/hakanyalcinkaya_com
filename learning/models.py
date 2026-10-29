@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel
+from course.models import SubtitleLanguage
 
 
 class EnrollmentSource(models.TextChoices):
@@ -202,3 +203,62 @@ class Favorite(BaseModel):
             return False
         cls.objects.get_or_create(user=user, lesson=lesson)
         return True
+
+
+class PlaybackRate(models.TextChoices):
+    SLOWEST = "0.5", "0.5×"
+    SLOW = "0.75", "0.75×"
+    NORMAL = "1", _("Normal (1×)")
+    FAST = "1.25", "1.25×"
+    FASTER = "1.5", "1.5×"
+    FASTEST = "1.75", "1.75×"
+    DOUBLE = "2", "2×"
+
+
+class VideoQuality(models.TextChoices):
+    AUTO = "auto", _("Otomatik (bağlantıya göre)")
+    Q360 = "360", "360p"
+    Q480 = "480", "480p"
+    Q720 = "720", "720p"
+    Q1080 = "1080", "1080p"
+    HIGHEST = "highest", _("En yüksek")
+
+
+class PlayerPreference(BaseModel):
+    """Kullanıcının video oynatma tercihleri. Hesap ayarlarından seçilir; oynatıcıda hız, kalite ya da altyazı
+    değiştirilince de kendiliğinden kaydedilir ve bir sonraki videoda uygulanır."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="player_preference", verbose_name=_("kullanıcı")
+    )
+    playback_rate = models.CharField(_("oynatma hızı"), max_length=5, choices=PlaybackRate, default=PlaybackRate.NORMAL)
+    quality = models.CharField(_("video kalitesi"), max_length=10, choices=VideoQuality, default=VideoQuality.Q720)
+    subtitles_enabled = models.BooleanField(_("altyazı açık"), default=False)
+    subtitle_language = models.CharField(
+        _("altyazı dili"), max_length=10, choices=SubtitleLanguage, default=SubtitleLanguage.TR
+    )
+    fullscreen_on_play = models.BooleanField(_("oynatınca tam ekran"), default=False)
+
+    class Meta:
+        verbose_name = _("oynatıcı tercihi")
+        verbose_name_plural = _("oynatıcı tercihleri")
+
+    def __str__(self):
+        return str(self.user)
+
+    @classmethod
+    def for_user(cls, user):
+        """Kayıtlı tercih ya da varsayılanlar (kaydedilmemiş)."""
+        if not user.is_authenticated:
+            return cls()
+        return cls.objects.filter(user=user).first() or cls(user=user)
+
+    def player_options(self):
+        """Oynatıcıya (site.js) verilen tercihler."""
+        return {
+            "rate": float(self.playback_rate),
+            "quality": self.quality if self.quality in (VideoQuality.AUTO, VideoQuality.HIGHEST) else int(self.quality),
+            "subtitles": self.subtitles_enabled,
+            "subtitleLanguage": self.subtitle_language,
+            "fullscreen": self.fullscreen_on_play,
+        }

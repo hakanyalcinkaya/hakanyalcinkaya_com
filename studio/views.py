@@ -10,11 +10,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import reswap, trigger_client_event
 
 from config.celery import worker_online
-from core.models import SiteSettings, VideoPlatform
+from core.models import SiteSettings, Status, VideoPlatform
 from course import video_service
 from course.models import (
     BUSY_UPLOAD_STATUSES,
@@ -22,6 +23,7 @@ from course.models import (
     Course,
     Lesson,
     LessonSubtitle,
+    Review,
     Section,
     VideoUpload,
 )
@@ -32,6 +34,7 @@ from studio.forms import (
     ExtraContentUploadForm,
     LessonBulkForm,
     LessonTitleForm,
+    ReviewImportForm,
     NewVideoLessonForm,
     SectionCreateForm,
     SectionTitleForm,
@@ -590,3 +593,84 @@ def settings_check(request, platform):
     except video_service.VideoServiceError as error:
         result, ok = str(error), False
     return render(request, "studio/partials/_settings_check.html", dict(result=result, ok=ok))
+
+
+# Yorumlar: kullanıcı yorumları onaya düşer; eski yorumlar buradan elle eklenir.
+REVIEW_FILTERS = {
+    "bekleyen": (gettext_lazy("Onay bekleyen"), lambda reviews: reviews.awaiting()),
+    "yayinda": (gettext_lazy("Yayında"), lambda reviews: reviews.visible()),
+    "gizli": (gettext_lazy("Gizli"), lambda reviews: reviews.filter(status=Status.ARCHIVED)),
+    "tumu": (gettext_lazy("Tümü"), lambda reviews: reviews),
+}
+REVIEW_ACTIONS = {
+    "approve": (Review.approve, gettext_lazy("Yorum onaylandı; sitede görünüyor.")),
+    "hide": (Review.hide, gettext_lazy("Yorum gizlendi.")),
+    "featured": (Review.toggle_featured, ""),
+    "home": (Review.toggle_home, ""),
+}
+
+
+def _review_filter(request):
+    key = request.GET.get("durum", "bekleyen")
+    return key if key in REVIEW_FILTERS else "bekleyen"
+
+
+@staff_required
+def reviews(request):
+    """Yorumlar: filtre (durum, kurs) GET parametresinde; HTMX isteğinde yalnız liste döner."""
+    key = _review_filter(request)
+    base = Review.objects.select_related("course", "user")
+    course_id = request.GET.get("kurs", "")
+    if course_id:
+        base = base.filter(course_id=course_id) if Course.objects.filter(pk=course_id).exists() else base.none()
+    items = REVIEW_FILTERS[key][1](base).order_by("-written_at", "id")
+    filters = [
+        dict(key=name, label=label, count=apply(base).count(), checked=name == key)
+        for name, (label, apply) in REVIEW_FILTERS.items()
+    ]
+    context = dict(reviews=items, filters=filters, review_filter=key, course_id=course_id, courses=Course.objects.order_by("title"))
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "studio/partials/_review_list.html", context)
+    context["import_form"] = ReviewImportForm()
+    return render(request, "studio/reviews.html", context)
+
+
+@staff_required
+@require_POST
+def review_action(request, review_id, action):
+    """Onayla, gizle, kursta öne çıkar, ana sayfada göster; satır yeniden çizilir."""
+    if action not in REVIEW_ACTIONS:
+        return HttpResponseBadRequest()
+    review = get_object_or_404(Review.objects.select_related("course", "user"), pk=review_id)
+    method, message = REVIEW_ACTIONS[action]
+    method(review)
+    response = render(request, "studio/partials/_review_row.html", dict(review=review))
+    return _toast(response, "success", str(message)) if message else response
+
+
+@staff_required
+@require_POST
+def review_delete(request, review_id):
+    get_object_or_404(Review, pk=review_id).delete()
+    return _toast(HttpResponse(), "success", _("Yorum silindi."))
+
+
+@staff_required
+def review_create(request):
+    """Eski yorum ekler (ad elle yazılır)."""
+    form = ReviewImportForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        review = form.save()
+        messages.success(request, _("Yorum eklendi.") if not review.is_visible else _("Yorum eklendi ve yayınlandı."))
+        return redirect(f"{reverse('studio:reviews')}?durum={'yayinda' if review.is_visible else 'bekleyen'}")
+    return render(request, "studio/reviews.html", dict(import_form=form, filters=[], reviews=[], import_open=True))
+
+
+@staff_required
+def review_edit(request, review_id):
+    """Eski (aktarılan) yorumu düzenler; kullanıcı yorumlarının metni yalnız kullanıcı tarafından değiştirilir."""
+    review = get_object_or_404(Review.objects.select_related("course", "user"), pk=review_id, user__isnull=True)
+    form = ReviewImportForm(request.POST or None, instance=review, prefix=f"edit-{review.pk}")
+    if request.method == "POST" and form.is_valid():
+        return render(request, "studio/partials/_review_row.html", dict(review=form.save()))
+    return render(request, "studio/partials/_review_edit.html", dict(review=review, form=form))

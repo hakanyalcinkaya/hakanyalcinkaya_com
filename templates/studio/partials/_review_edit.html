@@ -1,0 +1,8 @@
+{# Eski yorumu satırda düzenleme. #}
+<form class="list-group-item py-3 bg-body-tertiary" id="review-{{ review.id }}" hx-post="{% url 'studio:review_edit' review.id %}" hx-swap="outerHTML">
+  {% include "studio/partials/_review_fields.html" %}
+  <div class="d-flex gap-2 mt-3">
+    <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:reviews' %}?durum=tumu" hx-select="#review-{{ review.id }}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML">Vazgeç</button>
+  </div>
+</form>

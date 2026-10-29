@@ -12,6 +12,14 @@ def busy_upload_total():
 
 
 @register.simple_tag
+def pending_review_total():
+    """Stüdyo menüsündeki "Yorumlar" rozeti: onay bekleyen yorumlar."""
+    from course.models import Review
+
+    return Review.objects.awaiting().count()
+
+
+@register.simple_tag
 def video_accept():
     """Dosya seçicinin kabul ettiği video uzantıları (sunucudaki doğrulamayla aynı liste)."""
     from course.models import VIDEO_EXTENSIONS

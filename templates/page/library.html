@@ -117,6 +117,18 @@
     {% endif %}
   </div>
 
+  {% if review_items %}
+  <section class="mt-5 pt-4 border-top" id="degerlendirmelerim" aria-labelledby="degerlendirme-baslik">
+    <h2 id="degerlendirme-baslik" class="h5 fw-semibold mb-1">Değerlendirmelerim</h2>
+    <p class="small text-body-secondary mb-0">Aldığın kurslara puan ver ya da yorumunu değiştir. Her değişiklik onaydan sonra yayınlanır.</p>
+    <div class="row row-cols-1 row-cols-lg-2 g-3 mt-1">
+      {% for item in review_items %}
+      <div class="col">{% include "page/partials/review_box.html" with course=item.course review=item.review place="library" %}</div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
   <section class="mt-5 pt-4 border-top" id="favoriler" aria-labelledby="favori-baslik">
     <div class="d-flex flex-wrap align-items-end justify-content-between gap-2">
       <div>

@@ -1,6 +1,10 @@
 <figure class="card h-100 mb-0">
-  <div class="card-body p-4"><blockquote class="mb-0 text-pre-line">{{ review.text }}</blockquote></div>
+  <div class="card-body p-4">
+    {% if review.rating %}<div class="mb-2">{% include "page/partials/stars.html" with rating=review.rating %}</div>{% endif %}
+    <blockquote class="mb-0 text-pre-line">{{ review.text }}</blockquote>
+  </div>
   <figcaption class="card-footer bg-transparent d-flex align-items-center gap-2 fw-semibold px-4 py-3">
-    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis small hy-avatar" aria-hidden="true">{{ review.initial }}</span>{{ review.name }}
+    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis small hy-avatar" aria-hidden="true">{{ review.initial }}</span>
+    <span class="min-w-0">{{ review.name }}{% if review.date %}<span class="d-block small fw-normal text-body-tertiary">{{ review.date|date:"j F Y" }}</span>{% endif %}</span>
   </figcaption>
 </figure>

@@ -1,0 +1,21 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Yorumlar{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Yorumlar</h1>
+    <p class="text-body-secondary mb-0">Kullanıcıların puan ve yorumları onayla yayınlanır; değiştirilen yorum yeniden onaya düşer, o sırada sitede önceki onaylı hali görünür.</p>
+  </div>
+</div>
+
+<details class="border rounded mb-4"{% if import_open %} open{% endif %}>
+  <summary class="px-3 py-2 small fw-medium"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Eski yorum ekle <span class="fw-normal text-body-secondary">· ad elle yazılır</span></summary>
+  <form method="post" action="{% url 'studio:review_create' %}" class="px-3 pb-3">
+    {% csrf_token %}
+    {% include "studio/partials/_review_fields.html" with form=import_form %}
+    <button type="submit" class="btn btn-primary btn-sm mt-3">Yorumu ekle</button>
+  </form>
+</details>
+
+{% if filters %}{% include "studio/partials/_review_list.html" %}{% endif %}
+{% endblock %}

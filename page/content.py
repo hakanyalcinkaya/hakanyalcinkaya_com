@@ -7,13 +7,23 @@ Taslak kurs, bölüm ve dersler yalnız personele görünür (stüdyodan yüklen
 
 import json
 
+from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
 from core.models import Status
-from course.models import Course, HighlightKind, Lesson, LessonKind, LessonSubtitle, SubtitleStatus
+from course.models import (
+    Course,
+    HighlightKind,
+    Lesson,
+    LessonKind,
+    LessonSubtitle,
+    Review,
+    SubtitleStatus,
+    rating_summary,
+)
 from learning.models import LessonProgress
 from page import catalog
 
@@ -249,3 +259,52 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False, 
         "locked_count": len(flat) - len(previews),
         "learn_top": detail["learn"][:3],
     }
+
+
+# Yorumlar: sitede yalnız onaylı sürüm görünür. Öne çıkanlar sayfada, hepsi "Tüm yorumlar" penceresinde.
+FEATURED_REVIEW_LIMIT = 12
+
+
+def _featured_or_latest(featured, everything):
+    """Öne çıkarılmış yorum yoksa en yeniler gösterilir."""
+    items = list(featured.ordered()[:FEATURED_REVIEW_LIMIT])
+    return items or list(everything.order_by("-approved_written_at", "id")[:FEATURED_REVIEW_LIMIT])
+
+
+def course_reviews(course):
+    """Kurs sayfası: öne çıkan yorumlar, toplam yorum sayısı ve puan özeti."""
+    everything = Review.objects.all_for(course)
+    return dict(
+        reviews=[review.card() for review in _featured_or_latest(Review.objects.featured_for(course), everything)],
+        review_total=everything.count(),
+        rating=Review.objects.filter(course=course).rating_summary(),
+        reviews_url=reverse("page:course_reviews", kwargs={"slug": course.slug}),
+    )
+
+
+def home_reviews():
+    """Ana sayfa ve kurs listesi: "ana sayfada göster" seçilen yorumlar. Veritabanında hiç yorum yoksa örnek yorumlar."""
+    everything = Review.objects.all_for()
+    if not everything.exists():
+        return dict(reviews=catalog.reviews(), review_total=len(catalog.reviews()), reviews_url="")
+    return dict(
+        reviews=[review.card() for review in _featured_or_latest(Review.objects.for_home(), everything)],
+        review_total=everything.count(),
+        reviews_url=reverse("page:all_reviews"),
+    )
+
+
+def rating_by_slug():
+    """Kurs kartları için: slug → onaylı puan ortalaması ve sayısı."""
+    rows = (
+        Review.objects.visible()
+        .filter(approved_rating__isnull=False)
+        .values("course__slug")
+        .annotate(average=models.Avg("approved_rating"), count=models.Count("pk"))
+    )
+    return {row["course__slug"]: rating_summary(row["average"], row["count"]) for row in rows}
+
+
+def with_ratings(cards):
+    ratings = rating_by_slug()
+    return [dict(card, rating=ratings.get(card["slug"])) for card in cards]

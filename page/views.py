@@ -1,3 +1,4 @@
+import json
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -5,14 +6,14 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from course.models import Lesson
-from learning.models import Favorite, LessonProgress
+from course.models import Course, Lesson, Review
+from learning.models import Favorite, LessonProgress, PlayerPreference
 from page import content
 from page.catalog import (
     COUPON_SESSION_KEY,
@@ -50,6 +51,9 @@ from page.forms import (
     NewsletterUnsubscribeForm,
     PasswordChangeForm,
     PasswordResetForm,
+    PlayerPreferenceAutoForm,
+    ReviewForm,
+    PlayerPreferenceForm,
     ProfileForm,
     SignupForm,
 )
@@ -74,7 +78,8 @@ def index(request):
         "index.html",
         {
             "form": form,
-            "reviews": reviews(),
+            **content.home_reviews(),
+            "courses": content.with_ratings(course_catalog()),
             "stats": catalog_stats(course_catalog()),
         },
     )
@@ -92,12 +97,12 @@ def course_list(request):
         {
             "form": form,
             "topic": topic,
-            "course_list": courses,
+            "course_list": content.with_ratings(courses),
             "filters": course_filters(topic),
             "result_text": f"{count} kurs",
             "empty": count == 0,
             "stats": catalog_stats(course_catalog()),
-            "reviews": reviews(),
+            **content.home_reviews(),
         },
     )
 
@@ -110,8 +115,17 @@ def _enrolled(request, slug):
 def course_detail(request, slug):
     # Veritabanındaki kurs (müfredat, tanıtım videosu) önce gelir; yoksa örnek veri gösterilir.
     course = content.visible_course(slug, request.user)
+    review_context = dict(reviews=reviews(), review_total=len(reviews()))
     if course is not None:
-        page = content.course_page(course, enrolled=_enrolled(request, slug), staff=request.user.is_staff)
+        enrolled = _enrolled(request, slug)
+        page = content.course_page(course, enrolled=enrolled, staff=request.user.is_staff)
+        review_context = content.course_reviews(course)
+        page["course"]["rating"] = review_context["rating"]
+        # Kursu alan üye kendi puanını ve yorumunu burada verir ya da düzenler.
+        if enrolled and request.user.is_authenticated:
+            review_context.update(
+                review_course=course, my_review=Review.objects.filter(course=course, user=request.user).first()
+            )
     else:
         page = course_page(slug, enrolled=owns_course(request.user, request.session, slug))
     if page is None:
@@ -124,10 +138,30 @@ def course_detail(request, slug):
         "page/course.html",
         {
             **page,
+            **review_context,
             "form": form,
-            "reviews": reviews(),
         },
     )
+
+
+def all_reviews(request):
+    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır."""
+    items = Review.objects.all_for().order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
+    return render(
+        request, "page/partials/reviews_dialog.html", dict(reviews=[item.card() for item in items], show_course=True)
+    )
+
+
+def course_reviews(request, slug):
+    """Kursun tüm onaylı yorumları (pencerede)."""
+    course = content.visible_course(slug, request.user)
+    if course is None:
+        raise Http404
+    items = Review.objects.all_for(course).order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
+    context = dict(
+        reviews=[item.card() for item in items], course=course, rating=Review.objects.filter(course=course).rating_summary()
+    )
+    return render(request, "page/partials/reviews_dialog.html", context)
 
 
 def lesson(request, course_slug, section_slug, lesson_slug):
@@ -147,15 +181,23 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     lesson = page["current"].get("object")
     # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
     favorite = None
+    review_course = None
     if lesson is not None and not page["preview"] and request.user.is_authenticated:
         favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
+        # Kursu değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
+        if not Review.objects.filter(course=course, user=request.user).exists():
+            review_course = course
     return render(
         request,
         "page/lesson.html",
         {
             **page,
             "favorite": favorite,
-            "reviews": reviews()[:3],
+            "review_course": review_course,
+            # Oynatıcı tercihleri (hız, kalite, altyazı, tam ekran); ziyaretçiye varsayılanlar.
+            "player_preferences_json": json.dumps(PlayerPreference.for_user(request.user).player_options()),
+            # Önizleme ziyaretçisine kursun öne çıkan yorumları (örnek kursta örnek yorumlar).
+            "reviews": (content.course_reviews(course)["reviews"] if course is not None else reviews())[:3],
         },
     )
 
@@ -167,6 +209,35 @@ def _member_lesson(request, lesson_id):
     if course is None or not content.lesson_visible(lesson, request.user.is_staff) or not _enrolled(request, course.slug):
         raise Http404
     return lesson
+
+
+REVIEW_PLACES = ("lesson", "course", "library")
+ALL_REVIEWS_LIMIT = 500
+
+
+@login_required
+def course_review(request, slug):
+    """Kursu alan kullanıcının puan ve yorum kutusu (ders sayfası, kurs sayfası, Kurslarım).
+
+    GET kutuyu, ?edit=1 formu döner; POST kaydeder ve yorum yeniden onaya gider. Ders sayfasından değerlendiren
+    kullanıcıya orada bir daha sorulmaz; yorumunu Kurslarım'da görüp düzenler.
+    """
+    course = content.visible_course(slug, request.user)
+    if course is None or not _enrolled(request, slug):
+        raise Http404
+    place = request.POST.get("place") or request.GET.get("place")
+    place = place if place in REVIEW_PLACES else "course"
+    review = Review.objects.filter(course=course, user=request.user).first()
+    context = dict(course=course, review=review, place=place)
+    if request.method == "POST":
+        form = ReviewForm(request.POST, review=review)
+        if form.is_valid():
+            context.update(review=form.save(course, request.user, review), saved=True)
+            return render(request, "page/partials/review_box.html", context)
+        return render(request, "page/partials/review_form.html", dict(context, form=form))
+    if request.GET.get("edit"):
+        return render(request, "page/partials/review_form.html", dict(context, form=ReviewForm(review=review)))
+    return render(request, "page/partials/review_box.html", context)
 
 
 @login_required
@@ -292,6 +363,13 @@ def thanks(request):
     return render(request, "page/thanks.html", context)
 
 
+def _library_reviews(request):
+    """Kurslarım → Değerlendirmelerim: erişimi olan her kurs ve kullanıcının o kurstaki değerlendirmesi (varsa)."""
+    reviews = {review.course_id: review for review in Review.objects.filter(user=request.user)}
+    courses = [course for course in Course.objects.published().order_by("title") if _enrolled(request, course.slug)]
+    return [dict(course=course, review=reviews.get(course.pk)) for course in courses]
+
+
 @login_required
 def library(request):
     status = request.GET.get("durum", "")
@@ -303,6 +381,7 @@ def library(request):
         {
             **library_page(status),
             "favorites": Favorite.objects.for_user(request.user).for_library(),
+            "review_items": _library_reviews(request),
         },
     )
 
@@ -365,6 +444,7 @@ SETTINGS_FORMS = {
     "profile": (ProfileForm, "Profil bilgilerin kaydedildi."),
     "email": (EmailChangeForm, "E-posta adresin güncellendi."),
     "password": (PasswordChangeForm, "Şifren değiştirildi."),
+    "player": (PlayerPreferenceForm, "Video oynatma tercihlerin kaydedildi."),
 }
 
 
@@ -390,8 +470,20 @@ def account_settings(request):
             "profile_form": forms["profile"],
             "email_form": forms["email"],
             "password_form": forms["password"],
+            "player_form": forms["player"],
         },
     )
+
+
+@login_required
+@require_POST
+def player_preferences(request):
+    """Oynatıcıda hız, kalite ya da altyazı değişince arka planda çağrılır; yalnız gönderilen tercihler kaydedilir."""
+    form = PlayerPreferenceAutoForm(request.POST, user=request.user)
+    if not form.is_valid():
+        return JsonResponse(dict(ok=False, errors=form.errors.get_json_data()), status=400)
+    form.save()
+    return JsonResponse(dict(ok=True, preferences=form.instance.player_options()))
 
 
 def newsletter_confirmed(request):

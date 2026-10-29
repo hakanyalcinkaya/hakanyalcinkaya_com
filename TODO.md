@@ -15,14 +15,23 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 
 ## Video (Bunny Stream)
 - [ ] CDN token koruması: imzalı oynatma adreslerinin biçimini Bunny'nin gerçek CDN'inde doğrula, sonra `.env`'de `BUNNY_CDN_TOKEN_AUTH=True` yap (kod hazır, `course/bunny.py` `_signed`). Bunny panelinde MediaCage DRM kapalı, izinli alan adları dolu olmalı.
-- [ ] İzlenen süreyi her 5 saniyede bir veritabanına yaz (kaldığı yerden devam; `LessonProgress.position_seconds`); ders sayfasında ilerleme ve "tamamlandı" işaretleri şu an boş.
+- [ ] İzlenen süreyi her 5 saniyede bir veritabanına yaz ve dersi kaldığı saniyeden aç (`LessonProgress.position_seconds`). "Tamamlandı" işareti, kenar listesi ve ilerleme çubuğu artık gerçek veriden geliyor.
 - [ ] Kurs sayfasının tanıtım metinleri (neler öğreneceksin, kimler için ...) aynı slug'lı örnek kurstan geliyor; kurs maddeleri (CourseHighlight) doldurulunca örnek veri kaldırılabilir. Ana sayfa, kurs listesi, sepet ve kütüphane hâlâ örnek veride.
 - [ ] Ders/tanıtım videosu değiştirilince eski video Bunny'de kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
+- [ ] Studio'da "Orijinali indir": Bunny'de "Keep original files" açık kalmalı; indirme, CDN token koruması açılınca kısa süreli imzalı bağlantıyla yapılır (doğrudan dosya erişimi şu an 403).
+- [ ] Vimeo videolarını da kendi oynatıcımızla (HLS) oynatma seçeneği: Standard planda API HLS bağlantısı veriyor; bağlantılar süreli, sayfa açılışında alınıp kısa süre önbellekte tutulmalı.
+- [ ] Gerçek videoda deneme: 5 sn sonra tamamlandı, oynatıcı tercihleri (hız/kalite/altyazı otomatik kayıt, tam ekran; iPhone Safari'de tam ekran desteklenmeyebilir). Yerelde `http://local.hakanyalcinkaya.com/` (80 portu) üzerinden.
 - [ ] Prod: Celery işçisini servis olarak çalıştır (systemd/supervisor), Redis'i ayrı veritabanı numarasıyla kullan; sunucuda büyük dosya yüklemesi için Nginx `client_max_body_size` ve zaman aşımı ayarları.
 
 ## Öğrenci araçları (giriş yapmış ve kursu satın almış kullanıcı)
 - [ ] Video notu: oynatıcıda "Not ekle" düğmesi; not videonun o anki saniyesine kaydedilir. Oynatıcının ilerleme çubuğunda notların yerinde işaret (mark) görünür; işarete tıklanınca o saniyeye gidilir. `learning.Note` modeline saniye alanı (ör. `position_seconds`) eklenecek.
-- [ ] Favoriler (bookmark): kullanıcı kurstaki istediği dersleri favorilerine ekleyip çıkarabilir; favoriler kurs bazında listelenir (ör. kütüphane ve ders sayfasında "Favorilerim"). Yeni model gerekir (kullanıcı + ders, benzersiz).
+- [ ] Derslerde not alma şu an kapalı (Studio → Ayarlar); açılmadan önce not kaydetme bağlanmalı (ders sayfasındaki alan örnek, `learning.Note` kullanılmıyor).
+- [ ] Kurs erişimi gerçek satın almaya bağlanmalı: `owns_course` şu an örnek (oturumdaki satın alma + örnek kütüphane). `learning.Enrollment` modeli var ama sipariş/ödeme akışına bağlı değil; favoriler, tamamlama, değerlendirme ve ders kilitleri bu kurala dayanıyor.
+- [ ] Kurslarım sayfasındaki kurs kartları ve ilerleme örnek veride (Favorilerim ve Değerlendirmelerim gerçek veriden).
+
+## Yorumlar
+- [ ] Onay bekleyen yorum gelince yöneticiye bildirim (e-posta servisi bağlanınca).
+- [ ] Kullanıcıya yorumu onaylandığında / gizlendiğinde bilgi (isteğe bağlı).
 
 ## Diğer
 - [ ] `django-admin-sortable2` Django 6.1 desteği ekleyince projedeki uyumluluk dosyalarını sil: `templates/adminsortable2/edit_inline/*-django-6.1.html`, `static_files/adminsortable2/js/actions-6.1.js`.

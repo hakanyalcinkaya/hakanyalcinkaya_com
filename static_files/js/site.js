@@ -455,13 +455,24 @@
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         entry.target.classList.add("is-visible");
-        if (entry.target.hasAttribute("data-reviews")) startReviews();
         revealObserver.unobserve(entry.target);
       });
     }, { threshold: 0, rootMargin: "0px 0px -35% 0px" });
+    // Yorum listesi bölüm göründüğü anda başlar; sayfanın en altındaki bölüm ekranın üst kısmına hiç gelemeyebilir.
+    var reviewsObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        startReviews();
+        reviewsObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.2 });
     window.requestAnimationFrame(function () {
-      document.querySelectorAll("main > section, [data-reviews]").forEach(function (section) {
+      document.querySelectorAll("main > section").forEach(function (section) {
         revealObserver.observe(section);
+      });
+      document.querySelectorAll("[data-reviews]").forEach(function (section) {
+        reviewsObserver.observe(section);
       });
     });
   } else {
@@ -527,10 +538,12 @@
         track.label = item.label;
         media.appendChild(track);
       });
+      // "auto": kaliteyi oynatıcı bağlantıya göre seçer; diğerleri (720, "highest") ilk yüklemede seçilir.
+      var quality = options.quality || DEFAULT_QUALITY_HEIGHT;
       if (vimeo) {
-        videojs.enableVimeoQuality(media, options.quality || DEFAULT_QUALITY_HEIGHT);
-      } else {
-        videojs.preferQuality(media, options.quality || DEFAULT_QUALITY_HEIGHT);
+        videojs.enableVimeoQuality(media, quality === "auto" ? null : quality);
+      } else if (quality !== "auto") {
+        videojs.preferQuality(media, quality);
       }
       // Video alınamazsa (ör. CDN izin vermedi) oynatıcı yerine açıklama gösterilir.
       media.addEventListener("error", function () { showPlayerError(i18n); }, { once: true });
@@ -655,21 +668,163 @@
   // Ders videosu: sayfa açılınca yer tutucunun yerine oynatıcı kurulur; altyazılar JSON olarak gelir.
   document.querySelectorAll("[data-lesson-video]").forEach(function (holder) {
     var tracks = [];
+    var preferences = {};
     try {
       tracks = JSON.parse(holder.getAttribute("data-tracks") || "[]");
+      preferences = JSON.parse(holder.getAttribute("data-preferences") || "{}");
     } catch (error) {
       tracks = [];
     }
+    var preferencesUrl = holder.getAttribute("data-preferences-url");
     mountPlayer(holder, {
       playerSrc: holder.getAttribute("data-player-src"),
       platform: holder.getAttribute("data-video-platform"),
       src: holder.getAttribute("data-lesson-video"),
       poster: holder.getAttribute("data-poster"),
       tracks: tracks,
+      quality: preferences.quality,
     }).then(function (media) {
-      if (media) watchCompletion(media);
+      if (!media) return;
+      watchCompletion(media);
+      applyPreferences(media, preferences);
+      if (preferencesUrl) watchPreferences(media, preferences, preferencesUrl);
     }).catch(playerFailed);
   });
+
+  // Oynatıcı tercihleri (hesap ayarları → Video oynatma): hız, altyazı ve oynatınca tam ekran. Kalite createPlayer'da.
+  function captionTracks(media) {
+    return media.textTracks
+      ? Array.from(media.textTracks).filter(function (track) {
+          return track.kind === "subtitles" || track.kind === "captions";
+        })
+      : [];
+  }
+
+  function applyPreferences(media, preferences) {
+    var subtitlesApplied = false;
+    function applySubtitles() {
+      if (subtitlesApplied || !preferences.subtitles) return;
+      var tracks = captionTracks(media);
+      if (!tracks.length) return;
+      subtitlesApplied = true;
+      var track = tracks.filter(function (item) { return item.language === preferences.subtitleLanguage; })[0] || tracks[0];
+      tracks.forEach(function (item) { item.mode = item === track ? "showing" : "disabled"; });
+    }
+    media.addEventListener("loadedmetadata", function () {
+      if (preferences.rate && media.playbackRate !== preferences.rate) media.playbackRate = preferences.rate;
+      applySubtitles();
+    });
+    var trackLists = [];
+    function bindTrackList() {
+      var tracks = media.textTracks;
+      if (!tracks || !tracks.addEventListener || trackLists.indexOf(tracks) !== -1) return;
+      trackLists.push(tracks);
+      tracks.addEventListener("addtrack", applySubtitles);
+    }
+    bindTrackList();
+    media.addEventListener("loadedmetadata", bindTrackList);
+    // Tam ekran oynat'a basılınca (kullanıcı hareketiyle) bir kez açılır; tarayıcı reddederse sessizce geçilir.
+    var fullscreenTried = false;
+    media.addEventListener("play", function () {
+      if (!preferences.fullscreen || fullscreenTried || document.fullscreenElement) return;
+      fullscreenTried = true;
+      var player = media.closest("video-player");
+      if (player && player.requestFullscreen) player.requestFullscreen().catch(function () {});
+    });
+  }
+
+  // CSRF anahtarı base şablondaki hx-headers'tan okunur (HTMX dışı fetch istekleri için).
+  function csrfToken() {
+    try {
+      return JSON.parse(document.body.getAttribute("hx-headers") || "{}")["x-csrftoken"] || "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  // Kullanıcı oynatıcıda hızı, kaliteyi ya da altyazıyı değiştirince tercih arka planda kaydedilir. Tercihi uygularken
+  // oluşan değişiklikler kayıtlı değere eşit olduğu için yeniden gönderilmez.
+  function watchPreferences(media, preferences, url) {
+    var pending = {};
+    var timer = null;
+    function save(changes) {
+      Object.keys(changes).forEach(function (key) { pending[key] = changes[key]; });
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var data = new FormData();
+        Object.keys(pending).forEach(function (key) { data.append(key, pending[key]); });
+        pending = {};
+        fetch(url, { method: "POST", body: data, headers: { "X-CSRFToken": csrfToken() }, credentials: "same-origin" }).catch(function () {});
+      }, 700);
+    }
+
+    media.addEventListener("ratechange", function () {
+      var rate = Math.round(media.playbackRate * 100) / 100;
+      if (rate === preferences.rate) return;
+      preferences.rate = rate;
+      save({ playback_rate: String(rate) });
+    });
+
+    // Kaynak yeniden yüklenirse oynatıcı yeni bir kalite listesi açabilir; her seferinde güncel listeye bağlanılır.
+    var watchedList = null;
+    media.addEventListener("loadedmetadata", function () {
+      var list = media.videoRenditions;
+      if (list === watchedList || !list || !list.addEventListener) return;
+      watchedList = list;
+      list.addEventListener("change", function () {
+        if (list !== watchedList) return;
+        // Liste yalnız döngüyle okunabilir (Vimeo kalite listesinde dizin yok).
+        var renditions = Array.from(list);
+        var selected = renditions[list.selectedIndex];
+        var value = selected ? String(selected.height) : "auto";
+        if (preferences.quality === "highest" && selected) {
+          var highest = Math.max.apply(null, renditions.map(function (item) { return item.height || 0; }));
+          if (selected.height === highest) return;
+        }
+        if (String(preferences.quality) === value) return;
+        preferences.quality = value === "auto" ? "auto" : Number(value);
+        save({ quality: value });
+      });
+    });
+
+    // Altyazı listesi de oynatıcı kurulurken değişebilir; meta veri gelince güncel listeye bağlanılır.
+    var watchedTracks = null;
+    function onTracksChange(event) {
+      if (event.currentTarget !== watchedTracks) return;
+      var showing = captionTracks(media).filter(function (track) { return track.mode === "showing"; })[0];
+      var enabled = Boolean(showing);
+      var language = showing ? showing.language : preferences.subtitleLanguage;
+      if (enabled === Boolean(preferences.subtitles) && (!enabled || language === preferences.subtitleLanguage)) return;
+      preferences.subtitles = enabled;
+      preferences.subtitleLanguage = language;
+      save({ subtitles_enabled: enabled ? "true" : "false", subtitle_language: language });
+    }
+    function bindTracks() {
+      var tracks = media.textTracks;
+      if (tracks === watchedTracks || !tracks || !tracks.addEventListener) return;
+      watchedTracks = tracks;
+      tracks.addEventListener("change", onTracksChange);
+    }
+    bindTracks();
+    media.addEventListener("loadedmetadata", bindTracks);
+  }
+
+  // Ortak pencere (ör. "Tüm yorumlar"): içerik yüklenince açılır; ✕, Esc ya da dışarı tıklama kapatır.
+  var siteDialog = document.getElementById("site-dialog");
+  if (siteDialog) {
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event.detail.target.id !== "site-dialog-body" || siteDialog.open) return;
+      document.documentElement.classList.add("hy-dialog-open");
+      siteDialog.showModal();
+    });
+    siteDialog.addEventListener("click", function (event) {
+      if (event.target === siteDialog || event.target.closest("[data-dialog-close]")) siteDialog.close();
+    });
+    siteDialog.addEventListener("close", function () {
+      document.documentElement.classList.remove("hy-dialog-open");
+      document.getElementById("site-dialog-body").innerHTML = "";
+    });
+  }
 
   // Ders tamamlama: video durdurulmadan 5 sn oynayınca ders "tamamlandı" olarak işaretlenir. Durdurulursa sayaç
   // baştan başlar. Ders zaten tamamlandıysa ya da kullanıcı bu sayfada düğmeyle elle seçim yaptıysa denenmez.

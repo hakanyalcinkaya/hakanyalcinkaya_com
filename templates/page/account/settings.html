@@ -17,6 +17,7 @@
         <li class="nav-item"><a href="#profile" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-person me-2 text-body-tertiary" aria-hidden="true"></i>Profil</a></li>
         <li class="nav-item"><a href="#email" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-envelope me-2 text-body-tertiary" aria-hidden="true"></i>E-posta</a></li>
         <li class="nav-item"><a href="#password" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-key me-2 text-body-tertiary" aria-hidden="true"></i>Şifre</a></li>
+        <li class="nav-item"><a href="#player" class="nav-link link-body-emphasis px-0 px-lg-3"><i class="bi bi-play-btn me-2 text-body-tertiary" aria-hidden="true"></i>Video oynatma</a></li>
       </ul>
     </nav>
 
@@ -42,6 +43,14 @@
           <h2 id="sifre-baslik" class="h5 fw-semibold">Şifre</h2>
           <p class="small text-body-secondary">Şifreni hatırlamıyorsan <a href="{% url 'page:password_reset' %}">sıfırlama bağlantısı iste</a>.</p>
           {% crispy password_form %}
+        </div>
+      </section>
+
+      <section id="player" class="card" aria-labelledby="oynatma-baslik">
+        <div class="card-body p-4">
+          <h2 id="oynatma-baslik" class="h5 fw-semibold">Video oynatma</h2>
+          <p class="small text-body-secondary">Dersleri izlerken kullanılan varsayılan hız, kalite ve altyazı.</p>
+          {% crispy player_form %}
         </div>
       </section>
 

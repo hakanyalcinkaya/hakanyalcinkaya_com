@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from account.models import User
+from learning.models import PlayerPreference
 from page.catalog import COUPONS
 
 INPUT_CLASS = "form-control-lg fs-6"
@@ -229,6 +230,82 @@ class ProfileForm(StyledFormMixin, forms.ModelForm):
             Row(Column("first_name", css_class="col-sm-6"), Column("last_name", css_class="col-sm-6")),
             submit("Kaydet", icon="bi-check-lg", css_class="btn-primary"),
         )
+
+
+class ReviewForm(forms.Form):
+    """Kursu alan kullanıcının değerlendirmesi: puan zorunlu, yorum isteğe bağlı. Her kayıt yeniden onaya gider."""
+
+    rating = forms.TypedChoiceField(
+        label="Puanın",
+        choices=[(value, f"{value} yıldız") for value in range(5, 0, -1)],
+        coerce=int,
+        widget=forms.RadioSelect,
+        error_messages={"required": "Lütfen 1 ile 5 arasında puan ver."},
+    )
+    text = forms.CharField(
+        label="Yorumun (isteğe bağlı)",
+        required=False,
+        max_length=2000,
+        widget=forms.Textarea(attrs={"rows": 4, "class": "form-control", "placeholder": "Kurs hakkında düşüncelerin"}),
+        error_messages={"max_length": "Yorum en fazla 2000 karakter olabilir."},
+    )
+
+    def __init__(self, *args, review=None, **kwargs):
+        if review is not None and "initial" not in kwargs:
+            kwargs["initial"] = {"rating": review.rating, "text": review.text}
+        super().__init__(*args, **kwargs)
+
+    def save(self, course, user, review=None):
+        from course.models import Review
+
+        review = review or Review(course=course, user=user)
+        review.submit(self.cleaned_data["rating"], self.cleaned_data["text"])
+        return review
+
+
+class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
+    """Hesap ayarları → Video oynatma: varsayılan hız, kalite, altyazı ve oynatınca tam ekran."""
+
+    class Meta:
+        model = PlayerPreference
+        fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play")
+        widgets = {
+            "playback_rate": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
+            "quality": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
+            "subtitle_language": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
+        }
+        labels = {"fullscreen_on_play": "Oynat'a basınca tam ekrana geç"}
+        help_texts = {
+            "quality": "Videoda bu kalite yoksa bağlantına göre otomatik seçilir.",
+            "subtitles_enabled": "Açıksa altyazısı olan videolarda seçtiğin dil kendiliğinden açılır.",
+        }
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, instance=PlayerPreference.for_user(user), prefix="player", **kwargs)
+        self.helper.layout = Layout(
+            Hidden("action", "player"),
+            Row(Column("playback_rate", css_class="col-sm-6"), Column("quality", css_class="col-sm-6")),
+            Row(Column("subtitles_enabled", css_class="col-sm-6"), Column("subtitle_language", css_class="col-sm-6")),
+            "fullscreen_on_play",
+            HTML('<p class="small text-body-secondary">Oynatıcıda hızı, kaliteyi ya da altyazıyı değiştirdiğinde bu ayarlar kendiliğinden güncellenir.</p>'),
+            submit("Kaydet", icon="bi-check-lg", css_class="btn-primary"),
+        )
+
+
+class PlayerPreferenceAutoForm(forms.ModelForm):
+    """Oynatıcıdan gelen otomatik kayıt: yalnız gönderilen alanlar değişir, diğerleri olduğu gibi kalır."""
+
+    FIELDS = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language")
+
+    class Meta:
+        model = PlayerPreference
+        fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language")
+
+    def __init__(self, data, *, user, **kwargs):
+        instance = PlayerPreference.for_user(user)
+        merged = {name: getattr(instance, name) for name in self.FIELDS}
+        merged.update({name: data[name] for name in self.FIELDS if name in data})
+        super().__init__(merged, instance=instance, **kwargs)
 
 
 class CurrentPasswordMixin:

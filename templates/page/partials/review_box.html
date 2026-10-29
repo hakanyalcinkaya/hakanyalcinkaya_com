@@ -1,0 +1,41 @@
+{# Kullanıcının bu kurs için değerlendirmesi. place: lesson / course / library. #}
+{# Ders sayfasında yalnız henüz değerlendirmemiş kullanıcıya sorulur; kaydedince teşekkür gösterilir, düzenleme Kurslarım'dan. #}
+{% url 'page:course_review' course.slug as review_url %}
+<div id="course-{{ course.pk }}-review" class="card{% if place == 'lesson' %} border-primary-subtle{% endif %}">
+  <div class="card-body p-3 p-md-4">
+    {% if place == "lesson" and saved %}
+    <div class="d-flex gap-3 align-items-start">
+      <i class="bi bi-check-circle-fill text-success fs-4 lh-1" aria-hidden="true"></i>
+      <div>
+        <p class="fw-semibold mb-1">Teşekkürler, değerlendirmen alındı.</p>
+        <p class="small text-body-secondary mb-0">Onaylandıktan sonra kurs sayfasında görünecek. Puanını ve yorumunu <a href="{% url 'page:library' %}#degerlendirmelerim">Kurslarım</a> sayfasından değiştirebilirsin.</p>
+      </div>
+    </div>
+    {% elif review %}
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+      <div class="min-w-0">
+        {% if place == "library" %}<a href="{{ course.get_absolute_url }}" class="fw-semibold link-body-emphasis text-decoration-none d-block mb-1">{{ course.title }}</a>{% else %}<div class="small fw-semibold text-body-secondary mb-1">Değerlendirmen</div>{% endif %}
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          {% include "page/partials/stars.html" with rating=review.rating %}
+          {% if review.needs_review %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">Onay bekliyor</span>
+          {% elif review.is_visible %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">Yayında</span>
+          {% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">Yayınlanmadı</span>{% endif %}
+          <span class="small text-body-tertiary">{{ review.written_at|date:"j F Y" }}</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{{ review_url }}?edit=1&place={{ place }}" hx-target="#course-{{ course.pk }}-review" hx-swap="outerHTML"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Düzenle</button>
+    </div>
+    {% if review.text %}<p class="small mt-2 mb-0 text-pre-line">{{ review.text }}</p>{% endif %}
+    {% if saved %}<p class="small text-success-emphasis mt-2 mb-0"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Kaydedildi; onaylandıktan sonra yayınlanacak.</p>{% endif %}
+    {% if review.has_pending_changes %}<p class="small text-body-tertiary mt-2 mb-0">Yeni halin onaylanana kadar sitede önceki onaylı halin görünür.</p>{% endif %}
+    {% else %}
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        {% if place == "library" %}<a href="{{ course.get_absolute_url }}" class="fw-semibold link-body-emphasis text-decoration-none d-block">{{ course.title }}</a>{% else %}<p class="fw-semibold mb-0">Bu kursu nasıl buldun?</p>{% endif %}
+        <p class="small text-body-secondary mb-0">Puanın ve yorumun onaylandıktan sonra diğer öğrencilere yol gösterir.</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" hx-get="{{ review_url }}?edit=1&place={{ place }}" hx-target="#course-{{ course.pk }}-review" hx-swap="outerHTML"><i class="bi bi-star me-1" aria-hidden="true"></i>Kursu değerlendir</button>
+    </div>
+    {% endif %}
+  </div>
+</div>

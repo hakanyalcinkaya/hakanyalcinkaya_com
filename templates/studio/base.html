@@ -10,6 +10,8 @@
     </a>
     {% busy_upload_total as busy_total %}
     <a href="{% url 'studio:queue' %}" class="link-secondary small text-decoration-none"><i class="bi bi-list-task me-1" aria-hidden="true"></i>Kuyruk{% if busy_total %} <span class="badge text-bg-primary">{{ busy_total }}</span>{% endif %}</a>
+    {% pending_review_total as pending_reviews %}
+    <a href="{% url 'studio:reviews' %}" class="link-secondary small text-decoration-none"><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Yorumlar{% if pending_reviews %} <span class="badge text-bg-warning">{{ pending_reviews }}</span>{% endif %}</a>
     <a href="{% url 'studio:settings' %}" class="link-secondary small text-decoration-none"><i class="bi bi-gear me-1" aria-hidden="true"></i>Ayarlar</a>
     <a href="{% url 'admin:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-sliders me-1" aria-hidden="true"></i>Django admin</a>
     <a href="{% url 'page:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Siteye dön</a>

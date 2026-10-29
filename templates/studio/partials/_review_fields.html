@@ -1,0 +1,28 @@
+{# Eski yorum alanları (ekleme ve düzenleme). #}
+{% for error in form.non_field_errors %}<div class="alert alert-danger small py-2">{{ error }}</div>{% endfor %}
+<div class="row g-2">
+  <div class="col-md-4">
+    <label class="form-label small mb-1" for="{{ form.course.id_for_label }}">{{ form.course.label }}</label>{{ form.course }}
+    {% for error in form.course.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-md-3">
+    <label class="form-label small mb-1" for="{{ form.author_name.id_for_label }}">{{ form.author_name.label }}</label>{{ form.author_name }}
+    {% for error in form.author_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-6 col-md-2">
+    <label class="form-label small mb-1" for="{{ form.rating.id_for_label }}">{{ form.rating.label }}</label>{{ form.rating }}
+  </div>
+  <div class="col-6 col-md-3">
+    <label class="form-label small mb-1" for="{{ form.written_at.id_for_label }}">{{ form.written_at.label }}</label>{{ form.written_at }}
+    {% for error in form.written_at.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-12">
+    <label class="form-label small mb-1" for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>{{ form.text }}
+    {% for error in form.text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-12 d-flex flex-wrap gap-3 small">
+    <div class="form-check">{{ form.approve_now }}<label class="form-check-label" for="{{ form.approve_now.id_for_label }}">{{ form.approve_now.label }}</label></div>
+    <div class="form-check">{{ form.featured }}<label class="form-check-label" for="{{ form.featured.id_for_label }}">{{ form.featured.label|capfirst }}</label></div>
+    <div class="form-check">{{ form.show_on_home }}<label class="form-check-label" for="{{ form.show_on_home.id_for_label }}">{{ form.show_on_home.label|capfirst }}</label></div>
+  </div>
+</div>

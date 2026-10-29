@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from learning.models import Enrollment, Favorite, LessonProgress, Note
+from learning.models import Enrollment, Favorite, LessonProgress, Note, PlayerPreference
 
 
 @admin.register(Enrollment)
@@ -38,3 +38,12 @@ class FavoriteAdmin(admin.ModelAdmin):
     search_fields = ("user__email", "lesson__title")
     list_select_related = ("user", "lesson")
     autocomplete_fields = ("user", "lesson")
+
+
+@admin.register(PlayerPreference)
+class PlayerPreferenceAdmin(admin.ModelAdmin):
+    list_display = ("user", "playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play")
+    list_filter = ("quality", "subtitles_enabled", "fullscreen_on_play")
+    search_fields = ("user__email",)
+    list_select_related = ("user",)
+    autocomplete_fields = ("user",)

@@ -1,0 +1,24 @@
+{# "Tüm yorumlar" penceresi: onaylı yorumlar, en yeni önce. show_course: ana sayfadan açılınca kurs adı da yazılır. #}
+<div class="d-flex align-items-start justify-content-between gap-3 border-bottom px-3 px-md-4 py-3">
+  <div>
+    <h2 id="site-dialog-title" class="h5 fw-semibold mb-1">{% if course %}{{ course.title }} · {% endif %}Tüm yorumlar</h2>
+    <p class="small text-body-secondary mb-0">{% if rating.count %}{% include "page/partials/stars.html" with rating=rating.stars %} <b class="text-body">{{ rating.average|floatformat:1 }}</b> · {{ rating.count }} değerlendirme · {% endif %}{{ reviews|length }} yorum</p>
+  </div>
+  <button type="button" class="btn-close" data-dialog-close aria-label="Kapat"></button>
+</div>
+<div class="overflow-y-auto px-3 px-md-4 py-2 hy-site-dialog-scroll">
+  {% for review in reviews %}
+  <article class="py-3{% if not forloop.last %} border-bottom{% endif %}">
+    <div class="d-flex flex-wrap align-items-center gap-2 small">
+      <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis hy-avatar" aria-hidden="true">{{ review.initial }}</span>
+      <span class="fw-semibold">{{ review.name }}</span>
+      {% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% endif %}
+      {% if review.date %}<time class="text-body-tertiary" datetime="{{ review.date|date:'c' }}">{{ review.date|date:"j F Y" }}</time>{% endif %}
+      {% if show_course %}<span class="badge rounded-1 border text-body-secondary fw-medium ms-auto">{{ review.course }}</span>{% endif %}
+    </div>
+    <p class="mt-2 mb-0 text-pre-line">{{ review.text }}</p>
+  </article>
+  {% empty %}
+  <p class="text-body-secondary py-4 mb-0">Henüz yorum yok.</p>
+  {% endfor %}
+</div>

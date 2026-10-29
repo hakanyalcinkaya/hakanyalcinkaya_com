@@ -12,6 +12,8 @@ from course.models import (
     Lesson,
     LessonKind,
     LessonSubtitle,
+    Review,
+    ReviewSource,
     Section,
     SubtitleLanguage,
     VideoUpload,
@@ -331,3 +333,40 @@ class ExtraContentForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.set_extra_content(self.cleaned_data["extra_content"])
         return self.instance
+
+
+class ReviewImportForm(forms.ModelForm):
+    """Eski yorum: ad elle yazılır, puan isteğe bağlı. "Hemen onayla" seçiliyse sitede görünür (öne çıkarma seçenekleriyle)."""
+
+    approve_now = forms.BooleanField(label=_("Hemen onayla"), required=False, initial=True)
+
+    class Meta:
+        model = Review
+        fields = ("course", "author_name", "rating", "text", "written_at", "featured", "show_on_home")
+        widgets = {
+            "course": forms.Select(attrs={"class": "form-select form-select-sm"}),
+            "author_name": forms.TextInput(attrs={"class": "form-control form-control-sm", "placeholder": _("Ör. Ayşe K.")}),
+            "rating": forms.Select(attrs={"class": "form-select form-select-sm"}),
+            "text": forms.Textarea(attrs={"class": "form-control form-control-sm", "rows": 3}),
+            "written_at": forms.DateInput(attrs={"class": "form-control form-control-sm", "type": "date"}, format="%Y-%m-%d"),
+        }
+        labels = {"written_at": _("Yorum tarihi")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["author_name"].required = True
+        self.fields["text"].required = True
+        self.fields["rating"].required = False
+        self.fields["written_at"].input_formats = ["%Y-%m-%d"]
+        # UUID anahtar nesne açılırken atanır; yeni kayıt pk ile değil _state.adding ile anlaşılır.
+        if not self.instance._state.adding:
+            self.fields["course"].disabled = True
+            self.fields["approve_now"].initial = self.instance.is_visible
+
+    def save(self, commit=True):
+        review = super().save(commit=False)
+        review.source = ReviewSource.IMPORTED
+        review.save()
+        if self.cleaned_data["approve_now"]:
+            review.approve()
+        return review

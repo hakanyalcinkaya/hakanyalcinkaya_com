@@ -14,6 +14,7 @@
     <ul class="list-inline small text-body-secondary mb-0">
       <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span class="visually-hidden">Süre: </span>{{ course.duration }}</li>
       <li class="list-inline-item"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders</li>
+      {% if course.rating.count %}<li class="list-inline-item ms-3"><i class="bi bi-star-fill me-1 text-warning" aria-hidden="true"></i><span class="visually-hidden">Puan: </span><span class="fw-semibold text-body">{{ course.rating.average|floatformat:1 }}</span> ({{ course.rating.count }})</li>{% endif %}
     </ul>
   </div>
   <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 py-3">

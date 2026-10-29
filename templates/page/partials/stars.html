@@ -1,0 +1,1 @@
+{# Yıldızlı puan: rating (1-5). #}<span class="hy-stars text-warning text-nowrap" role="img" aria-label="5 üzerinden {{ rating }} puan">{% for step in "12345" %}<i class="bi {% if forloop.counter <= rating %}bi-star-fill{% else %}bi-star{% endif %}" aria-hidden="true"></i>{% endfor %}</span>

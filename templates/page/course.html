@@ -26,6 +26,7 @@
       <header>
         <h1 class="display-5 fw-semibold lh-1">{{ course.title }}</h1>
         <p class="lead text-body-secondary mt-3 mb-0">{{ detail.subtitle }}</p>
+        {% if course.rating.count %}<a href="#yorumlar" class="d-inline-flex align-items-center gap-2 small text-decoration-none mt-3">{% include "page/partials/stars.html" with rating=course.rating.stars %}<span class="fw-semibold text-body">{{ course.rating.average|floatformat:1 }}</span><span class="text-body-secondary">· {{ course.rating.count }} değerlendirme</span></a>{% endif %}
         <dl class="row row-cols-2 row-cols-sm-4 g-3 mt-3 mb-0" aria-label="Kurs özeti">
           <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ course.duration }}</dt><dd class="small text-body-tertiary mt-1 mb-0">video</dd></div>
           <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ course.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
@@ -172,9 +173,16 @@
       </section>
       {% endif %}
 
-      <section id="yorumlar" data-reviews aria-labelledby="yorum-baslik" aria-roledescription="carousel" class="pt-5">
-        {% include "components/review_carousel.html" with heading_class="h3 fw-semibold mb-1" %}
+      {% if review_course %}
+      <section class="pt-5" aria-label="Değerlendirmen">
+        {% include "page/partials/review_box.html" with course=review_course review=my_review place="course" %}
       </section>
+      {% endif %}
+      {% if reviews %}
+      <section id="yorumlar" data-reviews aria-labelledby="yorum-baslik" aria-roledescription="carousel" class="pt-5">
+        {% include "components/review_carousel.html" with heading_class="h3 fw-semibold mb-1" heading="Bu kursu alanlar ne diyor?" %}
+      </section>
+      {% endif %}
     </div>
 
     <aside class="col-lg-4 d-none d-lg-block" aria-label="Satın alma">

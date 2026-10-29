@@ -1,0 +1,25 @@
+{# Puan (zorunlu) ve yorum (isteğe bağlı). Kaydedince review_box döner. #}
+{% url 'page:course_review' course.slug as review_url %}
+<form id="course-{{ course.pk }}-review" class="card" hx-post="{{ review_url }}" hx-swap="outerHTML" novalidate>
+  <input type="hidden" name="place" value="{{ place }}">
+  <div class="card-body p-3 p-md-4">
+    <fieldset>
+      <legend class="small fw-semibold mb-2">{% if place == "library" %}{{ course.title }} · {% endif %}{{ form.rating.label }}</legend>
+      <div class="hy-star-input" role="radiogroup" aria-label="Puan">
+        {% for choice in form.rating %}
+        <input type="radio" class="btn-check" name="{{ form.rating.html_name }}" id="review-{{ course.pk }}-{{ choice.data.value }}" value="{{ choice.data.value }}"{% if form.rating.value|stringformat:"s" == choice.data.value|stringformat:"s" %} checked{% endif %}>
+        <label class="btn btn-link p-1 fs-4 lh-1" for="review-{{ course.pk }}-{{ choice.data.value }}" title="{{ choice.choice_label }}"><i class="bi bi-star-fill" aria-hidden="true"></i><span class="visually-hidden">{{ choice.choice_label }}</span></label>
+        {% endfor %}
+      </div>
+      {% for error in form.rating.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </fieldset>
+    <label class="form-label small fw-semibold mt-3" for="review-{{ course.pk }}-text">{{ form.text.label }}</label>
+    <textarea name="{{ form.text.html_name }}" id="review-{{ course.pk }}-text" rows="4" maxlength="2000" class="form-control" placeholder="Kurs hakkında düşüncelerin">{{ form.text.value|default:"" }}</textarea>
+    {% for error in form.text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+      <button type="submit" class="btn btn-primary btn-sm">Gönder</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{{ review_url }}?place={{ place }}" hx-target="#course-{{ course.pk }}-review" hx-swap="outerHTML">Vazgeç</button>
+      <span class="small text-body-tertiary ms-auto">Gönderdiğin her değişiklik onaydan sonra yayınlanır.</span>
+    </div>
+  </div>
+</form>
