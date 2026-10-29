@@ -284,7 +284,7 @@ def sample_context(key):
         "greeting_name": "Ayşe",
         "email": "ayse@example.com",
         "site_url": site,
-        "library_url": f"{site}/library/",
+        "library_url": f"{site}/my-courses/",
         "login_url": f"{site}/account/login/",
         "courses_url": f"{site}/courses/",
         "items": items,
