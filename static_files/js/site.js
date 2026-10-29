@@ -702,6 +702,8 @@
       poster: holder.getAttribute("data-poster"),
       tracks: tracks,
       quality: preferences.quality,
+      // Önizleme listesinden tıklanarak gelindiyse (?play=1) video kendiliğinden başlar.
+      autoplay: new URLSearchParams(window.location.search).has("play"),
     }).then(function (media) {
       if (!media) return;
       watchCompletion(media);

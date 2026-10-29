@@ -78,7 +78,7 @@
             <p class="opacity-75 mb-4">{{ total }} dersin tamamına ve her bölümdeki projelere erişmek için kursa kaydol. Kaydolduktan sonra izlemeye hemen başlayabilirsin.</p>
             <div class="d-flex flex-wrap justify-content-center gap-2">
               <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol · {{ course.price }}</a>
-              {% if previews %}<a href="{{ previews.0.url }}" class="btn btn-outline-light btn-lg fs-6">Ücretsiz önizlemeye dön</a>{% endif %}
+              {% if previews %}<a href="{{ previews.0.url }}?play=1" class="btn btn-outline-light btn-lg fs-6">Ücretsiz önizlemeye dön</a>{% endif %}
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@
         {# Oynatıcının hemen altında: önceki / tamamlandı / favori / sonraki. #}
         <div class="hy-lesson-nav d-flex flex-wrap align-items-center gap-2">
           {% if prev %}
-          <a href="{{ prev.url }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %}</a>
+          <a href="{{ prev.url }}{% if preview %}?play=1{% endif %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %}</a>
           {% else %}
           <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki</button>
           {% endif %}
@@ -121,7 +121,7 @@
           {% endif %}
           {% if favorite %}{% include "page/partials/favorite_button.html" with lesson_id=favorite.lesson_id is_favorite=favorite.is_favorite %}{% endif %}
           {% if next %}
-          <a href="{{ next.url }}" class="btn btn-primary ms-sm-auto">Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="{{ next.url }}{% if preview %}?play=1{% endif %}" class="btn btn-primary ms-sm-auto">Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% elif preview %}
           <a href="{{ course.buy_url }}" class="btn btn-primary ms-sm-auto">Tamamına eriş<span class="d-none d-sm-inline"> · {{ course.price }}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% else %}
@@ -165,7 +165,7 @@
           <div class="row flex-nowrap overflow-x-auto scrollbar-none g-2 pb-2 mt-1 hy-strip" data-preview-strip>
             {% for lesson in previews %}
             <div class="col-9 col-sm-5 col-xl-3">
-              <a href="{{ lesson.url }}" class="card h-100 p-3 text-decoration-none hover-lift{% if lesson.n == current.n %} border-primary bg-primary-subtle{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
+              <a href="{{ lesson.url }}?play=1" class="card h-100 p-3 text-decoration-none hover-lift{% if lesson.n == current.n %} border-primary bg-primary-subtle{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
                 <span class="small text-body-tertiary text-truncate">{{ lesson.n }}. ders · {{ lesson.section }}</span>
                 <span class="small fw-medium text-body mt-1">{{ lesson.title }}</span>
               </a>
@@ -253,7 +253,7 @@
           <div class="px-3 pt-3 pb-1 small fw-semibold text-body-secondary">Ücretsiz önizleme dersleri</div>
           <div class="list-group list-group-flush">
             {% for lesson in previews %}
-            <a href="{{ lesson.url }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 px-3 py-2 small{% if lesson.n == current.n %} active{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
+            <a href="{{ lesson.url }}?play=1" class="list-group-item list-group-item-action border-0 d-flex gap-2 px-3 py-2 small{% if lesson.n == current.n %} active{% endif %}"{% if lesson.n == current.n %} aria-current="page"{% endif %}>
               {% include "page/partials/lesson_meta.html" %}
               <span class="min-w-0"><span class="d-block">{{ lesson.title }}</span><span class="d-block text-body-tertiary text-truncate">{{ lesson.section }}</span></span>
             </a>

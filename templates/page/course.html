@@ -50,7 +50,7 @@
           <div class="card-body p-4">
             <div class="d-flex align-items-baseline justify-content-between gap-3">
               <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}{% include "components/list_price.html" %}</div>
-              {% if first_preview and not course.owned %}<a href="{{ first_preview.url }}" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
+              {% if first_preview and not course.owned %}<a href="{{ first_preview.url }}?play=1" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
             </div>
             {% include "page/partials/buy_actions.html" %}
             {% if detail.discount %}
@@ -135,7 +135,7 @@
                 <span class="flex-grow-1 small">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
                 {% else %}
                 <a href="{{ lesson.url }}" class="flex-grow-1 small link-body-emphasis text-decoration-none">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</a>
-                {% if lesson.preview %}{% if enrolled %}<span class="flex-shrink-0">{% include "components/preview_badge.html" %}</span>{% else %}<a href="{{ lesson.url }}" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme">Önizleme</a>{% endif %}{% endif %}
+                {% if lesson.preview %}{% if enrolled %}<span class="flex-shrink-0">{% include "components/preview_badge.html" %}</span>{% else %}<a href="{{ lesson.url }}?play=1" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme">Önizleme</a>{% endif %}{% endif %}
                 {% endif %}
               </li>
               {% endfor %}

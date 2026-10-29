@@ -209,6 +209,10 @@ def lesson(request, course_slug, section_slug, lesson_slug):
         page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
     if page is None:
         raise Http404
+    if page.get("locked") and page.get("previews"):
+        # Kursu almamış ziyaretçi kilitli derse gelirse sıradaki (yoksa ilk) önizleme dersine yönlenir.
+        target = next((item for item in page["previews"] if item["n"] > page["current"]["n"]), page["previews"][0])
+        return redirect(target["url"])
     lesson = page["current"].get("object")
     # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
     favorite = None
