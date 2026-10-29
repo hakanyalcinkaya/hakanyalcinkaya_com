@@ -8,28 +8,28 @@
       <a href="{% url 'studio:course_detail' upload.lesson.section.course_id %}#lesson-{{ upload.lesson_id }}" class="fw-medium link-body-emphasis text-decoration-none"><i class="bi bi-play-circle me-1 text-body-tertiary" aria-hidden="true"></i>{{ upload.lesson.title }}</a>
       <div class="small text-body-secondary">{{ upload.lesson.section.course.title }} › {{ upload.lesson.section.title }}</div>
       {% endif %}
-      <div class="small text-body-tertiary">{{ upload.original_name }} · {{ upload.size|filesizeformat }}{% if upload.duration_seconds %} · {{ upload.duration_display }}{% endif %}{% if upload.created_by %} · {{ upload.created_by.email }}{% endif %} · {{ upload.created_at|date:"d.m.Y H:i" }}</div>
+      <div class="small text-body-tertiary">{{ upload.get_platform_display }} · {{ upload.original_name }} · {{ upload.size|filesizeformat }}{% if upload.duration_seconds %} · {{ upload.duration_display }}{% endif %}{% if upload.created_by %} · {{ upload.created_by.email }}{% endif %} · {{ upload.created_at|date:"d.m.Y H:i" }}</div>
     </div>
     <div class="col-12 col-lg-4 small">
       <span class="badge {% if upload.is_busy %}text-bg-primary{% elif upload.status == 'ready' %}text-bg-success{% elif upload.is_failed %}text-bg-danger{% else %}text-bg-secondary{% endif %}">{{ upload.get_status_display }}</span>
       {% if upload.is_uploading %}
       <span class="font-monospace ms-1">%{{ upload.progress }}</span>
-      <div class="progress studio-progress mt-1" role="progressbar" aria-label="Bunny'ye gönderim" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ upload.progress }}"><div class="progress-bar" style="width:{{ upload.progress }}%"></div></div>
+      <div class="progress studio-progress mt-1" role="progressbar" aria-label="{{ upload.get_platform_display }} platformuna gönderim" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ upload.progress }}"><div class="progress-bar" style="width:{{ upload.progress }}%"></div></div>
       {% elif upload.is_processing %}
-      <div class="text-body-secondary mt-1">{{ upload.service_state_label|default:"Bunny'nin yanıtı bekleniyor" }}{% if upload.sent_at %} · dosya {{ upload.sent_at|timesince }} önce ulaştı{% endif %}</div>
+      <div class="text-body-secondary mt-1">{{ upload.service_state_label|default:"Platformun yanıtı bekleniyor" }}{% if upload.sent_at %} · dosya {{ upload.sent_at|timesince }} önce ulaştı{% endif %}</div>
       {% elif upload.is_busy %}
       <div class="text-body-secondary mt-1">{{ upload.created_at|timesince }} önce sıraya alındı{% if upload.is_stale %}; Celery işçisi çalışıyor mu?{% endif %}</div>
       {% elif upload.is_failed %}
       <div class="text-danger-emphasis mt-1" title="{{ upload.error }}">{{ upload.error|truncatechars:140 }}</div>
       {% elif upload.status == 'ready' %}
-      <div class="text-body-secondary mt-1">{% if upload.video_id %}<a href="{{ upload.video_id|bunny_play_url }}" target="_blank" rel="noopener" class="link-success">Bunny'de aç</a> · {% endif %}{% if upload.sent_at and upload.finished_at %}Bunny {{ upload.sent_at|timesince:upload.finished_at }} sürdü{% endif %}</div>
+      <div class="text-body-secondary mt-1">{% if upload.video_id %}<a href="{{ upload.video_dashboard_url }}" target="_blank" rel="noopener" class="link-success">{{ upload.get_platform_display }} platformunda aç</a> · {% endif %}{% if upload.sent_at and upload.finished_at %}İşleme {{ upload.sent_at|timesince:upload.finished_at }} sürdü{% endif %}</div>
       {% elif upload.finished_at %}
       <div class="text-body-secondary mt-1">{{ upload.finished_at|date:"d.m.Y H:i" }}{% if not upload.file %} · dosya yok{% endif %}</div>
       {% endif %}
     </div>
     <div class="col-12 col-lg-auto d-flex flex-wrap gap-2">
       {% if upload.can_cancel %}
-      <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:upload_cancel' upload.id %}" hx-vals='{"from": "queue", "filter": "{{ queue_filter }}"}' hx-target="#queue-list" hx-swap="outerHTML" hx-confirm="Yükleme iptal edilsin mi? Bunny'ye gönderilen kısım silinir; dosya yeniden başlatmak için saklanır."><i class="bi bi-x-circle me-1" aria-hidden="true"></i>İptal</button>
+      <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:upload_cancel' upload.id %}" hx-vals='{"from": "queue", "filter": "{{ queue_filter }}"}' hx-target="#queue-list" hx-swap="outerHTML" hx-confirm="Yükleme iptal edilsin mi? Platforma gönderilen kısım silinir; dosya yeniden başlatmak için saklanır."><i class="bi bi-x-circle me-1" aria-hidden="true"></i>İptal</button>
       {% endif %}
       {% if upload.can_retry %}
       <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:upload_retry' upload.id %}" hx-vals='{"from": "queue", "filter": "{{ queue_filter }}"}' hx-target="#queue-list" hx-swap="outerHTML"><i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Yeniden başlat</button>

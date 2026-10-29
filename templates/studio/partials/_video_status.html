@@ -1,13 +1,13 @@
 {# Ortak video durumu hücresi (ders videosu ve kurs tanıtım videosu). Yükleme sürerken her 3 saniyede kendini yeniler. #}
 {% load studio_tags %}
-{# Beklenen: cell_id, status_url, upload, video_id, duration (boş olabilir), oob. #}
+{# Beklenen: cell_id, status_url, upload, video_id, video_url, platform_label, duration (boş olabilir), oob. #}
 <div id="{{ cell_id }}" class="small"{% if oob %} hx-swap-oob="true"{% endif %}{% if upload.is_busy %} hx-get="{{ status_url }}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
   {% if upload.is_busy %}
   <div class="d-flex justify-content-between gap-2">
     <span><span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>{% if upload.is_processing and upload.service_state_label %}{{ upload.service_state_label }}{% else %}{{ upload.get_status_display }}{% endif %}</span>
     <span class="d-inline-flex align-items-center gap-2">
       {% if upload.is_uploading %}<span class="font-monospace">%{{ upload.progress }}</span>{% elif upload.duration_seconds %}<span class="font-monospace text-body-secondary" title="Süre">{{ upload.duration_display }}</span>{% endif %}
-      <button type="button" class="btn btn-link btn-sm p-0 link-danger" hx-post="{% url 'studio:upload_cancel' upload.id %}" hx-target="#{{ cell_id }}" hx-swap="outerHTML" hx-confirm="Yükleme iptal edilsin mi? Bunny'ye gönderilen kısım silinir; dosya yeniden başlatmak için saklanır.">İptal</button>
+      <button type="button" class="btn btn-link btn-sm p-0 link-danger" hx-post="{% url 'studio:upload_cancel' upload.id %}" hx-target="#{{ cell_id }}" hx-swap="outerHTML" hx-confirm="Yükleme iptal edilsin mi? Platforma gönderilen kısım silinir; dosya yeniden başlatmak için saklanır.">İptal</button>
     </span>
   </div>
   {% if upload.is_stale %}
@@ -20,7 +20,7 @@
     <div class="progress-bar{% if not upload.is_uploading %} progress-bar-striped progress-bar-animated{% endif %}" style="width:{% if upload.is_uploading %}{{ upload.progress }}{% else %}100{% endif %}%"></div>
   </div>
   {% elif video_id %}
-  <a href="{{ video_id|bunny_play_url }}" target="_blank" rel="noopener" class="link-success text-decoration-none"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>Bunny</a>
+  <a href="{{ video_url }}" target="_blank" rel="noopener" class="link-success text-decoration-none"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ platform_label }}</a>
   {% if duration %}<span class="text-body-secondary">· <span class="font-monospace">{{ duration }}</span></span>{% endif %}
   {% else %}
   <span class="text-body-tertiary">Video yok</span>

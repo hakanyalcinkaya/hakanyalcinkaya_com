@@ -1,3 +1,3 @@
 {# Form boşalır, yeni kategori listenin sonuna eklenir. #}
 {% include "studio/partials/_section_create_form.html" %}
-<div hx-swap-oob="beforeend:#course-sections">{% include "studio/partials/_section.html" %}</div>
+<div hx-swap-oob="beforeend:#course-sections">{% include "studio/partials/_section.html" with bulk=True %}</div>

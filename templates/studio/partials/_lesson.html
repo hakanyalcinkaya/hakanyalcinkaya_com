@@ -2,6 +2,7 @@
 <div class="list-group-item py-2 studio-lesson" id="lesson-{{ lesson.id }}" data-lesson-id="{{ lesson.id }}"{% if lesson.is_video %} data-subtitle-drop data-subtitle-url="{% url 'studio:lesson_subtitles' lesson.id %}"{% endif %}>
   <div class="row g-2 align-items-center">
     <div class="col-auto d-flex align-items-center gap-2">
+      {% if bulk %}<input class="form-check-input m-0" type="checkbox" name="lessons" value="{{ lesson.id }}" data-lesson-check aria-label="“{{ lesson.title }}” videosunu seç">{% endif %}
       <span class="studio-handle studio-lesson-handle text-body-tertiary" title="Sürükleyerek sırala ya da başka kategoriye taşı"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Videoyu taşı</span></span>
       <span class="font-monospace small text-body-tertiary" data-lesson-no>{{ section_no }}.{{ lesson_no }}</span>
     </div>

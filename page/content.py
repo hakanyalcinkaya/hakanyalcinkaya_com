@@ -12,7 +12,6 @@ from django.urls import reverse
 
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
-from course import bunny
 from course.models import Course, HighlightKind, Lesson, LessonKind, LessonSubtitle, SubtitleStatus
 from page import catalog
 
@@ -94,14 +93,16 @@ def _course_card(course, flat):
             "tags": [technology.name for technology in course.technologies.all()],
         }
     minutes = sum(ceil_minutes(item["seconds"]) for item in flat)
+    preview = course.preview_player or {}
     card.update(
         title=course.title,
         short=course.short_title,
         price=format_try(course.price),
         lessons=len(flat),
         duration=hours_minutes(minutes),
-        preview_video=course.preview_video,
-        preview_poster=course.preview_poster,
+        preview_video=preview.get("src", ""),
+        preview_poster=preview.get("poster", ""),
+        preview_platform=preview.get("platform", ""),
     )
     return card
 
@@ -157,18 +158,20 @@ def course_page(course, enrolled=False, staff=False):
 
 
 def _player(lesson):
-    """Ders oynatıcısının verisi: HLS adresi, kapak görseli ve hazır altyazılar (Video.js <track>)."""
-    if not lesson.video_id:
+    """Ders oynatıcısının verisi: platform, adres, kapak görseli ve hazır altyazılar (Video.js <track>).
+
+    Vimeo altyazıları kendi oynatıcısında yüklendiği için yalnız Bunny videolarında <track> verilir.
+    """
+    player = lesson.player
+    if player is None:
         return None
-    tracks = [
-        {
-            "src": bunny.caption_url(lesson.video_id, subtitle.language),
-            "lang": subtitle.language,
-            "label": subtitle.get_language_display(),
-        }
-        for subtitle in lesson.subtitles.all()
-    ]
-    return {"src": lesson.video_src, "poster": lesson.video_poster, "tracks_json": json.dumps(tracks)}
+    service = lesson.video_service
+    tracks = []
+    for subtitle in lesson.subtitles.all():
+        src = service.caption_url(lesson.video_id, subtitle.language)
+        if src:
+            tracks.append({"src": src, "lang": subtitle.language, "label": subtitle.get_language_display()})
+    return {**player, "tracks_json": json.dumps(tracks)}
 
 
 def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False):

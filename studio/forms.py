@@ -1,9 +1,11 @@
 from pathlib import Path
 
 from django import forms
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
+from core.models import SiteSettings
+from course import video_service
 from course.models import (
     SUBTITLE_EXTENSIONS,
     VIDEO_EXTENSIONS,
@@ -16,6 +18,71 @@ from course.models import (
 )
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
+
+
+class LessonBulkAction(models.TextChoices):
+    PUBLISH = "publish", _("Yayınla")
+    DRAFT = "draft", _("Taslağa al")
+    PREVIEW_ON = "preview_on", _("Önizlemeyi aç")
+    PREVIEW_OFF = "preview_off", _("Önizlemeyi kapat")
+    DELETE = "delete", _("Sil")
+    DELETE_REMOTE = "delete_remote", _("Sil ve videolarını platformdan sil")
+
+
+class LessonBulkForm(forms.Form):
+    """Düzenleyicide seçilen videolara (derslere) toplu işlem; yalnız bu kursun dersleri seçilebilir."""
+
+    action = forms.ChoiceField(choices=LessonBulkAction.choices)
+    lessons = forms.ModelMultipleChoiceField(queryset=Lesson.objects.none())
+
+    def __init__(self, *args, course, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["lessons"].queryset = Lesson.objects.filter(section__course=course)
+        self.fields["lessons"].error_messages["required"] = _("Önce video seç.")
+
+    @transaction.atomic
+    def save(self):
+        """İşlemi uygular, etkilenen ders sayısını döner."""
+        action = self.cleaned_data["action"]
+        lessons = list(self.cleaned_data["lessons"])
+        for lesson in lessons:
+            if action == LessonBulkAction.PUBLISH:
+                lesson.publish()
+            elif action == LessonBulkAction.DRAFT:
+                lesson.make_draft()
+            elif action in (LessonBulkAction.PREVIEW_ON, LessonBulkAction.PREVIEW_OFF):
+                lesson.set_preview(action == LessonBulkAction.PREVIEW_ON)
+            else:
+                lesson.remove(delete_remote=action == LessonBulkAction.DELETE_REMOTE)
+        return len(lessons)
+
+    def message(self, count):
+        action = self.cleaned_data["action"]
+        texts = {
+            LessonBulkAction.PUBLISH: _("%(count)s video yayına alındı."),
+            LessonBulkAction.DRAFT: _("%(count)s video taslağa alındı."),
+            LessonBulkAction.PREVIEW_ON: _("%(count)s videoda önizleme açıldı."),
+            LessonBulkAction.PREVIEW_OFF: _("%(count)s videoda önizleme kapatıldı."),
+            LessonBulkAction.DELETE: _("%(count)s video silindi; platformdaki videoları duruyor."),
+            LessonBulkAction.DELETE_REMOTE: _("%(count)s video silindi; platformdaki videoları da silinecek."),
+        }
+        return texts[action] % {"count": count}
+
+
+class SiteSettingsForm(forms.ModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = ("video_platform", "sync_video_titles")
+        widgets = {"video_platform": forms.RadioSelect}
+
+    def clean_video_platform(self):
+        platform = self.cleaned_data["video_platform"]
+        missing = video_service.missing_settings(video_service.get(platform).REQUIRED_SETTINGS)
+        if missing:
+            raise forms.ValidationError(
+                _("Bu platform seçilemez; .env dosyasında eksik: %(names)s") % {"names": ", ".join(missing)}
+            )
+        return platform
 
 
 def _extension(upload):
@@ -73,7 +140,12 @@ class NewVideoLessonForm(forms.Form):
             sort_order=section.next_lesson_order(),
         )
         upload = VideoUpload.objects.create(
-            lesson=lesson, file=upload_file, original_name=upload_file.name, size=upload_file.size, created_by=user
+            lesson=lesson,
+            platform=video_service.current_name(),
+            file=upload_file,
+            original_name=upload_file.name,
+            size=upload_file.size,
+            created_by=user,
         )
         upload.read_duration()
         upload.queue()
@@ -112,6 +184,7 @@ class VideoUploadForm(forms.ModelForm):
         upload = super().save(commit=False)
         upload.lesson = self.lesson
         upload.course = self.course
+        upload.platform = video_service.current_name()
         upload.original_name = upload.file.name
         upload.size = upload.file.size
         upload.created_by = user
@@ -154,7 +227,7 @@ class SubtitleForm(forms.Form):
         return upload
 
     def save(self):
-        """Aynı dilde altyazı varsa dosyası değiştirilir; Bunny'deki eskisinin yerine geçer."""
+        """Aynı dilde altyazı varsa dosyası değiştirilir; platformdaki eskisinin yerine geçer."""
         language = self.cleaned_data["language"]
         subtitle = LessonSubtitle.objects.filter(lesson=self.lesson, language=language).first()
         if subtitle is None:

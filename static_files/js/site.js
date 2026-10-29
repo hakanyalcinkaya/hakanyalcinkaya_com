@@ -471,10 +471,17 @@
     startReviews();
   }
 
-  // Video.js oynatıcısı (HLS, Bunny Stream). Paket büyük olduğu için yalnız gerektiğinde yüklenir
-  // (frontend/ → static_files/js/videojs/player.js). Açılışta 720p seçilir; kalite menüsünden değiştirilebilir.
+  // Video.js oynatıcısı. Video, yüklendiği platformdan oynar: Bunny Stream'de HLS (<hlsjs-video>), Vimeo'da Vimeo'nun
+  // kendi oynatıcısı (<vimeo-video>). Paket büyük olduğu için yalnız gerektiğinde yüklenir
+  // (frontend/ → static_files/js/videojs/player.js). Dersler 720p, tanıtım videosu en yüksek kalitede açılır;
+  // kalite menüsünden değiştirilebilir.
   var DEFAULT_QUALITY_HEIGHT = 720;
+  // Django tüm sayfalarda "Referrer-Policy: same-origin" gönderir; alan adı kısıtlı Vimeo videoları referrer olmadan
+  // oynamaz. Yalnız Vimeo bağlantısı için Vimeo'nun kendi gömme kodundaki politika kullanılır.
+  var VIMEO_REFERRER_POLICY = "strict-origin-when-cross-origin";
+
   function mountPlayer(target, options) {
+    if (options.platform === "vimeo") return createPlayer(target, options);
     // HLS motoru CDN reddettiğinde (ör. 403) hata vermeden boş kalıyor; liste önce yoklanır, alınamazsa açıklama gösterilir.
     return fetch(options.src, { credentials: "omit" }).then(function (response) {
       if (response.ok) return createPlayer(target, options);
@@ -490,7 +497,8 @@
       var i18n = document.createElement("media-i18n");
       var player = document.createElement("video-player");
       var skin = document.createElement("video-skin");
-      var media = document.createElement("hlsjs-video");
+      var vimeo = options.platform === "vimeo";
+      var media = document.createElement(vimeo ? "vimeo-video" : "hlsjs-video");
       i18n.className = "d-block";
       i18n.setAttribute("lang", document.documentElement.lang || "tr");
       player.className = "d-block hy-video";
@@ -499,7 +507,18 @@
       media.setAttribute("playsinline", "");
       media.setAttribute("crossorigin", "");
       if (options.poster) media.setAttribute("poster", options.poster);
-      if (options.autoplay) media.setAttribute("autoplay", "");
+      if (options.autoplay) {
+        // Tıklamayla açıldığı için sesli başlar; tarayıcı sesli otomatik oynatmayı reddederse sessiz başlatılır.
+        media.addEventListener("loadedmetadata", function () {
+          var started = media.play();
+          if (started && started.catch) {
+            started.catch(function () {
+              media.muted = true;
+              media.play();
+            });
+          }
+        }, { once: true });
+      }
       (options.tracks || []).forEach(function (item) {
         var track = document.createElement("track");
         track.kind = "subtitles";
@@ -508,13 +527,20 @@
         track.label = item.label;
         media.appendChild(track);
       });
-      videojs.preferQuality(media, DEFAULT_QUALITY_HEIGHT);
+      if (vimeo) {
+        videojs.enableVimeoQuality(media, options.quality || DEFAULT_QUALITY_HEIGHT);
+      } else {
+        videojs.preferQuality(media, options.quality || DEFAULT_QUALITY_HEIGHT);
+      }
       // Video alınamazsa (ör. CDN izin vermedi) oynatıcı yerine açıklama gösterilir.
       media.addEventListener("error", function () { showPlayerError(i18n); }, { once: true });
       skin.appendChild(media);
       player.appendChild(skin);
       i18n.appendChild(player);
       target.replaceWith(i18n);
+      // Vimeo iframe'i öğe sayfaya eklenince kurulur; referrer politikası iframe yüklenmeden önce verilir.
+      var frame = vimeo && media.shadowRoot && media.shadowRoot.querySelector("iframe");
+      if (frame) frame.referrerPolicy = VIMEO_REFERRER_POLICY;
       return media;
     });
   }
@@ -538,17 +564,89 @@
     if (window.hyToast) window.hyToast("error", "Video yüklenemedi. Sayfayı yenileyip tekrar dene.");
   }
 
-  // Tanıtım videosu: görsele tıklanınca oynatıcı görselin yerine geçer ve oynamaya başlar.
+  // Tanıtım videosu: görsele tıklanınca ekranın %95'ini kaplayan pencerede açılır ve kendiliğinden başlar.
+  // Videonun altında kurs sayfasına ve önizleme derslerine bağlantı vardır.
+  // Esc, ✕ ya da pencere dışına tıklama kapatır; kapanınca oynatıcı kaldırılır (ses kesilir) ve odak görsele döner.
+  var previewDialog = null;
+  var previewTrigger = null;
+
+  function closePreview() {
+    // Kaydırma kilidi hemen kalkar; "close" olayı sonra gelir ve bağlantının bölüme kaydırmasını engellememeli.
+    document.documentElement.classList.remove("hy-dialog-open");
+    if (previewDialog && previewDialog.open) previewDialog.close();
+  }
+
+  function previewDialogElement() {
+    if (previewDialog) return previewDialog;
+    previewDialog = document.createElement("dialog");
+    previewDialog.className = "hy-video-dialog";
+    previewDialog.setAttribute("aria-label", "Tanıtım videosu");
+    previewDialog.addEventListener("click", function (event) {
+      var link = event.target.closest("[data-dialog-link]");
+      if (link) {
+        // Önce pencere kapanır, sonra bağlantıya gidilir; aynı sayfadaki bölümse sayfa oraya kayar.
+        event.preventDefault();
+        previewTrigger = null;
+        closePreview();
+        var target = new URL(link.href, window.location.href);
+        if (target.pathname !== window.location.pathname || !target.hash) {
+          window.location.href = target.href;
+          return;
+        }
+        // Pencere kapanınca tarayıcı odağı görsele geri verip sayfayı oraya kaydırır; bölüme ondan sonra gidilir.
+        history.pushState(null, "", target.hash);
+        setTimeout(function () {
+          var section = document.getElementById(target.hash.slice(1));
+          if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 0);
+        return;
+      }
+      if (event.target === previewDialog || event.target.closest("[data-dialog-close]")) closePreview();
+    });
+    previewDialog.addEventListener("close", function () {
+      previewDialog.innerHTML = "";
+      document.documentElement.classList.remove("hy-dialog-open");
+      if (previewTrigger) previewTrigger.focus();
+    });
+    document.body.appendChild(previewDialog);
+    return previewDialog;
+  }
+
+  function previewLinks(trigger) {
+    var links = [];
+    var courseUrl = trigger.getAttribute("data-course-url");
+    var previewsUrl = trigger.getAttribute("data-previews-url");
+    if (courseUrl) {
+      links.push('<a class="btn btn-light" data-dialog-link href="' + courseUrl + '">Eğitim detay sayfasını incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>');
+    }
+    if (previewsUrl) {
+      links.push('<a class="btn btn-outline-light" data-dialog-link href="' + previewsUrl + '"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Önizleme videolarını incele</a>');
+    }
+    return links.length ? '<div class="hy-video-dialog-actions d-flex flex-wrap justify-content-center gap-2">' + links.join("") + "</div>" : "";
+  }
+
   document.querySelectorAll("[data-preview-video]").forEach(function (trigger) {
+    trigger.setAttribute("aria-haspopup", "dialog");
     trigger.addEventListener("click", function () {
-      trigger.setAttribute("aria-busy", "true");
-      mountPlayer(trigger, {
+      var dialog = previewDialogElement();
+      previewTrigger = trigger;
+      dialog.innerHTML =
+        '<button type="button" class="btn btn-dark btn-sm rounded-circle hy-video-dialog-close" data-dialog-close aria-label="Kapat"><i class="bi bi-x-lg" aria-hidden="true"></i></button>' +
+        '<div class="hy-video-dialog-body"><div class="ratio ratio-16x9"><div class="d-flex align-items-center justify-content-center text-white-50" data-dialog-player>' +
+        '<span class="spinner-border" aria-hidden="true"></span><span class="visually-hidden">Video yükleniyor</span></div></div>' +
+        previewLinks(trigger) + "</div>";
+      document.documentElement.classList.add("hy-dialog-open");
+      dialog.showModal();
+      mountPlayer(dialog.querySelector("[data-dialog-player]"), {
         playerSrc: trigger.getAttribute("data-player-src"),
+        platform: trigger.getAttribute("data-video-platform"),
         src: trigger.getAttribute("data-preview-video"),
         poster: trigger.getAttribute("data-poster"),
         autoplay: true,
+        // Tanıtım videosu en yüksek kalitede açılır (dersler 720p).
+        quality: "highest",
       }).catch(function () {
-        trigger.removeAttribute("aria-busy");
+        closePreview();
         playerFailed();
       });
     });
@@ -564,6 +662,7 @@
     }
     mountPlayer(holder, {
       playerSrc: holder.getAttribute("data-player-src"),
+      platform: holder.getAttribute("data-video-platform"),
       src: holder.getAttribute("data-lesson-video"),
       poster: holder.getAttribute("data-poster"),
       tracks: tracks,

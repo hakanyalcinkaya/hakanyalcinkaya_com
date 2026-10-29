@@ -1,5 +1,4 @@
 from adminsortable2.admin import SortableAdminMixin, SortableTabularInline
-from django.conf import settings
 from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
@@ -19,19 +18,10 @@ from course.models import (
     Technology,
     VideoUpload,
 )
-from course.bunny import VideoServiceError
+from course.video_service import VideoServiceError
 
 # Sıralama sürükle-bırak ile yapılır (django-admin-sortable2); sort_order formlarda gösterilmez.
 PUBLISH_FIELDS = (_("Yayın"), {"fields": ("status", "published_at")})
-
-
-def video_service_ready(modeladmin, request):
-    if settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY:
-        return True
-    modeladmin.message_user(
-        request, _("Bunny ayarları (BUNNY_LIBRARY_ID, BUNNY_API_KEY) tanımlı değil; süre hesaplanamadı."), messages.ERROR
-    )
-    return False
 
 
 @admin.register(Category)
@@ -82,10 +72,17 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("title", "short_title", "slug", "subtitle", "description", "image")}),
         (
-            _("Video (Bunny)"),
+            _("Video"),
             {
-                "fields": ("preview_video_id", "preview_video_title", "video_collection_id"),
-                "description": _("Tanıtım videosu ve koleksiyon, stüdyodan yükleme yapınca kendiliğinden dolar."),
+                "fields": (
+                    "preview_video_platform",
+                    "preview_video_id",
+                    "preview_video_key",
+                    "preview_video_title",
+                    "video_collection_id",
+                    "vimeo_folder_uri",
+                ),
+                "description": _("Tanıtım videosu ve klasörler, stüdyodan yükleme yapınca kendiliğinden dolar."),
             },
         ),
         (_("Sınıflandırma"), {"fields": ("category", "subcategories", "technologies", "level")}),
@@ -99,7 +96,7 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         if obj.queue_preview_title_sync():
-            self.message_user(request, _("Tanıtım videosunun başlığı Bunny'de de güncellenecek."))
+            self.message_user(request, _("Tanıtım videosunun başlığı video platformunda da güncellenecek."))
 
     @admin.display(description=_("fiyat"), ordering="price")
     def price_display(self, obj):
@@ -107,10 +104,8 @@ class CourseAdmin(SortableAdminMixin, admin.ModelAdmin):
             return f"{format_try(obj.price)} (liste {format_try(obj.list_price)})"
         return format_try(obj.price)
 
-    @admin.action(description=_("Seçili kursların tüm ders sürelerini Bunny'den hesapla"))
+    @admin.action(description=_("Seçili kursların tüm ders sürelerini video platformundan hesapla"))
     def sync_durations(self, request, queryset):
-        if not video_service_ready(self, request):
-            return
         for course in queryset:
             try:
                 count = course.sync_durations()
@@ -150,14 +145,22 @@ class LessonAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
     sort_parent_filter = "section__id__exact"
     list_display = ("title", "section", "kind", "is_preview", "duration_display", "status")
     list_editable = ("status",)
-    list_filter = ("status", "kind", "is_preview", ("video_id", admin.EmptyFieldListFilter), "section__course", "section")
+    list_filter = (
+        "status",
+        "kind",
+        "is_preview",
+        "video_platform",
+        ("video_id", admin.EmptyFieldListFilter),
+        "section__course",
+        "section",
+    )
     search_fields = ("title", "section__title", "section__course__title", "video_id")
     list_select_related = ("section__course",)
     autocomplete_fields = ("section",)
     actions = ("sync_duration",)
     fieldsets = (
         (None, {"fields": ("section", "title", "slug", "kind", "is_preview")}),
-        (_("Video (Bunny)"), {"fields": ("video_id", "video_title", "duration_seconds")}),
+        (_("Video"), {"fields": ("video_platform", "video_id", "video_key", "video_title", "duration_seconds")}),
         (_("Diğer içerik"), {"fields": ("external_url", "body"), "classes": ("collapse",)}),
         PUBLISH_FIELDS,
     )
@@ -171,12 +174,10 @@ class LessonAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         if obj.queue_video_title_sync():
-            self.message_user(request, _("Başlık Bunny'de de güncellenecek."))
+            self.message_user(request, _("Başlık video platformunda da güncellenecek."))
 
-    @admin.action(description=_("Seçili derslerin süresini Bunny'den hesapla"))
+    @admin.action(description=_("Seçili derslerin süresini video platformundan hesapla"))
     def sync_duration(self, request, queryset):
-        if not video_service_ready(self, request):
-            return
         updated = 0
         for lesson in queryset.exclude(video_id=""):
             try:
@@ -261,8 +262,8 @@ class BundleCourseAdmin(ParentFilteredSortableAdminMixin, admin.ModelAdmin):
 
 @admin.register(VideoUpload)
 class VideoUploadAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "status", "progress", "video_id", "created_by", "created_at")
-    list_filter = ("status", ("course", admin.EmptyFieldListFilter), "lesson__section__course", "course")
+    list_display = ("__str__", "platform", "status", "progress", "video_id", "created_by", "created_at")
+    list_filter = ("status", "platform", ("course", admin.EmptyFieldListFilter), "lesson__section__course", "course")
     search_fields = ("lesson__title", "course__title", "original_name", "video_id")
     list_select_related = ("lesson", "course", "created_by")
     autocomplete_fields = ("lesson", "course")

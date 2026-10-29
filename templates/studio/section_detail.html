@@ -8,9 +8,7 @@
 <h1 class="h3 mb-1">{{ section_no }}. {{ section.title }}</h1>
 <p class="small text-body-secondary mb-4">Bu kategoriye video yükle. Dosyalar adlarına göre sıralanıp kategorinin sonuna eklenir; başlıkları ve sıraları aşağıdan düzenlenir.</p>
 
-{% if not video_service_configured %}
-<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i><code>.env</code> dosyasında <code>BUNNY_LIBRARY_ID</code> / <code>BUNNY_API_KEY</code> yok; yüklemeler hata verir.</div>
-{% endif %}
+{% include "studio/partials/_platform_alert.html" %}
 {% if not worker_online %}
 <div class="alert alert-warning small" role="alert">
   <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Celery işçisi çalışmıyor; yüklemeler "Sırada" bekler. Proje klasöründe başlat: <code>celery -A config worker -l info -P threads</code>

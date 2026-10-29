@@ -1,7 +1,6 @@
 import json
 from functools import wraps
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -14,6 +13,8 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import reswap, trigger_client_event
 
 from config.celery import worker_online
+from core.models import SiteSettings, VideoPlatform
+from course import video_service
 from course.models import (
     BUSY_UPLOAD_STATUSES,
     FINISHED_UPLOAD_STATUSES,
@@ -24,10 +25,12 @@ from course.models import (
     VideoUpload,
 )
 from studio.forms import (
+    LessonBulkForm,
     LessonTitleForm,
     NewVideoLessonForm,
     SectionCreateForm,
     SectionTitleForm,
+    SiteSettingsForm,
     SubtitleForm,
     VideoUploadForm,
 )
@@ -65,6 +68,17 @@ def _worker_online():
     return worker_online()
 
 
+def _platform_label():
+    return video_service.current().LABEL
+
+
+def _video_platform():
+    """Yeni yüklemelerin gideceği platform; ayarları eksikse panel uyarır."""
+    platform = video_service.current_name()
+    service = video_service.get(platform)
+    return dict(value=platform, label=service.LABEL, missing=video_service.missing_settings(service.REQUIRED_SETTINGS))
+
+
 @staff_required
 def course_list(request):
     courses = Course.objects.with_video_stats().order_by("sort_order", "title")
@@ -100,8 +114,8 @@ def course_detail(request, course_id):
         course=course,
         sections=_with_lessons(course.sections.all()),
         section_form=SectionCreateForm(),
-        title_sync_total=course.lessons_needing_video_title_sync().count(),
-        video_service_configured=bool(settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY),
+        title_sync_total=course.lessons_needing_video_title_sync().count() if SiteSettings.title_sync_enabled() else 0,
+        video_platform=_video_platform(),
         worker_online=_worker_online(),
     )
     return render(request, "studio/course_detail.html", context)
@@ -115,7 +129,7 @@ def section_detail(request, section_id):
         section=section,
         course=section.course,
         section_no=_section_no(section),
-        video_service_configured=bool(settings.BUNNY_LIBRARY_ID and settings.BUNNY_API_KEY),
+        video_platform=_video_platform(),
         worker_online=_worker_online(),
     )
     return render(request, "studio/section_detail.html", context)
@@ -125,14 +139,18 @@ def section_detail(request, section_id):
 @require_GET
 def section_block(request, section_id):
     section = _section(section_id)
-    context = dict(section=section, course=section.course, section_no=_section_no(section))
+    # Yalnız kurs düzenleyicisinden istenir; satırlarda toplu seçim kutusu olur.
+    context = dict(section=section, course=section.course, section_no=_section_no(section), bulk=True)
     return render(request, "studio/partials/_section.html", context)
 
 
-def _video_lesson_response(request, lesson):
-    """Yanıt yeni ders satırıdır. Bölüm sayfada henüz yoksa (ilk "Genel") istemci bölüm bloğunu ayrıca ister."""
+def _video_lesson_response(request, lesson, bulk):
+    """Yanıt yeni ders satırıdır. Bölüm sayfada henüz yoksa (ilk "Genel") istemci bölüm bloğunu ayrıca ister.
+
+    `bulk`: satır kurs düzenleyicisine eklenecekse toplu seçim kutusu olur.
+    """
     lesson = _lesson(lesson.pk)
-    response = render(request, "studio/partials/_lesson.html", dict(lesson=lesson))
+    response = render(request, "studio/partials/_lesson.html", dict(lesson=lesson, bulk=bulk))
     response["X-Section-Id"] = str(lesson.section_id)
     response["X-Section-Block-Url"] = reverse("studio:section_block", args=[lesson.section_id])
     return response
@@ -146,7 +164,7 @@ def course_videos(request, course_id):
     form = NewVideoLessonForm(request.POST, request.FILES)
     if not form.is_valid():
         return HttpResponseBadRequest(_first_error(form))
-    return _video_lesson_response(request, form.save(course.general_section(), request.user))
+    return _video_lesson_response(request, form.save(course.general_section(), request.user), bulk=True)
 
 
 @staff_required
@@ -156,7 +174,7 @@ def section_videos(request, section_id):
     form = NewVideoLessonForm(request.POST, request.FILES)
     if not form.is_valid():
         return HttpResponseBadRequest(_first_error(form))
-    return _video_lesson_response(request, form.save(section, request.user))
+    return _video_lesson_response(request, form.save(section, request.user), bulk=request.GET.get("bulk") == "1")
 
 
 @staff_required
@@ -237,14 +255,33 @@ def lesson_preview(request, lesson_id):
 
 
 @staff_required
+@require_POST
+def lesson_bulk(request, course_id):
+    """Düzenleyicide seçilen videolara toplu işlem; kategori listesi yeniden çizilir, seçim temizlenir."""
+    course = get_object_or_404(Course, pk=course_id)
+    form = LessonBulkForm(request.POST, course=course)
+    if not form.is_valid():
+        return _toast(reswap(HttpResponse(), "none"), "warning", _first_error(form))
+    count = form.save()
+    response = render(
+        request, "studio/partials/_course_sections.html", dict(course=course, sections=_with_lessons(course.sections.all()))
+    )
+    return _toast(response, "success", form.message(count))
+
+
+@staff_required
 def lesson_delete(request, lesson_id):
-    """GET onay panelini açar (Bunny'den de silinsin mi sorulur); POST dersi siler ve satırı kaldırır."""
+    """GET onay panelini açar (platformdan da silinsin mi sorulur); POST dersi siler ve satırı kaldırır."""
     lesson = get_object_or_404(Lesson, pk=lesson_id)
     if request.method != "POST":
         return render(request, "studio/partials/_lesson_delete.html", dict(lesson=lesson))
     delete_remote = request.POST.get("remote") == "1"
     lesson.remove(delete_remote=delete_remote)
-    text = _("Ders ve Bunny'deki videosu silindi.") if delete_remote else _("Ders silindi.")
+    text = (
+        _("Ders silindi; videosu %(platform)s platformundan da silinecek.") % {"platform": lesson.video_service.LABEL}
+        if delete_remote
+        else _("Ders silindi.")
+    )
     return _toast(HttpResponse(), "success", text)
 
 
@@ -252,8 +289,11 @@ def lesson_delete(request, lesson_id):
 @require_POST
 def course_sync_titles(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
+    if not SiteSettings.title_sync_enabled():
+        messages.warning(request, _("Video başlığını platformda güncelleme ayarı kapalı; Ayarlar'dan açabilirsin."))
+        return redirect("studio:course_detail", course_id=course.pk)
     queued = sum(lesson.queue_video_title_sync() for lesson in course.lessons_needing_video_title_sync())
-    messages.success(request, _("%(count)s dersin başlığı Bunny'de güncellenecek.") % {"count": queued})
+    messages.success(request, _("%(count)s dersin başlığı video platformunda güncellenecek.") % {"count": queued})
     return redirect("studio:course_detail", course_id=course.pk)
 
 
@@ -283,7 +323,7 @@ def lesson_video(request, lesson_id):
     if is_post and form.is_valid():
         form.save(request.user)
         response = render(request, "studio/partials/_video_queued.html", dict(lesson=_lesson(lesson_id)))
-        return _toast(response, "success", _("Video sunucuya ulaştı; Bunny'ye gönderiliyor."))
+        return _toast(response, "success", _("Video sunucuya ulaştı; %(platform)s platformuna gönderiliyor.") % {"platform": _platform_label()})
     return render(request, "studio/partials/_video_form.html", dict(lesson=lesson, form=form))
 
 
@@ -303,7 +343,7 @@ def course_preview(request, course_id):
     if is_post and form.is_valid():
         form.save(request.user)
         response = render(request, "studio/partials/_preview_queued.html", dict(course=_course(course_id)))
-        return _toast(response, "success", _("Tanıtım videosu sunucuya ulaştı; Bunny'ye gönderiliyor."))
+        return _toast(response, "success", _("Tanıtım videosu sunucuya ulaştı; %(platform)s platformuna gönderiliyor.") % {"platform": _platform_label()})
     return render(request, "studio/partials/_video_form.html", dict(form=form, course=course))
 
 
@@ -436,3 +476,38 @@ def subtitle_delete(request, subtitle_id):
     lesson_id = subtitle.lesson_id
     subtitle.remove()
     return render(request, "studio/partials/_lesson_subtitles.html", dict(lesson=_lesson(lesson_id)))
+
+
+@staff_required
+def site_settings(request):
+    """Site ayarları: yeni videoların yükleneceği platform. Her platformun eksik ayarı ve video sayısı gösterilir."""
+    site = SiteSettings.load()
+    form = SiteSettingsForm(request.POST or None, instance=site)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Ayarlar kaydedildi. Yeni yüklemeler %(platform)s platformuna gidecek.") % {
+            "platform": site.get_video_platform_display()
+        })
+        return redirect("studio:settings")
+    lesson_totals = dict(
+        Lesson.objects.exclude(video_id="").values_list("video_platform").annotate(total=Count("pk")).order_by()
+    )
+    platforms = [
+        dict(item, lesson_total=lesson_totals.get(item["value"], 0), selected=item["value"] == site.video_platform)
+        for item in video_service.choices()
+    ]
+    return render(request, "studio/settings.html", dict(form=form, platforms=platforms))
+
+
+@staff_required
+@require_POST
+def settings_check(request, platform):
+    """Platform bağlantısını dener (anahtar geçerli mi, yetkiler yeterli mi); sonucu satırına yazar."""
+    if platform not in VideoPlatform.values:
+        return HttpResponseBadRequest()
+    service = video_service.get(platform)
+    try:
+        result, ok = service.check(), True
+    except video_service.VideoServiceError as error:
+        result, ok = str(error), False
+    return render(request, "studio/partials/_settings_check.html", dict(result=result, ok=ok))

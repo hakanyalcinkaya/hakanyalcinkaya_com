@@ -3,8 +3,8 @@
   {% if lesson.has_busy_upload %}<p class="mb-2">Süren yüklemesi iptal edilir.</p>{% endif %}
   <div class="d-flex flex-wrap gap-2">
     {% if lesson.video_id %}
-    <button type="button" class="btn btn-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"remote": "1"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Dersi ve Bunny'deki videosunu sil</button>
-    <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"remote": "0"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Yalnız dersi sil, video Bunny'de kalsın</button>
+    <button type="button" class="btn btn-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"remote": "1"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Dersi ve {{ lesson.get_video_platform_display }} videosunu sil</button>
+    <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"remote": "0"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Yalnız dersi sil, video {{ lesson.get_video_platform_display }} platformunda kalsın</button>
     {% else %}
     <button type="button" class="btn btn-danger btn-sm" hx-post="{% url 'studio:lesson_delete' lesson.id %}" hx-vals='{"remote": "0"}' hx-target="#lesson-{{ lesson.id }}" hx-swap="outerHTML">Dersi sil</button>
     {% endif %}

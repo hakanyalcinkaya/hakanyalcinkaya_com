@@ -1,6 +1,7 @@
 {# Kategori bloğu. Videolar tutamaktan sürüklenerek sıralanır ve kategoriler arasında taşınır; bloğa video dosyası bırakılabilir. #}
-<section class="card studio-section" id="section-{{ section.id }}" data-section-id="{{ section.id }}" data-upload-zone data-upload-url="{% url 'studio:section_videos' section.id %}">
+<section class="card studio-section" id="section-{{ section.id }}" data-section-id="{{ section.id }}" data-upload-zone data-upload-url="{% url 'studio:section_videos' section.id %}{% if bulk %}?bulk=1{% endif %}">
   <div class="card-header d-flex flex-wrap align-items-center gap-2 py-2">
+    {% if bulk %}<input class="form-check-input m-0" type="checkbox" data-section-check aria-label="“{{ section.title }}” kategorisindeki tüm videoları seç">{% endif %}
     {% if not on_section_page %}<span class="studio-handle studio-section-handle text-body-tertiary" title="Sürükleyerek sırala"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Kategoriyi taşı</span></span>{% endif %}
     <span class="font-monospace small text-body-tertiary" data-section-no>{{ section_no }}.</span>
     <div class="flex-grow-1">{% include "studio/partials/_section_title.html" %}</div>
@@ -12,7 +13,7 @@
     {% endif %}
   </div>
   <div class="list-group list-group-flush studio-lessons" id="section-{{ section.id }}-lessons" data-sortable-lessons>
-    {% for lesson in section.lessons.all %}{% include "studio/partials/_lesson.html" with lesson_no=forloop.counter %}{% endfor %}
+    {% for lesson in section.lessons.all %}{% include "studio/partials/_lesson.html" with lesson_no=forloop.counter bulk=bulk %}{% endfor %}
   </div>
   <div class="small text-body-tertiary px-3 py-2 studio-empty-hint">Video yok. Dosya sürükle ya da başka kategoriden video taşı.</div>
   <ul class="list-unstyled small px-3 mb-0 vstack gap-2" data-upload-list aria-live="polite"></ul>

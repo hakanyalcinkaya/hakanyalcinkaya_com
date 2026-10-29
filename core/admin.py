@@ -1,4 +1,7 @@
 from adminsortable2.admin import SortableAdminMixin
+from django.contrib import admin
+
+from core.models import SiteSettings
 
 
 class ParentFilteredSortableAdminMixin(SortableAdminMixin):
@@ -15,3 +18,16 @@ class ParentFilteredSortableAdminMixin(SortableAdminMixin):
         if self.sort_parent_filter and self.sort_parent_filter not in request.GET:
             self.enable_sorting = False
         return changelist
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    """Tek kayıt; asıl düzenleme stüdyodaki "Ayarlar" sayfasından yapılır."""
+
+    list_display = ("__str__", "video_platform", "updated_at")
+
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False

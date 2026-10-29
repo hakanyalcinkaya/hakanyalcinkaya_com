@@ -1,0 +1,4 @@
+{# Kursun kategorileri; toplu işlemden sonra bütün olarak yeniden çizilir. #}
+<div id="course-sections" class="vstack gap-3 mt-3" data-structure data-structure-url="{% url 'studio:course_structure' course.id %}" data-sortable-sections>
+  {% for section in sections %}{% include "studio/partials/_section.html" with section_no=forloop.counter bulk=True %}{% endfor %}
+</div>

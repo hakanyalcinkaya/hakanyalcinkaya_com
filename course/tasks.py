@@ -1,24 +1,27 @@
-"""Bunny Stream işleri (Celery). Görevler kimlikle çağrılır ve beklenen durumda değilse sessizce çıkar; iki kez çalışması zarar vermez."""
+"""Video platformu işleri (Celery; Bunny Stream / Vimeo). Görevler kimlikle çağrılır ve beklenen durumda değilse sessizce
+çıkar; iki kez çalışması zarar vermez. Her iş, videonun kaydında yazan platformla yapılır (bkz. `course.video_service`)."""
 
 import logging
 
 from celery import shared_task
 
-from course import bunny
+from core.models import SiteSettings, VideoPlatform
+from course import video_service
 from course.models import Course, Lesson, LessonSubtitle, SubtitleStatus, UploadCanceled, VideoUpload, VideoUploadStatus
+from course.video_service import VideoServiceError
 
 logger = logging.getLogger(__name__)
 
 PROCESSING_CHECK_SECONDS = 15
-# Bunny birkaç dakikada işler; uzun videolar için yaklaşık 2 saat beklenir.
+# Platform birkaç dakikada işler; uzun videolar için yaklaşık 2 saat beklenir.
 PROCESSING_MAX_CHECKS = 480
 
 
-def _delete_quietly(video_id):
+def _delete_quietly(service, video_id):
     try:
-        bunny.delete_video(video_id)
-    except bunny.VideoServiceError as error:
-        logger.warning("Bunny videosu silinemedi (%s): %s", video_id, error)
+        service.delete_video(video_id)
+    except VideoServiceError as error:
+        logger.warning("%s videosu silinemedi (%s): %s", service.LABEL, video_id, error)
 
 
 @shared_task
@@ -27,21 +30,24 @@ def upload_video(upload_id):
     # İptal edilmiş ya da başka bir işçinin aldığı iş atlanır.
     if upload is None or not upload.mark_uploading():
         return
+    service = upload.video_service
     name = upload.video_name
-    video_id = None
+    video = None
     try:
-        # Video kursun koleksiyonunda açılır; Bunny panelinde kurs kurs görünür.
-        video_id = bunny.create_video(name, upload.target_course.ensure_video_collection())
-        upload.mark_created(video_id, name)
-        bunny.upload_file(video_id, upload.file.path, name, on_progress=upload.set_progress)
+        # Video kursun klasöründe açılır; platformun panelinde kurs kurs görünür.
+        folder = upload.target_course.ensure_video_folder(upload.platform)
+        video = service.create_video(name, folder, upload.size)
+        upload.mark_created(video.id, name)
+        service.upload_file(video, upload.file.path, name, on_progress=upload.set_progress)
+        service.finish_upload(video, folder)
     except UploadCanceled:
-        if video_id:
-            _delete_quietly(video_id)
+        if video:
+            _delete_quietly(service, video.id)
         return
-    except (bunny.VideoServiceError, OSError, ValueError) as error:
-        # Bunny'de yarım kalan kayıt silinir; yeniden başlatınca yenisi açılır.
-        if video_id:
-            _delete_quietly(video_id)
+    except (VideoServiceError, OSError, ValueError) as error:
+        # Platformda yarım kalan kayıt silinir; yeniden başlatınca yenisi açılır.
+        if video:
+            _delete_quietly(service, video.id)
         upload.mark_failed(str(error))
         return
     if upload.mark_sent():
@@ -57,11 +63,12 @@ def check_video_processing(self, upload_id):
     )
     if upload is None:
         return
+    service = upload.video_service
     try:
-        status = bunny.video_status(upload.video_id)
-    except bunny.VideoServiceError as error:
+        status = service.video_status(upload.video_id)
+    except VideoServiceError as error:
         # Geçici ağ hatası işlemeyi bozmaz; bir sonraki kontrolde yeniden sorulur.
-        logger.warning("Bunny durumu okunamadı (%s): %s", upload.video_id, error)
+        logger.warning("%s durumu okunamadı (%s): %s", service.LABEL, upload.video_id, error)
         status = None
     if status:
         upload.set_service_state(status)
@@ -69,11 +76,11 @@ def check_video_processing(self, upload_id):
         upload.mark_ready(status)
         return
     if status and status.is_failed:
-        if upload.mark_failed("Bunny videoyu işleyemedi; dosyayı kontrol edip yeniden başlat."):
-            _delete_quietly(upload.video_id)
+        if upload.mark_failed(f"Video işlenemedi ({service.LABEL}); dosyayı kontrol edip yeniden başlat."):
+            _delete_quietly(service, upload.video_id)
         return
     if self.request.retries >= self.max_retries:
-        upload.mark_failed("Bunny'deki işleme 2 saatte tamamlanmadı.")
+        upload.mark_failed(f"İşleme 2 saatte tamamlanmadı ({service.LABEL}).")
         return
     raise self.retry()
 
@@ -81,13 +88,14 @@ def check_video_processing(self, upload_id):
 @shared_task
 def sync_video_title(lesson_id):
     lesson = Lesson.objects.filter(pk=lesson_id).first()
-    if lesson is None or not lesson.needs_video_title_sync:
+    # Sıradayken ayar kapatılmışsa başlık platformda değişmez.
+    if lesson is None or not lesson.needs_video_title_sync or not SiteSettings.title_sync_enabled():
         return
     title = lesson.title
     try:
-        bunny.rename_video(lesson.video_id, title)
-    except bunny.VideoServiceError as error:
-        logger.warning("Bunny başlığı güncellenemedi (%s): %s", lesson.video_id, error)
+        lesson.video_service.rename_video(lesson.video_id, title)
+    except VideoServiceError as error:
+        logger.warning("Video başlığı güncellenemedi (%s): %s", lesson.video_id, error)
         return
     Lesson.objects.filter(pk=lesson.pk).update(video_title=title)
 
@@ -95,13 +103,13 @@ def sync_video_title(lesson_id):
 @shared_task
 def sync_preview_title(course_id):
     course = Course.objects.filter(pk=course_id).first()
-    if course is None or not course.needs_preview_title_sync:
+    if course is None or not course.needs_preview_title_sync or not SiteSettings.title_sync_enabled():
         return
     title = course.title
     try:
-        bunny.rename_video(course.preview_video_id, title)
-    except bunny.VideoServiceError as error:
-        logger.warning("Tanıtım videosunun Bunny başlığı güncellenemedi (%s): %s", course.preview_video_id, error)
+        video_service.get(course.preview_video_platform).rename_video(course.preview_video_id, title)
+    except VideoServiceError as error:
+        logger.warning("Tanıtım videosunun başlığı güncellenemedi (%s): %s", course.preview_video_id, error)
         return
     Course.objects.filter(pk=course.pk).update(preview_video_title=title)
 
@@ -118,25 +126,25 @@ def upload_subtitle(subtitle_id):
         subtitle.mark_waiting()
         return
     try:
-        # Bunny'de aynı dilin altyazısı yenisiyle değişir.
-        language = bunny.upload_caption(
+        # Platformda aynı dilin altyazısı yenisiyle değişir.
+        language = lesson.video_service.upload_caption(
             lesson.video_id, subtitle.language, subtitle.get_language_display(), subtitle.file.path
         )
-    except (bunny.VideoServiceError, OSError) as error:
+    except (VideoServiceError, OSError) as error:
         subtitle.mark_failed(str(error))
         return
     subtitle.mark_ready(language)
 
 
 @shared_task
-def delete_remote_video(video_id):
-    """Silinen dersin ya da iptal edilen yüklemenin Bunny'deki videosu."""
-    _delete_quietly(video_id)
+def delete_remote_video(video_id, platform=VideoPlatform.BUNNY):
+    """Silinen dersin ya da iptal edilen yüklemenin platformdaki videosu."""
+    _delete_quietly(video_service.get(platform), video_id)
 
 
 @shared_task
-def delete_remote_caption(video_id, language):
+def delete_remote_caption(video_id, language, platform=VideoPlatform.BUNNY):
     try:
-        bunny.delete_caption(video_id, language)
-    except bunny.VideoServiceError as error:
-        logger.warning("Bunny altyazısı silinemedi (%s, %s): %s", video_id, language, error)
+        video_service.get(platform).delete_caption(video_id, language)
+    except VideoServiceError as error:
+        logger.warning("Altyazı silinemedi (%s, %s): %s", video_id, language, error)

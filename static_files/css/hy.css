@@ -218,6 +218,15 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-preview:hover .hy-preview-play,.hy-preview:focus-visible .hy-preview-play{transform:translate(-50%,-50%) scale(1.08)}
 .hy-preview[aria-busy="true"] .hy-preview-play{opacity:.7}
 .hy-video{background:#000}
+/* Tanıtım videosu penceresi: ekranın %95'i; video oranı korunarak sığabildiği en büyük boyutta ortalanır. */
+.hy-video-dialog{width:95vw;height:95vh;max-width:none;max-height:none;padding:0;border:0;border-radius:var(--bs-border-radius-lg);background:#000;color:#fff;overflow:hidden}
+.hy-video-dialog[open]{display:flex;align-items:center;justify-content:center}
+.hy-video-dialog-actions{padding:1rem}
+.hy-video-dialog::backdrop{background:rgba(0,0,0,.85)}
+/* Altta bağlantı satırı için yer bırakılır (~5rem); video yine 16:9 ve sığabildiği en büyük boyutta. */
+.hy-video-dialog-body{width:min(100%,calc((95vh - 5rem) * 16 / 9))}
+.hy-video-dialog-close{position:absolute;top:.75rem;right:.75rem;z-index:10;width:2.5rem;height:2.5rem;display:inline-flex;align-items:center;justify-content:center}
+.hy-dialog-open{overflow:hidden}
 .hy-video-skin{
   display:block;width:100%;aspect-ratio:16/9;
   --media-accent-color:var(--bs-primary);
@@ -234,6 +243,7 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .studio-progress{height:.375rem}
 /* İçerik düzenleyici: sürükleme tutamakları, bırakma alanları, boş kategori ipucu. */
 .studio-handle{cursor:grab;touch-action:none;padding:.125rem}
+.studio-bulk-bar{position:sticky;top:4rem;z-index:1020}
 .studio-dropzone{border-style:dashed!important;transition:background-color .15s,border-color .15s}
 .studio-dropzone.is-dragover{background:var(--bs-primary-bg-subtle);border-color:var(--bs-primary)!important}
 .studio-section.is-dragover{outline:2px dashed var(--bs-primary);outline-offset:2px}

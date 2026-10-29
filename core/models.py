@@ -90,3 +90,46 @@ class BaseSortOrder(models.Model):
     class Meta:
         abstract = True
         ordering = ("sort_order",)
+
+
+class VideoPlatform(models.TextChoices):
+    BUNNY = "bunny", "Bunny Stream"
+    VIMEO = "vimeo", "Vimeo"
+
+
+class SiteSettings(BaseCreatedAtUpdatedAt):
+    """Sitenin tek kayıtlık ayarları; stüdyodaki "Ayarlar" sayfasından değiştirilir."""
+
+    SINGLETON_ID = 1
+
+    id = models.PositiveSmallIntegerField(primary_key=True, default=SINGLETON_ID, editable=False)
+    video_platform = models.CharField(
+        _("video platformu"),
+        max_length=20,
+        choices=VideoPlatform,
+        default=VideoPlatform.BUNNY,
+        help_text=_("Yeni yüklemeler bu platforma gider; yüklenmiş videolar kendi platformlarında oynamaya devam eder."),
+    )
+    sync_video_titles = models.BooleanField(
+        _("video başlığını platformda güncelle"),
+        default=True,
+        help_text=_(
+            "Açıksa ders ya da kurs başlığı değişince videonun platformdaki başlığı da değişir. Vimeo başlığı oynatıcıda "
+            "gösterir; Bunny'de başlık oynatıcıda görünmediği için kapatılabilir."
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("site ayarları")
+        verbose_name_plural = _("site ayarları")
+
+    def __str__(self):
+        return str(_("Site ayarları"))
+
+    @classmethod
+    def load(cls):
+        return cls.objects.get_or_create(pk=cls.SINGLETON_ID)[0]
+
+    @classmethod
+    def title_sync_enabled(cls):
+        return cls.load().sync_video_titles

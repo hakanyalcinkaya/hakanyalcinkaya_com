@@ -11,16 +11,14 @@
     {% if title_sync_total %}
     <form method="post" action="{% url 'studio:course_sync_titles' course.id %}">
       {% csrf_token %}
-      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Bunny başlıklarını eşitle ({{ title_sync_total }})</button>
+      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Platform başlıklarını eşitle ({{ title_sync_total }})</button>
     </form>
     {% endif %}
     <a href="{% url 'admin:course_course_change' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Kursu düzenle</a>
   </div>
 </div>
 
-{% if not video_service_configured %}
-<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i><code>.env</code> dosyasında <code>BUNNY_LIBRARY_ID</code> / <code>BUNNY_API_KEY</code> yok; yüklemeler hata verir.</div>
-{% endif %}
+{% include "studio/partials/_platform_alert.html" %}
 {% if not worker_online %}
 <div class="alert alert-warning small" role="alert">
   <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Celery işçisi çalışmıyor; yüklemeler "Sırada" bekler. Proje klasöründe başlat: <code>celery -A config worker -l info -P threads</code>
@@ -31,7 +29,7 @@
   <div class="row g-2 g-lg-3 align-items-center">
     <div class="col">
       <h2 id="course-preview-title" class="h6 mb-0"><i class="bi bi-film me-2 text-body-tertiary" aria-hidden="true"></i>Tanıtım videosu</h2>
-      <div class="small text-body-secondary">Kurs sayfasında görsele tıklanınca oynar. Bunny'deki başlığı kurs başlığıdır.</div>
+      <div class="small text-body-secondary">Kurs sayfasında görsele tıklanınca oynar. Video platformundaki başlığı kurs başlığıdır.</div>
     </div>
     <div class="col-12 col-md-4 col-xl-3">{% include "studio/partials/_preview_video.html" %}</div>
     <div class="col-12 col-md-auto">
@@ -47,8 +45,7 @@
 </div>
 {% url 'studio:course_videos' course.id as course_videos_url %}
 {% include "studio/partials/_upload_zone.html" with upload_url=course_videos_url hint="Bırakılan videolar Genel kategorisine eklenir; sonra kategorilere taşıyabilirsin." %}
-<div id="course-sections" class="vstack gap-3 mt-3" data-structure data-structure-url="{% url 'studio:course_structure' course.id %}" data-sortable-sections>
-  {% for section in sections %}{% include "studio/partials/_section.html" with section_no=forloop.counter %}{% endfor %}
-</div>
+{% include "studio/partials/_lesson_bulk_bar.html" %}
+{% include "studio/partials/_course_sections.html" %}
 {% include "studio/partials/_section_create_form.html" %}
 {% endblock %}

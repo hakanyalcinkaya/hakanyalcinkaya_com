@@ -1,6 +1,7 @@
 """Bunny Stream istemcisi. Video önce oluşturulur, dosya TUS ile parça parça gönderilir; kesilirse kaldığı yerden sürer.
 
-Oynatma doğrudan CDN'deki HLS listesinden yapılır (Video.js `<hls-video>`); iframe kullanılmaz.
+Oynatma doğrudan CDN'deki HLS listesinden yapılır (Video.js `<hlsjs-video>`); iframe kullanılmaz.
+Ortak platform arayüzünün Bunny karşılığıdır (bkz. `course.video_service`).
 """
 
 import base64
@@ -13,6 +14,14 @@ from pathlib import Path
 
 import requests
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+
+from course.video_service import RemoteVideo, VideoServiceError, VideoServiceNotConfigured, missing_settings
+
+LABEL = "Bunny Stream"
+# Kursun Bunny'deki koleksiyonu
+FOLDER_FIELD = "video_collection_id"
+REQUIRED_SETTINGS = ("BUNNY_LIBRARY_ID", "BUNNY_API_KEY", "BUNNY_CDN_HOST")
 
 API_ROOT = "https://video.bunnycdn.com"
 TUS_ENDPOINT = f"{API_ROOT}/tusupload"
@@ -38,14 +47,13 @@ STATE_NAMES = {
     7: "jit_segmenting",
     8: "jit_playlists_created",
 }
-
-
-class VideoServiceError(Exception):
-    pass
-
-
-class VideoServiceNotConfigured(VideoServiceError):
-    pass
+# Dosya Bunny'ye ulaştıktan sonraki aşamalar; stüdyoda açıklanır.
+STATE_LABELS = {
+    "created": _("Bunny sıraya aldı"),
+    "uploaded": _("Bunny dosyayı aldı"),
+    "processing": _("Bunny işlemeye başladı"),
+    "transcoding": _("Bunny kaliteleri hazırlıyor"),
+}
 
 
 @dataclass
@@ -65,6 +73,15 @@ class VideoStatus:
     @property
     def is_failed(self):
         return self.code in (5, 6)
+
+    @property
+    def key(self):
+        # Bunny'de oynatma için ek anahtar gerekmez (Vimeo'daki gizli bağlantı anahtarının karşılığı).
+        return ""
+
+
+def is_configured():
+    return not missing_settings(REQUIRED_SETTINGS)
 
 
 def _credentials():
@@ -108,19 +125,29 @@ def _ignore_missing(call, *args):
             raise
 
 
+def check():
+    """Bağlantıyı dener; kütüphanedeki video sayısını döner."""
+    data = api("GET", "/videos", params={"page": 1, "itemsPerPage": 1})
+    return _("Bağlantı kuruldu · kütüphanede %(count)s video") % {"count": data.get("totalItems", 0)}
+
+
 # Video ve koleksiyon
 
 
-def create_collection(name):
+def create_folder(name):
     """Kursun koleksiyonu (Vimeo'daki klasör karşılığı); kimliğini döner."""
     return api("POST", "/collections", json={"name": name})["guid"]
 
 
-def create_video(title, collection_id=""):
+def create_video(title, folder="", size=0):
     body = {"title": title}
-    if collection_id:
-        body["collectionId"] = collection_id
-    return api("POST", "/videos", json=body)["guid"]
+    if folder:
+        body["collectionId"] = folder
+    return RemoteVideo(id=api("POST", "/videos", json=body)["guid"])
+
+
+def finish_upload(video, folder):
+    """Video koleksiyonda açıldığı için gönderimden sonra yapılacak bir şey yok."""
 
 
 def video_status(video_id):
@@ -174,10 +201,10 @@ def _tus_offset(upload_url, headers):
     return int(response.headers["Upload-Offset"])
 
 
-def upload_file(video_id, path, title, on_progress=None):
+def upload_file(video, path, title, on_progress=None):
     """Dosyayı TUS ile gönderir. Hata olursa sunucudaki konumu sorup oradan devam eder; üst üste 3 hatada vazgeçer."""
     size = Path(path).stat().st_size
-    headers = _tus_headers(video_id)
+    headers = _tus_headers(video.id)
     try:
         created = requests.post(
             TUS_ENDPOINT,
@@ -262,6 +289,11 @@ def _signed(path, video_id):
     token = base64.b64encode(raw).decode().replace("+", "-").replace("/", "_").replace("=", "")
     token_path = urllib.parse.quote(directory, safe="")
     return f"https://{host}/bcdn_token={token}&expires={expires}&token_path={token_path}{path}"
+
+
+def playback(video_id, key=""):
+    """Oynatıcı verisi: HLS listesi ve kapak görseli."""
+    return {"platform": "bunny", "src": playlist_url(video_id), "poster": thumbnail_url(video_id)}
 
 
 def playlist_url(video_id):

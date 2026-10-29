@@ -1,0 +1,6 @@
+{# Yeni yüklemelerin gideceği platform; ayarları eksikse uyarı. Beklenen: video_platform (label, missing). #}
+{% if video_platform.missing %}
+<div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Yüklemeler {{ video_platform.label }} platformuna gidiyor ama <code>.env</code> dosyasında {% for name in video_platform.missing %}<code>{{ name }}</code>{% if not forloop.last %}, {% endif %}{% endfor %} yok; yüklemeler hata verir. <a href="{% url 'studio:settings' %}" class="alert-link">Ayarlar</a></div>
+{% else %}
+<p class="small text-body-secondary mb-3"><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Yeni videolar <strong>{{ video_platform.label }}</strong> platformuna yüklenir · <a href="{% url 'studio:settings' %}" class="link-secondary">değiştir</a></p>
+{% endif %}

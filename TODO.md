@@ -20,6 +20,10 @@ Sonraya bırakılan işler. Tamamlananı listeden çıkar.
 - [ ] Ders/tanıtım videosu değiştirilince eski video Bunny'de kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
 - [ ] Prod: Celery işçisini servis olarak çalıştır (systemd/supervisor), Redis'i ayrı veritabanı numarasıyla kullan; sunucuda büyük dosya yüklemesi için Nginx `client_max_body_size` ve zaman aşımı ayarları.
 
+## Öğrenci araçları (giriş yapmış ve kursu satın almış kullanıcı)
+- [ ] Video notu: oynatıcıda "Not ekle" düğmesi; not videonun o anki saniyesine kaydedilir. Oynatıcının ilerleme çubuğunda notların yerinde işaret (mark) görünür; işarete tıklanınca o saniyeye gidilir. `learning.Note` modeline saniye alanı (ör. `position_seconds`) eklenecek.
+- [ ] Favoriler (bookmark): kullanıcı kurstaki istediği dersleri favorilerine ekleyip çıkarabilir; favoriler kurs bazında listelenir (ör. kütüphane ve ders sayfasında "Favorilerim"). Yeni model gerekir (kullanıcı + ders, benzersiz).
+
 ## Diğer
 - [ ] `django-admin-sortable2` Django 6.1 desteği ekleyince projedeki uyumluluk dosyalarını sil: `templates/adminsortable2/edit_inline/*-django-6.1.html`, `static_files/adminsortable2/js/actions-6.1.js`.
 - [ ] `django-admin-honeypot-updated-2021` bakımsız; Django yükseltmesinde sorun çıkarsa kendi sahte giriş sayfamızı yaz.

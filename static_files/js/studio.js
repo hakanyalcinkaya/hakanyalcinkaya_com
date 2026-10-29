@@ -119,6 +119,7 @@
   }
 
   function moved(event) {
+    refreshSelection();
     return event.from !== event.to || event.oldIndex !== event.newIndex;
   }
 
@@ -149,13 +150,52 @@
     });
   }
 
+  // Toplu seçim: videolar tek tek ya da kategori kutusuyla seçilir; seçim varken işlem çubuğu görünür.
+  // Kısmen seçili kategorinin kutusu ara durumda gösterilir. İşlemden sonra liste yeniden çizilir, seçim sıfırlanır.
+  function refreshSelection() {
+    var bar = document.querySelector("[data-bulk-bar]");
+    if (!bar) return;
+    document.querySelectorAll("[data-section-id]").forEach(function (section) {
+      var box = section.querySelector("[data-section-check]");
+      if (!box) return;
+      var checks = section.querySelectorAll("[data-lesson-check]");
+      var checked = section.querySelectorAll("[data-lesson-check]:checked").length;
+      box.checked = checks.length > 0 && checked === checks.length;
+      box.indeterminate = checked > 0 && checked < checks.length;
+      box.disabled = checks.length === 0;
+    });
+    var count = document.querySelectorAll("[data-lesson-check]:checked").length;
+    bar.querySelector("[data-bulk-count]").textContent = count;
+    bar.classList.toggle("d-none", count === 0);
+  }
+
+  document.addEventListener("change", function (event) {
+    var sectionBox = event.target.closest("[data-section-check]");
+    if (sectionBox) {
+      sectionBox.closest("[data-section-id]").querySelectorAll("[data-lesson-check]").forEach(function (box) {
+        box.checked = sectionBox.checked;
+      });
+    }
+    if (sectionBox || event.target.closest("[data-lesson-check]")) refreshSelection();
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest("[data-bulk-clear]")) return;
+    document.querySelectorAll("[data-lesson-check]:checked").forEach(function (box) { box.checked = false; });
+    refreshSelection();
+  });
+
   function contentAdded(element) {
     initSortables(element);
     renumberAll();
+    refreshSelection();
   }
 
   if (window.htmx) window.htmx.onLoad(contentAdded);
-  document.body.addEventListener("htmx:afterSettle", renumberAll);
+  document.body.addEventListener("htmx:afterSettle", function () {
+    renumberAll();
+    refreshSelection();
+  });
 
   // Video yükleme: dosyalar adlarına göre sıralanır ve sırayla, tek tek gönderilir; her biri bir ders satırı olur.
 

@@ -25,3 +25,16 @@ Bundled license information:
    * Copyright 2022 Google LLC
    * SPDX-License-Identifier: BSD-3-Clause
    */
+
+@vimeo/player/dist/player.es.js:
+  /*! @vimeo/player v2.30.3 | (c) 2026 Vimeo | MIT License | https://github.com/vimeo/player.js */
+  /*!
+   * weakmap-polyfill v2.0.4 - ECMAScript6 WeakMap polyfill
+   * https://github.com/polygonplanet/weakmap-polyfill
+   * Copyright (c) 2015-2021 polygonplanet <polygon.planet.aqua@gmail.com>
+   * @license MIT
+   */
+  /*! Native Promise Only
+      v0.8.1 (c) Kyle Simpson
+      MIT License: http://getify.mit-license.org
+  */
