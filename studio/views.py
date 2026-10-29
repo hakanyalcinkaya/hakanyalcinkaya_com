@@ -708,10 +708,11 @@ def emails(request):
 
 
 # Bültenler: Stüdyo'da yazılır, önizlenir, yönlendirme adresine test edilir, onaylı abonelere toplu gönderilir (Celery).
-def _sample_subscriber():
+def _preview_subscriber(user):
+    """Önizleme ve test gönderimi giriş yapan yöneticinin adıyla: abone kaydı varsa o, yoksa kaydedilmemiş bir örnek."""
     from newsletter.models import Subscriber
 
-    return Subscriber(email="ayse@example.com", name="Ayşe")
+    return Subscriber.objects.by_email(user.email) or Subscriber(email=user.email, name=user.first_name)
 
 
 @staff_required
@@ -724,6 +725,8 @@ def newsletters(request):
 
 @staff_required
 def newsletter_create(request):
+    from newsletter.models import PERSONALIZATION_FIELDS
+
     form = IssueForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         issue = form.save()
@@ -734,7 +737,13 @@ def newsletter_create(request):
     return render(
         request,
         "studio/newsletter_edit.html",
-        dict(form=form, issue=None, confirmed_total=Subscriber.objects.confirmed().count(), recipient_total=Subscriber.objects.confirmed().count()),
+        dict(
+            form=form,
+            issue=None,
+            confirmed_total=Subscriber.objects.confirmed().count(),
+            recipient_total=Subscriber.objects.confirmed().count(),
+            personalization_fields=list(PERSONALIZATION_FIELDS.items()),
+        ),
     )
 
 
@@ -742,7 +751,7 @@ def newsletter_create(request):
 def newsletter_edit(request, issue_id):
     """Taslak düzenlenir ve önizlenir; gönderilmiş sayı yalnız görüntülenir (alıcılar toplu gönderim sayfasında)."""
     from mailing.emails import render_email
-    from newsletter.models import Issue, Subscriber
+    from newsletter.models import PERSONALIZATION_FIELDS, Issue, Subscriber
 
     issue = get_object_or_404(Issue.objects.select_related("batch"), pk=issue_id)
     form = IssueForm(request.POST or None, instance=issue) if issue.is_draft else None
@@ -750,7 +759,7 @@ def newsletter_edit(request, issue_id):
         form.save()
         messages.success(request, _("Taslak kaydedildi."))
         return redirect(issue)
-    subject, text, html = render_email("newsletter", issue.email_context(_sample_subscriber()))
+    subject, text, html = render_email("newsletter", issue.email_context(_preview_subscriber(request.user)))
     return render(
         request,
         "studio/newsletter_edit.html",
@@ -762,6 +771,7 @@ def newsletter_edit(request, issue_id):
             text=text,
             confirmed_total=Subscriber.objects.confirmed().count(),
             recipient_total=issue.recipients().count(),
+            personalization_fields=list(PERSONALIZATION_FIELDS.items()),
             redirect_to=settings.EMAIL_REDIRECT_TO,
             worker_online=_worker_online(),
         ),
@@ -793,7 +803,7 @@ def newsletter_send_test(request, issue_id):
     if not settings.EMAIL_REDIRECT_TO:
         return _toast(HttpResponse(), "warning", _("Yönlendirme adresi (EMAIL_REDIRECT_TO) yok; test gönderimi kapalı."))
     try:
-        send_email("newsletter", settings.EMAIL_REDIRECT_TO, issue.email_context(_sample_subscriber()))
+        send_email("newsletter", settings.EMAIL_REDIRECT_TO, issue.email_context(_preview_subscriber(request.user)))
     except (smtplib.SMTPException, OSError) as error:
         return _toast(HttpResponse(), "error", _("Gönderilemedi: %(error)s") % {"error": error})
     return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_REDIRECT_TO})

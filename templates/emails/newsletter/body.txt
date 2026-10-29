@@ -1,7 +1,5 @@
 {% extends "emails/base.txt" %}
-{% block content %}Merhaba{% if name %} {{ name }}{% endif %},
-
-{% if intro %}{{ intro }}
+{% block content %}{% if intro %}{{ intro }}
 
 {% endif %}{{ content_text }}
 {% if cta_url %}

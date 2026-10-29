@@ -518,6 +518,24 @@
     applyMarkdown(input, button.getAttribute("data-md"));
   });
 
+  // Bülten alanları ({{ ad }} vb.): düğmeye basınca en son yazılan metin alanına (yoksa içeriğe) imleç yerine eklenir.
+  var lastPersonalizeField = null;
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches && event.target.matches("[data-personalize]")) lastPersonalizeField = event.target;
+  });
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-insert-text]");
+    if (!button) return;
+    var input = lastPersonalizeField && document.body.contains(lastPersonalizeField)
+      ? lastPersonalizeField
+      : document.querySelector("[data-personalize][data-md-input]");
+    if (!input) return;
+    var text = button.getAttribute("data-insert-text");
+    input.focus();
+    input.setRangeText(text, input.selectionStart, input.selectionEnd, "end");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
   document.addEventListener("keydown", function (event) {
     if (!(event.ctrlKey || event.metaKey) || !event.target.matches || !event.target.matches("[data-md-input]")) return;
     var action = { b: "bold", i: "italic", k: "link" }[event.key.toLowerCase()];

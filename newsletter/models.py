@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import timedelta
 from functools import partial
@@ -172,10 +173,34 @@ class Subscriber(BaseModel):
         self.save(update_fields=["status", "unsubscribed_at", "updated_at"])
 
 
+# Bülten metinlerinde (başlık, giriş, içerik) kullanılabilen alanlar: {{ ad }} yazılır, her aboneye kendi değeri konur.
+# {{ ad|dostum }}: değer boşsa | sonrasındaki metin yazılır. Tanımsız alan olduğu gibi kalır.
+PERSONALIZATION_FIELDS = {
+    "ad": _("Abonenin adı (ilk kelime)"),
+    "ad_soyad": _("Abonenin yazdığı tam ad"),
+    "eposta": _("Abonenin e-posta adresi"),
+    "site": _("Sitenin adresi"),
+}
+PLACEHOLDER_RE = re.compile(r"\{\{\s*(\w+)\s*(?:\|\s*([^}]*?)\s*)?\}\}")
+
+
+def personalize(text, values):
+    """{{ alan }} ve {{ alan|yedek }} yer tutucularını values'taki değerlerle doldurur."""
+
+    def replace(match):
+        name, fallback = match.group(1), match.group(2)
+        if name not in values:
+            return match.group(0)
+        return values[name] or (fallback or "")
+
+    return PLACEHOLDER_RE.sub(replace, text or "")
+
+
 class AudienceKind(models.TextChoices):
     ALL = "all", _("Tüm aboneler")
     BUYERS = "buyers", _("Yalnız satın alanlar")
     NON_BUYERS = "non_buyers", _("Yalnız satın almayanlar")
+    SUBSCRIBERS = "subscribers", _("Sadece aboneler")
 
 
 class IssueStatus(models.TextChoices):
@@ -234,16 +259,29 @@ class Issue(BaseModel):
             self.audience, self.courses.all(), self.categories.all(), self.min_progress, self.max_progress
         )
 
+    @staticmethod
+    def personalization_values(subscriber):
+        name = (subscriber.name or "").strip()
+        return {
+            "ad": name.split()[0] if name else "",
+            "ad_soyad": name,
+            "eposta": subscriber.email,
+            "site": settings.SITE_URL.rstrip("/"),
+        }
+
     def email_context(self, subscriber):
-        """Bir abone için "newsletter" e-postasının değişkenleri (bkz. mailing.emails)."""
+        """Bir abone için "newsletter" e-postasının değişkenleri (bkz. mailing.emails); metinlerdeki {{ ad }} gibi alanlar
+        aboneye göre doldurulur (PERSONALIZATION_FIELDS)."""
         from core.markup import render_markdown
 
+        values = self.personalization_values(subscriber)
+        content = personalize(self.content, values)
         return {
             **subscriber.email_context(),
-            "headline": self.headline,
-            "intro": self.intro,
-            "content_html": render_markdown(self.content),
-            "content_text": self.content,
+            "headline": personalize(self.headline, values),
+            "intro": personalize(self.intro, values),
+            "content_html": render_markdown(content),
+            "content_text": content,
             "cta_label": self.cta_label,
             "cta_url": self.cta_url,
         }

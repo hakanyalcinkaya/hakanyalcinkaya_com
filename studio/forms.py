@@ -376,8 +376,8 @@ class ReviewImportForm(forms.ModelForm):
 
 
 class IssueForm(forms.ModelForm):
-    """Bülten sayısı (yalnız taslak düzenlenir) ve hedef kitlesi. "Tüm aboneler"de eğitim/kategori, "satın alanlar"
-    dışında bitirme oranı yok sayılır."""
+    """Bülten sayısı (yalnız taslak düzenlenir) ve hedef kitlesi. "Tüm aboneler" ve "Sadece aboneler"de eğitim/kategori,
+    "satın alanlar" dışında bitirme oranı yok sayılır."""
 
     AUDIENCE_FIELDS = ("audience", "courses", "categories", "min_progress", "max_progress")
 
@@ -390,9 +390,13 @@ class IssueForm(forms.ModelForm):
             "categories": forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
             "min_progress": forms.NumberInput(attrs={"class": "form-control form-control-sm", "min": 0, "max": 100, "placeholder": "0"}),
             "max_progress": forms.NumberInput(attrs={"class": "form-control form-control-sm", "min": 0, "max": 100, "placeholder": "100"}),
-            "headline": forms.TextInput(attrs={"class": "form-control", "placeholder": _("Ör. Yeni kurs: Django ile API")}),
-            "intro": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "content": forms.Textarea(attrs={"class": "form-control font-monospace small", "rows": 14}),
+            "headline": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": _("Ör. Yeni kurs: Django ile API"), "data-personalize": ""}
+            ),
+            "intro": forms.Textarea(attrs={"class": "form-control", "rows": 3, "data-personalize": ""}),
+            "content": forms.Textarea(
+                attrs={"class": "form-control font-monospace small", "rows": 14, "data-md-input": "", "data-personalize": ""}
+            ),
             "cta_label": forms.TextInput(attrs={"class": "form-control", "placeholder": _("Ör. Kursa göz at")}),
             "cta_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://hakanyalcinkaya.com/..."}),
         }
@@ -419,7 +423,7 @@ class IssueForm(forms.ModelForm):
         if cleaned.get("cta_url") and not cleaned.get("cta_label"):
             self.add_error("cta_label", _("Düğme bağlantısı varsa yazısı da girilmeli."))
         audience = cleaned.get("audience")
-        if audience == AudienceKind.ALL:
+        if audience in (AudienceKind.ALL, AudienceKind.SUBSCRIBERS):
             cleaned["courses"], cleaned["categories"] = Course.objects.none(), Category.objects.none()
         if audience != AudienceKind.BUYERS:
             cleaned["min_progress"] = cleaned["max_progress"] = None

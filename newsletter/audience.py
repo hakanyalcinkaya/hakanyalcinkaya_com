@@ -1,4 +1,5 @@
 """Bülten hedef kitlesi: onaylı aboneler arasından satın alma, kurs/kategori ve bitirme oranına göre seçim.
+"Sadece aboneler": hiçbir eğitimi olmayan, yalnız bültene abone kişiler (eğitim seçimi yok sayılır).
 
 Abone ile üye e-posta adresiyle eşleşir (büyük/küçük harf duyarsız). Kurs ya da kategori seçilmezse bütün kurslar
 kapsamdadır. Bitirme oranı yalnız "satın alanlar"da kullanılır: kapsamdaki kurslardan en az birinde ilerlemesi aralıkta
@@ -66,6 +67,8 @@ def subscribers(kind, courses=(), categories=(), min_progress=None, max_progress
     confirmed = Subscriber.objects.confirmed().annotate(email_lower=Lower("email"))
     if kind == AudienceKind.ALL:
         return confirmed
+    if kind == AudienceKind.SUBSCRIBERS:
+        return confirmed.exclude(email_lower__in=buyer_emails())
     course_ids = scope_courses(courses, categories)
     if kind == AudienceKind.BUYERS:
         return confirmed.filter(email_lower__in=buyer_emails(course_ids, min_progress, max_progress))

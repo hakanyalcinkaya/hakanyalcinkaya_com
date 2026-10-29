@@ -1,5 +1,13 @@
 {% extends "studio/base.html" %}
 {% block studio_title %}{% if issue %}{{ issue.headline }}{% else %}Yeni bülten{% endif %}{% endblock %}
+{% block head %}{{ block.super }}
+{# Seçilen kitlede kullanılmayan alanlar soluk ve tıklanamaz (değerleri kayıtta da yok sayılır, bkz. IssueForm). #}
+<style>
+#audience-fields:has([name=audience][value=all]:checked) .audience-scope,
+#audience-fields:has([name=audience][value=subscribers]:checked) .audience-scope,
+#audience-fields:not(:has([name=audience][value=buyers]:checked)) .audience-progress { opacity: .45; pointer-events: none; }
+</style>
+{% endblock %}
 {% block studio_content %}
 <nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:newsletters' %}" class="link-secondary text-decoration-none">Bültenler</a> <span class="text-body-tertiary">/</span></nav>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
@@ -18,7 +26,17 @@
   <div class="col-lg-6">
     <form method="post" action="{% if issue %}{{ issue.get_absolute_url }}{% else %}{% url 'studio:newsletter_create' %}{% endif %}" novalidate>
       {% csrf_token %}
-      {% for field in form %}{% if field.name not in form.AUDIENCE_FIELDS %}
+      {% for field in form %}{% if field.name == "content" %}
+      <div class="mb-3" data-md-editor>
+        <div class="d-flex flex-wrap align-items-end gap-2 mb-1">
+          <label class="form-label small mb-0 me-auto" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% include "studio/partials/_md_toolbar.html" with toolbar_class="" %}
+        </div>
+        {{ field }}
+        <div class="form-text">Markdown: <code>## başlık</code> <code>**kalın**</code> <code>- madde</code> <code>[metin](https://…)</code>. Kaydedince sağdaki önizleme güncellenir.</div>
+        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      {% elif field.name not in form.AUDIENCE_FIELDS %}
       <div class="mb-3">
         <label class="form-label small mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}
@@ -31,7 +49,7 @@
         <div class="mb-3">
           {% for radio in form.audience %}<div class="form-check form-check-inline">{{ radio.tag }}<label class="form-check-label small" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label></div>{% endfor %}
         </div>
-        <div class="row g-3 mb-3">
+        <div class="row g-3 mb-3 audience-scope">
           <div class="col-md-6">
             <div class="small fw-medium mb-1">Eğitimler</div>
             <div class="border rounded px-2 py-1 overflow-auto small" style="max-height: 12rem;">
@@ -44,9 +62,9 @@
               {% for box in form.categories %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Kategori yok.</span>{% endfor %}
             </div>
           </div>
-          <div class="col-12 form-text mt-1">Eğitim ya da kategori seçmezsen bütün eğitimler sayılır. "Tüm aboneler"de bu seçim yok sayılır. "Satın almayanlar": seçilen eğitimlerin hiçbirine sahip olmayan aboneler.</div>
+          <div class="col-12 form-text mt-1">Eğitim ya da kategori seçmezsen bütün eğitimler sayılır. "Satın almayanlar"da React seçersen React'i almamış abonelere gider. "Tüm aboneler" ve "Sadece aboneler"de (hiç eğitim almamış, yalnız bültene abone olanlar) bu seçim kullanılmaz.</div>
         </div>
-        <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small audience-progress">
           <span class="fw-medium">Bitirme oranı</span>
           <span class="input-group input-group-sm w-auto"><span class="input-group-text">en az %</span>{{ form.min_progress }}</span>
           <span class="input-group input-group-sm w-auto"><span class="input-group-text">en çok %</span>{{ form.max_progress }}</span>
@@ -63,6 +81,12 @@
     </form>
   </div>
   {% endif %}
+  {% if not issue %}
+  <div class="col-lg-6">
+    {% include "studio/partials/_newsletter_fields.html" %}
+    <div class="border rounded p-3 small text-body-secondary"><i class="bi bi-eye me-1" aria-hidden="true"></i>Önizleme, test gönderimi ve gönderim ilk kayıttan sonra burada görünür.</div>
+  </div>
+  {% endif %}
   {% if issue %}
   <div class="col-lg-{% if form %}6{% else %}12{% endif %}">
     {% if issue.is_draft %}
@@ -74,8 +98,9 @@
       <div class="form-text mb-0 mt-2">Test ve gönderim kayıtlı sürümle yapılır; değişiklikten sonra önce kaydet.{% if not worker_online %} <span class="text-danger">Celery işçisi çalışmıyor.</span>{% endif %}</div>
     </div>
     {% endif %}
+    {% if issue.is_draft %}{% include "studio/partials/_newsletter_fields.html" %}{% endif %}
     <div class="border rounded overflow-hidden">
-      <div class="small px-3 py-2 border-bottom bg-body-tertiary"><span class="text-body-secondary">Konu:</span> <strong>{{ subject }}</strong> <span class="text-body-tertiary">· örnek abone</span></div>
+      <div class="small px-3 py-2 border-bottom bg-body-tertiary"><span class="text-body-secondary">Konu:</span> <strong>{{ subject }}</strong> <span class="text-body-tertiary">· senin adınla ({{ request.user.email }})</span></div>
       <iframe title="Bülten önizlemesi" srcdoc="{{ html|force_escape }}" class="w-100 d-block bg-white" style="height: 900px; border: 0;" sandbox></iframe>
     </div>
   </div>

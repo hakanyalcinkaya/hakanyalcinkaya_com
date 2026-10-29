@@ -12,24 +12,7 @@
       <li class="nav-item"><button type="button" class="nav-link py-1 px-2 active" data-md-tab="write" aria-selected="true">Yaz</button></li>
       <li class="nav-item"><button type="button" class="nav-link py-1 px-2" data-md-tab="preview" aria-selected="false" hx-post="{% url 'studio:extra_content_preview' %}" hx-include="[data-md-input]" hx-target="#lesson-{{ lesson.id }}-md-preview">Önizleme</button></li>
     </ul>
-    <div class="btn-toolbar gap-1 ms-auto" role="toolbar" aria-label="Biçimlendirme" data-md-toolbar>
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-outline-secondary" data-md="h2" title="Başlık"><i class="bi bi-type-h2" aria-hidden="true"></i><span class="visually-hidden">Başlık</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="bold" title="Kalın (Ctrl+B)"><i class="bi bi-type-bold" aria-hidden="true"></i><span class="visually-hidden">Kalın</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="italic" title="İtalik (Ctrl+I)"><i class="bi bi-type-italic" aria-hidden="true"></i><span class="visually-hidden">İtalik</span></button>
-      </div>
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-outline-secondary" data-md="ul" title="Madde listesi"><i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden">Madde listesi</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="ol" title="Numaralı liste"><i class="bi bi-list-ol" aria-hidden="true"></i><span class="visually-hidden">Numaralı liste</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="quote" title="Alıntı"><i class="bi bi-quote" aria-hidden="true"></i><span class="visually-hidden">Alıntı</span></button>
-      </div>
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-outline-secondary" data-md="link" title="Bağlantı (Ctrl+K)"><i class="bi bi-link-45deg" aria-hidden="true"></i><span class="visually-hidden">Bağlantı</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="code" title="Kod"><i class="bi bi-code" aria-hidden="true"></i><span class="visually-hidden">Satır içi kod</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="codeblock" title="Kod bloğu"><i class="bi bi-code-square" aria-hidden="true"></i><span class="visually-hidden">Kod bloğu</span></button>
-        <button type="button" class="btn btn-outline-secondary" data-md="hr" title="Ayraç"><i class="bi bi-hr" aria-hidden="true"></i><span class="visually-hidden">Ayraç</span></button>
-      </div>
-    </div>
+    {% include "studio/partials/_md_toolbar.html" %}
   </div>
   <div class="flex-grow-1 overflow-auto px-3 py-2">
     <label class="visually-hidden" for="{{ form.extra_content.id_for_label }}">{{ form.extra_content.label }}</label>

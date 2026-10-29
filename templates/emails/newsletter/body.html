@@ -4,7 +4,6 @@
 {% block eyebrow %}Bülten{% endblock %}
 {% block heading %}{{ headline }}{% endblock %}
 {% block content %}
-<p style="margin: 0 0 14px;">Merhaba{% if name %} {{ name }}{% endif %},</p>
 {% if intro %}<p style="margin: 0 0 14px;">{{ intro }}</p>{% endif %}
 <div>{{ content_html|safe }}</div>
 {% if cta_url %}{% include "emails/modules/button.html" with url=cta_url label=cta_label|default:"Devamını oku" %}{% endif %}

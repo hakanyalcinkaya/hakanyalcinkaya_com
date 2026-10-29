@@ -1,0 +1,17 @@
+{# Bülten metinlerinde kullanılabilen alanlar; düğme alanı en son yazılan kutuya ekler (studio.js). #}
+<div class="border rounded p-3 mb-3 small">
+  <div class="fw-semibold mb-1">Kullanılabilecek alanlar</div>
+  <p class="text-body-secondary mb-2">Başlık, giriş ya da içerikte yaz; her aboneye kendi değeri konur. Tıklayınca imlecin olduğu yere eklenir. Selamlama dahil her şeyi sen yazarsın.</p>
+  <table class="table table-sm align-middle mb-2">
+    <tbody>
+      {% for name, label in personalization_fields %}
+      <tr>
+        <td class="text-nowrap"><button type="button" class="btn btn-sm btn-outline-secondary font-monospace py-0" data-insert-text="{% templatetag openvariable %} {{ name }} {% templatetag closevariable %}" title="Ekle">{% templatetag openvariable %} {{ name }} {% templatetag closevariable %}</button></td>
+        <td class="text-body-secondary">{{ label }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="text-body-secondary">Değer boşsa yedek metin: <code>{% templatetag openvariable %} ad|dostum {% templatetag closevariable %}</code> → adı yoksa “dostum”. Örnek: <code>Merhaba {% templatetag openvariable %} ad|dostum {% templatetag closevariable %},</code></div>
+  <div class="text-body-secondary mt-1">Altta “Abonelikten çık” bağlantısı her bültene kendiliğinden eklenir.</div>
+</div>
