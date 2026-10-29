@@ -1,9 +1,11 @@
 {# Başlık video platformundakinden farklıyken arka plandaki güncelleme bitene kadar birkaç saniyede bir yenilenir. #}
 {# Ayarlarda başlık güncelleme kapalıysa platformdaki başlık değişmez; rozet de gösterilmez. #}
 {% load studio_tags %}{% title_sync_enabled as sync_titles %}
-<div id="lesson-{{ lesson.id }}-title" class="d-flex flex-wrap align-items-center gap-2"{% if sync_titles and lesson.needs_video_title_sync %} hx-get="{% url 'studio:lesson_title' lesson.id %}" hx-trigger="every 5s" hx-swap="outerHTML"{% endif %}>
-  <button type="button" class="btn btn-link btn-sm p-0 link-secondary" hx-get="{% url 'studio:lesson_title' lesson.id %}?edit=1" hx-target="#lesson-{{ lesson.id }}-title" hx-swap="outerHTML" aria-label="Başlığı düzenle"><i class="bi bi-pencil" aria-hidden="true"></i></button>
-  <span class="fw-medium">{{ lesson.title }}</span>
-  {% if not lesson.is_video %}<span class="badge border text-body-secondary fw-normal">{{ lesson.get_kind_display }}</span>{% endif %}
-  {% if sync_titles and lesson.needs_video_title_sync %}<span class="badge bg-warning-subtle text-warning-emphasis fw-normal" title="{{ lesson.get_video_platform_display }} platformundaki başlık: {{ lesson.video_title|default:'—' }}"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>{{ lesson.get_video_platform_display }} başlığı güncelleniyor</span>{% endif %}
+<div id="lesson-{{ lesson.id }}-title" class="d-flex align-items-start gap-2"{% if sync_titles and lesson.needs_video_title_sync %} hx-get="{% url 'studio:lesson_title' lesson.id %}" hx-trigger="every 5s" hx-swap="outerHTML"{% endif %}>
+  <button type="button" class="btn btn-link btn-sm p-0 link-secondary flex-shrink-0" hx-get="{% url 'studio:lesson_title' lesson.id %}?edit=1" hx-target="#lesson-{{ lesson.id }}-title" hx-swap="outerHTML" aria-label="Başlığı düzenle"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+  <div class="d-flex flex-wrap align-items-center column-gap-2 min-w-0">
+    <span class="fw-medium">{{ lesson.title }}</span>
+    {% if not lesson.is_video %}<span class="badge border text-body-secondary fw-normal">{{ lesson.get_kind_display }}</span>{% endif %}
+    {% if sync_titles and lesson.needs_video_title_sync %}<span class="badge bg-warning-subtle text-warning-emphasis fw-normal" title="{{ lesson.get_video_platform_display }} platformundaki başlık: {{ lesson.video_title|default:'—' }}"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>{{ lesson.get_video_platform_display }} başlığı güncelleniyor</span>{% endif %}
+  </div>
 </div>
