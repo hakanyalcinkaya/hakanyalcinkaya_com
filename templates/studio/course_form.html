@@ -17,67 +17,74 @@
   {% endif %}
 </div>
 
-<form method="post" enctype="multipart/form-data" class="d-grid gap-4" style="max-width: 56rem">
+{# Büyük ekranda iki sütun: solda içerik, sağda yayın, fiyat, sınıflandırma ve kaydet. #}
+<form method="post" enctype="multipart/form-data" class="row g-4">
   {% csrf_token %}
-  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
-  <fieldset class="border rounded p-3 p-lg-4">
-    <legend class="h5 float-none w-auto mb-3">Genel</legend>
-    <div class="row g-3">
-      <div class="col-lg-8">{{ form.title|as_crispy_field }}</div>
-      <div class="col-lg-4">{{ form.short_title|as_crispy_field }}</div>
-      <div class="col-lg-6">{{ form.slug|as_crispy_field }}</div>
-      <div class="col-lg-6">{{ form.subtitle|as_crispy_field }}</div>
-      <div class="col-12">{{ form.description|as_crispy_field }}</div>
-      <div class="col-12">{{ form.image|as_crispy_field }}</div>
-      <div class="col-12">{{ form.access_note|as_crispy_field }}</div>
-    </div>
-  </fieldset>
-  <fieldset class="border rounded p-3 p-lg-4">
-    <legend class="h5 float-none w-auto mb-3">Fiyat (₺, KDV dahil)</legend>
-    <div class="row g-3">
-      <div class="col-sm-6">{{ form.price|as_crispy_field }}</div>
-      <div class="col-sm-6">{{ form.list_price|as_crispy_field }}</div>
-    </div>
-  </fieldset>
-  <fieldset class="border rounded p-3 p-lg-4">
-    <legend class="h5 float-none w-auto mb-3">Sınıflandırma ve eğitmenler</legend>
-    <div class="row g-3">
-      <div class="col-sm-6">{{ form.category|as_crispy_field }}</div>
-      <div class="col-sm-6">{{ form.level|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.subcategories|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.technologies|as_crispy_field }}</div>
-      <div class="col-md-4">{{ form.instructors|as_crispy_field }}</div>
-    </div>
-  </fieldset>
-  <fieldset class="border rounded p-3 p-lg-4">
-    <legend class="h5 float-none w-auto mb-1">Kurs sayfasındaki maddeler</legend>
-    <p class="small text-body-secondary">Neler öğreneceksin, özellikler, konular, kazanımlar, kimler için. Kaydedince boş satırlar atlanır; yeni satırlar için kaydedip yeniden aç.</p>
-    {{ highlights.management_form }}
-    {% if highlights.non_form_errors %}<div class="alert alert-danger small" role="alert">{{ highlights.non_form_errors|join:" " }}</div>{% endif %}
-    <div class="d-grid gap-2">
-      {% for item in highlights %}
-      <div class="row g-2 align-items-start border-bottom pb-2">
-        {% for hidden in item.hidden_fields %}{{ hidden }}{% endfor %}
-        <div class="col-sm-3">{{ item.kind }}{% for error in item.kind.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-        <div class="col-sm-3">{{ item.title }}</div>
-        <div class="col-sm">{{ item.text }}{% for error in item.text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-        {% if item.instance.created_at %}
-        <div class="col-sm-auto form-check small pt-1"><input type="checkbox" name="{{ item.DELETE.html_name }}" id="{{ item.DELETE.auto_id }}" class="form-check-input"><label for="{{ item.DELETE.auto_id }}" class="form-check-label text-danger-emphasis">Sil</label></div>
-        {% endif %}
+  {% if form.non_field_errors %}<div class="col-12"><div class="alert alert-danger small mb-0" role="alert">{{ form.non_field_errors|join:" " }}</div></div>{% endif %}
+  <div class="col-xl-8 d-grid gap-4 align-content-start">
+    <fieldset class="border rounded p-3 p-lg-4">
+      <legend class="h5 float-none w-auto mb-3">Genel</legend>
+      <div class="row g-3">
+        <div class="col-lg-8">{{ form.title|as_crispy_field }}</div>
+        <div class="col-lg-4">{{ form.short_title|as_crispy_field }}</div>
+        <div class="col-lg-6">{{ form.slug|as_crispy_field }}</div>
+        <div class="col-lg-6">{{ form.subtitle|as_crispy_field }}</div>
+        <div class="col-12">{{ form.description|as_crispy_field }}</div>
+        <div class="col-12">{{ form.image|as_crispy_field }}</div>
+        <div class="col-12">{{ form.access_note|as_crispy_field }}</div>
       </div>
-      {% endfor %}
+    </fieldset>
+    <fieldset class="border rounded p-3 p-lg-4">
+      <legend class="h5 float-none w-auto mb-1">Kurs sayfasındaki maddeler</legend>
+      <p class="small text-body-secondary">Neler öğreneceksin, özellikler, konular, kazanımlar, kimler için. Kaydedince boş satırlar atlanır; yeni satırlar için kaydedip yeniden aç.</p>
+      {{ highlights.management_form }}
+      {% if highlights.non_form_errors %}<div class="alert alert-danger small" role="alert">{{ highlights.non_form_errors|join:" " }}</div>{% endif %}
+      <div class="d-grid gap-2">
+        {% for item in highlights %}
+        <div class="row g-2 align-items-start border-bottom pb-2">
+          {% for hidden in item.hidden_fields %}{{ hidden }}{% endfor %}
+          <div class="col-sm-3">{{ item.kind }}{% for error in item.kind.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+          <div class="col-sm-3">{{ item.title }}</div>
+          <div class="col-sm">{{ item.text }}{% for error in item.text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+          {% if item.instance.created_at %}
+          <div class="col-sm-auto form-check small pt-1"><input type="checkbox" name="{{ item.DELETE.html_name }}" id="{{ item.DELETE.auto_id }}" class="form-check-input"><label for="{{ item.DELETE.auto_id }}" class="form-check-label text-danger-emphasis">Sil</label></div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+  <div class="col-xl-4">
+    <div class="d-grid gap-4">
+      <fieldset class="border rounded p-3 p-lg-4">
+        <legend class="h5 float-none w-auto mb-3">Yayın</legend>
+        <div class="row g-3">
+          <div class="col-sm-6">{{ form.status|as_crispy_field }}</div>
+          <div class="col-sm-6">{{ form.published_at|as_crispy_field }}</div>
+        </div>
+      </fieldset>
+      <fieldset class="border rounded p-3 p-lg-4">
+        <legend class="h5 float-none w-auto mb-3">Fiyat (₺, KDV dahil)</legend>
+        <div class="row g-3">
+          <div class="col-sm-6">{{ form.price|as_crispy_field }}</div>
+          <div class="col-sm-6">{{ form.list_price|as_crispy_field }}</div>
+        </div>
+      </fieldset>
+      <fieldset class="border rounded p-3 p-lg-4">
+        <legend class="h5 float-none w-auto mb-3">Sınıflandırma ve eğitmenler</legend>
+        <div class="row g-3">
+          <div class="col-sm-6">{{ form.category|as_crispy_field }}</div>
+          <div class="col-sm-6">{{ form.level|as_crispy_field }}</div>
+          <div class="col-md-4 col-xl-12">{{ form.subcategories|as_crispy_field }}</div>
+          <div class="col-md-4 col-xl-12">{{ form.technologies|as_crispy_field }}</div>
+          <div class="col-md-4 col-xl-12">{{ form.instructors|as_crispy_field }}</div>
+        </div>
+      </fieldset>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a href="{% if is_new %}{% url 'studio:course_list' %}{% else %}{% url 'studio:course_detail' course.id %}{% endif %}" class="btn btn-outline-secondary">Vazgeç</a>
+      </div>
     </div>
-  </fieldset>
-  <fieldset class="border rounded p-3 p-lg-4">
-    <legend class="h5 float-none w-auto mb-3">Yayın</legend>
-    <div class="row g-3">
-      <div class="col-sm-6">{{ form.status|as_crispy_field }}</div>
-      <div class="col-sm-6">{{ form.published_at|as_crispy_field }}</div>
-    </div>
-  </fieldset>
-  <div class="d-flex gap-2">
-    <button type="submit" class="btn btn-primary">Kaydet</button>
-    <a href="{% if is_new %}{% url 'studio:course_list' %}{% else %}{% url 'studio:course_detail' course.id %}{% endif %}" class="btn btn-outline-secondary">Vazgeç</a>
   </div>
 </form>
 {% endblock %}
