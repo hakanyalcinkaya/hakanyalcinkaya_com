@@ -20,17 +20,18 @@
     </div>
 
     <div id="mobil-menu" class="collapse navbar-collapse hy-nav-center">
-      <ul class="navbar-nav gap-lg-3 pt-3 pt-lg-0">
+      {# Site bağlantıları: masaüstünde ortada; mobilde yalnız misafire (üyede menü mobile_account.html). #}
+      <ul class="navbar-nav gap-lg-3 pt-3 pt-lg-0{% if nav_member %} d-none d-lg-flex{% endif %}">
         {% for item in nav_items %}
         <li class="nav-item"><a href="{{ item.href }}" data-nav="{{ item.id }}" class="nav-link d-flex justify-content-between align-items-center">{{ item.label }}<i class="bi bi-chevron-right small d-lg-none text-body-tertiary" data-nav-chevron aria-hidden="true"></i></a></li>
         {% endfor %}
       </ul>
+      {% if not nav_member %}
       <div class="row g-2 py-3 d-lg-none">
-        {% if not nav_member %}
         <div class="col-6"><a href="{{ login_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
-        {% endif %}
-        <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{% url 'page:course_list' %}" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
+        <div class="col-6"><a href="{% url 'page:course_list' %}" data-nav="egitimler" class="btn btn-primary btn-lg fs-6 w-100">Kurslar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
       </div>
+      {% endif %}
       {% include "_base/mobile_account.html" %}
     </div>
   </div>

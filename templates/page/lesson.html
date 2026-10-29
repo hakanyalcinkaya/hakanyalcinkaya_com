@@ -41,16 +41,17 @@
   {# Mobil menü: geniş ekranda üst çubukta görünen bağlantılar ve düğmeler. #}
   <div id="mobil-menu" class="collapse w-100 d-lg-none border-top mt-2">
     <div class="container-fluid px-3 px-md-4">
+      {% if not nav_member %}
       <ul class="navbar-nav pt-2">
         <li class="nav-item"><a href="#ders-listesi" data-nav="ders-listesi" class="nav-link d-flex justify-content-between align-items-center">Ders listesi<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
         <li class="nav-item"><a href="{{ course.url }}" class="nav-link d-flex justify-content-between align-items-center">{{ course.short }}<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
         {% if nav_member %}<li class="nav-item"><a href="{{ library_url }}" class="nav-link d-flex justify-content-between align-items-center">Kurslarım<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>{% endif %}
         <li class="nav-item"><a href="{% url 'page:course_list' %}" class="nav-link d-flex justify-content-between align-items-center">Tüm Kurslar<i class="bi bi-chevron-right small text-body-tertiary" aria-hidden="true"></i></a></li>
       </ul>
+      {% endif %}
+      {% include "_base/mobile_account.html" with lesson_links=True %}
+      {% if not nav_member or preview %}
       <div class="row g-2 py-3">
-        {% if show_cart %}
-        <div class="col-12"><a href="{{ cart_url }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-bag me-2" aria-hidden="true"></i>Sepet{% if cart_count %} ({{ cart_count }}){% endif %}</a></div>
-        {% endif %}
         {% if not nav_member %}
         <div class="col-6"><a href="{{ login_url }}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
         {% endif %}
@@ -58,7 +59,7 @@
         <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 w-100">Satın al · {{ course.price }}</a></div>
         {% endif %}
       </div>
-      {% include "_base/mobile_account.html" with show_library=False %}
+      {% endif %}
     </div>
   </div>
 </nav>
