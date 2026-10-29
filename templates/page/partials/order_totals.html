@@ -1,0 +1,9 @@
+{# Sepet ve ödeme özeti: liste fiyatı toplamı, toplam indirim tutarı (varsa) ve ödenecek toplam (KDV dahil). #}
+{% if summary.saving %}
+<div class="d-flex justify-content-between small text-body-secondary"><span>Liste fiyatı ({{ summary.count }} kurs)</span><span>{{ summary.list_total }}</span></div>
+<div class="d-flex justify-content-between small text-success-emphasis mt-1"><span>İndirim</span><span>−{{ summary.saving }}</span></div>
+{% else %}
+<div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam ({{ summary.count }} kurs)</span><span>{{ summary.subtotal }}</span></div>
+{% endif %}
+<hr>
+<div class="d-flex justify-content-between align-items-baseline"><span class="fw-semibold">Toplam <span class="small fw-normal text-body-tertiary">(KDV dahil)</span></span><span class="fs-3 fw-semibold">{{ summary.total }}</span></div>

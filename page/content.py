@@ -180,7 +180,7 @@ def _course_card(course, flat):
         short=course.short_title,
         price=format_try(course.price),
         list_price=format_try(course.list_price) if course.has_list_discount else "",
-        discount_percent=course.discount_percent,
+        list_amount=course.list_price if course.has_list_discount else None,
         amount=course.price,
         lessons=len(flat),
         minutes=minutes,
@@ -271,10 +271,15 @@ def cart_remove(request, slug):
 def order_summary(items):
     """Sepet özeti; tutarlar kartlardaki `amount` (₺, KDV dahil) ile."""
     total = sum((item["amount"] for item in items), Decimal("0"))
+    # Liste fiyatı olan kursta indirim = liste fiyatı − satış fiyatı; sepette toplam indirim tutarı gösterilir.
+    list_total = sum((item.get("list_amount") or item["amount"] for item in items), Decimal("0"))
+    saving = list_total - total
     return {
         "items": items,
         "count": len(items),
         "count_text": f"{len(items)} kurs",
+        "list_total": format_try(list_total),
+        "saving": format_try(saving) if saving > 0 else "",
         "subtotal": format_try(total),
         "coupon": None,
         "coupon_pct": 0,
