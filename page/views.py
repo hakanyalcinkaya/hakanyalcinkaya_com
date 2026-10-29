@@ -154,6 +154,7 @@ def course_detail(request, slug):
             **page,
             **review_context,
             "form": form,
+            "course_schema": content.course_schema(page["course"], page["detail"], request.build_absolute_uri(page["course"]["url"])),
         },
     )
 

@@ -253,6 +253,9 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .studio-extra-drop.is-dragover{border-color:var(--bs-primary)!important;background:var(--bs-primary-bg-subtle)}
 .studio-dialog{width:min(56rem,95vw);height:min(44rem,90vh);padding:0;border:1px solid var(--bs-border-color);border-radius:var(--bs-border-radius-lg);background:var(--bs-body-bg);color:var(--bs-body-color)}
 .studio-dialog::backdrop{background:rgba(0,0,0,.6)}
+/* Kurs sayfası mobil satın alma çubuğu; görünürken sayfanın sonu çubuğun altında kalmaz. */
+.hy-buy-bar{z-index:1025;padding-bottom:calc(.5rem + env(safe-area-inset-bottom))!important}
+@media (max-width:991.98px){body.has-buy-bar{padding-bottom:4.5rem}}
 /* Stüdyo menüsü: bağlantılar sade, geçerli bölüm vurgu renginde. */
 .studio-nav-link{color:var(--bs-secondary-color);text-decoration:none;font-size:inherit}
 .studio-nav-link:hover,.studio-nav-link.active{color:var(--bs-emphasis-color)}

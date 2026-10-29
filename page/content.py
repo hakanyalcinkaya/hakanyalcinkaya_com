@@ -9,6 +9,7 @@ import json
 from collections import defaultdict
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
@@ -453,3 +454,24 @@ def rating_by_slug():
 def with_ratings(cards):
     ratings = rating_by_slug()
     return [dict(card, rating=ratings.get(card["slug"])) for card in cards]
+
+
+def course_schema(course, detail, url):
+    """Kurs sayfasının schema.org Course verisi (JSON-LD); <script> içine güvenle yazılır."""
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": course["title"],
+        "description": detail["subtitle"],
+        "url": url,
+        "inLanguage": "tr",
+        "provider": {"@type": "Person", "name": "Hakan Yalçınkaya", "url": settings.SITE_URL},
+        "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online"},
+    }
+    amount = course.get("amount")
+    if amount is not None and course.get("price", "").startswith("₺"):
+        data["offers"] = {"@type": "Offer", "category": "Paid", "price": f"{amount:.2f}", "priceCurrency": "TRY", "url": url}
+    rating = course.get("rating") or {}
+    if rating.get("count"):
+        data["aggregateRating"] = {"@type": "AggregateRating", "ratingValue": rating["average"], "ratingCount": rating["count"]}
+    return json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")

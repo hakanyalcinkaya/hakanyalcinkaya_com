@@ -201,6 +201,17 @@
     syncFoldToggle();
   }
 
+  // Kurs sayfası (mobil): fiyat kartı ekranın üstünden çıkınca altta satın alma çubuğu görünür.
+  var buyBar = document.querySelector("[data-buy-bar]");
+  var buyCard = document.querySelector("[data-buy-card]");
+  if (buyBar && buyCard && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      var passed = !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0;
+      buyBar.hidden = !passed;
+      document.body.classList.toggle("has-buy-bar", passed);
+    }).observe(buyCard);
+  }
+
   // Önizleme şeridi: açılışta izlenen ders kartını şeridin ortasına getirir (ilk kart doğal olarak solda kalır).
   var previewStrip = document.querySelector("[data-preview-strip]");
   var previewCurrent = previewStrip && previewStrip.querySelector("[aria-current]");

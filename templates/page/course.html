@@ -9,6 +9,7 @@
 <meta property="og:description" content="{{ detail.subtitle }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 <link rel="canonical" href="{{ request.build_absolute_uri }}">
+<script type="application/ld+json">{{ course_schema|safe }}</script>
 {% endblock %}
 
 {% block content %}
@@ -43,9 +44,9 @@
         </div>
       </header>
 
-      <div class="d-lg-none mt-4">
+      <div class="d-lg-none mt-4" data-buy-card>
         <div class="card shadow overflow-hidden">
-          {% if course.preview_video %}{% include "page/partials/preview_media.html" with media_class=" border-bottom" %}{% endif %}
+          {% include "page/partials/preview_media.html" with media_class=" border-bottom" %}
           <div class="card-body p-4">
             <div class="d-flex align-items-baseline justify-content-between gap-3">
               <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
@@ -111,7 +112,7 @@
             <h2 id="mufredat-baslik" class="h3 fw-semibold mb-1">Müfredat</h2>
             <p class="small text-body-tertiary mb-0">{{ section_count }} bölüm · {{ course.lessons }} ders{% if preview_count %} · {{ preview_count }} ücretsiz önizleme{% endif %}</p>
           </div>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-fold-all="[data-curriculum] > details" aria-controls="mufredat-listesi" aria-expanded="true">Tümünü kapat</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-fold-all="[data-curriculum] > details" aria-controls="mufredat-listesi" aria-expanded="false">Tümünü aç</button>
         </div>
         {% if enrolled %}
         <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Bir dersi açmak için başlığına tıkla.</p>
@@ -120,7 +121,8 @@
         {% endif %}
         <div id="mufredat-listesi" class="border rounded mt-3" data-curriculum>
           {% for section in sections %}
-          <details class="hy-fold border-bottom" open>
+          {# Uzun müfredatta yalnız ilk bölüm açık gelir; "Tümünü aç" hepsini açar. #}
+          <details class="hy-fold border-bottom"{% if forloop.first %} open{% endif %}>
             <summary class="px-3 py-3">
               <span class="d-block fw-semibold">{{ section.index }}. {{ section.name }}</span>
               <span class="d-block small text-body-tertiary mt-1">{% if enrolled %}{{ section.meta_enrolled }}{% else %}{{ section.meta }}{% endif %}</span>
@@ -216,4 +218,16 @@
     {% include "components/newsletter.html" %}
   </div>
 </section>
+{% if not enrolled and not course.owned %}
+{# Mobil: fiyat kartı ekrandan çıkınca altta sabit satın alma çubuğu (site.js data-buy-bar). #}
+<div class="hy-buy-bar d-lg-none fixed-bottom border-top bg-body px-3 py-2" data-buy-bar hidden>
+  <div class="d-flex align-items-center gap-3">
+    <div class="min-w-0 flex-grow-1">
+      <div class="small text-body-tertiary text-truncate">{{ course.short }}</div>
+      <div class="fw-semibold lh-sm"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+    </div>
+    <a href="{{ course.buy_url }}" class="btn btn-primary text-nowrap">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

@@ -376,7 +376,8 @@ def _copy(course):
         "audience": detail.get("audience") or list(course.get("audience", ())),
         "access": detail.get("access")
         or "Kursa kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.",
-        "discount": detail.get("discount"),
+        # Örnek verideki indirim bağlantısı eski platforma gidiyor; sitedeki kod akışı (?kod=) gelene kadar gösterilmez.
+        "discount": None,
     }
 
 
