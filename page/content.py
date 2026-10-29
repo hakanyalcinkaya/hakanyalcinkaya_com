@@ -8,12 +8,15 @@ Taslak kurs, bölüm ve dersler yalnız personele görünür (stüdyodan yüklen
 import json
 from collections import defaultdict
 from decimal import Decimal
+from functools import lru_cache
+from pathlib import Path
 
 from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 
+from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
 from core.models import Status
@@ -28,8 +31,10 @@ from course.models import (
     rating_summary,
 )
 from learning.models import Enrollment, LessonProgress
-from cart.request_cart import current_cart
 from page import catalog
+
+# Kurs taslakları (eski platformdaki adreslerle); eski kurs adreslerini yönlendirmek için okunur.
+OUTLINE_DIR = Path(__file__).resolve().parent.parent / "course" / "outlines"
 
 FALLBACK_IMAGE = "img/courses/react.jpg"
 # Örnek veride karşılığı olmayan kursun kapağı: slug'da geçen kelimeye göre (kapak yükleme henüz yok).
@@ -40,6 +45,38 @@ LESSON_FORMAT_KEYS = {LessonKind.VIDEO: "video", LessonKind.FORM: "form", Lesson
 def visible_course(slug, user):
     courses = Course.objects.all() if user.is_staff else Course.objects.published()
     return courses.filter(slug=slug).first()
+
+
+@lru_cache(maxsize=1)
+def _legacy_section_slugs():
+    """Eski platform (Podia) kurs slug'ı → o kursun bölüm slug'ları (course/outlines taslaklarından)."""
+    slugs = {}
+    for path in OUTLINE_DIR.glob("*.json"):
+        outline = json.loads(path.read_text(encoding="utf-8"))
+        if outline.get("podia_slug"):
+            slugs[outline["podia_slug"]] = [section["slug"] for section in outline.get("sections", ())]
+    return slugs
+
+
+def moved_course(slug, user):
+    """Eski kurs adresi (Podia slug'ı): bölümleri taslaktakilerle eşleşen, görünen kurs; yoksa None.
+    Kurs sitede başka slug'la açılmış olsa da eski bağlantılar doğru kursa yönlenir."""
+    sections = _legacy_section_slugs().get(slug)
+    if not sections:
+        return None
+    courses = Course.objects.all() if user.is_staff else Course.objects.published()
+    return courses.exclude(slug=slug).filter(sections__slug__in=sections).distinct().first()
+
+
+def moved_lesson(section_slug, lesson_slug, user):
+    """Eski ders adresi: bölüm ve ders slug'ı aynı kalan tek görünen ders; yoksa (ya da birden çoksa) None."""
+    lessons = Lesson.objects.filter(section__slug=section_slug, slug=lesson_slug).select_related("section__course")
+    if not user.is_staff:
+        lessons = lessons.filter(
+            status=Status.PUBLISHED, section__status=Status.PUBLISHED, section__course__status=Status.PUBLISHED
+        )
+    matches = list(lessons[:2])
+    return matches[0] if len(matches) == 1 else None
 
 
 def lesson_visible(lesson, staff=False):

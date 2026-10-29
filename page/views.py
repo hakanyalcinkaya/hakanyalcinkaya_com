@@ -129,6 +129,9 @@ def _enrolled(request, slug):
 def course_detail(request, slug):
     # Veritabanındaki kurs (müfredat, tanıtım videosu) önce gelir; yoksa örnek veri gösterilir.
     course = content.visible_course(slug, request.user)
+    if course is None and (moved := content.moved_course(slug, request.user)) is not None:
+        # Eski platformdaki kurs adresi: kurs sitede başka slug'la açıldı.
+        return redirect(moved.get_absolute_url(), permanent=True)
     review_context = dict(reviews=reviews(), review_total=len(reviews()))
     site_rating = None
     if course is not None:
@@ -197,6 +200,12 @@ def lesson(request, course_slug, section_slug, lesson_slug):
             LessonProgress.completed_lesson_ids(request.user, content.visible_lessons(course, staff)) if enrolled else set()
         )
         page = content.find_lesson(course, section_slug, lesson_slug, enrolled=enrolled, staff=staff, completed=completed)
+    elif (moved := content.moved_lesson(section_slug, lesson_slug, request.user)) is not None:
+        # Eski ders adresi (ör. Podia'daki kurs slug'ıyla): bölüm ve ders slug'ları aynı, kurs slug'ı farklı.
+        return redirect(moved.get_absolute_url(), permanent=True)
+    elif (moved_course := content.moved_course(course_slug, request.user)) is not None:
+        # Eski kursun dersi sitede (henüz) yok ya da yayında değil: kursun sayfasına.
+        return redirect(moved_course.get_absolute_url())
     else:
         enrolled = owns_course(request.user, request.session, course_slug)
         page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
