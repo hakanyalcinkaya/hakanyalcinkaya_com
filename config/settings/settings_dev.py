@@ -24,6 +24,10 @@ INTERNAL_IPS = ["127.0.0.1", "::1"]
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "local.hakanyalcinkaya.com"]
 VIMEO_EMBED_DOMAINS = [*VIMEO_EMBED_DOMAINS, "local.hakanyalcinkaya.com"]  # noqa: F405
 SITE_URL = env("SITE_URL", default="http://local.hakanyalcinkaya.com:8001")  # noqa: F405
+# Yerel çerezler canlı siteden (hakanyalcinkaya.com) ya da eski kurulumlardan kalan aynı adlı çerezlerle çakışmasın:
+# tarayıcı iki "sessionid" gönderirse Django eskisini okur ve giriş yapılmamış görünür.
+SESSION_COOKIE_NAME = "hy_dev_sessionid"
+CSRF_COOKIE_NAME = "hy_dev_csrftoken"
 if EMAIL_TRACKING_URL:  # noqa: F405
     ALLOWED_HOSTS.append(urlparse(EMAIL_TRACKING_URL).hostname)  # noqa: F405
 
