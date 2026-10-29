@@ -372,6 +372,9 @@ def lesson_video(request, lesson_id):
         form.save(request.user)
         response = render(request, "studio/partials/_video_queued.html", dict(lesson=_lesson(lesson_id)))
         return _toast(response, "success", _("Video sunucuya ulaştı; %(platform)s platformuna gönderiliyor.") % {"platform": _platform_label()})
+    if is_post and not request.htmx:
+        # Yükleme sırası (studio.js) düz istek gönderir; hata metni sıradaki dosyanın satırına yazılır.
+        return HttpResponseBadRequest(_first_error(form))
     return render(request, "studio/partials/_video_form.html", dict(lesson=lesson, form=form))
 
 

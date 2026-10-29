@@ -43,7 +43,7 @@
     form.querySelectorAll("button").forEach(function (button) { button.disabled = false; });
   });
   window.addEventListener("beforeunload", function (event) {
-    if (!pending && !uploadQueue.length && !bulkQueue.length && !bulkBusy) return;
+    if (!pending && !uploading && !uploadQueue.length && !bulkQueue.length && !bulkBusy) return;
     event.preventDefault();
     event.returnValue = "";
   });
@@ -227,25 +227,37 @@
   });
 
   // Video yükleme: dosyalar adlarına göre sıralanır ve sırayla, tek tek gönderilir; her biri bir ders satırı olur.
+  // Ders satırına bırakılan video da aynı sıraya girer, o dersin videosu olur; beklemeden sonraki satıra geçilebilir.
 
   var uploading = false;
+
+  function queueItem(zone, label) {
+    var item = document.createElement("li");
+    item.innerHTML =
+      '<div class="d-flex justify-content-between gap-2"><span class="text-truncate" data-upload-name></span>' +
+      '<span class="text-body-secondary text-nowrap" data-upload-state>Bekliyor</span></div>' +
+      '<div class="progress studio-progress mt-1" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:0%"></div></div>';
+    item.querySelector("[data-upload-name]").textContent = label;
+    zone.querySelector("[data-upload-list]").appendChild(item);
+    return item;
+  }
 
   function enqueue(zone, fileList) {
     var files = Array.prototype.filter.call(fileList, function (file) { return VIDEO_FILE.test(file.name); });
     var skipped = fileList.length - files.length;
     if (skipped) toast("warning", skipped + " dosya video olmadığı için atlandı.");
     files.sort(function (a, b) { return a.name.localeCompare(b.name, "tr", { numeric: true }); });
-    var list = zone.querySelector("[data-upload-list]");
     files.forEach(function (file) {
-      var item = document.createElement("li");
-      item.innerHTML =
-        '<div class="d-flex justify-content-between gap-2"><span class="text-truncate" data-upload-name></span>' +
-        '<span class="text-body-secondary text-nowrap" data-upload-state>Bekliyor</span></div>' +
-        '<div class="progress studio-progress mt-1" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:0%"></div></div>';
-      item.querySelector("[data-upload-name]").textContent = file.name;
-      list.appendChild(item);
-      uploadQueue.push({ zone: zone, file: file, item: item });
+      uploadQueue.push({ url: zone.getAttribute("data-upload-url"), file: file, item: queueItem(zone, file.name), place: placeLesson });
     });
+    pump();
+  }
+
+  function enqueueLesson(row, file) {
+    var zone = row.closest("[data-upload-zone]");
+    var number = row.querySelector("[data-lesson-no]");
+    var label = file.name + (number ? " → " + number.textContent.trim() : "");
+    uploadQueue.push({ url: row.getAttribute("data-video-url"), file: file, item: queueItem(zone, label), place: placeVideoCell });
     pump();
   }
 
@@ -266,7 +278,7 @@
     data.append("file", job.file);
     return new Promise(function (resolve) {
       var xhr = new XMLHttpRequest();
-      xhr.open("POST", job.zone.getAttribute("data-upload-url"));
+      xhr.open("POST", job.url);
       xhr.setRequestHeader("X-CSRFToken", csrfToken());
       xhr.upload.onprogress = function (event) {
         if (!event.lengthComputable) return;
@@ -281,7 +293,7 @@
           return resolve();
         }
         state.textContent = "Sunucuda";
-        placeLesson(xhr).then(function () {
+        job.place(xhr).then(function () {
           job.item.remove();
           resolve();
         });
@@ -328,6 +340,34 @@
         contentAdded(sections.firstElementChild);
       });
   }
+
+  // Ders videosu yanıtı yalnız video hücresidir (hx-swap-oob); hücre yerinde değişir ve durumunu kendisi yeniler.
+  function placeVideoCell(xhr) {
+    var box = document.createElement("div");
+    box.innerHTML = xhr.responseText;
+    Array.prototype.slice.call(box.children).forEach(function (cell) {
+      var existing = cell.id && document.getElementById(cell.id);
+      if (!existing) return;
+      cell.removeAttribute("hx-swap-oob");
+      existing.replaceWith(cell);
+      window.htmx.process(cell);
+    });
+    return Promise.resolve();
+  }
+
+  // "Videoyu değiştir" formu dosyayı kendisi göndermez: dosya sıraya girer, form kapanır.
+  document.body.addEventListener("htmx:confirm", function (event) {
+    var form = event.detail.elt;
+    if (!form.matches || !form.matches("[data-upload-queue]")) return;
+    var input = form.querySelector('input[type="file"]');
+    var row = form.closest("[data-video-url]");
+    var file = input && input.files[0];
+    // Dosya yoksa ya da video değilse form sunucuya gider, hatayı formda gösterir.
+    if (!row || !file || !VIDEO_FILE.test(file.name)) return;
+    event.preventDefault();
+    enqueueLesson(row, file);
+    form.closest('[id$="-form"]').innerHTML = "";
+  });
 
   document.addEventListener("change", function (event) {
     var input = event.target;
@@ -636,6 +676,13 @@
       } else {
         toast("warning", kind === "subtitle" ? "Bu alana SRT ya da VTT dosyası bırak." : "Bu alana Markdown, TXT ya da HTML dosyası bırak.");
       }
+      return;
+    }
+    // Satıra tek video bırakıldıysa o derse gider; birden çok video kategoriye bırakılmış sayılır (ada göre eşleşir).
+    var lessonRow = event.target.closest && event.target.closest("[data-video-url]");
+    var videos = files.filter(function (file) { return VIDEO_FILE.test(file.name); });
+    if (lessonRow && videos.length === 1) {
+      enqueueLesson(lessonRow, videos[0]);
       return;
     }
     var row = event.target.closest && event.target.closest("[data-subtitle-drop]");
