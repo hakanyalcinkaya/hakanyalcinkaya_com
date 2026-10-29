@@ -1,0 +1,9 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Öğrenciler{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Öğrenciler</h1>
+  <p class="text-body-secondary mb-0">Üyeler ve kurs erişimleri. Üyenin sayfasından elle kurs açabilir, erişim kaldırabilir, hesabı kapatabilirsin.</p>
+</div>
+{% include "studio/partials/_students_list.html" %}
+{% endblock %}

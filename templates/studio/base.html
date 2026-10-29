@@ -4,20 +4,46 @@
 {% block head %}<meta name="robots" content="noindex">{% endblock %}
 {% block navbar %}
 <nav class="navbar sticky-top bg-body border-bottom" aria-label="Stüdyo menüsü">
-  <div class="container d-flex align-items-center gap-3">
+  {% studio_section as section %}{% busy_upload_total as busy_total %}{% pending_review_total as pending_reviews %}
+  <div class="container d-flex flex-wrap align-items-center column-gap-3 row-gap-2">
     <a href="{% url 'studio:course_list' %}" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6 me-auto">
       <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>Stüdyo
     </a>
-    {% busy_upload_total as busy_total %}
-    <a href="{% url 'studio:queue' %}" class="link-secondary small text-decoration-none"><i class="bi bi-list-task me-1" aria-hidden="true"></i>Kuyruk{% if busy_total %} <span class="badge text-bg-primary">{{ busy_total }}</span>{% endif %}</a>
-    {% pending_review_total as pending_reviews %}
-    <a href="{% url 'studio:reviews' %}" class="link-secondary small text-decoration-none"><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Yorumlar{% if pending_reviews %} <span class="badge text-bg-warning">{{ pending_reviews }}</span>{% endif %}</a>
-    <a href="{% url 'studio:emails' %}" class="link-secondary small text-decoration-none"><i class="bi bi-envelope me-1" aria-hidden="true"></i>E-postalar</a>
-    <a href="{% url 'studio:newsletters' %}" class="link-secondary small text-decoration-none"><i class="bi bi-megaphone me-1" aria-hidden="true"></i>Bültenler</a>
-    <a href="{% url 'studio:subscribers' %}" class="link-secondary small text-decoration-none"><i class="bi bi-people me-1" aria-hidden="true"></i>Aboneler</a>
-    <a href="{% url 'studio:settings' %}" class="link-secondary small text-decoration-none"><i class="bi bi-gear me-1" aria-hidden="true"></i>Ayarlar</a>
-    <a href="{% url 'admin:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-sliders me-1" aria-hidden="true"></i>Django admin</a>
-    <a href="{% url 'page:index' %}" class="link-secondary small text-decoration-none"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Siteye dön</a>
+    <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 small">
+      <a href="{% url 'studio:course_list' %}" class="studio-nav-link{% if section == 'courses' %} active{% endif %}"{% if section == 'courses' %} aria-current="page"{% endif %}><i class="bi bi-collection-play me-1" aria-hidden="true"></i>Kurslar</a>
+      <div class="dropdown" data-dropdown>
+        <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'catalog' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-catalog-menu"><i class="bi bi-boxes me-1" aria-hidden="true"></i>Katalog<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
+        <ul id="studio-catalog-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">
+          <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'bundles' %}"><i class="bi bi-stack me-2 text-body-tertiary" aria-hidden="true"></i>Paketler</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'discounts' %}"><i class="bi bi-ticket-perforated me-2 text-body-tertiary" aria-hidden="true"></i>İndirim kodları</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'categories' %}"><i class="bi bi-diagram-3 me-2 text-body-tertiary" aria-hidden="true"></i>Kategoriler</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'technologies' %}"><i class="bi bi-cpu me-2 text-body-tertiary" aria-hidden="true"></i>Teknolojiler</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'instructors' %}"><i class="bi bi-person-video3 me-2 text-body-tertiary" aria-hidden="true"></i>Eğitmenler</a></li>
+        </ul>
+      </div>
+      <div class="dropdown" data-dropdown>
+        <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'sales' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-sales-menu"><i class="bi bi-receipt me-1" aria-hidden="true"></i>Satışlar<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
+        <ul id="studio-sales-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">
+          <li><a class="dropdown-item" href="{% url 'studio:orders' %}"><i class="bi bi-receipt me-2 text-body-tertiary" aria-hidden="true"></i>Siparişler</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:carts' %}"><i class="bi bi-cart me-2 text-body-tertiary" aria-hidden="true"></i>Sepetler</a></li>
+        </ul>
+      </div>
+      <a href="{% url 'studio:students' %}" class="studio-nav-link{% if section == 'students' %} active{% endif %}"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Öğrenciler</a>
+      <a href="{% url 'studio:reviews' %}" class="studio-nav-link{% if section == 'reviews' %} active{% endif %}"><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Yorumlar{% if pending_reviews %} <span class="badge text-bg-warning">{{ pending_reviews }}</span>{% endif %}</a>
+      <div class="dropdown" data-dropdown>
+        <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'mail' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-mail-menu"><i class="bi bi-envelope me-1" aria-hidden="true"></i>E-posta<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
+        <ul id="studio-mail-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">
+          <li><a class="dropdown-item" href="{% url 'studio:emails' %}"><i class="bi bi-envelope me-2 text-body-tertiary" aria-hidden="true"></i>Şablonlar</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:email_log' %}"><i class="bi bi-journal-text me-2 text-body-tertiary" aria-hidden="true"></i>Gönderim günlüğü</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:newsletters' %}"><i class="bi bi-megaphone me-2 text-body-tertiary" aria-hidden="true"></i>Bültenler</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:subscribers' %}"><i class="bi bi-people me-2 text-body-tertiary" aria-hidden="true"></i>Aboneler</a></li>
+        </ul>
+      </div>
+      <a href="{% url 'studio:queue' %}" class="studio-nav-link{% if section == 'queue' %} active{% endif %}"><i class="bi bi-list-task me-1" aria-hidden="true"></i>Kuyruk{% if busy_total %} <span class="badge text-bg-primary">{{ busy_total }}</span>{% endif %}</a>
+      <a href="{% url 'studio:settings' %}" class="studio-nav-link{% if section == 'settings' %} active{% endif %}"><i class="bi bi-gear me-1" aria-hidden="true"></i>Ayarlar</a>
+      <a href="{% url 'page:index' %}" class="studio-nav-link"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Siteye dön</a>
+    </div>
   </div>
 </nav>
 {% endblock %}
@@ -31,4 +57,4 @@
 <dialog class="studio-dialog" id="studio-dialog" aria-label="Düzenleyici"><div id="studio-dialog-body" class="h-100"></div></dialog>
 {% endblock %}
 {% block scripts %}<script src="{% static 'js/sortable.min.js' %}"></script>
-<script src="{% static 'js/studio.js' %}"></script>{% endblock %}
+<script src="{% static 'js/studio.js' %}"></script>{% block studio_scripts %}{% endblock %}{% endblock %}

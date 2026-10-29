@@ -1,0 +1,54 @@
+{% extends "studio/base.html" %}
+{% load core_tags %}
+{% block studio_title %}{{ course.title }} · İstatistikler{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a> <span class="text-body-tertiary">/</span> <a href="{% url 'studio:course_detail' course.id %}" class="link-secondary text-decoration-none">{{ course.title }}</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">İstatistikler</h1>
+    <p class="text-body-secondary mb-0">İzleme oranı yayındaki derslerden tamamlananların payıdır. Gelir yalnız kursun tek başına satıldığı siparişlerden.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'studio:course_detail' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-collection-play me-1" aria-hidden="true"></i>İçerik ve videolar</a>
+    <a href="{% url 'studio:course_edit' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Kurs bilgileri</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">Kayıtlı öğrenci</div>
+    <div class="fs-3 fw-semibold">{{ stats.enrollment_total }}</div>
+    <div class="small text-body-tertiary">{% for source in stats.sources %}{{ source.label }} {{ source.count }}{% if not forloop.last %} · {% endif %}{% empty %}Henüz kayıt yok{% endfor %}</div>
+  </div></div>
+  <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">İzlemeye başlayan</div>
+    <div class="fs-3 fw-semibold">{{ stats.started_total }}</div>
+    <div class="small text-body-tertiary">Ortalama izleme %{{ stats.average_progress }} · {{ stats.finished_total }} kişi bitirdi</div>
+  </div></div>
+  <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">Satın alan</div>
+    <div class="fs-3 fw-semibold">{{ stats.buyer_total }}</div>
+    <div class="small text-body-tertiary">{% for row in stats.revenue %}{% if row.order__currency == "TRY" %}{{ row.total|money }}{% else %}{{ row.total }} {{ row.order__currency }}{% endif %} ({{ row.count }}){% if not forloop.last %} · {% endif %}{% empty %}Tek başına satış yok{% endfor %}{% if stats.bundle_sale_total %} · {{ stats.bundle_sale_total }} paketle{% endif %}</div>
+  </div></div>
+  <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">Sepete ekleyip almayan</div>
+    <div class="fs-3 fw-semibold">{{ stats.cart_member_total|add:stats.cart_guest_total }}</div>
+    <div class="small text-body-tertiary">{{ stats.cart_member_total }} üye · {{ stats.cart_guest_total }} misafir{% if stats.unfinished_total %} · {{ stats.unfinished_total }} ödemede bıraktı{% endif %}</div>
+  </div></div>
+</div>
+
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="progress-title">
+  <h2 id="progress-title" class="h6 mb-3">İzleme oranı dağılımı</h2>
+  <div class="d-grid gap-2">
+    {% for bucket in stats.buckets %}
+    <a href="?sekme=ogrenciler&oran={{ bucket.key }}" class="row g-2 align-items-center small text-decoration-none link-body-emphasis" hx-get="{% url 'studio:course_stats' course.id %}?sekme=ogrenciler&oran={{ bucket.key }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true">
+      <span class="col-4 col-md-2">{{ bucket.label }}</span>
+      <span class="col"><span class="studio-bar d-block" role="img" aria-label="%{{ bucket.percent }}"><span style="width: {{ bucket.percent }}%"></span></span></span>
+      <span class="col-3 col-md-2 text-end text-body-secondary">{{ bucket.count }} kişi · %{{ bucket.percent }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% include "studio/partials/_course_stats_list.html" %}
+{% endblock %}

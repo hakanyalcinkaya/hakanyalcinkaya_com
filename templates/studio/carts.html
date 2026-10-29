@@ -1,0 +1,9 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Sepetler{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Sepetler</h1>
+  <p class="text-body-secondary mb-0">İçinde ürün olan sepetler. Boşaltılan sepet silinmez; ödemeyle siparişe dönüşür. Kurs bazında “sepette bırakanlar” kursun istatistik sayfasında.</p>
+</div>
+{% include "studio/partials/_carts_list.html" %}
+{% endblock %}

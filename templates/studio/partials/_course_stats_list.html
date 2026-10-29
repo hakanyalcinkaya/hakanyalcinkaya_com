@@ -1,0 +1,45 @@
+{# Kurs istatistiği listeleri; sekme, oran, filtre ve arama GET parametresinde, HTMX ile yalnız bu blok yenilenir. #}
+<div id="course-stats-list">
+  <ul class="nav nav-underline mb-3 small">
+    {% for key, label in tabs %}
+    <li class="nav-item"><a class="nav-link{% if key == tab %} active{% endif %}" href="{{ list_url }}?sekme={{ key }}" hx-get="{{ list_url }}?sekme={{ key }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true"{% if key == tab %} aria-current="page"{% endif %}>{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if tab == "satin-alanlar" %}
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    <input type="hidden" name="sekme" value="{{ tab }}">
+    {% include "studio/partials/_order_filter_fields.html" with filters=filters %}
+  </form>
+  {% if revenue %}<p class="small text-body-secondary">{% include "studio/partials/_revenue.html" %}</p>{% endif %}
+  <div class="list-group">{% include "studio/partials/stats/_satin-alanlar_rows.html" %}</div>
+  {% elif tab == "sepette" %}
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    <input type="hidden" name="sekme" value="{{ tab }}">
+    <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Üye e-postası" aria-label="Üye e-postası ara">
+  </form>
+  <p class="small text-body-secondary">Sepetinde bu kurs (ya da kursu içeren bir paket) duran ya da sepetini boşaltan, kursa kayıtlı olmayan kişiler.</p>
+  <div class="list-group mb-4">{% include "studio/partials/stats/_sepette_rows.html" %}</div>
+  {% if unfinished %}
+  <h3 class="h6">Ödeme adımında bırakanlar</h3>
+  <div class="list-group">
+    {% for order in unfinished %}
+    <a href="{% url 'studio:order_detail' order.id %}" class="list-group-item list-group-item-action d-flex flex-wrap gap-2 py-2 small">
+      <span class="fw-medium">{{ order.email }}</span><span class="text-body-secondary">{{ order.number }} · {{ order.get_status_display }}</span>
+      <span class="ms-auto text-body-tertiary">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% else %}
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    <input type="hidden" name="sekme" value="{{ tab }}">
+    <select name="oran" class="form-select form-select-sm w-auto" aria-label="İzleme oranı">
+      <option value="">Tüm oranlar</option>
+      {% for key, label, low, high in buckets %}<option value="{{ key }}"{% if key == bucket %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Ad ya da e-posta" aria-label="Ad ya da e-posta ara">
+    <span class="small text-body-tertiary">{{ page.paginator.count }} öğrenci</span>
+  </form>
+  <div class="list-group">{% include "studio/partials/stats/_ogrenciler_rows.html" %}</div>
+  {% endif %}
+</div>

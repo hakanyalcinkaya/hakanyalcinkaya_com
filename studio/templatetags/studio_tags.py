@@ -46,3 +46,37 @@ def video_platform_label():
     from course import video_service
 
     return video_service.current().LABEL
+
+
+# Kaydırınca yüklenen listeler: sayfanın sonundaki gözcü satır görünür olunca sonraki sayfanın satırları istenir.
+ROWS_PARAM = "parca"
+
+
+@register.simple_tag(takes_context=True)
+def next_rows_url(context, page):
+    """Geçerli filtrelerle sonraki sayfanın yalnız satırlarını isteyen adres (?...&sayfa=N&parca=satir)."""
+    request = context["request"]
+    params = request.GET.copy()
+    params["sayfa"] = page.next_page_number()
+    params[ROWS_PARAM] = "satir"
+    return f"{request.path}?{params.urlencode()}"
+
+
+NAV_SECTIONS = (
+    ("courses", ("course_", "section_", "lesson_", "extra_content", "subtitle_")),
+    ("catalog", ("catalog_",)),
+    ("sales", ("order", "cart")),
+    ("students", ("student", "enrollment")),
+    ("reviews", ("review",)),
+    ("mail", ("email", "newsletter", "subscriber")),
+    ("queue", ("queue", "upload_")),
+    ("settings", ("settings",)),
+)
+
+
+@register.simple_tag(takes_context=True)
+def studio_section(context):
+    """Menüde vurgulanacak bölüm (geçerli adresin adına göre)."""
+    match = getattr(context.get("request"), "resolver_match", None)
+    name = match.url_name if match else ""
+    return next((section for section, prefixes in NAV_SECTIONS if name.startswith(prefixes)), "")

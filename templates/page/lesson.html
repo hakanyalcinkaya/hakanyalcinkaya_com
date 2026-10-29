@@ -97,7 +97,7 @@
             <div class="position-relative text-center text-white px-3">
               <i class="bi bi-camera-video-off fs-1" aria-hidden="true"></i>
               <p class="mt-2 mb-0">Bu dersin videosu henüz hazır değil.</p>
-              {% if request.user.is_staff and current.object %}<a href="{% url 'studio:course_detail' current.object.section.course_id %}#lesson-{{ current.object.id }}" class="btn btn-outline-light btn-sm mt-3">Stüdyo'da video yükle</a>{% endif %}
+              {% if request.user.is_superuser and current.object %}<a href="{% url 'studio:course_detail' current.object.section.course_id %}#lesson-{{ current.object.id }}" class="btn btn-outline-light btn-sm mt-3">Stüdyo'da video yükle</a>{% endif %}
             </div>
           </div>
         </div>

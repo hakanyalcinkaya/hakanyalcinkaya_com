@@ -1,0 +1,9 @@
+{# Sipariş listesi; filtreler GET parametresinde, HTMX ile yalnız bu blok yenilenir, kaydırınca satırlar eklenir. #}
+{% url 'studio:orders' as orders_url %}
+<div id="order-list">
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ orders_url }}" hx-get="{{ orders_url }}" hx-target="#order-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    {% include "studio/partials/_order_filter_fields.html" %}
+  </form>
+  <p class="small text-body-secondary">{{ page.paginator.count }} sipariş{% if revenue %} · {% include "studio/partials/_revenue.html" %}{% endif %}</p>
+  <div class="list-group">{% include "studio/partials/_orders_rows.html" %}</div>
+</div>

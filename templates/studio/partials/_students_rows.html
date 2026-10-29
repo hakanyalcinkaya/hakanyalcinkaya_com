@@ -1,0 +1,15 @@
+{% load core_tags %}
+{% for member in page %}
+<a href="{% url 'studio:student_detail' member.id %}" class="list-group-item list-group-item-action py-2">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <span class="fw-medium">{{ member.display_name }}</span><span class="small text-body-secondary">{{ member.email }}</span>
+    {% if not member.is_active %}<span class="badge rounded-1 bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-medium">Kapalı</span>{% endif %}
+    {% if member.is_superuser %}<span class="badge rounded-1 border text-body-secondary fw-medium">Yönetici</span>{% endif %}
+    <time class="ms-auto small text-body-tertiary" datetime="{{ member.date_joined|date:'c' }}" title="{{ member.date_joined|date:'d.m.Y H:i' }}">{{ member.date_joined|ago }} üye oldu</time>
+  </div>
+  <div class="small text-body-secondary">{{ member.enrollment_total }} kurs · {{ member.paid_order_total }} ödenen sipariş{% if member.last_login %} · son giriş {{ member.last_login|ago }}{% endif %}</div>
+</a>
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede üye yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

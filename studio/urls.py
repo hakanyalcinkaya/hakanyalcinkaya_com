@@ -1,12 +1,16 @@
 from django.urls import path
 
-from studio import views
+from studio import views, views_catalog, views_sales
 
 app_name = "studio"
 
 urlpatterns = [
     path("", views.course_list, name="course_list"),
+    path("courses/new/", views_catalog.course_create, name="course_create"),
+    path("courses/sort/", views_catalog.course_sort, name="course_sort"),
     path("courses/<uuid:course_id>/", views.course_detail, name="course_detail"),
+    path("courses/<uuid:course_id>/edit/", views_catalog.course_edit, name="course_edit"),
+    path("courses/<uuid:course_id>/stats/", views_catalog.course_stats_view, name="course_stats"),
     path("courses/<uuid:course_id>/sync-titles/", views.course_sync_titles, name="course_sync_titles"),
     path("courses/<uuid:course_id>/videos/", views.course_videos, name="course_videos"),
     path("courses/<uuid:course_id>/structure/", views.course_structure, name="course_structure"),
@@ -42,6 +46,7 @@ urlpatterns = [
     path("settings/", views.site_settings, name="settings"),
     path("emails/", views.emails, name="emails"),
     path("subscribers/", views.subscribers, name="subscribers"),
+    path("subscribers/<uuid:subscriber_id>/<slug:action>/", views_sales.subscriber_action, name="subscriber_action"),
     path("newsletters/", views.newsletters, name="newsletters"),
     path("newsletters/new/", views.newsletter_create, name="newsletter_create"),
     path("newsletters/audience/", views.newsletter_audience, name="newsletter_audience"),
@@ -65,4 +70,18 @@ urlpatterns = [
     path("uploads/<uuid:upload_id>/retry/", views.upload_retry, name="upload_retry"),
     path("uploads/<uuid:upload_id>/cancel/", views.upload_cancel, name="upload_cancel"),
     path("uploads/<uuid:upload_id>/discard/", views.upload_discard, name="upload_discard"),
+    path("catalog/<slug:kind>/", views_catalog.catalog_list, name="catalog_list"),
+    path("catalog/<slug:kind>/new/", views_catalog.catalog_create, name="catalog_create"),
+    path("catalog/<slug:kind>/sort/", views_catalog.catalog_sort, name="catalog_sort"),
+    path("catalog/<slug:kind>/<uuid:item_id>/", views_catalog.catalog_edit, name="catalog_edit"),
+    path("catalog/<slug:kind>/<uuid:item_id>/delete/", views_catalog.catalog_delete, name="catalog_delete"),
+    path("orders/", views_sales.orders, name="orders"),
+    path("orders/<uuid:order_id>/", views_sales.order_detail, name="order_detail"),
+    path("orders/<uuid:order_id>/mark-paid/", views_sales.order_mark_paid, name="order_mark_paid"),
+    path("carts/", views_sales.carts, name="carts"),
+    path("students/", views_sales.students, name="students"),
+    path("students/<uuid:user_id>/", views_sales.student_detail, name="student_detail"),
+    path("students/<uuid:user_id>/enroll/", views_sales.student_enroll, name="student_enroll"),
+    path("students/<uuid:user_id>/access/", views_sales.student_access, name="student_access"),
+    path("enrollments/<uuid:enrollment_id>/delete/", views_sales.enrollment_delete, name="enrollment_delete"),
 ]

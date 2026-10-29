@@ -1,0 +1,1 @@
+{% if item.status == "published" %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">{{ item.get_status_display }}</span>{% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ item.get_status_display }}</span>{% endif %}

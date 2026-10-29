@@ -1,0 +1,6 @@
+{% for subscriber in page %}
+{% include "studio/partials/_subscriber_row.html" %}
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede abone yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

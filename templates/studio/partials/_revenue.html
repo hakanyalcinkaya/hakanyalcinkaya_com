@@ -1,0 +1,1 @@
+{% load core_tags %}Ödenen toplam: {% for row in revenue %}<span class="fw-medium text-body-emphasis">{% if row.currency == "TRY" %}{{ row.total|money }}{% else %}{{ row.total }} {{ row.currency }}{% endif %}</span> ({{ row.count }} sipariş){% if not forloop.last %} · {% endif %}{% endfor %}

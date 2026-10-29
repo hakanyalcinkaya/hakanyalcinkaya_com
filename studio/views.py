@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, IntegerField, OuterRef, Prefetch, Q, Subquery
+from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -32,6 +33,8 @@ from course.models import (
     VideoUpload,
 )
 from core.markup import render_markdown
+from learning.models import Enrollment
+from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.forms import (
     ExtraContentBulkForm,
     ExtraContentForm,
@@ -49,13 +52,13 @@ from studio.forms import (
 )
 
 
-def staff_required(view):
-    """Panel yalnız personel (is_staff) ve süper kullanıcılara açık; diğer üyeler 403 alır."""
+def superuser_required(view):
+    """Stüdyodaki her işlem yalnız süper kullanıcıya açık; diğer üyeler (personel dahil) 403 alır."""
 
     @wraps(view)
     @login_required
     def wrapper(request, *args, **kwargs):
-        if not (request.user.is_staff or request.user.is_superuser):
+        if not request.user.is_superuser:
             raise PermissionDenied
         return view(request, *args, **kwargs)
 
@@ -92,9 +95,14 @@ def _video_platform():
     return dict(value=platform, label=service.LABEL, missing=video_service.missing_settings(service.REQUIRED_SETTINGS))
 
 
-@staff_required
+@superuser_required
 def course_list(request):
-    courses = Course.objects.with_video_stats().order_by("sort_order", "title")
+    enrollments = Enrollment.objects.filter(course=OuterRef("pk")).order_by().values("course").annotate(n=Count("pk")).values("n")
+    courses = (
+        Course.objects.with_video_stats()
+        .annotate(enrollment_total=Coalesce(Subquery(enrollments, output_field=IntegerField()), 0))
+        .order_by("sort_order", "title")
+    )
     return render(request, "studio/course_list.html", dict(courses=courses))
 
 
@@ -119,7 +127,7 @@ def _first_error(form):
     return next(error for errors in form.errors.values() for error in errors)
 
 
-@staff_required
+@superuser_required
 def course_detail(request, course_id):
     """İçerik düzenleyici: kategoriler (bölümler) ve videolar (dersler) sürükle-bırak ile düzenlenir."""
     course = _course(course_id)
@@ -134,7 +142,7 @@ def course_detail(request, course_id):
     return render(request, "studio/course_detail.html", context)
 
 
-@staff_required
+@superuser_required
 def section_detail(request, section_id):
     """Kategorinin video yükleme sayfası."""
     section = _section(section_id)
@@ -148,7 +156,7 @@ def section_detail(request, section_id):
     return render(request, "studio/section_detail.html", context)
 
 
-@staff_required
+@superuser_required
 @require_GET
 def section_block(request, section_id):
     section = _section(section_id)
@@ -169,7 +177,7 @@ def _video_lesson_response(request, lesson, bulk):
     return response
 
 
-@staff_required
+@superuser_required
 @require_POST
 def course_videos(request, course_id):
     """Kursa doğrudan bırakılan video "Genel" kategorisine eklenir."""
@@ -180,7 +188,7 @@ def course_videos(request, course_id):
     return _video_lesson_response(request, form.save(course.general_section(), request.user), bulk=True)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def section_videos(request, section_id):
     section = get_object_or_404(Section, pk=section_id)
@@ -190,7 +198,7 @@ def section_videos(request, section_id):
     return _video_lesson_response(request, form.save(section, request.user), bulk=request.GET.get("bulk") == "1")
 
 
-@staff_required
+@superuser_required
 @require_POST
 def course_structure(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -202,7 +210,7 @@ def course_structure(request, course_id):
     return HttpResponse(status=204)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def section_create(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -217,7 +225,7 @@ def section_create(request, course_id):
     return _toast(response, "success", _("Kategori eklendi."))
 
 
-@staff_required
+@superuser_required
 def section_title(request, section_id):
     section = get_object_or_404(Section.objects.select_related("course"), pk=section_id)
     if request.method == "POST":
@@ -232,7 +240,7 @@ def section_title(request, section_id):
     return render(request, "studio/partials/_section_title.html", dict(section=section))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def section_status(request, section_id):
     section = get_object_or_404(Section, pk=section_id)
@@ -240,7 +248,7 @@ def section_status(request, section_id):
     return render(request, "studio/partials/_section_status.html", dict(section=section))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def section_delete(request, section_id):
     section = get_object_or_404(Section, pk=section_id)
@@ -251,7 +259,7 @@ def section_delete(request, section_id):
     return _toast(HttpResponse(), "success", _("Kategori silindi."))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def lesson_status(request, lesson_id):
     lesson = get_object_or_404(Lesson, pk=lesson_id)
@@ -259,7 +267,7 @@ def lesson_status(request, lesson_id):
     return render(request, "studio/partials/_lesson_status.html", dict(lesson=lesson))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def lesson_preview(request, lesson_id):
     lesson = get_object_or_404(Lesson, pk=lesson_id)
@@ -267,7 +275,7 @@ def lesson_preview(request, lesson_id):
     return render(request, "studio/partials/_lesson_status.html", dict(lesson=lesson))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def lesson_bulk(request, course_id):
     """Düzenleyicide seçilen videolara toplu işlem; kategori listesi yeniden çizilir, seçim temizlenir."""
@@ -282,7 +290,7 @@ def lesson_bulk(request, course_id):
     return _toast(response, "success", form.message(count))
 
 
-@staff_required
+@superuser_required
 def lesson_delete(request, lesson_id):
     """GET onay panelini açar (platformdan da silinsin mi sorulur); POST dersi siler ve satırı kaldırır."""
     lesson = get_object_or_404(Lesson, pk=lesson_id)
@@ -298,7 +306,7 @@ def lesson_delete(request, lesson_id):
     return _toast(HttpResponse(), "success", text)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def course_sync_titles(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
@@ -310,7 +318,7 @@ def course_sync_titles(request, course_id):
     return redirect("studio:course_detail", course_id=course.pk)
 
 
-@staff_required
+@superuser_required
 def lesson_title(request, lesson_id):
     lesson = _lesson(lesson_id)
     if request.method == "POST":
@@ -326,7 +334,7 @@ def lesson_title(request, lesson_id):
     return render(request, "studio/partials/_lesson_title.html", dict(lesson=lesson))
 
 
-@staff_required
+@superuser_required
 def lesson_video(request, lesson_id):
     lesson = _lesson(lesson_id)
     is_post = request.method == "POST"
@@ -340,13 +348,13 @@ def lesson_video(request, lesson_id):
     return render(request, "studio/partials/_video_form.html", dict(lesson=lesson, form=form))
 
 
-@staff_required
+@superuser_required
 @require_GET
 def lesson_video_status(request, lesson_id):
     return render(request, "studio/partials/_lesson_video.html", dict(lesson=_lesson(lesson_id)))
 
 
-@staff_required
+@superuser_required
 def course_preview(request, course_id):
     course = _course(course_id)
     is_post = request.method == "POST"
@@ -360,7 +368,7 @@ def course_preview(request, course_id):
     return render(request, "studio/partials/_video_form.html", dict(form=form, course=course))
 
 
-@staff_required
+@superuser_required
 @require_GET
 def course_preview_status(request, course_id):
     return render(request, "studio/partials/_preview_video.html", dict(course=_course(course_id)))
@@ -390,7 +398,7 @@ def _queue_context(queue_filter):
     )
 
 
-@staff_required
+@superuser_required
 @require_GET
 def queue(request):
     context = _queue_context(_queue_filter(request))
@@ -415,7 +423,7 @@ def _upload(upload_id):
     return get_object_or_404(VideoUpload.objects.select_related("lesson", "course"), pk=upload_id)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def upload_retry(request, upload_id):
     upload = _upload(upload_id)
@@ -424,7 +432,7 @@ def upload_retry(request, upload_id):
     return _upload_response(request, upload, "warning", _("Bu iş yeniden başlatılamıyor; liste güncellendi."))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def upload_cancel(request, upload_id):
     upload = _upload(upload_id)
@@ -434,7 +442,7 @@ def upload_cancel(request, upload_id):
     return _upload_response(request, upload, "warning", _("Bu iş artık iptal edilemiyor; liste güncellendi."))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def upload_discard(request, upload_id):
     upload = _upload(upload_id)
@@ -445,7 +453,7 @@ def upload_discard(request, upload_id):
     return _toast(response, "warning", _("Süren iş kaldırılamaz; önce iptal et."))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def queue_clear(request):
     cleared = sum(upload.discard() for upload in VideoUpload.objects.finished())
@@ -453,7 +461,7 @@ def queue_clear(request):
     return _toast(response, "success", _("%(count)s biten iş temizlendi.") % {"count": cleared})
 
 
-@staff_required
+@superuser_required
 def _extras_panel(request, lesson, subtitle_form=None, content_form=None):
     """Dersin "Ek içerik" paneli: solda altyazı (SRT/VTT), sağda Markdown/TXT/HTML içerik; ikisine de dosya bırakılır.
 
@@ -467,7 +475,7 @@ def _extras_panel(request, lesson, subtitle_form=None, content_form=None):
     return render(request, "studio/partials/_lesson_extras_panel.html", context)
 
 
-@staff_required
+@superuser_required
 def lesson_subtitles(request, lesson_id):
     """GET paneli açar; POST altyazıyı kaydeder ve paneli yeniler."""
     lesson = _lesson(lesson_id)
@@ -481,7 +489,7 @@ def lesson_subtitles(request, lesson_id):
     return _toast(response, "success", _("%(language)s altyazı kaydedildi.") % {"language": subtitle.get_language_display()})
 
 
-@staff_required
+@superuser_required
 @require_POST
 def lesson_extra_content(request, lesson_id):
     """Ek içerik dosyası (Markdown/TXT/HTML) yükler; varsa eskisinin yerine geçer."""
@@ -493,7 +501,7 @@ def lesson_extra_content(request, lesson_id):
     return _toast(_extras_panel(request, lesson), "success", _("Ek içerik kaydedildi."))
 
 
-@staff_required
+@superuser_required
 def lesson_extra_content_edit(request, lesson_id):
     """Ek içerik düzenleyicisi (pencerede). Kaydedince pencere kapanır, satırdaki rozet yenilenir."""
     lesson = _lesson(lesson_id)
@@ -507,7 +515,7 @@ def lesson_extra_content_edit(request, lesson_id):
     return render(request, "studio/partials/_extra_content_editor.html", dict(lesson=lesson, form=form))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def course_extra_contents(request, course_id):
     """Toplu ek içerik: tek dosya alır, dosya adından dersi bulup kaydeder. Tarayıcı dosyaları sırayla gönderir ve
@@ -523,7 +531,7 @@ def course_extra_contents(request, course_id):
     return JsonResponse(dict(status=status, message=str(message), lesson=lesson.title, lesson_id=str(lesson.pk), badge=badge))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def extra_content_preview(request):
     """Düzenleyicideki metnin sayfada görüneceği hâli (kaydetmeden)."""
@@ -532,7 +540,7 @@ def extra_content_preview(request):
     )
 
 
-@staff_required
+@superuser_required
 @require_POST
 def lesson_extra_content_delete(request, lesson_id):
     lesson = _lesson(lesson_id)
@@ -541,13 +549,13 @@ def lesson_extra_content_delete(request, lesson_id):
     return _toast(response, "success", _("Ek içerik kaldırıldı."))
 
 
-@staff_required
+@superuser_required
 @require_GET
 def lesson_subtitles_status(request, lesson_id):
     return render(request, "studio/partials/_lesson_subtitles.html", dict(lesson=_lesson(lesson_id)))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def subtitle_retry(request, subtitle_id):
     subtitle = get_object_or_404(LessonSubtitle.objects.select_related("lesson"), pk=subtitle_id)
@@ -556,7 +564,7 @@ def subtitle_retry(request, subtitle_id):
     return render(request, "studio/partials/_lesson_subtitles.html", dict(lesson=_lesson(subtitle.lesson_id)))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def subtitle_delete(request, subtitle_id):
     subtitle = get_object_or_404(LessonSubtitle, pk=subtitle_id)
@@ -565,7 +573,7 @@ def subtitle_delete(request, subtitle_id):
     return render(request, "studio/partials/_lesson_subtitles.html", dict(lesson=_lesson(lesson_id)))
 
 
-@staff_required
+@superuser_required
 def site_settings(request):
     """Site ayarları: yeni videoların yükleneceği platform. Her platformun eksik ayarı ve video sayısı gösterilir."""
     site = SiteSettings.load()
@@ -586,7 +594,7 @@ def site_settings(request):
     return render(request, "studio/settings.html", dict(form=form, platforms=platforms))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def settings_check(request, platform):
     """Platform bağlantısını dener (anahtar geçerli mi, yetkiler yeterli mi); sonucu satırına yazar."""
@@ -620,7 +628,7 @@ def _review_filter(request):
     return key if key in REVIEW_FILTERS else "bekleyen"
 
 
-@staff_required
+@superuser_required
 def reviews(request):
     """Yorumlar: filtre (durum, kurs) GET parametresinde; HTMX isteğinde yalnız liste döner."""
     key = _review_filter(request)
@@ -640,7 +648,7 @@ def reviews(request):
     return render(request, "studio/reviews.html", context)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def review_action(request, review_id, action):
     """Onayla, gizle, kursta öne çıkar, ana sayfada göster; satır yeniden çizilir."""
@@ -653,14 +661,14 @@ def review_action(request, review_id, action):
     return _toast(response, "success", str(message)) if message else response
 
 
-@staff_required
+@superuser_required
 @require_POST
 def review_delete(request, review_id):
     get_object_or_404(Review, pk=review_id).delete()
     return _toast(HttpResponse(), "success", _("Yorum silindi."))
 
 
-@staff_required
+@superuser_required
 def review_create(request):
     """Eski yorum ekler (ad elle yazılır)."""
     form = ReviewImportForm(request.POST or None)
@@ -671,7 +679,7 @@ def review_create(request):
     return render(request, "studio/reviews.html", dict(import_form=form, filters=[], reviews=[], import_open=True))
 
 
-@staff_required
+@superuser_required
 def review_edit(request, review_id):
     """Eski (aktarılan) yorumu düzenler; kullanıcı yorumlarının metni yalnız kullanıcı tarafından değiştirilir."""
     review = get_object_or_404(Review.objects.select_related("course", "user"), pk=review_id, user__isnull=True)
@@ -697,7 +705,7 @@ def _email_preview_context(request, key):
     return preview_context(key, user), user, ""
 
 
-@staff_required
+@superuser_required
 def emails(request):
     from mailing.emails import EMAILS
 
@@ -715,7 +723,7 @@ def _preview_subscriber(user):
     return Subscriber.objects.by_email(user.email) or Subscriber(email=user.email, name=user.first_name)
 
 
-@staff_required
+@superuser_required
 def newsletters(request):
     from newsletter.models import Issue, Subscriber
 
@@ -723,7 +731,7 @@ def newsletters(request):
     return render(request, "studio/newsletters.html", dict(issues=issues, confirmed_total=Subscriber.objects.confirmed().count()))
 
 
-@staff_required
+@superuser_required
 def newsletter_create(request):
     from newsletter.models import PERSONALIZATION_FIELDS
 
@@ -747,7 +755,7 @@ def newsletter_create(request):
     )
 
 
-@staff_required
+@superuser_required
 def newsletter_edit(request, issue_id):
     """Taslak düzenlenir ve önizlenir; gönderilmiş sayı yalnız görüntülenir (alıcılar toplu gönderim sayfasında)."""
     from mailing.emails import render_email
@@ -779,7 +787,7 @@ def newsletter_edit(request, issue_id):
     )
 
 
-@staff_required
+@superuser_required
 @require_GET
 def newsletter_audience(request):
     """Formdaki kitle seçimine göre kaç onaylı aboneye gideceği (kaydetmeden, HTMX ile her değişiklikte)."""
@@ -793,7 +801,7 @@ def newsletter_audience(request):
     return render(request, "studio/partials/_newsletter_audience_count.html", dict(count=count, errors=errors))
 
 
-@staff_required
+@superuser_required
 @require_POST
 def newsletter_send_test(request, issue_id):
     """Kayıtlı taslağı giriş yapanın adıyla yalnız test adresine (EMAIL_TEST_TO) gönderir."""
@@ -810,7 +818,7 @@ def newsletter_send_test(request, issue_id):
     return _toast(HttpResponse(), "success", _("Test e-postası %(to)s adresine gönderildi.") % {"to": settings.EMAIL_TEST_TO})
 
 
-@staff_required
+@superuser_required
 @require_POST
 def newsletter_send(request, issue_id):
     """Kitledeki onaylı abonelere toplu gönderimi başlatır (bir kez); gönderim Celery işçisinde yapılır."""
@@ -830,7 +838,7 @@ def newsletter_send(request, issue_id):
     return HttpResponseClientRedirect(issue.get_absolute_url()) if request.htmx else redirect(issue)
 
 
-@staff_required
+@superuser_required
 @require_POST
 def newsletter_delete(request, issue_id):
     """Yalnız taslak silinir."""
@@ -845,7 +853,7 @@ def newsletter_delete(request, issue_id):
 SUBSCRIBER_PAGE_SIZE = 50
 
 
-@staff_required
+@superuser_required
 def subscribers(request):
     """Bülten aboneleri: durum filtresi ve adres/ad araması GET parametresinde; HTMX isteğinde yalnız liste döner.
     Çıkanlarda hangi e-postadaki bağlantıyla çıktığı gösterilir."""
@@ -865,6 +873,8 @@ def subscribers(request):
         dict(key=value, label=label, count=counts[value]) for value, label in SubscriberStatus.choices
     ]
     context = dict(page=page, status=status, query=query, filters=filters)
+    if request.htmx and request.GET.get(ROWS_PARAM):
+        return render(request, "studio/partials/_subscriber_rows.html", context)
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_subscriber_list.html", context)
     return render(request, "studio/subscribers.html", context)
@@ -906,7 +916,7 @@ def _email_log_list(request, logs, list_url, labels):
     )
 
 
-@staff_required
+@superuser_required
 def email_log(request):
     """Gönderim günlüğü, iki sekme: tekil e-postalar (şifre, satın alma vb.; tek alıcı) ve toplu gönderimler (bülten;
     çok alıcı). Tekil listede filtre (şablon, durum, adres) GET parametresinde; HTMX isteğinde yalnız liste döner."""
@@ -924,6 +934,8 @@ def email_log(request):
         )
     single = EmailLog.objects.single()
     context = _email_log_list(request, single, reverse("studio:email_log"), labels)
+    if request.htmx and request.GET.get(ROWS_PARAM):
+        return render(request, "studio/partials/_email_log_rows.html", context)
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_email_log_list.html", context)
     stats = single.stats_by_template()
@@ -933,7 +945,7 @@ def email_log(request):
     return render(request, "studio/email_log.html", context)
 
 
-@staff_required
+@superuser_required
 def email_batch_detail(request, batch_id):
     """Toplu gönderim: kaç alıcıya gittiği, açılma/tıklama/çıkış oranları ve alıcı listesi (filtreli, sayfalı)."""
     from mailing.models import EmailBatch
@@ -941,13 +953,16 @@ def email_batch_detail(request, batch_id):
     batch = get_object_or_404(EmailBatch.objects.with_stats(), pk=batch_id)
     labels = _email_labels()
     context = _email_log_list(request, batch.logs.all(), reverse("studio:email_batch_detail", args=[batch.pk]), labels)
+    context["in_batch"] = True
+    if request.htmx and request.GET.get(ROWS_PARAM):
+        return render(request, "studio/partials/_email_log_rows.html", context)
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_email_log_list.html", context)
-    context.update(batch=batch, label=labels.get(batch.template, batch.template), in_batch=True)
+    context.update(batch=batch, label=labels.get(batch.template, batch.template))
     return render(request, "studio/email_batch_detail.html", context)
 
 
-@staff_required
+@superuser_required
 def email_log_detail(request, log_id):
     """Bir e-postanın saklanan içeriği (gizli bağlantılar maskeli) ve olayları (gönderim, açılma, tıklama, çıkış)."""
     from mailing.models import EmailLog
@@ -961,7 +976,7 @@ def email_log_detail(request, log_id):
     )
 
 
-@staff_required
+@superuser_required
 def email_preview(request, key):
     from mailing.emails import EMAILS, render_email, template_names
 
@@ -990,7 +1005,7 @@ def email_preview(request, key):
     )
 
 
-@staff_required
+@superuser_required
 @require_POST
 def email_send_test(request, key):
     """Önizlenen e-postayı yalnız test adresine (EMAIL_TEST_TO) gönderir; adres yoksa göndermez."""

@@ -1,16 +1,25 @@
+from datetime import datetime, time
 from pathlib import Path
 
 from django import forms
 from django.db import models, transaction
+from django.db.models import F, Q
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from account.models import InstructorProfile, User
 from core.models import SiteSettings
 from course import video_service
 from course.models import (
     SUBTITLE_EXTENSIONS,
     VIDEO_EXTENSIONS,
+    Bundle,
+    BundleCourse,
     Category,
     Course,
+    CourseHighlight,
+    CourseInstructor,
     Lesson,
     LessonKind,
     LessonSubtitle,
@@ -18,9 +27,13 @@ from course.models import (
     ReviewSource,
     Section,
     SubtitleLanguage,
+    Technology,
     VideoUpload,
 )
+from discount.forms import DiscountTargetsMixin
+from discount.models import Discount
 from newsletter.models import AudienceKind, Issue
+from order.models import OrderStatus
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
 EXTRA_CONTENT_EXTENSIONS = (".md", ".markdown", ".txt", ".html", ".htm")
@@ -444,3 +457,337 @@ class IssueForm(forms.ModelForm):
             min_progress=data.get("min_progress"),
             max_progress=data.get("max_progress"),
         )
+
+
+# Katalog ve satış yönetimi: Django admin'deki kayıtlar stüdyodan düzenlenir. Sıra listelerde sürükle-bırak ile verilir.
+DATETIME_WIDGET = forms.DateTimeInput(attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M")
+DATETIME_FORMATS = ["%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S"]
+
+
+def _append_order(model, **parent):
+    last = model.objects.filter(**parent).order_by("-sort_order").values_list("sort_order", flat=True).first()
+    return (last or 0) + 1
+
+
+class SortedCreateMixin:
+    """Yeni kayıt listenin sonuna eklenir (sort_order)."""
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance._state.adding:
+            instance.sort_order = _append_order(type(instance))
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
+
+def _sync_through(owner, through, owner_field, target_field, selected):
+    """Ara tablolu çoklu seçimi kaydeder: kalanların sırası korunur, yeniler sona eklenir, seçilmeyenler çıkar."""
+    links = through.objects.filter(**{owner_field: owner})
+    selected_ids = {item.pk for item in selected}
+    links.exclude(**{f"{target_field}__in": selected_ids}).delete()
+    existing = set(links.values_list(f"{target_field}_id", flat=True))
+    order = _append_order(through, **{owner_field: owner})
+    for item in selected:
+        if item.pk not in existing:
+            through.objects.create(**{owner_field: owner, target_field: item, "sort_order": order})
+            order += 1
+
+
+class CourseForm(SortedCreateMixin, forms.ModelForm):
+    """Kurs bilgileri; videolar ve tanıtım videosu kurs sayfasındaki düzenleyiciden yüklenir."""
+
+    instructors = forms.ModelMultipleChoiceField(
+        label=_("Eğitmenler"), queryset=InstructorProfile.objects.none(), required=False, widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = Course
+        fields = (
+            "title",
+            "short_title",
+            "slug",
+            "subtitle",
+            "description",
+            "image",
+            "category",
+            "subcategories",
+            "technologies",
+            "level",
+            "price",
+            "list_price",
+            "access_note",
+            "status",
+            "published_at",
+        )
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "access_note": forms.Textarea(attrs={"rows": 2}),
+            "subcategories": forms.CheckboxSelectMultiple,
+            "technologies": forms.CheckboxSelectMultiple,
+            "published_at": DATETIME_WIDGET,
+        }
+        help_texts = {"slug": _("Boş bırakılırsa başlıktan üretilir.")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slug"].required = False
+        self.fields["published_at"].input_formats = DATETIME_FORMATS
+        self.fields["instructors"].queryset = InstructorProfile.objects.order_by("sort_order", "display_name")
+        if not self.instance._state.adding:
+            self.fields["instructors"].initial = list(self.instance.instructors.values_list("pk", flat=True))
+
+    def save(self, commit=True):
+        course = super().save(commit=commit)
+        _sync_through(course, CourseInstructor, "course", "instructor", self.cleaned_data["instructors"])
+        return course
+
+
+class CourseHighlightForm(forms.ModelForm):
+    class Meta:
+        model = CourseHighlight
+        fields = ("kind", "title", "text")
+        widgets = {
+            "kind": forms.Select(attrs={"class": "form-select form-select-sm"}),
+            "title": forms.TextInput(attrs={"class": "form-control form-control-sm", "placeholder": _("Başlık (isteğe bağlı)")}),
+            "text": forms.Textarea(attrs={"class": "form-control form-control-sm", "rows": 2}),
+        }
+
+
+class BaseHighlightFormSet(forms.BaseInlineFormSet):
+    def save(self, commit=True):
+        """Maddeler formdaki sırayla kaydedilir; silinmek üzere işaretlenenler silinir, boş satırlar atlanır."""
+        order = 0
+        for form in self.forms:
+            adding = form.instance._state.adding
+            if form in self.deleted_forms:
+                if not adding:
+                    form.instance.delete()
+                continue
+            if adding and not form.has_changed():
+                continue
+            item = form.save(commit=False)
+            item.course = self.instance
+            item.sort_order = order
+            item.save()
+            order += 1
+
+
+CourseHighlightFormSet = forms.inlineformset_factory(
+    Course, CourseHighlight, form=CourseHighlightForm, formset=BaseHighlightFormSet, extra=3, can_delete=True
+)
+
+
+class BundleForm(SortedCreateMixin, forms.ModelForm):
+    courses = forms.ModelMultipleChoiceField(
+        label=_("Kurslar"), queryset=Course.objects.none(), widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = Bundle
+        fields = ("title", "short_title", "slug", "description", "image", "price", "status", "published_at")
+        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "published_at": DATETIME_WIDGET}
+        help_texts = {"price": _("Liste fiyatı, paketteki kursların fiyat toplamıdır."), "slug": _("Boş bırakılırsa başlıktan üretilir.")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slug"].required = False
+        self.fields["published_at"].input_formats = DATETIME_FORMATS
+        self.fields["courses"].queryset = Course.objects.order_by("sort_order", "title")
+        if not self.instance._state.adding:
+            self.fields["courses"].initial = list(self.instance.courses.values_list("pk", flat=True))
+
+    def save(self, commit=True):
+        bundle = super().save(commit=commit)
+        _sync_through(bundle, BundleCourse, "bundle", "course", self.cleaned_data["courses"])
+        return bundle
+
+
+class CategoryForm(SortedCreateMixin, forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ("name", "slug", "parent", "status")
+        help_texts = {"parent": _("Üst kategori filtrelerde, alt kategoriler kurs başlığında etiket olarak görünür.")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slug"].required = False
+        parents = Category.objects.filter(parent__isnull=True)
+        self.fields["parent"].queryset = parents.exclude(pk=self.instance.pk) if not self.instance._state.adding else parents
+
+
+class TechnologyForm(SortedCreateMixin, forms.ModelForm):
+    class Meta:
+        model = Technology
+        fields = ("name", "slug")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slug"].required = False
+
+
+class InstructorForm(SortedCreateMixin, forms.ModelForm):
+    """Eğitmen profili bir üyeye bağlıdır; üye e-postasıyla seçilir."""
+
+    user_email = forms.EmailField(label=_("Üye e-postası"), help_text=_("Profil bu e-postayla kayıtlı üyeye bağlanır."))
+
+    class Meta:
+        model = InstructorProfile
+        fields = ("display_name", "slug", "title", "photo", "bio", "website", "youtube", "linkedin", "github", "status")
+        widgets = {"bio": forms.Textarea(attrs={"rows": 4})}
+
+    field_order = ("user_email",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["slug"].required = False
+        if not self.instance._state.adding:
+            self.fields["user_email"].initial = self.instance.user.email
+
+    def clean_user_email(self):
+        user = User.objects.with_email(self.cleaned_data["user_email"]).first()
+        if user is None:
+            raise forms.ValidationError(_("Bu e-postayla üye yok."))
+        if InstructorProfile.objects.filter(user=user).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(_("Bu üyenin zaten eğitmen profili var."))
+        self.instance.user = user
+        return user.email
+
+
+class DiscountForm(DiscountTargetsMixin, forms.ModelForm):
+    class Meta:
+        model = Discount
+        fields = (
+            "code",
+            "kind",
+            "value",
+            "note",
+            "courses",
+            "bundles",
+            "valid_from",
+            "valid_until",
+            "max_uses",
+            "max_uses_per_user",
+            "status",
+        )
+        widgets = {
+            "courses": forms.CheckboxSelectMultiple,
+            "bundles": forms.CheckboxSelectMultiple,
+            "valid_from": DATETIME_WIDGET,
+            "valid_until": DATETIME_WIDGET,
+        }
+        help_texts = {"courses": _("Yüzde indirimde kurs ve paket seçilmezse hepsinde geçerlidir.")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in ("valid_from", "valid_until"):
+            self.fields[name].input_formats = DATETIME_FORMATS
+        self.fields["courses"].queryset = Course.objects.order_by("sort_order", "title")
+        self.fields["bundles"].queryset = Bundle.objects.order_by("sort_order", "title")
+
+
+class EnrollmentGrantForm(forms.Form):
+    """Üyeye elle kurs erişimi açar (hediye ya da manuel); zaten kayıtlı olduğu kurslar listelenmez."""
+
+    course = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none())
+    source = forms.ChoiceField(label=_("Kaynak"), choices=())
+
+    def __init__(self, *args, user, **kwargs):
+        from learning.models import EnrollmentSource
+
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.fields["course"].queryset = Course.objects.exclude(enrollments__user=user).order_by("sort_order", "title")
+        self.fields["source"].choices = [(EnrollmentSource.GIFT, EnrollmentSource.GIFT.label), (EnrollmentSource.MANUAL, EnrollmentSource.MANUAL.label)]
+        self.fields["course"].widget.attrs["class"] = "form-select form-select-sm"
+        self.fields["source"].widget.attrs["class"] = "form-select form-select-sm"
+
+    def save(self):
+        from learning.models import Enrollment
+
+        return Enrollment.objects.create(user=self.user, course=self.cleaned_data["course"], source=self.cleaned_data["source"])
+
+
+class MemberAccessForm(forms.ModelForm):
+    """Üyenin hesabı açık mı; kapalı hesap giriş yapamaz. Kendi hesabını kapatamaz."""
+
+    class Meta:
+        model = User
+        fields = ("is_active",)
+        labels = {"is_active": _("Hesap açık")}
+
+    def __init__(self, *args, editor, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk == editor.pk:
+            for field in self.fields.values():
+                field.disabled = True
+
+
+class OrderFilterForm(forms.Form):
+    """Sipariş listesi filtreleri (GET): durum, kurs/paket, ödeme sağlayıcı, para birimi, indirim kodu, tarih ve arama.
+    Tarih aralığı ödeme tarihine, ödenmemişlerde oluşturulma tarihine bakar (yerel gün)."""
+
+    DISCOUNT_CHOICES = (("", _("Kod: tümü")), ("var", _("Kodlu")), ("yok", _("Kodsuz")))
+
+    q = forms.CharField(label=_("Ara"), required=False)
+    durum = forms.ChoiceField(label=_("Durum"), required=False)
+    kurs = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
+    paket = forms.ModelChoiceField(label=_("Paket"), queryset=Bundle.objects.none(), required=False, empty_label=_("Tüm paketler"))
+    saglayici = forms.ChoiceField(label=_("Ödeme yolu"), required=False)
+    para = forms.ChoiceField(label=_("Para birimi"), required=False)
+    kod = forms.ChoiceField(label=_("İndirim kodu"), required=False, choices=DISCOUNT_CHOICES)
+    baslangic = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    bitis = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+
+    def __init__(self, *args, orders, with_status=True, with_course=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["durum"].choices = [("", _("Tüm durumlar"))] + list(OrderStatus.choices)
+        self.fields["kurs"].queryset = Course.objects.order_by("sort_order", "title")
+        self.fields["paket"].queryset = Bundle.objects.order_by("sort_order", "title")
+        providers = orders.exclude(payment_provider="").order_by().values_list("payment_provider", flat=True).distinct()
+        self.fields["saglayici"].choices = [("", _("Tüm ödeme yolları"))] + [(name, name) for name in sorted(providers)]
+        currencies = orders.order_by().values_list("currency", flat=True).distinct()
+        self.fields["para"].choices = [("", _("Tüm para birimleri"))] + [(code, code) for code in sorted(currencies)]
+        if not with_status:
+            del self.fields["durum"]
+        if not with_course:
+            del self.fields["kurs"]
+        for name, field in self.fields.items():
+            css = "form-select form-select-sm w-auto" if isinstance(field, (forms.ChoiceField, forms.ModelChoiceField)) else "form-control form-control-sm w-auto"
+            field.widget.attrs.setdefault("class", css)
+            field.widget.attrs.setdefault("aria-label", field.label)
+        self.fields["q"].widget.attrs.update(type="search", placeholder=_("E-posta ya da sipariş no"))
+
+    def filter(self, orders):
+        if not self.is_valid():
+            return orders
+        data = self.cleaned_data
+        if data.get("q"):
+            orders = orders.filter(Q(email__icontains=data["q"]) | Q(number__icontains=data["q"]) | Q(user__email__icontains=data["q"]))
+        if data.get("durum"):
+            orders = orders.filter(status=data["durum"])
+        if data.get("kurs"):
+            orders = orders.containing(data["kurs"])
+        if data.get("paket"):
+            orders = orders.filter(items__bundle=data["paket"]).distinct()
+        if data.get("saglayici"):
+            orders = orders.filter(payment_provider=data["saglayici"])
+        if data.get("para"):
+            orders = orders.filter(currency=data["para"])
+        if data.get("kod") == "var":
+            orders = orders.exclude(discount_code="")
+        elif data.get("kod") == "yok":
+            orders = orders.filter(discount_code="")
+        if data.get("baslangic") or data.get("bitis"):
+            orders = orders.annotate(sale_at=Coalesce("paid_at", F("created_at")))
+            zone = timezone.get_current_timezone()
+            if data.get("baslangic"):
+                orders = orders.filter(sale_at__gte=datetime.combine(data["baslangic"], time.min, tzinfo=zone))
+            if data.get("bitis"):
+                orders = orders.filter(sale_at__lte=datetime.combine(data["bitis"], time.max, tzinfo=zone))
+        return orders
+
+    @property
+    def is_filtered(self):
+        return self.is_valid() and any(value for value in self.cleaned_data.values())

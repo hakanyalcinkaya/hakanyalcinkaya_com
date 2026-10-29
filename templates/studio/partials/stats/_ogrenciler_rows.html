@@ -1,0 +1,22 @@
+{% load core_tags %}
+{% for enrollment in page %}
+<a href="{% url 'studio:student_detail' enrollment.user_id %}" class="list-group-item list-group-item-action py-2">
+  <div class="row g-2 align-items-center">
+    <div class="col-md-5">
+      <div class="fw-medium text-truncate">{{ enrollment.user.display_name }}</div>
+      <div class="small text-body-secondary text-truncate">{{ enrollment.user.email }}</div>
+    </div>
+    <div class="col-md-3">
+      <div class="d-flex align-items-center gap-2 small"><span class="studio-bar flex-grow-1"><span style="width: {{ enrollment.progress }}%"></span></span><span class="text-nowrap">%{{ enrollment.progress }}</span></div>
+      <div class="small text-body-tertiary">{{ enrollment.completed_total }} / {{ enrollment.lesson_total }} ders</div>
+    </div>
+    <div class="col-md-4 small text-body-secondary text-md-end">
+      {{ enrollment.get_source_display }} · {% if enrollment.last_watched_at %}<time datetime="{{ enrollment.last_watched_at|date:'c' }}" title="{{ enrollment.last_watched_at|date:'d.m.Y H:i' }}">{{ enrollment.last_watched_at|ago }} izledi</time>{% else %}hiç izlemedi{% endif %}
+      {% if enrollment.last_lesson %}<div class="text-body-tertiary text-truncate">{{ enrollment.last_lesson.title }}</div>{% endif %}
+    </div>
+  </div>
+</a>
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede öğrenci yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

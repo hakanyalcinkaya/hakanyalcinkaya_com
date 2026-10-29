@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Case, Count, IntegerField, OuterRef, Subquery, Value, When
+from django.db.models.functions import Cast, Coalesce, Round
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel
+from core.models import BaseModel, Status
 from course.models import SubtitleLanguage
 
 
@@ -30,6 +32,42 @@ class EnrollmentQuerySet(models.QuerySet):
     def has_access(self, user, course):
         """Kullanıcının kursa erişimi var mı (satın alma, paket, hediye, manuel ya da eski platformdan aktarım)."""
         return self.for_user(user).filter(course=course).exists()
+
+    def with_progress(self):
+        """completed_total, lesson_total ve progress (yayındaki derslere göre %0-100) ekler; filtrelenip sıralanabilir."""
+        from course.models import Lesson
+
+        published = dict(status=Status.PUBLISHED, section__status=Status.PUBLISHED)
+        lessons = (
+            Lesson.objects.filter(section__course=OuterRef("course"), **published)
+            .order_by()
+            .values("section__course")
+            .annotate(n=Count("pk"))
+            .values("n")
+        )
+        done = (
+            LessonProgress.objects.filter(
+                user=OuterRef("user"),
+                lesson__section__course=OuterRef("course"),
+                lesson__status=Status.PUBLISHED,
+                lesson__section__status=Status.PUBLISHED,
+                completed_at__isnull=False,
+            )
+            .order_by()
+            .values("user")
+            .annotate(n=Count("pk"))
+            .values("n")
+        )
+        return self.annotate(
+            lesson_total=Coalesce(Subquery(lessons, output_field=IntegerField()), 0),
+            completed_total=Coalesce(Subquery(done, output_field=IntegerField()), 0),
+        ).annotate(
+            progress=Case(
+                When(lesson_total=0, then=Value(0)),
+                default=Cast(Round(Cast("completed_total", models.FloatField()) * 100.0 / Cast("lesson_total", models.FloatField())), IntegerField()),
+                output_field=IntegerField(),
+            )
+        )
 
 
 class Enrollment(BaseModel):

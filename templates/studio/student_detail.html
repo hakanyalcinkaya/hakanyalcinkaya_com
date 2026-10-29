@@ -1,0 +1,81 @@
+{% extends "studio/base.html" %}
+{% load core_tags %}
+{% block studio_title %}{{ member.display_name }}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:students' %}" class="link-secondary text-decoration-none">Öğrenciler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">{{ member.display_name }}</h1>
+    <div class="small text-body-secondary">{{ member.email }} · {{ member.date_joined|date:"d.m.Y" }} üye oldu{% if member.last_login %} · son giriş {{ member.last_login|ago }}{% endif %}{% if subscriber %} · bülten: {{ subscriber.get_status_display|lower }}{% endif %}</div>
+  </div>
+  <form method="post" action="{% url 'studio:student_access' member.id %}" class="d-flex align-items-center gap-2">
+    {% csrf_token %}
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" role="switch" name="is_active" id="member-active"{% if member.is_active %} checked{% endif %}{% if access_form.is_active.field.disabled %} disabled{% endif %} onchange="this.form.requestSubmit()">
+      <label class="form-check-label small" for="member-active">Hesap açık</label>
+    </div>
+    <noscript><button type="submit" class="btn btn-outline-secondary btn-sm">Kaydet</button></noscript>
+  </form>
+</div>
+
+<section class="mb-4" aria-labelledby="member-courses-title">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+    <h2 id="member-courses-title" class="h5 mb-0">Kursları</h2>
+    {% if grant_form.fields.course.queryset.exists %}
+    <form method="post" action="{% url 'studio:student_enroll' member.id %}" class="d-flex flex-wrap align-items-center gap-2">
+      {% csrf_token %}
+      <label class="visually-hidden" for="{{ grant_form.course.auto_id }}">Kurs</label>{{ grant_form.course }}
+      <label class="visually-hidden" for="{{ grant_form.source.auto_id }}">Kaynak</label>{{ grant_form.source }}
+      <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-unlock me-1" aria-hidden="true"></i>Erişim aç</button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="list-group">
+    {% for enrollment in enrollments %}
+    <div class="list-group-item py-2">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-5"><a href="{% url 'studio:course_stats' enrollment.course_id %}" class="fw-medium link-body-emphasis">{{ enrollment.course.title }}</a>
+          <div class="small text-body-tertiary">{{ enrollment.get_source_display }} · {{ enrollment.created_at|date:"d.m.Y" }}{% if enrollment.order %} · <a href="{% url 'studio:order_detail' enrollment.order_id %}" class="link-secondary">{{ enrollment.order.number }}</a>{% endif %}</div>
+        </div>
+        <div class="col-md-3">
+          <div class="d-flex align-items-center gap-2 small"><span class="studio-bar flex-grow-1"><span style="width: {{ enrollment.progress }}%"></span></span><span>%{{ enrollment.progress }}</span></div>
+          <div class="small text-body-tertiary">{{ enrollment.completed_total }} / {{ enrollment.lesson_total }} ders</div>
+        </div>
+        <div class="col-md-3 small text-body-secondary">{% if enrollment.last_watched_at %}{{ enrollment.last_watched_at|ago }} izledi{% if enrollment.last_lesson %}<div class="text-body-tertiary text-truncate">{{ enrollment.last_lesson.title }}</div>{% endif %}{% else %}Hiç izlemedi{% endif %}</div>
+        <div class="col-md-1 text-md-end">
+          <button type="button" class="btn btn-outline-danger btn-sm" title="Erişimi kaldır" hx-post="{% url 'studio:enrollment_delete' enrollment.id %}" hx-confirm="{{ enrollment.course.title }} erişimi kaldırılsın mı?{% if enrollment.order %} Bu erişim bir satın almayla açıldı; sipariş değişmez.{% endif %} Ders ilerlemesi silinmez."><i class="bi bi-lock" aria-hidden="true"></i><span class="visually-hidden">Erişimi kaldır</span></button>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="list-group-item small text-body-secondary py-3 text-center">Kursu yok.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="row g-4">
+  <section class="col-lg-7" aria-labelledby="member-orders-title">
+    <h2 id="member-orders-title" class="h5">Siparişleri</h2>
+    <div class="list-group">
+      {% for order in orders %}
+      <a href="{% url 'studio:order_detail' order.id %}" class="list-group-item list-group-item-action py-2">
+        <div class="d-flex flex-wrap align-items-center gap-2"><span class="font-monospace small">{{ order.number }}</span>{% include "studio/partials/_order_status.html" %}<span class="ms-auto fw-medium">{% if order.currency == "TRY" %}{{ order.total|money }}{% else %}{{ order.total }} {{ order.currency }}{% endif %}</span></div>
+        <div class="small text-body-secondary">{% for item in order.items.all %}{{ item.title }}{% if not forloop.last %} · {% endif %}{% endfor %} · {{ order.paid_at|default:order.created_at|date:"d.m.Y" }}</div>
+      </a>
+      {% empty %}
+      <div class="list-group-item small text-body-secondary py-3 text-center">Siparişi yok.</div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="col-lg-5" aria-labelledby="member-cart-title">
+    <h2 id="member-cart-title" class="h5">Sepetinde</h2>
+    <ul class="list-group">
+      {% for item in cart_items %}
+      <li class="list-group-item small d-flex"><span>{{ item.product.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}</span><span class="ms-auto text-body-tertiary">{{ item.created_at|ago }}</span></li>
+      {% empty %}
+      <li class="list-group-item small text-body-secondary py-3 text-center">Sepeti boş.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

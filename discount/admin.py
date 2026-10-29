@@ -1,22 +1,8 @@
-from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from discount.models import Discount, DiscountKind
-
-
-class DiscountAdminForm(forms.ModelForm):
-    class Meta:
-        model = Discount
-        fields = "__all__"
-
-    def clean(self):
-        cleaned = super().clean()
-        kind = cleaned.get("kind")
-        has_targets = bool(cleaned.get("courses")) or bool(cleaned.get("bundles"))
-        if kind in (DiscountKind.AMOUNT, DiscountKind.FIXED_PRICE) and not has_targets:
-            raise forms.ValidationError(_("Tutar indirimi ve sabit fiyat için en az bir kurs ya da paket seçmelisin."))
-        return cleaned
+from discount.forms import DiscountAdminForm
+from discount.models import Discount
 
 
 @admin.register(Discount)

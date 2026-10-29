@@ -1,0 +1,52 @@
+{% extends "studio/base.html" %}
+{% load core_tags %}
+{% block studio_title %}{{ order.number }}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:orders' %}" class="link-secondary text-decoration-none">Siparişler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1 font-monospace">{{ order.number }}</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2 small text-body-secondary">{% include "studio/partials/_order_status.html" %}{{ order.created_at|date:"d.m.Y H:i" }} oluşturuldu{% if order.paid_at %} · {{ order.paid_at|date:"d.m.Y H:i" }} ödendi{% endif %}</div>
+  </div>
+  {% if not order.is_paid %}
+  <button type="button" class="btn btn-primary btn-sm" hx-post="{% url 'studio:order_mark_paid' order.id %}" hx-confirm="Sipariş ödendi olarak işaretlensin mi? Kurs erişimleri açılır ve indirim kodu kullanımı sayılır."><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Ödendi olarak işaretle</button>
+  {% endif %}
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="border rounded mb-4" aria-labelledby="order-items-title">
+      <h2 id="order-items-title" class="h6 px-3 pt-3">Kalemler</h2>
+      <ul class="list-group list-group-flush">
+        {% for item in order.items.all %}
+        <li class="list-group-item d-flex flex-wrap gap-2">
+          <span>{% if item.course %}<a href="{% url 'studio:course_stats' item.course_id %}" class="link-body-emphasis">{{ item.title }}</a>{% else %}{{ item.title }} <span class="small text-body-tertiary">(paket)</span>{% endif %}</span>
+          <span class="ms-auto">{% if item.unit_price != item.paid_price %}<s class="small text-body-tertiary me-1">{% if order.currency == "TRY" %}{{ item.unit_price|money }}{% else %}{{ item.unit_price }}{% endif %}</s>{% endif %}{% if order.currency == "TRY" %}{{ item.paid_price|money }}{% else %}{{ item.paid_price }} {{ order.currency }}{% endif %}</span>
+        </li>
+        {% endfor %}
+        <li class="list-group-item small text-body-secondary d-flex"><span>Ara toplam</span><span class="ms-auto">{% if order.currency == "TRY" %}{{ order.subtotal|money }}{% else %}{{ order.subtotal }} {{ order.currency }}{% endif %}</span></li>
+        {% if order.discount_total %}<li class="list-group-item small text-body-secondary d-flex"><span>İndirim{% if order.discount_code %} ({% if order.discount %}<a href="{% url 'studio:catalog_edit' 'discounts' order.discount_id %}" class="link-secondary">{{ order.discount_code }}</a>{% else %}{{ order.discount_code }}{% endif %}){% endif %}</span><span class="ms-auto">−{% if order.currency == "TRY" %}{{ order.discount_total|money }}{% else %}{{ order.discount_total }} {{ order.currency }}{% endif %}</span></li>{% endif %}
+        <li class="list-group-item d-flex fw-semibold"><span>Toplam (KDV dahil)</span><span class="ms-auto">{% if order.currency == "TRY" %}{{ order.total|money }}{% else %}{{ order.total }} {{ order.currency }}{% endif %}</span></li>
+      </ul>
+    </section>
+    <section class="border rounded" aria-labelledby="order-enrollments-title">
+      <h2 id="order-enrollments-title" class="h6 px-3 pt-3">Açtığı kurs erişimleri</h2>
+      <ul class="list-group list-group-flush">
+        {% for enrollment in order.enrollments.all %}
+        <li class="list-group-item small d-flex"><span>{{ enrollment.course.title }}</span><span class="ms-auto text-body-tertiary">{{ enrollment.get_source_display }}</span></li>
+        {% empty %}
+        <li class="list-group-item small text-body-secondary">{% if order.is_paid and not order.user %}Sipariş bir üyeye bağlı değil; erişim açılmadı.{% else %}Henüz yok.{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+  <div class="col-lg-5">
+    <dl class="border rounded p-3 small mb-0">
+      <dt>Alıcı</dt>
+      <dd>{{ order.email }}{% if order.user %} · <a href="{% url 'studio:student_detail' order.user_id %}">üye sayfası</a>{% endif %}</dd>
+      <dt>Ödeme yolu</dt><dd>{{ order.payment_provider|default:"—" }}</dd>
+      <dt>Ödeme referansı</dt><dd class="font-monospace text-break">{{ order.payment_reference|default:"—" }}</dd>
+      <dt>Para birimi</dt><dd class="mb-0">{{ order.currency }}</dd>
+    </dl>
+  </div>
+</div>
+{% endblock %}

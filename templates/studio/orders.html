@@ -1,0 +1,9 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Siparişler{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Siparişler</h1>
+  <p class="text-body-secondary mb-0">Sitedeki satışlar ve eski platformdan aktarılanlar. Tutarlar mali kayıttır, değiştirilmez; havale gibi elle onaylanan ödemeler sipariş sayfasından işaretlenir.</p>
+</div>
+{% include "studio/partials/_orders_list.html" %}
+{% endblock %}

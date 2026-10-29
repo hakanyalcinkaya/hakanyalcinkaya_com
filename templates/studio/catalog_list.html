@@ -1,0 +1,22 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}{{ entry.title }}{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">{{ entry.title }}</h1>
+    <p class="text-body-secondary mb-0">{{ entry.description }}{% if entry.sortable %} Sırayı tutamaktan sürükleyerek değiştir.{% endif %}</p>
+  </div>
+  <a href="{% url 'studio:catalog_create' entry.kind %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ entry.singular }} ekle</a>
+</div>
+<div class="list-group"{% if entry.sortable %} data-sortable-list data-sort-url="{% url 'studio:catalog_sort' entry.kind %}"{% endif %}>
+  {% for item in items %}
+  <div class="list-group-item studio-sortable-row d-flex flex-wrap align-items-center gap-3 py-2" data-sort-id="{{ item.pk }}">
+    {% if entry.sortable %}<span class="studio-handle text-body-tertiary" title="Sürükle" aria-hidden="true"><i class="bi bi-grip-vertical"></i></span>{% endif %}
+    <div class="me-auto min-w-0">{% include row_template %}</div>
+    <a href="{% url 'studio:catalog_edit' entry.kind item.pk %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Düzenle</a>
+  </div>
+  {% empty %}
+  <div class="list-group-item text-body-secondary small py-4 text-center">Henüz kayıt yok.</div>
+  {% endfor %}
+</div>
+{% endblock %}

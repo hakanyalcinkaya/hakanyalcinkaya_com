@@ -1,0 +1,14 @@
+{% load core_tags %}
+{% for item in page %}
+<div class="list-group-item py-2">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    {% if item.cart.user %}<a href="{% url 'studio:student_detail' item.cart.user_id %}" class="fw-medium link-body-emphasis">{{ item.cart.user.email }}</a>{% else %}<span class="fw-medium text-body-secondary">Misafir</span>{% endif %}
+    <span class="badge rounded-1 border text-body-secondary fw-medium">{{ item.cart.get_status_display }}</span>
+    {% if item.bundle_id %}<span class="small text-body-secondary">{{ item.bundle.title }} paketiyle</span>{% endif %}
+    <time class="ms-auto small text-body-tertiary" datetime="{{ item.created_at|date:'c' }}" title="{{ item.created_at|date:'d.m.Y H:i' }}">{{ item.created_at|ago }} ekledi</time>
+  </div>
+</div>
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Sepette bırakan yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

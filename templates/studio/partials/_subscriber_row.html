@@ -1,0 +1,20 @@
+{% load core_tags %}
+<div class="list-group-item py-2" id="subscriber-{{ subscriber.id }}">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <span class="fw-medium">{{ subscriber.email }}</span>{% if subscriber.name %}<span class="text-body-secondary small">{{ subscriber.name }}</span>{% endif %}
+    {% if subscriber.status == "confirmed" %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">{{ subscriber.get_status_display }}</span>
+    {% elif subscriber.status == "pending" %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">{{ subscriber.get_status_display }}</span>
+    {% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ subscriber.get_status_display }}</span>{% endif %}
+    <time class="ms-auto small text-body-tertiary" datetime="{{ subscriber.created_at|date:'c' }}" title="{{ subscriber.created_at|date:'d.m.Y H:i' }}">{{ subscriber.created_at|ago }} abone oldu</time>
+    {% if subscriber.status != "confirmed" %}<button type="button" class="btn btn-outline-secondary btn-sm py-0" hx-post="{% url 'studio:subscriber_action' subscriber.id 'confirm' %}" hx-target="#subscriber-{{ subscriber.id }}" hx-swap="outerHTML" hx-confirm="{{ subscriber.email }} onaylı abone yapılsın mı? Bültenler bu adrese gider.">Onayla</button>{% endif %}
+    {% if subscriber.status != "unsubscribed" %}<button type="button" class="btn btn-outline-danger btn-sm py-0" hx-post="{% url 'studio:subscriber_action' subscriber.id 'unsubscribe' %}" hx-target="#subscriber-{{ subscriber.id }}" hx-swap="outerHTML" hx-confirm="{{ subscriber.email }} abonelikten çıkarılsın mı?">Çıkar</button>{% endif %}
+  </div>
+  <div class="small text-body-secondary">
+    {% if subscriber.status == "unsubscribed" %}
+      {% if subscriber.unsubscribed_at %}<time datetime="{{ subscriber.unsubscribed_at|date:'c' }}" title="{{ subscriber.unsubscribed_at|date:'d.m.Y H:i' }}">{{ subscriber.unsubscribed_at|ago }} çıktı</time>{% else %}Çıktı{% endif %}
+      {% if subscriber.unsubscribe_log_id %} · <a href="{% url 'studio:email_log_detail' subscriber.unsubscribe_log_id %}" class="link-secondary">{{ subscriber.unsubscribe_log_subject }}</a> e-postasından{% else %} · sitedeki formdan ya da yönetici çıkardı{% endif %}
+    {% elif subscriber.confirmed_at %}<time datetime="{{ subscriber.confirmed_at|date:'c' }}" title="{{ subscriber.confirmed_at|date:'d.m.Y H:i' }}">{{ subscriber.confirmed_at|ago }} onayladı</time>
+    {% else %}Onay e-postasındaki bağlantıya henüz tıklamadı{% endif %}
+    {% if subscriber.source %} · <span class="text-body-tertiary">kaynak: {{ subscriber.source }}</span>{% endif %}
+  </div>
+</div>

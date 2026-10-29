@@ -12,33 +12,6 @@
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="E-posta ya da ad" aria-label="E-posta ya da ad ara">
   </form>
   <div class="list-group">
-    {% for subscriber in page %}
-    <div class="list-group-item py-2">
-      <div class="d-flex flex-wrap align-items-center gap-2">
-        <span class="fw-medium">{{ subscriber.email }}</span>{% if subscriber.name %}<span class="text-body-secondary small">{{ subscriber.name }}</span>{% endif %}
-        {% if subscriber.status == "confirmed" %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">{{ subscriber.get_status_display }}</span>
-        {% elif subscriber.status == "pending" %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">{{ subscriber.get_status_display }}</span>
-        {% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ subscriber.get_status_display }}</span>{% endif %}
-        <time class="ms-auto small text-body-tertiary" datetime="{{ subscriber.created_at|date:'c' }}" title="{{ subscriber.created_at|date:'d.m.Y H:i' }}">{{ subscriber.created_at|ago }} abone oldu</time>
-      </div>
-      <div class="small text-body-secondary">
-        {% if subscriber.status == "unsubscribed" %}
-          {% if subscriber.unsubscribed_at %}<time datetime="{{ subscriber.unsubscribed_at|date:'c' }}" title="{{ subscriber.unsubscribed_at|date:'d.m.Y H:i' }}">{{ subscriber.unsubscribed_at|ago }} çıktı</time>{% else %}Çıktı{% endif %}
-          {% if subscriber.unsubscribe_log_id %} · <a href="{% url 'studio:email_log_detail' subscriber.unsubscribe_log_id %}" class="link-secondary">{{ subscriber.unsubscribe_log_subject }}</a> e-postasından{% else %} · sitedeki formdan ya da yönetici çıkardı{% endif %}
-        {% elif subscriber.confirmed_at %}<time datetime="{{ subscriber.confirmed_at|date:'c' }}" title="{{ subscriber.confirmed_at|date:'d.m.Y H:i' }}">{{ subscriber.confirmed_at|ago }} onayladı</time>
-        {% else %}Onay e-postasındaki bağlantıya henüz tıklamadı{% endif %}
-        {% if subscriber.source %} · <span class="text-body-tertiary">kaynak: {{ subscriber.source }}</span>{% endif %}
-      </div>
-    </div>
-    {% empty %}
-    <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede abone yok.</div>
-    {% endfor %}
+    {% include "studio/partials/_subscriber_rows.html" %}
   </div>
-  {% if page.has_other_pages %}
-  <nav class="d-flex justify-content-between align-items-center mt-3 small" aria-label="Sayfalar">
-    {% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-get="{{ subscribers_url }}?durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.previous_page_number }}" hx-target="#subscriber-list" hx-swap="outerHTML" hx-push-url="true">Önceki</a>{% else %}<span></span>{% endif %}
-    <span class="text-body-secondary">{{ page.number }} / {{ page.paginator.num_pages }}</span>
-    {% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-get="{{ subscribers_url }}?durum={{ status }}&q={{ query|urlencode }}&sayfa={{ page.next_page_number }}" hx-target="#subscriber-list" hx-swap="outerHTML" hx-push-url="true">Sonraki</a>{% else %}<span></span>{% endif %}
-  </nav>
-  {% endif %}
 </div>

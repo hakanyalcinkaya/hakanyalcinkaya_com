@@ -1,0 +1,3 @@
+{% load core_tags %}
+<div class="d-flex flex-wrap align-items-center gap-2"><span class="fw-medium">{{ item.title }}</span>{% include "studio/partials/catalog/_status.html" %}<span class="small text-body-secondary">{{ item.price|money }}</span></div>
+<div class="small text-body-tertiary text-truncate">{% for course in item.courses.all %}{{ course.short_title|default:course.title }}{% if not forloop.last %} · {% endif %}{% empty %}Kurs seçilmemiş{% endfor %}</div>

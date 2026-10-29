@@ -1,0 +1,7 @@
+{# Tablolar için kaydırmalı sayfalama satırı (bkz. _more_rows.html). #}
+{% load studio_tags %}
+{% if page.has_next %}
+<tr hx-get="{% next_rows_url page %}" hx-trigger="revealed" hx-swap="outerHTML" hx-sync="this:drop">
+  <td colspan="{{ colspan }}" class="text-center text-body-tertiary py-3"><span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Yükleniyor… ({{ page.end_index }} / {{ page.paginator.count }})</td>
+</tr>
+{% endif %}

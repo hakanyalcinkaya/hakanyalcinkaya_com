@@ -1,0 +1,20 @@
+{% extends "studio/base.html" %}
+{% load crispy_forms_tags %}
+{% block studio_title %}{% if is_new %}Yeni {{ entry.singular|lower }}{% else %}{{ item }}{% endif %}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:catalog_list' entry.kind %}" class="link-secondary text-decoration-none">{{ entry.title }}</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <h1 class="h3 mb-0">{% if is_new %}Yeni {{ entry.singular|lower }}{% else %}{{ item }}{% endif %}</h1>
+  {% if not is_new %}
+  <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:catalog_delete' entry.kind item.pk %}" hx-confirm="{{ item }} silinsin mi? Bu işlem geri alınamaz."><i class="bi bi-trash me-1" aria-hidden="true"></i>Sil</button>
+  {% endif %}
+</div>
+<form method="post" enctype="multipart/form-data" class="border rounded p-3 p-lg-4" style="max-width: 46rem">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <div class="d-flex gap-2 mt-2">
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="{% url 'studio:catalog_list' entry.kind %}" class="btn btn-outline-secondary">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

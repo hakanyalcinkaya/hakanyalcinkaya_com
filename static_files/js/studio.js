@@ -137,6 +137,34 @@
         },
       });
     });
+    // Düz listeler (kurslar, paketler, kategoriler...): bırakınca sıra { ids } olarak data-sort-url'e gönderilir.
+    within(scope, "[data-sortable-list]:not([data-sortable-ready])").forEach(function (list) {
+      list.setAttribute("data-sortable-ready", "");
+      window.Sortable.create(list, {
+        handle: ".studio-handle",
+        draggable: "[data-sort-id]",
+        animation: 150,
+        onEnd: function (event) {
+          if (event.oldIndex === event.newIndex) return;
+          var ids = Array.prototype.map.call(list.querySelectorAll("[data-sort-id]"), function (row) {
+            return row.getAttribute("data-sort-id");
+          });
+          fetch(list.getAttribute("data-sort-url"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken() },
+            body: JSON.stringify({ ids: ids }),
+          })
+            .then(function (response) {
+              if (!response.ok) throw new Error(response.status);
+              toast("success", "Sıra kaydedildi.");
+            })
+            .catch(function () {
+              toast("error", "Sıralama kaydedilemedi; sayfa yenileniyor.");
+              setTimeout(function () { window.location.reload(); }, 1500);
+            });
+        },
+      });
+    });
     within(scope, "[data-sortable-lessons]:not([data-sortable-ready])").forEach(function (list) {
       list.setAttribute("data-sortable-ready", "");
       window.Sortable.create(list, {

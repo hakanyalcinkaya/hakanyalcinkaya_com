@@ -1,0 +1,7 @@
+<div class="d-flex flex-wrap align-items-center gap-2"><span class="fw-medium font-monospace">{{ item.code }}</span>{% include "studio/partials/catalog/_status.html" %}<span class="small text-body-secondary">{{ item.get_kind_display }} · {{ item.label }}</span></div>
+<div class="small text-body-tertiary">
+  {{ item.used_count }}{% if item.max_uses %} / {{ item.max_uses }}{% endif %} kullanım
+  {% if item.valid_until %} · {{ item.valid_until|date:"d.m.Y H:i" }} tarihine kadar{% endif %}
+  · {% for course in item.courses.all %}{{ course.short_title|default:course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}{% for bundle in item.bundles.all %}{% if forloop.first and item.courses.all %}, {% endif %}{{ bundle.short_title }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not item.courses.all and not item.bundles.all %}tüm kurs ve paketler{% endif %}
+  {% if item.note %} · {{ item.note }}{% endif %}
+</div>

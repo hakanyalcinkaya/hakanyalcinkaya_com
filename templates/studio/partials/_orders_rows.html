@@ -1,0 +1,19 @@
+{% load core_tags %}
+{% for order in page %}
+<a href="{% url 'studio:order_detail' order.id %}" class="list-group-item list-group-item-action py-2">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <span class="fw-medium">{{ order.email }}</span>
+    <span class="small text-body-secondary font-monospace">{{ order.number }}</span>
+    {% include "studio/partials/_order_status.html" %}
+    {% if order.discount_code %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ order.discount_code }}</span>{% endif %}
+    <span class="ms-auto fw-medium">{% if order.currency == "TRY" %}{{ order.total|money }}{% else %}{{ order.total }} {{ order.currency }}{% endif %}</span>
+  </div>
+  <div class="d-flex flex-wrap gap-2 small text-body-secondary">
+    <span class="text-truncate">{% for item in order.items.all %}{{ item.title }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
+    <span class="ms-auto text-body-tertiary">{% if order.payment_provider %}{{ order.payment_provider }} · {% endif %}{{ order.paid_at|default:order.created_at|date:"d.m.Y H:i" }}</span>
+  </div>
+</a>
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede sipariş yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

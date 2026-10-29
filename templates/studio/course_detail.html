@@ -14,7 +14,8 @@
       <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Platform başlıklarını eşitle ({{ title_sync_total }})</button>
     </form>
     {% endif %}
-    <a href="{% url 'admin:course_course_change' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Kursu düzenle</a>
+    <a href="{% url 'studio:course_edit' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Kurs bilgileri</a>
+    <a href="{% url 'studio:course_stats' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart me-1" aria-hidden="true"></i>İstatistikler</a>
   </div>
 </div>
 

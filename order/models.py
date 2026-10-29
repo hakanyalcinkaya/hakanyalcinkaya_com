@@ -27,6 +27,14 @@ class OrderQuerySet(models.QuerySet):
     def for_user(self, user):
         return self.filter(user=user) if user.is_authenticated else self.none()
 
+    def containing(self, course):
+        """Kursu doğrudan ya da içindeki bir paketle içeren siparişler."""
+        return self.filter(Q(items__course=course) | Q(items__bundle__courses=course)).distinct()
+
+    def unfinished(self):
+        """Ödeme adımına gelip tamamlanmayanlar (bekleyen ya da başarısız)."""
+        return self.filter(status__in=(OrderStatus.PENDING, OrderStatus.FAILED))
+
 
 def new_order_number():
     return f"HY-{timezone.localdate():%y%m%d}-{secrets.token_hex(3).upper()}"

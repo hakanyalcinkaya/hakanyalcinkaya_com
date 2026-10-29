@@ -1,0 +1,83 @@
+{% extends "studio/base.html" %}
+{% load crispy_forms_tags %}
+{% block studio_title %}{% if course.title %}{{ course.title }}{% else %}Yeni kurs{% endif %}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a> <span class="text-body-tertiary">/</span>{% if not is_new %} <a href="{% url 'studio:course_detail' course.id %}" class="link-secondary text-decoration-none">{{ course.title }}</a> <span class="text-body-tertiary">/</span>{% endif %}</nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">{% if is_new %}Yeni kurs{% else %}Kurs bilgileri{% endif %}</h1>
+    <p class="text-body-secondary mb-0">Başlık, fiyat, sınıflandırma, eğitmenler ve kurs sayfasındaki madde listeleri. Bölüm, ders ve videolar içerik düzenleyicisinde.</p>
+  </div>
+  {% if not is_new %}
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'studio:course_detail' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-collection-play me-1" aria-hidden="true"></i>İçerik ve videolar</a>
+    <a href="{% url 'studio:course_stats' course.id %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart me-1" aria-hidden="true"></i>İstatistikler</a>
+    {% if course.is_published %}<a href="{{ course.get_absolute_url }}" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Sitede gör</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<form method="post" enctype="multipart/form-data" class="d-grid gap-4" style="max-width: 56rem">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  <fieldset class="border rounded p-3 p-lg-4">
+    <legend class="h5 float-none w-auto mb-3">Genel</legend>
+    <div class="row g-3">
+      <div class="col-lg-8">{{ form.title|as_crispy_field }}</div>
+      <div class="col-lg-4">{{ form.short_title|as_crispy_field }}</div>
+      <div class="col-lg-6">{{ form.slug|as_crispy_field }}</div>
+      <div class="col-lg-6">{{ form.subtitle|as_crispy_field }}</div>
+      <div class="col-12">{{ form.description|as_crispy_field }}</div>
+      <div class="col-12">{{ form.image|as_crispy_field }}</div>
+      <div class="col-12">{{ form.access_note|as_crispy_field }}</div>
+    </div>
+  </fieldset>
+  <fieldset class="border rounded p-3 p-lg-4">
+    <legend class="h5 float-none w-auto mb-3">Fiyat (₺, KDV dahil)</legend>
+    <div class="row g-3">
+      <div class="col-sm-6">{{ form.price|as_crispy_field }}</div>
+      <div class="col-sm-6">{{ form.list_price|as_crispy_field }}</div>
+    </div>
+  </fieldset>
+  <fieldset class="border rounded p-3 p-lg-4">
+    <legend class="h5 float-none w-auto mb-3">Sınıflandırma ve eğitmenler</legend>
+    <div class="row g-3">
+      <div class="col-sm-6">{{ form.category|as_crispy_field }}</div>
+      <div class="col-sm-6">{{ form.level|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.subcategories|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.technologies|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.instructors|as_crispy_field }}</div>
+    </div>
+  </fieldset>
+  <fieldset class="border rounded p-3 p-lg-4">
+    <legend class="h5 float-none w-auto mb-1">Kurs sayfasındaki maddeler</legend>
+    <p class="small text-body-secondary">Neler öğreneceksin, özellikler, konular, kazanımlar, kimler için. Kaydedince boş satırlar atlanır; yeni satırlar için kaydedip yeniden aç.</p>
+    {{ highlights.management_form }}
+    {% if highlights.non_form_errors %}<div class="alert alert-danger small" role="alert">{{ highlights.non_form_errors|join:" " }}</div>{% endif %}
+    <div class="d-grid gap-2">
+      {% for item in highlights %}
+      <div class="row g-2 align-items-start border-bottom pb-2">
+        {% for hidden in item.hidden_fields %}{{ hidden }}{% endfor %}
+        <div class="col-sm-3">{{ item.kind }}{% for error in item.kind.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="col-sm-3">{{ item.title }}</div>
+        <div class="col-sm">{{ item.text }}{% for error in item.text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        {% if item.instance.created_at %}
+        <div class="col-sm-auto form-check small pt-1"><input type="checkbox" name="{{ item.DELETE.html_name }}" id="{{ item.DELETE.auto_id }}" class="form-check-input"><label for="{{ item.DELETE.auto_id }}" class="form-check-label text-danger-emphasis">Sil</label></div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <fieldset class="border rounded p-3 p-lg-4">
+    <legend class="h5 float-none w-auto mb-3">Yayın</legend>
+    <div class="row g-3">
+      <div class="col-sm-6">{{ form.status|as_crispy_field }}</div>
+      <div class="col-sm-6">{{ form.published_at|as_crispy_field }}</div>
+    </div>
+  </fieldset>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="{% if is_new %}{% url 'studio:course_list' %}{% else %}{% url 'studio:course_detail' course.id %}{% endif %}" class="btn btn-outline-secondary">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

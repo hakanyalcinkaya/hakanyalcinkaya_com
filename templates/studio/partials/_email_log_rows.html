@@ -1,0 +1,13 @@
+{% for log in page %}
+<tr>
+  <td class="text-nowrap"><a href="{% url 'studio:email_log_detail' log.pk %}" class="text-decoration-none">{{ log.sent_at|default:log.created_at|date:"d.m.Y H:i" }}</a></td>
+  <td>{{ log.to_email }}{% if log.delivered_to != log.to_email %}<div class="text-body-tertiary">→ {{ log.delivered_to }} (test)</div>{% endif %}</td>
+  {% if not in_batch %}<td><a href="{% url 'studio:email_log_detail' log.pk %}" class="fw-medium text-decoration-none">{{ log.subject }}</a><div class="text-body-tertiary">{{ log.label }}</div></td>{% endif %}
+  <td>{% if log.status == "failed" %}<span class="badge text-bg-danger">Hata</span>{% elif log.status == "queued" %}<span class="badge text-bg-secondary">Gönderiliyor</span>{% else %}<span class="text-body-secondary">Gönderildi</span>{% endif %}</td>
+  <td class="text-end">{% if log.first_opened_at %}<i class="bi bi-envelope-open me-1" aria-hidden="true"></i>{{ log.open_count }}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+  <td class="text-end">{% if log.first_clicked_at %}<i class="bi bi-cursor me-1" aria-hidden="true"></i>{{ log.click_count }}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+</tr>
+{% empty %}
+<tr><td colspan="6" class="text-body-secondary text-center py-4">Bu filtrede e-posta yok.</td></tr>
+{% endfor %}
+{% include "studio/partials/_more_table_rows.html" with colspan=6 %}

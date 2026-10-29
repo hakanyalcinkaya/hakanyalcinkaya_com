@@ -134,6 +134,20 @@ class Cart(BaseModel):
         return target
 
 
+class CartItemQuerySet(models.QuerySet):
+    def for_course(self, course):
+        """Kursu doğrudan ya da içindeki bir paketle içeren ürünler."""
+        return self.filter(Q(course=course) | Q(bundle__courses=course)).distinct()
+
+    def left_for(self, course):
+        """Sepete eklenip satın alınmamış: sepet açık ya da boşaltılmış, sahibi kursa kayıtlı değil (misafirler dahil)."""
+        return (
+            self.for_course(course)
+            .filter(cart__status__in=(CartStatus.ACTIVE, CartStatus.EMPTIED))
+            .exclude(cart__user__enrollments__course=course)
+        )
+
+
 class CartItem(BaseModel):
     """Sepetteki ürün: bir kurs ya da bir paket (ikisinden yalnız biri)."""
 
@@ -144,6 +158,8 @@ class CartItem(BaseModel):
     bundle = models.ForeignKey(
         "course.Bundle", on_delete=models.CASCADE, null=True, blank=True, related_name="cart_items", verbose_name=_("paket")
     )
+
+    objects = CartItemQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("sepet ürünü")
