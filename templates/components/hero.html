@@ -1,6 +1,6 @@
 {% load static %}
-<section id="top" aria-labelledby="hero-baslik" class="py-5">
-  <div class="container py-lg-5">
+<section id="top" aria-labelledby="hero-baslik" class="pt-4 pb-5 py-lg-5">
+  <div class="container pt-2 pt-lg-5 pb-lg-5">
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
         <h1 id="hero-baslik" class="display-4 fw-semibold lh-1">Kodla. Üret. <span class="text-primary-emphasis">Kendini Geliştir.</span></h1>
@@ -16,7 +16,8 @@
         </dl>
       </div>
 
-      <div class="col-lg-6">
+      {# Mobilde kurs kaydırıcısı üst menünün hemen altında, başlık onun altında; büyük ekranda başlık solda. #}
+      <div class="col-lg-6 order-first order-lg-0">
         {% with course=courses.0 %}
         <div class="card bg-body-tertiary shadow p-2" data-hero role="region" aria-roledescription="carousel" aria-label="Öne çıkan kurslar — ok tuşlarıyla gezinebilirsin" tabindex="0">
           <div class="ratio ratio-16x9 rounded overflow-hidden bg-body-secondary" data-hero-surface style="touch-action:pan-y">
