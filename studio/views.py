@@ -1,6 +1,7 @@
 import json
 import smtplib
 from functools import partial, wraps
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -25,6 +26,7 @@ from course import video_service
 from course.models import (
     BUSY_UPLOAD_STATUSES,
     FINISHED_UPLOAD_STATUSES,
+    REVIEW_RATINGS,
     Course,
     Lesson,
     LessonSubtitle,
@@ -651,6 +653,8 @@ REVIEW_ACTIONS = {
     "featured": (Review.toggle_featured, ""),
     "home": (Review.toggle_home, ""),
 }
+# Puan filtresi: 5…1 yıldız ya da puansız (yalnız yorum).
+REVIEW_RATING_FILTERS = {str(value): dict(rating=value) for value in range(5, 0, -1)} | {"yok": dict(rating__isnull=True)}
 
 
 def _review_filter(request):
@@ -660,18 +664,33 @@ def _review_filter(request):
 
 @superuser_required
 def reviews(request):
-    """Yorumlar: filtre (durum, kurs) GET parametresinde; HTMX isteğinde yalnız liste döner."""
+    """Yorumlar: filtre (durum, kurs, puan) GET parametresinde; HTMX isteğinde yalnız liste döner."""
     key = _review_filter(request)
     base = Review.objects.select_related("course", "user")
     course_id = request.GET.get("kurs", "")
     if course_id:
         base = base.filter(course_id=course_id) if Course.objects.filter(pk=course_id).exists() else base.none()
+    rating = request.GET.get("puan", "")
+    if rating in REVIEW_RATING_FILTERS:
+        base = base.filter(**REVIEW_RATING_FILTERS[rating])
+    else:
+        rating = ""
     items = REVIEW_FILTERS[key][1](base).order_by("-written_at", "id")
     filters = [
         dict(key=name, label=label, count=apply(base).count(), checked=name == key)
         for name, (label, apply) in REVIEW_FILTERS.items()
     ]
-    context = dict(reviews=items, filters=filters, review_filter=key, course_id=course_id, courses=Course.objects.order_by("title"))
+    context = dict(
+        reviews=items,
+        filters=filters,
+        review_filter=key,
+        course_id=course_id,
+        rating=rating,
+        ratings=[(str(value), stars) for value, stars in reversed(REVIEW_RATINGS)],
+        # Durum sekmeleri diğer filtreleri korur.
+        filter_query=urlencode({name: value for name, value in (("kurs", course_id), ("puan", rating)) if value}),
+        courses=Course.objects.order_by("title"),
+    )
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_review_list.html", context)
     context["import_form"] = ReviewImportForm()

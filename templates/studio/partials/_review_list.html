@@ -1,16 +1,21 @@
-{# Yorum listesi; filtreler GET parametresinde (durum, kurs), HTMX ile yalnız bu blok yenilenir. #}
+{# Yorum listesi; filtreler GET parametresinde (durum, kurs, puan), HTMX ile yalnız bu blok yenilenir. #}
 {% url 'studio:reviews' as reviews_url %}
 <div id="review-list">
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" hx-get="{{ reviews_url }}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change" hx-sync="this:replace">
     <input type="hidden" name="durum" value="{{ review_filter }}">
     <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
       {% for item in filters %}
-      <a href="{{ reviews_url }}?durum={{ item.key }}{% if course_id %}&kurs={{ course_id }}{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}" hx-get="{{ reviews_url }}?durum={{ item.key }}{% if course_id %}&kurs={{ course_id }}{% endif %}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+      <a href="{{ reviews_url }}?durum={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}" hx-get="{{ reviews_url }}?durum={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
     </div>
     <select name="kurs" class="form-select form-select-sm w-auto" aria-label="Kurs">
       <option value="">Tüm kurslar</option>
       {% for course in courses %}<option value="{{ course.pk }}"{% if course_id == course.pk|stringformat:"s" %} selected{% endif %}>{{ course.title }}</option>{% endfor %}
+    </select>
+    <select name="puan" class="form-select form-select-sm w-auto" aria-label="Puan">
+      <option value="">Tüm puanlar</option>
+      {% for value, stars in ratings %}<option value="{{ value }}"{% if rating == value %} selected{% endif %}>{{ stars }} {{ value }}</option>{% endfor %}
+      <option value="yok"{% if rating == "yok" %} selected{% endif %}>Puansız</option>
     </select>
   </form>
   <div class="list-group">
