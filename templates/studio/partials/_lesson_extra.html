@@ -2,8 +2,8 @@
 <span id="lesson-{{ lesson.id }}-extra" class="d-inline-flex align-items-center small"{% if oob %} hx-swap-oob="true"{% endif %}>
   {% if lesson.has_extra_content %}
   <span class="badge border fw-normal text-success-emphasis d-inline-flex align-items-center gap-1" title="{% if lesson.is_video %}Videonun altında “Ek bilgiler” olarak görünür{% else %}Dersin içeriği{% endif %} · {{ lesson.extra_content_words }} kelime">
-    <i class="bi bi-journal-text" aria-hidden="true"></i>{% if lesson.is_video %}Ek bilgi{% else %}İçerik var{% endif %}
     <button type="button" class="btn btn-link btn-sm p-0 lh-1 link-secondary" aria-label="Ek içeriği düzenle" title="Düzenle" hx-get="{% url 'studio:lesson_extra_content_edit' lesson.id %}" hx-target="#studio-dialog-body"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+    <i class="bi bi-journal-text" aria-hidden="true"></i>{% if lesson.is_video %}Ek bilgi{% else %}İçerik var{% endif %}
     <button type="button" class="btn btn-link btn-sm p-0 lh-1 link-secondary" aria-label="Ek içeriği kaldır" title="Kaldır" hx-post="{% url 'studio:lesson_extra_content_delete' lesson.id %}" hx-confirm="“{{ lesson.title }}” dersinin ek içeriği kaldırılsın mı?" hx-target="#lesson-{{ lesson.id }}-extra" hx-swap="outerHTML"><i class="bi bi-x" aria-hidden="true"></i></button>
   </span>
   {% else %}
