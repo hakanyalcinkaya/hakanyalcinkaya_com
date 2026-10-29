@@ -142,6 +142,7 @@ def _course_card(course, flat):
         price=format_try(course.price),
         amount=course.price,
         lessons=len(flat),
+        minutes=minutes,
         duration=hours_minutes(minutes),
         preview_video=preview.get("src", ""),
         preview_poster=preview.get("poster", ""),

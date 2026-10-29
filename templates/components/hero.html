@@ -11,12 +11,12 @@
         </div>
         <dl class="row row-cols-3 g-0 border-top mt-5 pt-4 mb-0" aria-label="Rakamlarla kurslar" style="max-width:420px">
           <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.courses }}</dt><dd class="small text-body-tertiary mt-1 mb-0">kurs</dd></div>
-          <div class="col"><dt class="fs-3 fw-semibold lh-1">100+</dt><dd class="small text-body-tertiary mt-1 mb-0">saat video</dd></div>
+          <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.hours }}</dt><dd class="small text-body-tertiary mt-1 mb-0">saat video</dd></div>
           <div class="col"><dt class="fs-3 fw-semibold lh-1">{{ stats.lessons }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ders</dd></div>
         </dl>
       </div>
 
-      <div class="col-lg-6 order-first order-lg-0">
+      <div class="col-lg-6">
         {% with course=courses.0 %}
         <div class="card bg-body-tertiary shadow p-2" data-hero role="region" aria-roledescription="carousel" aria-label="Öne çıkan kurslar — ok tuşlarıyla gezinebilirsin" tabindex="0">
           <div class="ratio ratio-16x9 rounded overflow-hidden bg-body-secondary" data-hero-surface style="touch-action:pan-y">

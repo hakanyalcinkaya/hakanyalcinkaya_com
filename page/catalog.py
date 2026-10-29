@@ -229,9 +229,23 @@ def course_by_slug(slug):
     return None
 
 
+def _rounded_down(total):
+    """Ana sayfadaki rakamlar: 10 ve üstü onluğa aşağı yuvarlanır ("770+"), küçükse olduğu gibi."""
+    return f"{(total // 10) * 10}+" if total >= 10 else str(total)
+
+
+def _card_minutes(course):
+    # Veritabanındaki kurslarda dakika hesaplanmış gelir; örnek kurslarda süre "52+ saat" metnindedir.
+    if "minutes" in course:
+        return course["minutes"]
+    digits = "".join(char for char in course.get("duration", "").split("saat")[0] if char.isdigit())
+    return int(digits) * 60 if digits else 0
+
+
 def catalog_stats(courses):
     lessons = sum(course["lessons"] for course in courses)
-    return {"courses": len(courses), "lessons": f"{(lessons // 10) * 10}+"}
+    hours = -(-sum(_card_minutes(course) for course in courses) // 60)  # yukarı yuvarlanır: 50 dk → 1 saat
+    return {"courses": len(courses), "lessons": _rounded_down(lessons), "hours": _rounded_down(hours)}
 
 
 def reviews():

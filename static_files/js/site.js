@@ -446,8 +446,7 @@
       go(0);
     });
 
-    if (reduced) reveal();
-    else window.setTimeout(reveal, 900);
+    reveal();
   }
 
   if ("IntersectionObserver" in window) {
