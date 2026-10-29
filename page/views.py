@@ -23,6 +23,7 @@ from page.catalog import (
     NEWSLETTER_SESSION_KEY,
     ORDER_SESSION_KEY,
     RESET_SESSION_KEY,
+    TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
     cart_add,
     cart_remove,
@@ -94,20 +95,22 @@ def course_list(request):
     if done:
         return done
     count = len(courses)
-    return render(
-        request,
-        "page/courses.html",
-        {
-            "form": form,
-            "topic": topic,
-            "course_list": content.with_ratings(courses),
-            "filters": course_filters(topic, cards),
-            "result_text": f"{count} kurs",
-            "empty": count == 0,
-            "stats": catalog_stats(cards),
-            **content.home_reviews(),
-        },
-    )
+    topic_label = dict(TOPIC_FILTERS).get(topic) if topic else ""
+    context = {
+        "form": form,
+        "topic": topic,
+        "page_title": f"{topic_label} kursları — Hakan Yalçınkaya" if topic_label else "Kurslar — Hakan Yalçınkaya",
+        "course_list": content.with_ratings(courses),
+        "filters": course_filters(topic, cards),
+        "result_text": f"{count} kurs",
+        "empty": count == 0,
+        "stats": catalog_stats(cards),
+    }
+    # Konu filtresi HTMX ile yalnız listeyi yeniler.
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "page/partials/course_list.html", context)
+    context.update(content.home_reviews())
+    return render(request, "page/courses.html", context)
 
 
 def _enrolled(request, slug):

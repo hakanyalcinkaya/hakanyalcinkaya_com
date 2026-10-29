@@ -1,0 +1,72 @@
+{# Kurs listesi ve konu filtresi; filtre HTMX ile yalnız bu bölümü yeniler (adres ve sayfa başlığı da güncellenir). #}
+{% load static %}
+{% if request.htmx %}<title>{{ page_title }}</title>{% endif %}
+<section id="kurs-listesi" aria-labelledby="liste-baslik" class="py-5 bg-body-tertiary border-bottom">
+  <div class="container">
+    <h2 id="liste-baslik" class="visually-hidden">Kurs listesi</h2>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div role="radiogroup" aria-label="Konuya göre filtrele" class="btn-group">
+        {% for item in filters %}
+        <a href="{{ item.url }}" hx-get="{{ item.url }}" hx-target="#kurs-listesi" hx-swap="outerHTML" hx-push-url="true" hx-sync="#kurs-listesi:replace" role="radio" aria-checked="{% if item.checked %}true{% else %}false{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}">{{ item.label }} <span class="text-body-tertiary ms-1">{{ item.count }}</span></a>
+        {% endfor %}
+      </div>
+      <p class="small text-body-tertiary mb-0" aria-live="polite">{{ result_text }}</p>
+    </div>
+
+    {% if empty %}
+    <div class="card text-center p-5">
+      <p class="fw-semibold mb-1">Bu konuda henüz kurs yok.</p>
+      <p class="text-body-secondary mb-3">Yeni kurslar eklendiğinde e-postayla haber vermemizi ister misin?</p>
+      <div class="d-flex justify-content-center gap-2">
+        <a href="{% url 'page:course_list' %}" class="btn btn-outline-secondary">Tüm kursları göster</a>
+        <a href="#bulten" class="btn btn-primary">Bültene katıl</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="d-grid gap-3">
+      {% for course in course_list %}
+      <article class="card shadow overflow-hidden hover-lift" aria-labelledby="egitim-{{ forloop.counter }}">
+        <div class="row g-0">
+          <div class="col-md-5">
+            <a href="{{ course.url }}" tabindex="-1" aria-label="{{ course.image_label }}" class="d-flex align-items-center h-100 bg-body-secondary">
+              {# Görselin içinde kurs adı yazılı; 16:9 korunur, kenarları kırpılmaz. #}
+              <div class="ratio ratio-16x9">
+                <img src="{% static course.image %}" alt="{{ course.alt }}" width="1280" height="720" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" decoding="async" class="object-fit-cover">
+              </div>
+            </a>
+          </div>
+          <div class="col-md-7 d-flex flex-column">
+            <div class="card-body p-4 p-lg-5 pb-lg-4">
+              <div class="d-flex flex-wrap gap-1">
+                {% for tag in course.tags %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ tag }}</span>{% endfor %}
+              </div>
+              <h3 id="egitim-{{ forloop.counter }}" class="h4 fw-semibold mt-3 mb-2"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a></h3>
+              <p class="text-body-secondary mb-3" style="max-width:56ch">{{ course.description }}</p>
+              <ul class="list-inline small text-body-secondary mb-0">
+                <li class="list-inline-item me-3"><i class="bi bi-clock me-1 text-body-tertiary" aria-hidden="true"></i><span class="visually-hidden">Süre: </span>{{ course.duration }}</li>
+                <li class="list-inline-item me-3"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders</li>
+                <li class="list-inline-item"><i class="bi bi-bar-chart me-1 text-body-tertiary" aria-hidden="true"></i>{{ course.level_text|default:"Sıfırdan başlar" }}</li>
+              </ul>
+            </div>
+            <div class="card-footer bg-transparent d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 px-lg-5 py-3 mt-auto">
+              {% if course.owned %}
+              <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Eğitimlerinde</span>
+              <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                <a href="{{ course.url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Eğitime git</a>
+              </div>
+              {% else %}
+              <div class="fs-3 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+              <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></button></form>
+                <a href="{{ course.url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

@@ -133,7 +133,7 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 }
 
 /* İlk bölüm (ekranın üstü) animasyonsuz görünür; aşağıdaki bölümler kaydırınca belirir. */
-.js main > section:not(:first-child){
+.js main > section:not(:first-of-type){
   opacity:0;
   transform:translateY(36px);
   transition:opacity .7s ease, transform .7s ease;
