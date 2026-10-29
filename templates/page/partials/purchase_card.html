@@ -8,7 +8,7 @@
       <li><i class="bi bi-clock me-2 text-body-tertiary" aria-hidden="true"></i>{{ course.duration }} detaylı video</li>
       <li><i class="bi bi-collection-play me-2 text-body-tertiary" aria-hidden="true"></i>{{ course.lessons }} ders · {{ section_count }} bölüm</li>
       <li><i class="bi bi-kanban me-2 text-body-tertiary" aria-hidden="true"></i>Her bölümde bölüm sonu projesi</li>
-      {% if first_preview %}<li><i class="bi bi-play-circle me-2 text-body-tertiary" aria-hidden="true"></i><a href="{{ first_preview.url }}">{{ preview_count }} dersi ücretsiz izle</a></li>{% endif %}
+      {% if first_preview and not course.owned %}<li><i class="bi bi-play-circle me-2 text-body-tertiary" aria-hidden="true"></i><a href="{{ first_preview.url }}">{{ preview_count }} dersi ücretsiz izle</a></li>{% endif %}
     </ul>
   </div>
   {% if detail.discount %}
