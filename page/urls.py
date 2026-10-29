@@ -1,5 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path, reverse_lazy
+from django.views.generic import RedirectView
 
 from page import views
 from page.forms import NewPasswordForm
@@ -12,17 +13,19 @@ urlpatterns = [
     path("cart/", views.cart, name="cart"),
     path("checkout/", views.checkout, name="checkout"),
     path("thanks/", views.thanks, name="thanks"),
-    path("p/products/library/", views.library, name="library"),
+    path("library/", views.library, name="library"),
+    # Eski platformun (Podia) Kurslarım adresi: yeni adrese kalıcı yönlenir (sorgu parametreleri korunur).
+    path("p/products/library/", RedirectView.as_view(pattern_name="page:library", permanent=True, query_string=True)),
     # Eski platform (Podia) ders adresi: yeni adrese kalıcı yönlenir.
     path(
         "p/courses/<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/",
         views.legacy_lesson,
         name="legacy_lesson",
     ),
-    path("p/lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
-    path("p/lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
-    path("p/courses/<slug:slug>/review/", views.course_review, name="course_review"),
-    path("p/courses/<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
+    path("lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
+    path("lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
+    path("courses/<slug:slug>/review/", views.course_review, name="course_review"),
+    path("courses/<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
     path("reviews/", views.all_reviews, name="all_reviews"),
     path("account/login/", views.login, name="login"),
     path("account/signup/", views.signup, name="signup"),
