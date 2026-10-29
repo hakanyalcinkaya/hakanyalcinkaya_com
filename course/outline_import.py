@@ -1,7 +1,7 @@
 """Kurs içeriğini (bilgiler, sayfa maddeleri, bölüm ve ders başlıkları) bir taslak dosyasından aktarır (course/outlines/*.json).
 
-Tekrar çalıştırılabilir. Bölüm ve dersler slug'larıyla eşleşir; slug'lar eski platformdakiyle aynıdır, böylece eski ders
-adresleri yalnız alan adı değiştirilerek yönlendirilebilir. Var olan derslerin videoları korunur. Videoları daha önce dosya
+Tekrar çalıştırılabilir. Bölüm ve dersler slug'larıyla eşleşir; eski platformdaki slug'la (legacy_slug, ör.
+"2383524-baslangic") açılmış olanlar yeni slug'a ("baslangic") çevrilir. Eski adresler legacy_slug'la yönlendirilir. Var olan derslerin videoları korunur. Videoları daha önce dosya
 adıyla açılmış dersler ("001-002-...") sıra numarasıyla taslaktaki derse bağlanır (1. bölüm, 2. ders). Taslakta karşılığı
 olmayan dersler silinmez, sona "Eşleşmeyen dersler" bölümüne taşınır.
 
@@ -18,9 +18,8 @@ from django.core.files import File
 from django.db import transaction
 
 from core.models import Status
-from course.models import CourseHighlight, HighlightKind, Lesson, LessonKind, Section, Technology
+from course.models import LEFTOVER_SECTION_SLUG, CourseHighlight, HighlightKind, Lesson, LessonKind, Section, Technology
 
-LEFTOVER_SECTION_SLUG = "eslesmeyen-dersler"
 FILE_NUMBER = re.compile(r"^(\d{3})-(\d{3})(?!\d)")
 INFO_FIELDS = ("title", "short_title", "subtitle", "description", "access_note")
 
@@ -77,7 +76,9 @@ def _fill_highlights(course, highlights, replace, report):
 
 def _sync_curriculum(course, sections, report):
     lessons = list(Lesson.objects.filter(section__course=course).select_related("section"))
-    by_slug = {lesson.slug: lesson for lesson in lessons}
+    by_lesson_slug = {}
+    for lesson in lessons:
+        by_lesson_slug.setdefault(lesson.slug, []).append(lesson)
     by_number = {}
     for lesson in lessons:
         key = _number_key(lesson.title)
@@ -86,6 +87,12 @@ def _sync_curriculum(course, sections, report):
     used, counts = set(), Counter()
     for section_no, item in enumerate(sections, start=1):
         section = course.sections.filter(slug=item["slug"]).first()
+        if section is None and item.get("legacy_slug"):
+            section = course.sections.filter(slug=item["legacy_slug"]).first()
+            if section is not None:
+                section.slug = item["slug"]
+                section.save(update_fields=["slug", "updated_at"])
+                counts["section_renamed"] += 1
         if section is None:
             section = Section.objects.create(
                 course=course, title=item["title"], slug=item["slug"], sort_order=section_no, status=Status.PUBLISHED
@@ -95,7 +102,18 @@ def _sync_curriculum(course, sections, report):
             section.sort_order = section_no
             section.save(update_fields=["sort_order", "updated_at"])
         for lesson_no, entry in enumerate(item["lessons"], start=1):
-            lesson = by_slug.get(entry["slug"])
+            lesson = None
+            for slug in filter(None, (entry["slug"], entry.get("legacy_slug"))):
+                candidates = [found for found in by_lesson_slug.get(slug, []) if found.pk not in used]
+                # Önce aynı bölümdeki, yoksa kursta bu slug'lı tek ders.
+                lesson = next((found for found in candidates if found.section_id == section.pk), None) or (
+                    candidates[0] if len(candidates) == 1 else None
+                )
+                if lesson is not None:
+                    break
+            if lesson is not None and lesson.slug != entry["slug"]:
+                lesson.slug = entry["slug"]
+                counts["lesson_renamed"] += 1
             numbered = by_number.get((section_no, lesson_no), [])
             if lesson is not None:
                 counts["lesson_kept"] += 1

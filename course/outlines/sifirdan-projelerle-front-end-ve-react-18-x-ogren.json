@@ -129,83 +129,97 @@
  "sections": [
   {
    "title": "Başlangıç",
-   "slug": "2383524-baslangic",
+   "slug": "baslangic",
+   "legacy_slug": "2383524-baslangic",
    "lessons": [
     {
      "title": "Yeni Teknoloji Çıktı.. Şimdi Ne Olacak? Hemen En Yeni Olana Geçmeli miyiz?",
-     "slug": "7588422-yeni-teknoloji-cikti-simdi-ne-olacak-hemen-en-yeni-olana-gecmeli-miyiz",
+     "slug": "yeni-teknoloji-cikti-simdi-ne-olacak-hemen-en-yeni-olana-gecmeli-miyiz",
+     "legacy_slug": "7588422-yeni-teknoloji-cikti-simdi-ne-olacak-hemen-en-yeni-olana-gecmeli-miyiz",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Frameworkler ve Yazılım Dillerindeki Versiyon Değişiklikleri Hakkında Genel Bilgi",
-     "slug": "8277860-frameworkler-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     "slug": "frameworkler-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
+     "legacy_slug": "8277860-frameworkler-ve-yazilim-dillerindeki-versiyon-degisiklikleri-hakkinda-genel-bilgi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Çözüm Geliştirici Olmak",
-     "slug": "7588425-cozum-gelistirici-olmak",
+     "slug": "cozum-gelistirici-olmak",
+     "legacy_slug": "7588425-cozum-gelistirici-olmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Diff Checker - Yazdığınız Koddaki Farklılıkları Bulmak",
-     "slug": "7588417-diff-checker-yazdiginiz-koddaki-farkliliklari-bulmak",
+     "slug": "diff-checker-yazdiginiz-koddaki-farkliliklari-bulmak",
+     "legacy_slug": "7588417-diff-checker-yazdiginiz-koddaki-farkliliklari-bulmak",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Denemek ve Yeniden Yeni Yollar Denemek",
-     "slug": "7588421-denemek-ve-yeniden-yeni-yollar-denemek",
+     "slug": "denemek-ve-yeniden-yeni-yollar-denemek",
+     "legacy_slug": "7588421-denemek-ve-yeniden-yeni-yollar-denemek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "10 Günde Yazılan Yazılım Dili..",
-     "slug": "7588418-10-gunde-yazilan-yazilim-dili",
+     "slug": "10-gunde-yazilan-yazilim-dili",
+     "legacy_slug": "7588418-10-gunde-yazilan-yazilim-dili",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Front-End Yol Haritası",
-     "slug": "7588423-front-end-yol-haritasi",
+     "slug": "front-end-yol-haritasi",
+     "legacy_slug": "7588423-front-end-yol-haritasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Biraz Tarihçe :) HTML, CSS, JavaScript ve Browser Tarihçesi",
-     "slug": "7588431-biraz-tarihce-html-css-javascript-ve-browser-tarihcesi",
+     "slug": "biraz-tarihce-html-css-javascript-ve-browser-tarihcesi",
+     "legacy_slug": "7588431-biraz-tarihce-html-css-javascript-ve-browser-tarihcesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bu Eğitimi Alırsam Front-End Developer Olabilir miyim?",
-     "slug": "7588419-bu-egitimi-alirsam-front-end-developer-olabilir-miyim",
+     "slug": "bu-egitimi-alirsam-front-end-developer-olabilir-miyim",
+     "legacy_slug": "7588419-bu-egitimi-alirsam-front-end-developer-olabilir-miyim",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Sınıf İçi Eğitim vs Özel Ders vs Video Eğitim",
-     "slug": "7588433-sinif-ici-egitim-vs-ozel-ders-vs-video-egitim",
+     "slug": "sinif-ici-egitim-vs-ozel-ders-vs-video-egitim",
+     "legacy_slug": "7588433-sinif-ici-egitim-vs-ozel-ders-vs-video-egitim",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Yapay Zeka ve Biz",
-     "slug": "8278302-yapay-zeka-ve-biz",
+     "slug": "yapay-zeka-ve-biz",
+     "legacy_slug": "8278302-yapay-zeka-ve-biz",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Front-End Eğitiminde Kullanılan Kaynak Dosyalara Nasıl Erişebilirim",
-     "slug": "8647987-front-end-egitiminde-kullanilan-kaynak-dosyalara-nasil-erisebilirim",
+     "slug": "front-end-egitiminde-kullanilan-kaynak-dosyalara-nasil-erisebilirim",
+     "legacy_slug": "8647987-front-end-egitiminde-kullanilan-kaynak-dosyalara-nasil-erisebilirim",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8071776-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8071776-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -213,23 +227,27 @@
   },
   {
    "title": "Kurulum",
-   "slug": "2383525-kurulum",
+   "slug": "kurulum",
+   "legacy_slug": "2383525-kurulum",
    "lessons": [
     {
      "title": "Windows İşletim Sistemine Gerekli Kurulumların Yapılması",
-     "slug": "7588426-windows-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
+     "slug": "windows-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
+     "legacy_slug": "7588426-windows-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "macOS İşletim Sistemine Gerekli Kurulumların Yapılması",
-     "slug": "7588429-macos-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
+     "slug": "macos-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
+     "legacy_slug": "7588429-macos-isletim-sistemine-gerekli-kurulumlarin-yapilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "GitHub Profilinin Açılması",
-     "slug": "7588428-github-profilinin-acilmasi",
+     "slug": "github-profilinin-acilmasi",
+     "legacy_slug": "7588428-github-profilinin-acilmasi",
      "kind": "video",
      "preview": false
     }
@@ -237,35 +255,41 @@
   },
   {
    "title": "Eğitime Hazırlık: Notion, Chrome ve MarkDown ile Üretkenliğinizi Arttırın",
-   "slug": "2383526-egitime-hazirlik-notion-chrome-ve-markdown-ile-uretkenliginizi-arttirin",
+   "slug": "egitime-hazirlik-notion-chrome-ve-markdown-ile-uretkenliginizi-arttirin",
+   "legacy_slug": "2383526-egitime-hazirlik-notion-chrome-ve-markdown-ile-uretkenliginizi-arttirin",
    "lessons": [
     {
      "title": "Notion ile Not Alma Sisteminin Oluşturulması",
-     "slug": "7588435-notion-ile-not-alma-sisteminin-olusturulmasi",
+     "slug": "notion-ile-not-alma-sisteminin-olusturulmasi",
+     "legacy_slug": "7588435-notion-ile-not-alma-sisteminin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Chrome'da Sayfaların Bookmark ile Organize Edilmesi",
-     "slug": "7588432-chrome-da-sayfalarin-bookmark-ile-organize-edilmesi",
+     "slug": "chrome-da-sayfalarin-bookmark-ile-organize-edilmesi",
+     "legacy_slug": "7588432-chrome-da-sayfalarin-bookmark-ile-organize-edilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Visual Studio Code - Genel Kullanımı",
-     "slug": "7588436-visual-studio-code-genel-kullanimi",
+     "slug": "visual-studio-code-genel-kullanimi",
+     "legacy_slug": "7588436-visual-studio-code-genel-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "*Markdown Nedir? Nasıl Kullanılır?",
-     "slug": "7588453-markdown-nedir-nasil-kullanilir",
+     "slug": "markdown-nedir-nasil-kullanilir",
+     "legacy_slug": "7588453-markdown-nedir-nasil-kullanilir",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8071778-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8071778-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -273,191 +297,223 @@
   },
   {
    "title": "HTML",
-   "slug": "2383527-html",
+   "slug": "html",
+   "legacy_slug": "2383527-html",
    "lessons": [
     {
      "title": "HTML Nedir?",
-     "slug": "7588441-html-nedir",
+     "slug": "html-nedir",
+     "legacy_slug": "7588441-html-nedir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Arkana Yaslan - CSS Olmadan Web Siteleri Nasıl Gözüküyor?",
-     "slug": "7588438-arkana-yaslan-css-olmadan-web-siteleri-nasil-gozukuyor",
+     "slug": "arkana-yaslan-css-olmadan-web-siteleri-nasil-gozukuyor",
+     "legacy_slug": "7588438-arkana-yaslan-css-olmadan-web-siteleri-nasil-gozukuyor",
      "kind": "video",
      "preview": false
     },
     {
      "title": "İlk HTML Dokümanının Oluşturulması",
-     "slug": "7588448-ilk-html-dokumaninin-olusturulmasi",
+     "slug": "ilk-html-dokumaninin-olusturulmasi",
+     "legacy_slug": "7588448-ilk-html-dokumaninin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Başlıklar ve Paragraflar ile Çalışmak",
-     "slug": "7588450-basliklar-ve-paragraflar-ile-calismak",
+     "slug": "basliklar-ve-paragraflar-ile-calismak",
+     "legacy_slug": "7588450-basliklar-ve-paragraflar-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "HTML Yapısının Emmet ile Oluşturulması",
-     "slug": "7588466-html-yapisinin-emmet-ile-olusturulmasi",
+     "slug": "html-yapisinin-emmet-ile-olusturulmasi",
+     "legacy_slug": "7588466-html-yapisinin-emmet-ile-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Visual Studio Code içinde Hangi Yapısal Dil ile Çalıştığımızın Belirlenmesi",
-     "slug": "7588440-visual-studio-code-icinde-hangi-yapisal-dil-ile-calistigimizin-belirlenmesi",
+     "slug": "visual-studio-code-icinde-hangi-yapisal-dil-ile-calistigimizin-belirlenmesi",
+     "legacy_slug": "7588440-visual-studio-code-icinde-hangi-yapisal-dil-ile-calistigimizin-belirlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Açıklama Satırı Eklemek",
-     "slug": "7588455-aciklama-satiri-eklemek",
+     "slug": "aciklama-satiri-eklemek",
+     "legacy_slug": "7588455-aciklama-satiri-eklemek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Listeler ile Çalışmak",
-     "slug": "7588452-listeler-ile-calismak",
+     "slug": "listeler-ile-calismak",
+     "legacy_slug": "7588452-listeler-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Emmet ile Çalışmak - Bölüm 1",
-     "slug": "7588465-emmet-ile-calismak-bolum-1",
+     "slug": "emmet-ile-calismak-bolum-1",
+     "legacy_slug": "7588465-emmet-ile-calismak-bolum-1",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Emmet ile Çalışmak - Bölüm 2",
-     "slug": "7588459-emmet-ile-calismak-bolum-2",
+     "slug": "emmet-ile-calismak-bolum-2",
+     "legacy_slug": "7588459-emmet-ile-calismak-bolum-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Emmet ile Çalışmak - Bölüm 3",
-     "slug": "7588462-emmet-ile-calismak-bolum-3",
+     "slug": "emmet-ile-calismak-bolum-3",
+     "legacy_slug": "7588462-emmet-ile-calismak-bolum-3",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Linkler ile Çalışmak",
-     "slug": "7588474-linkler-ile-calismak",
+     "slug": "linkler-ile-calismak",
+     "legacy_slug": "7588474-linkler-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "HTML Yapılarına Görsel Eklemek",
-     "slug": "7588486-html-yapilarina-gorsel-eklemek",
+     "slug": "html-yapilarina-gorsel-eklemek",
+     "legacy_slug": "7588486-html-yapilarina-gorsel-eklemek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Link ve Görselin Birlikte Kullanımı",
-     "slug": "7588461-link-ve-gorselin-birlikte-kullanimi",
+     "slug": "link-ve-gorselin-birlikte-kullanimi",
+     "legacy_slug": "7588461-link-ve-gorselin-birlikte-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bold ve İtalik Gibi Metinsel Özelliklerin Eklenmesi",
-     "slug": "7588467-bold-ve-italik-gibi-metinsel-ozelliklerin-eklenmesi",
+     "slug": "bold-ve-italik-gibi-metinsel-ozelliklerin-eklenmesi",
+     "legacy_slug": "7588467-bold-ve-italik-gibi-metinsel-ozelliklerin-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Block ve Inline Etiketler Nelerdir? Nasıl Kullanılır?",
-     "slug": "7588472-block-ve-inline-etiketler-nelerdir-nasil-kullanilir",
+     "slug": "block-ve-inline-etiketler-nelerdir-nasil-kullanilir",
+     "legacy_slug": "7588472-block-ve-inline-etiketler-nelerdir-nasil-kullanilir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Tablo ile Çalışmak",
-     "slug": "7588468-tablo-ile-calismak",
+     "slug": "tablo-ile-calismak",
+     "legacy_slug": "7588468-tablo-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Girintiler(Indentations) ile Çalışmak",
-     "slug": "7588471-girintiler-indentations-ile-calismak",
+     "slug": "girintiler-indentations-ile-calismak",
+     "legacy_slug": "7588471-girintiler-indentations-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "HTML Etiketlerine Ekstra Özellikler Eklenebilmesi",
-     "slug": "7588473-html-etiketlerine-ekstra-ozellikler-eklenebilmesi",
+     "slug": "html-etiketlerine-ekstra-ozellikler-eklenebilmesi",
+     "legacy_slug": "7588473-html-etiketlerine-ekstra-ozellikler-eklenebilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Semantic(Anlamlandırılmış) Etiketlerin Kullanımı",
-     "slug": "7588479-semantic-anlamlandirilmis-etiketlerin-kullanimi",
+     "slug": "semantic-anlamlandirilmis-etiketlerin-kullanimi",
+     "legacy_slug": "7588479-semantic-anlamlandirilmis-etiketlerin-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Web Sitelerinde Erişilebilirlik",
-     "slug": "7588488-web-sitelerinde-erisilebilirlik",
+     "slug": "web-sitelerinde-erisilebilirlik",
+     "legacy_slug": "7588488-web-sitelerinde-erisilebilirlik",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Erişilebilirlik için Tasarım (Ek Bilgi)",
-     "slug": "7588480-erisilebilirlik-icin-tasarim-ek-bilgi",
+     "slug": "erisilebilirlik-icin-tasarim-ek-bilgi",
+     "legacy_slug": "7588480-erisilebilirlik-icin-tasarim-ek-bilgi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Diğer HTML Etiketleri Neler",
-     "slug": "7588483-diger-html-etiketleri-neler",
+     "slug": "diger-html-etiketleri-neler",
+     "legacy_slug": "7588483-diger-html-etiketleri-neler",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Sürpriz Yumurta :)",
-     "slug": "7588481-surpriz-yumurta",
+     "slug": "surpriz-yumurta",
+     "legacy_slug": "7588481-surpriz-yumurta",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1",
-     "slug": "7588510-bolum-sonu-projesi-1",
+     "slug": "bolum-sonu-projesi-1",
+     "legacy_slug": "7588510-bolum-sonu-projesi-1",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1 - Projeyi Canlıya Almak",
-     "slug": "7588490-bolum-sonu-projesi-1-projeyi-canliya-almak",
+     "slug": "bolum-sonu-projesi-1-projeyi-canliya-almak",
+     "legacy_slug": "7588490-bolum-sonu-projesi-1-projeyi-canliya-almak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2",
-     "slug": "7588518-bolum-sonu-projesi-2",
+     "slug": "bolum-sonu-projesi-2",
+     "legacy_slug": "7588518-bolum-sonu-projesi-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2 - Projeyi Canlıya Almak",
-     "slug": "7588485-bolum-sonu-projesi-2-projeyi-canliya-almak",
+     "slug": "bolum-sonu-projesi-2-projeyi-canliya-almak",
+     "legacy_slug": "7588485-bolum-sonu-projesi-2-projeyi-canliya-almak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Classless CSS - İlham",
-     "slug": "9333532-classless-css-ilham",
+     "slug": "classless-css-ilham",
+     "legacy_slug": "9333532-classless-css-ilham",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Hikayesi",
-     "slug": "7588517-bolum-sonu-hikayesi",
+     "slug": "bolum-sonu-hikayesi",
+     "legacy_slug": "7588517-bolum-sonu-hikayesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8071779-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8071779-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -465,107 +521,125 @@
   },
   {
    "title": "Visual Studio Code (VS Code) Kulllanımı",
-   "slug": "2383530-visual-studio-code-vs-code-kulllanimi",
+   "slug": "visual-studio-code-vs-code-kulllanimi",
+   "legacy_slug": "2383530-visual-studio-code-vs-code-kulllanimi",
    "lessons": [
     {
      "title": "Ekran Kullanımının İyileştirilmesi",
-     "slug": "7588508-ekran-kullaniminin-iyilestirilmesi",
+     "slug": "ekran-kullaniminin-iyilestirilmesi",
+     "legacy_slug": "7588508-ekran-kullaniminin-iyilestirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "IDE Nedir? Metin/Kod Editörü Nedir?",
-     "slug": "7588519-ide-nedir-metin-kod-editoru-nedir",
+     "slug": "ide-nedir-metin-kod-editoru-nedir",
+     "legacy_slug": "7588519-ide-nedir-metin-kod-editoru-nedir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code Genel Görünümü ve Görünüm Özellikleri",
-     "slug": "7588520-vs-code-genel-gorunumu-ve-gorunum-ozellikleri",
+     "slug": "vs-code-genel-gorunumu-ve-gorunum-ozellikleri",
+     "legacy_slug": "7588520-vs-code-genel-gorunumu-ve-gorunum-ozellikleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Proje Klasörü Açmak ve Birden Fazla Proje ile Çalışmak",
-     "slug": "7588522-proje-klasoru-acmak-ve-birden-fazla-proje-ile-calismak",
+     "slug": "proje-klasoru-acmak-ve-birden-fazla-proje-ile-calismak",
+     "legacy_slug": "7588522-proje-klasoru-acmak-ve-birden-fazla-proje-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code içinde Dosya ve Klasör Açma Taktikleri",
-     "slug": "7588523-vs-code-icinde-dosya-ve-klasor-acma-taktikleri",
+     "slug": "vs-code-icinde-dosya-ve-klasor-acma-taktikleri",
+     "legacy_slug": "7588523-vs-code-icinde-dosya-ve-klasor-acma-taktikleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code Ayarlarının İncelenmesi ve Birden Fazla Profil ile Çalışmak",
-     "slug": "7588524-vs-code-ayarlarinin-incelenmesi-ve-birden-fazla-profil-ile-calismak",
+     "slug": "vs-code-ayarlarinin-incelenmesi-ve-birden-fazla-profil-ile-calismak",
+     "legacy_slug": "7588524-vs-code-ayarlarinin-incelenmesi-ve-birden-fazla-profil-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Font Kullanımı",
-     "slug": "7588525-font-kullanimi",
+     "slug": "font-kullanimi",
+     "legacy_slug": "7588525-font-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Görünümün Ayarlanması: Temalar ve İkonlar",
-     "slug": "7588527-gorunumun-ayarlanmasi-temalar-ve-ikonlar",
+     "slug": "gorunumun-ayarlanmasi-temalar-ve-ikonlar",
+     "legacy_slug": "7588527-gorunumun-ayarlanmasi-temalar-ve-ikonlar",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code - Birden Fazla Profil ile Çalışmak",
-     "slug": "7588529-vs-code-birden-fazla-profil-ile-calismak",
+     "slug": "vs-code-birden-fazla-profil-ile-calismak",
+     "legacy_slug": "7588529-vs-code-birden-fazla-profil-ile-calismak",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Outline ve Breadcrumbs",
-     "slug": "7588528-outline-ve-breadcrumbs",
+     "slug": "outline-ve-breadcrumbs",
+     "legacy_slug": "7588528-outline-ve-breadcrumbs",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Multi-Cursor Kullanımı",
-     "slug": "7588533-multi-cursor-kullanimi",
+     "slug": "multi-cursor-kullanimi",
+     "legacy_slug": "7588533-multi-cursor-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Blok Yapılarını Kopyalama ve Taşıma",
-     "slug": "7588530-blok-yapilarini-kopyalama-ve-tasima",
+     "slug": "blok-yapilarini-kopyalama-ve-tasima",
+     "legacy_slug": "7588530-blok-yapilarini-kopyalama-ve-tasima",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Klavye Kısayol Tuşları ile Çalışmak",
-     "slug": "7588534-klavye-kisayol-tuslari-ile-calismak",
+     "slug": "klavye-kisayol-tuslari-ile-calismak",
+     "legacy_slug": "7588534-klavye-kisayol-tuslari-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Code Snippets Kullanımı",
-     "slug": "7588539-code-snippets-kullanimi",
+     "slug": "code-snippets-kullanimi",
+     "legacy_slug": "7588539-code-snippets-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code içinde Terminal ile Çalışmak",
-     "slug": "7588535-vs-code-icinde-terminal-ile-calismak",
+     "slug": "vs-code-icinde-terminal-ile-calismak",
+     "legacy_slug": "7588535-vs-code-icinde-terminal-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code Playground",
-     "slug": "7588537-vs-code-playground",
+     "slug": "vs-code-playground",
+     "legacy_slug": "7588537-vs-code-playground",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074625-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074625-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -573,95 +647,111 @@
   },
   {
    "title": "Git Versiyon Kontrol Sistemi ve GitHub Platformu",
-   "slug": "2383531-git-versiyon-kontrol-sistemi-ve-github-platformu",
+   "slug": "git-versiyon-kontrol-sistemi-ve-github-platformu",
+   "legacy_slug": "2383531-git-versiyon-kontrol-sistemi-ve-github-platformu",
    "lessons": [
     {
      "title": "Neden Versiyon Kontrol Sistemi Kullanıyoruz?",
-     "slug": "7588543-neden-versiyon-kontrol-sistemi-kullaniyoruz",
+     "slug": "neden-versiyon-kontrol-sistemi-kullaniyoruz",
+     "legacy_slug": "7588543-neden-versiyon-kontrol-sistemi-kullaniyoruz",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Versiyon Kontrol Sistemi Görsel Demo",
-     "slug": "7588542-versiyon-kontrol-sistemi-gorsel-demo",
+     "slug": "versiyon-kontrol-sistemi-gorsel-demo",
+     "legacy_slug": "7588542-versiyon-kontrol-sistemi-gorsel-demo",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Projelerde Versiyon Kontrol Sisteminin Oluşturulması (git init)",
-     "slug": "7588555-projelerde-versiyon-kontrol-sisteminin-olusturulmasi-git-init",
+     "slug": "projelerde-versiyon-kontrol-sisteminin-olusturulmasi-git-init",
+     "legacy_slug": "7588555-projelerde-versiyon-kontrol-sisteminin-olusturulmasi-git-init",
      "kind": "video",
      "preview": false
     },
     {
      "title": ".gitignore ile Versiyonlanmayacak Dosya ve Klasorlerin Tanımlanması",
-     "slug": "7588553-gitignore-ile-versiyonlanmayacak-dosya-ve-klasorlerin-tanimlanmasi",
+     "slug": "gitignore-ile-versiyonlanmayacak-dosya-ve-klasorlerin-tanimlanmasi",
+     "legacy_slug": "7588553-gitignore-ile-versiyonlanmayacak-dosya-ve-klasorlerin-tanimlanmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": ".gitignore Dosyasının Diğer Projelere Eklenmesi",
-     "slug": "7588544-gitignore-dosyasinin-diger-projelere-eklenmesi",
+     "slug": "gitignore-dosyasinin-diger-projelere-eklenmesi",
+     "legacy_slug": "7588544-gitignore-dosyasinin-diger-projelere-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Terminal'de Versiyon Kontrol Sistemi Komutları",
-     "slug": "7588546-terminal-de-versiyon-kontrol-sistemi-komutlari",
+     "slug": "terminal-de-versiyon-kontrol-sistemi-komutlari",
+     "legacy_slug": "7588546-terminal-de-versiyon-kontrol-sistemi-komutlari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Birden Fazla Branch ile Çalışmak",
-     "slug": "7588551-birden-fazla-branch-ile-calismak",
+     "slug": "birden-fazla-branch-ile-calismak",
+     "legacy_slug": "7588551-birden-fazla-branch-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "GitHub Profil Sayfasının Oluşturulması",
-     "slug": "7588560-github-profil-sayfasinin-olusturulmasi",
+     "slug": "github-profil-sayfasinin-olusturulmasi",
+     "legacy_slug": "7588560-github-profil-sayfasinin-olusturulmasi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "GitHub'a Projenin Aktarılması",
-     "slug": "7588562-github-a-projenin-aktarilmasi",
+     "slug": "github-a-projenin-aktarilmasi",
+     "legacy_slug": "7588562-github-a-projenin-aktarilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Uzaktaki Repodan(GitHub) Projenin Clone ile Alınması - Projenin Senkron Edilmesi",
-     "slug": "7588552-uzaktaki-repodan-github-projenin-clone-ile-alinmasi-projenin-senkron-edilmesi",
+     "slug": "uzaktaki-repodan-github-projenin-clone-ile-alinmasi-projenin-senkron-edilmesi",
+     "legacy_slug": "7588552-uzaktaki-repodan-github-projenin-clone-ile-alinmasi-projenin-senkron-edilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS-Code'u Online Açmak ve GitHub Üzerindeki Repoda Değişiklik Yapmak",
-     "slug": "7588554-vs-code-u-online-acmak-ve-github-uzerindeki-repoda-degisiklik-yapmak",
+     "slug": "vs-code-u-online-acmak-ve-github-uzerindeki-repoda-degisiklik-yapmak",
+     "legacy_slug": "7588554-vs-code-u-online-acmak-ve-github-uzerindeki-repoda-degisiklik-yapmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "GitHub.io (GitHub Pages) üzerinde Web Sitemizi Yayınlamak",
-     "slug": "7588565-github-io-github-pages-uzerinde-web-sitemizi-yayinlamak",
+     "slug": "github-io-github-pages-uzerinde-web-sitemizi-yayinlamak",
+     "legacy_slug": "7588565-github-io-github-pages-uzerinde-web-sitemizi-yayinlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "GitHub Gist'i Keşfet, Code Snippets ve Diğer Bilgilerini GitHub Gist'e Kaydet",
-     "slug": "7588558-github-gist-i-kesfet-code-snippets-ve-diger-bilgilerini-github-gist-e-kaydet",
+     "slug": "github-gist-i-kesfet-code-snippets-ve-diger-bilgilerini-github-gist-e-kaydet",
+     "legacy_slug": "7588558-github-gist-i-kesfet-code-snippets-ve-diger-bilgilerini-github-gist-e-kaydet",
      "kind": "video",
      "preview": false
     },
     {
      "title": "GitHub Alternatifleri",
-     "slug": "7588561-github-alternatifleri",
+     "slug": "github-alternatifleri",
+     "legacy_slug": "7588561-github-alternatifleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074636-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074636-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -669,263 +759,307 @@
   },
   {
    "title": "CSS",
-   "slug": "2383532-css",
+   "slug": "css",
+   "legacy_slug": "2383532-css",
    "lessons": [
     {
      "title": "CSS Nedir",
-     "slug": "7588563-css-nedir",
+     "slug": "css-nedir",
+     "legacy_slug": "7588563-css-nedir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CSS Tanımlamaları - Inline, Internal ve External CSS Tanımlamaları",
-     "slug": "7588570-css-tanimlamalari-inline-internal-ve-external-css-tanimlamalari",
+     "slug": "css-tanimlamalari-inline-internal-ve-external-css-tanimlamalari",
+     "legacy_slug": "7588570-css-tanimlamalari-inline-internal-ve-external-css-tanimlamalari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Relative Path, Root-Relative Path ve Absolute Path ile Dosya Yeri Belirlemek",
-     "slug": "7588566-relative-path-root-relative-path-ve-absolute-path-ile-dosya-yeri-belirlemek",
+     "slug": "relative-path-root-relative-path-ve-absolute-path-ile-dosya-yeri-belirlemek",
+     "legacy_slug": "7588566-relative-path-root-relative-path-ve-absolute-path-ile-dosya-yeri-belirlemek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Açıklama Satırı Eklemek, Genel Seçiciler ve CSS Yazma Kuralları",
-     "slug": "7588573-aciklama-satiri-eklemek-genel-seciciler-ve-css-yazma-kurallari",
+     "slug": "aciklama-satiri-eklemek-genel-seciciler-ve-css-yazma-kurallari",
+     "legacy_slug": "7588573-aciklama-satiri-eklemek-genel-seciciler-ve-css-yazma-kurallari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CSS Seçicileri ile Çalışmak",
-     "slug": "7588577-css-secicileri-ile-calismak",
+     "slug": "css-secicileri-ile-calismak",
+     "legacy_slug": "7588577-css-secicileri-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Block, Inline ve Inline-Block Yapılarını Anlamak",
-     "slug": "7588575-block-inline-ve-inline-block-yapilarini-anlamak",
+     "slug": "block-inline-ve-inline-block-yapilarini-anlamak",
+     "legacy_slug": "7588575-block-inline-ve-inline-block-yapilarini-anlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Kutu Özellikleri: Margin, Padding, Border, Width ve Height",
-     "slug": "7588588-kutu-ozellikleri-margin-padding-border-width-ve-height",
+     "slug": "kutu-ozellikleri-margin-padding-border-width-ve-height",
+     "legacy_slug": "7588588-kutu-ozellikleri-margin-padding-border-width-ve-height",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Görünürlük: Visibility ve Display None Arasındaki Farklar",
-     "slug": "7588572-gorunurluk-visibility-ve-display-none-arasindaki-farklar",
+     "slug": "gorunurluk-visibility-ve-display-none-arasindaki-farklar",
+     "legacy_slug": "7588572-gorunurluk-visibility-ve-display-none-arasindaki-farklar",
      "kind": "video",
      "preview": false
     },
     {
      "title": "User Agent CSS Düzenlemeri",
-     "slug": "7588593-user-agent-css-duzenlemeri",
+     "slug": "user-agent-css-duzenlemeri",
+     "legacy_slug": "7588593-user-agent-css-duzenlemeri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Hover ve Display None Özelliklerinin Birlikte Kullanımı",
-     "slug": "7588598-hover-ve-display-none-ozelliklerinin-birlikte-kullanimi",
+     "slug": "hover-ve-display-none-ozelliklerinin-birlikte-kullanimi",
+     "legacy_slug": "7588598-hover-ve-display-none-ozelliklerinin-birlikte-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CSS Reset ve Normalize Nedir ve Neden Kullanılmalı",
-     "slug": "7588594-css-reset-ve-normalize-nedir-ve-neden-kullanilmali",
+     "slug": "css-reset-ve-normalize-nedir-ve-neden-kullanilmali",
+     "legacy_slug": "7588594-css-reset-ve-normalize-nedir-ve-neden-kullanilmali",
      "kind": "video",
      "preview": true
     },
     {
      "title": "CSS Bloklarının/Yapılarının Organize Edilmesi",
-     "slug": "7588600-css-bloklarinin-yapilarinin-organize-edilmesi",
+     "slug": "css-bloklarinin-yapilarinin-organize-edilmesi",
+     "legacy_slug": "7588600-css-bloklarinin-yapilarinin-organize-edilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Background-Image Kullanımı",
-     "slug": "7588602-background-image-kullanimi",
+     "slug": "background-image-kullanimi",
+     "legacy_slug": "7588602-background-image-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Renk Tanımlamaları - HEX, RGBA ve HSL Kullanımı",
-     "slug": "7588606-renk-tanimlamalari-hex-rgba-ve-hsl-kullanimi",
+     "slug": "renk-tanimlamalari-hex-rgba-ve-hsl-kullanimi",
+     "legacy_slug": "7588606-renk-tanimlamalari-hex-rgba-ve-hsl-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Metin Özellikleri",
-     "slug": "7588635-metin-ozellikleri",
+     "slug": "metin-ozellikleri",
+     "legacy_slug": "7588635-metin-ozellikleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Font Size, REM ve EM Kullanımları",
-     "slug": "7588609-font-size-rem-ve-em-kullanimlari",
+     "slug": "font-size-rem-ve-em-kullanimlari",
+     "legacy_slug": "7588609-font-size-rem-ve-em-kullanimlari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Font-Family Kullanımı",
-     "slug": "7588607-font-family-kullanimi",
+     "slug": "font-family-kullanimi",
+     "legacy_slug": "7588607-font-family-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Float Kullanımı",
-     "slug": "7588608-float-kullanimi",
+     "slug": "float-kullanimi",
+     "legacy_slug": "7588608-float-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Liste Özellikleri",
-     "slug": "7588633-liste-ozellikleri",
+     "slug": "liste-ozellikleri",
+     "legacy_slug": "7588633-liste-ozellikleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CSS Değişkenleri ile Çalışmak ve Değişkenleri :root ile Tanımlamak",
-     "slug": "7597577-css-degiskenleri-ile-calismak-ve-degiskenleri-root-ile-tanimlamak",
+     "slug": "css-degiskenleri-ile-calismak-ve-degiskenleri-root-ile-tanimlamak",
+     "legacy_slug": "7597577-css-degiskenleri-ile-calismak-ve-degiskenleri-root-ile-tanimlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": ":root ile Dark Theme Oluşturmak",
-     "slug": "7588613-root-ile-dark-theme-olusturmak",
+     "slug": "root-ile-dark-theme-olusturmak",
+     "legacy_slug": "7588613-root-ile-dark-theme-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Proje1: Pico Clone - NavBar",
-     "slug": "7588645-proje1-pico-clone-navbar",
+     "slug": "proje1-pico-clone-navbar",
+     "legacy_slug": "7588645-proje1-pico-clone-navbar",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Proje1: Pico Clone - Dark Theme",
-     "slug": "7588611-proje1-pico-clone-dark-theme",
+     "slug": "proje1-pico-clone-dark-theme",
+     "legacy_slug": "7588611-proje1-pico-clone-dark-theme",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Proje1: Pico Clone - main Block ve aside Düzenlemeleri",
-     "slug": "7588639-proje1-pico-clone-main-block-ve-aside-duzenlemeleri",
+     "slug": "proje1-pico-clone-main-block-ve-aside-duzenlemeleri",
+     "legacy_slug": "7588639-proje1-pico-clone-main-block-ve-aside-duzenlemeleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Proje1: Pico Clone - Article Yapısının Eklenmesi",
-     "slug": "7588644-proje1-pico-clone-article-yapisinin-eklenmesi",
+     "slug": "proje1-pico-clone-article-yapisinin-eklenmesi",
+     "legacy_slug": "7588644-proje1-pico-clone-article-yapisinin-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Neden Classless CSS Kullandık",
-     "slug": "7588640-neden-classless-css-kullandik",
+     "slug": "neden-classless-css-kullandik",
+     "legacy_slug": "7588640-neden-classless-css-kullandik",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CSS Positions ile Objelerin Yerleşiminin Değiştirilmesi",
-     "slug": "7588652-css-positions-ile-objelerin-yerlesiminin-degistirilmesi",
+     "slug": "css-positions-ile-objelerin-yerlesiminin-degistirilmesi",
+     "legacy_slug": "7588652-css-positions-ile-objelerin-yerlesiminin-degistirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Media Query ile Responsive Yapılar Oluşturmak",
-     "slug": "7588649-media-query-ile-responsive-yapilar-olusturmak",
+     "slug": "media-query-ile-responsive-yapilar-olusturmak",
+     "legacy_slug": "7588649-media-query-ile-responsive-yapilar-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "CodePen ile Denemeler Yapmak",
-     "slug": "7588643-codepen-ile-denemeler-yapmak",
+     "slug": "codepen-ile-denemeler-yapmak",
+     "legacy_slug": "7588643-codepen-ile-denemeler-yapmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox Kullanımı ve İlk Yapının Oluşturulması",
-     "slug": "7588647-flexbox-kullanimi-ve-ilk-yapinin-olusturulmasi",
+     "slug": "flexbox-kullanimi-ve-ilk-yapinin-olusturulmasi",
+     "legacy_slug": "7588647-flexbox-kullanimi-ve-ilk-yapinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox - Justify Content Kullanımı",
-     "slug": "7588648-flexbox-justify-content-kullanimi",
+     "slug": "flexbox-justify-content-kullanimi",
+     "legacy_slug": "7588648-flexbox-justify-content-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox - Justify Content Özelliklerine Devam ;)",
-     "slug": "7588651-flexbox-justify-content-ozelliklerine-devam",
+     "slug": "flexbox-justify-content-ozelliklerine-devam",
+     "legacy_slug": "7588651-flexbox-justify-content-ozelliklerine-devam",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox ile Ekranın Ortasında Kutu Oluşturulması",
-     "slug": "7588653-flexbox-ile-ekranin-ortasinda-kutu-olusturulmasi",
+     "slug": "flexbox-ile-ekranin-ortasinda-kutu-olusturulmasi",
+     "legacy_slug": "7588653-flexbox-ile-ekranin-ortasinda-kutu-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox ile Google Layout(İskelet) Yapısının Oluşturulması",
-     "slug": "7588665-flexbox-ile-google-layout-iskelet-yapisinin-olusturulmasi",
+     "slug": "flexbox-ile-google-layout-iskelet-yapisinin-olusturulmasi",
+     "legacy_slug": "7588665-flexbox-ile-google-layout-iskelet-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox - Order Kullanımı ile Responsive Yapıda Sıralamanın Değiştirilmesi",
-     "slug": "7588664-flexbox-order-kullanimi-ile-responsive-yapida-siralamanin-degistirilmesi",
+     "slug": "flexbox-order-kullanimi-ile-responsive-yapida-siralamanin-degistirilmesi",
+     "legacy_slug": "7588664-flexbox-order-kullanimi-ile-responsive-yapida-siralamanin-degistirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox - Align Self ile Tek Bir Kutunun Yerleşiminin Değiştirilmesi",
-     "slug": "7588663-flexbox-align-self-ile-tek-bir-kutunun-yerlesiminin-degistirilmesi",
+     "slug": "flexbox-align-self-ile-tek-bir-kutunun-yerlesiminin-degistirilmesi",
+     "legacy_slug": "7588663-flexbox-align-self-ile-tek-bir-kutunun-yerlesiminin-degistirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Flexbox - Wrap, Grow, Shrink ve Basis Kullamımları",
-     "slug": "7588728-flexbox-wrap-grow-shrink-ve-basis-kullamimlari",
+     "slug": "flexbox-wrap-grow-shrink-ve-basis-kullamimlari",
+     "legacy_slug": "7588728-flexbox-wrap-grow-shrink-ve-basis-kullamimlari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi: Yapının Hazırlanması ve Navbar",
-     "slug": "7588669-bolum-sonu-projesi-yapinin-hazirlanmasi-ve-navbar",
+     "slug": "bolum-sonu-projesi-yapinin-hazirlanmasi-ve-navbar",
+     "legacy_slug": "7588669-bolum-sonu-projesi-yapinin-hazirlanmasi-ve-navbar",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi: Main Kısmının Oluşturulması",
-     "slug": "7588666-bolum-sonu-projesi-main-kisminin-olusturulmasi",
+     "slug": "bolum-sonu-projesi-main-kisminin-olusturulmasi",
+     "legacy_slug": "7588666-bolum-sonu-projesi-main-kisminin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi: Aside Kısmının Oluşturulması",
-     "slug": "7588668-bolum-sonu-projesi-aside-kisminin-olusturulmasi",
+     "slug": "bolum-sonu-projesi-aside-kisminin-olusturulmasi",
+     "legacy_slug": "7588668-bolum-sonu-projesi-aside-kisminin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi: Alt Kısmın Oluşturulması",
-     "slug": "7588717-bolum-sonu-projesi-alt-kismin-olusturulmasi",
+     "slug": "bolum-sonu-projesi-alt-kismin-olusturulmasi",
+     "legacy_slug": "7588717-bolum-sonu-projesi-alt-kismin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi: Projenin Yayına/Canlıya Alınması",
-     "slug": "7588667-bolum-sonu-projesi-projenin-yayina-canliya-alinmasi",
+     "slug": "bolum-sonu-projesi-projenin-yayina-canliya-alinmasi",
+     "legacy_slug": "7588667-bolum-sonu-projesi-projenin-yayina-canliya-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074639-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074639-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -933,125 +1067,146 @@
   },
   {
    "title": "SASS - SCSS",
-   "slug": "2383533-sass-scss",
+   "slug": "sass-scss",
+   "legacy_slug": "2383533-sass-scss",
    "lessons": [
     {
      "title": "SASS / SCSS Nedir?",
-     "slug": "7588711-sass-scss-nedir",
+     "slug": "sass-scss-nedir",
+     "legacy_slug": "7588711-sass-scss-nedir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "SCSS ve SASS Arasındaki Farklar Nedir?",
-     "slug": "7588670-scss-ve-sass-arasindaki-farklar-nedir",
+     "slug": "scss-ve-sass-arasindaki-farklar-nedir",
+     "legacy_slug": "7588670-scss-ve-sass-arasindaki-farklar-nedir",
      "kind": "video",
      "preview": true
     },
     {
      "title": "SCSS'i Online Ortamda ve Proje İçinde Kullanmak/Ayarlamak",
-     "slug": "7588718-scss-i-online-ortamda-ve-proje-icinde-kullanmak-ayarlamak",
+     "slug": "scss-i-online-ortamda-ve-proje-icinde-kullanmak-ayarlamak",
+     "legacy_slug": "7588718-scss-i-online-ortamda-ve-proje-icinde-kullanmak-ayarlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code içinde Live Sass Compiler Kullanımı ile Sass Kullanımı",
-     "slug": "7588712-vs-code-icinde-live-sass-compiler-kullanimi-ile-sass-kullanimi",
+     "slug": "vs-code-icinde-live-sass-compiler-kullanimi-ile-sass-kullanimi",
+     "legacy_slug": "7588712-vs-code-icinde-live-sass-compiler-kullanimi-ile-sass-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "VS Code içerisinde Hazırladığım Repo için Live Sass Compiler Ayarlar Düzenlemesi",
-     "slug": "7588715-vs-code-icerisinde-hazirladigim-repo-icin-live-sass-compiler-ayarlar-duzenlemesi",
+     "slug": "vs-code-icerisinde-hazirladigim-repo-icin-live-sass-compiler-ayarlar-duzenlemesi",
+     "legacy_slug": "7588715-vs-code-icerisinde-hazirladigim-repo-icin-live-sass-compiler-ayarlar-duzenlemesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "README Dosyasındaki Linkler ve .gitignore Düzenlemesi Hakkında",
-     "slug": "7588709-readme-dosyasindaki-linkler-ve-gitignore-duzenlemesi-hakkinda",
+     "slug": "readme-dosyasindaki-linkler-ve-gitignore-duzenlemesi-hakkinda",
+     "legacy_slug": "7588709-readme-dosyasindaki-linkler-ve-gitignore-duzenlemesi-hakkinda",
      "kind": "video",
      "preview": false
     },
     {
      "title": "SCSS - Değişken Tanımlamak",
-     "slug": "7588720-scss-degisken-tanimlamak",
+     "slug": "scss-degisken-tanimlamak",
+     "legacy_slug": "7588720-scss-degisken-tanimlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "SCSS ile import Kullanımı",
-     "slug": "7588719-scss-ile-import-kullanimi",
+     "slug": "scss-ile-import-kullanimi",
+     "legacy_slug": "7588719-scss-ile-import-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "SCSS Nesting Kullanımı",
-     "slug": "7588733-scss-nesting-kullanimi",
+     "slug": "scss-nesting-kullanimi",
+     "legacy_slug": "7588733-scss-nesting-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Parent Selector Kullanımı",
-     "slug": "7588721-parent-selector-kullanimi",
+     "slug": "parent-selector-kullanimi",
+     "legacy_slug": "7588721-parent-selector-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Mixin Kullanımı",
-     "slug": "7588730-mixin-kullanimi",
+     "slug": "mixin-kullanimi",
+     "legacy_slug": "7588730-mixin-kullanimi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Extend Kullanımı",
-     "slug": "7588725-extend-kullanimi",
+     "slug": "extend-kullanimi",
+     "legacy_slug": "7588725-extend-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Interpolation Kullanımı",
-     "slug": "7588729-interpolation-kullanimi",
+     "slug": "interpolation-kullanimi",
+     "legacy_slug": "7588729-interpolation-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "List ile Birden Fazla Değişkenin Sistemde Tutulabilmesi",
-     "slug": "7588732-list-ile-birden-fazla-degiskenin-sistemde-tutulabilmesi",
+     "slug": "list-ile-birden-fazla-degiskenin-sistemde-tutulabilmesi",
+     "legacy_slug": "7588732-list-ile-birden-fazla-degiskenin-sistemde-tutulabilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Each Kullanımı (Liste İçindeki Verileri Döngüde Kullanmak)",
-     "slug": "7588731-each-kullanimi-liste-icindeki-verileri-dongude-kullanmak",
+     "slug": "each-kullanimi-liste-icindeki-verileri-dongude-kullanmak",
+     "legacy_slug": "7588731-each-kullanimi-liste-icindeki-verileri-dongude-kullanmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Map Kullanımı(Key / Value Yapıları Kullanımı)",
-     "slug": "7588737-map-kullanimi-key-value-yapilari-kullanimi",
+     "slug": "map-kullanimi-key-value-yapilari-kullanimi",
+     "legacy_slug": "7588737-map-kullanimi-key-value-yapilari-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "For Kullanımı",
-     "slug": "7588734-for-kullanimi",
+     "slug": "for-kullanimi",
+     "legacy_slug": "7588734-for-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "SCSS Renk Fonksiyonlarının Kullanımı",
-     "slug": "7588736-scss-renk-fonksiyonlarinin-kullanimi",
+     "slug": "scss-renk-fonksiyonlarinin-kullanimi",
+     "legacy_slug": "7588736-scss-renk-fonksiyonlarinin-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması:Classless CSS ile Yapılan Blog Çalışmasının SCSS'e Çevirmek",
-     "slug": "7588745-bolum-sonu-calismasi-classless-css-ile-yapilan-blog-calismasinin-scss-e-cevirmek",
+     "slug": "bolum-sonu-calismasi-classless-css-ile-yapilan-blog-calismasinin-scss-e-cevirmek",
+     "legacy_slug": "7588745-bolum-sonu-calismasi-classless-css-ile-yapilan-blog-calismasinin-scss-e-cevirmek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074650-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074650-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1059,155 +1214,181 @@
   },
   {
    "title": "Bootstrap",
-   "slug": "2383534-bootstrap",
+   "slug": "bootstrap",
+   "legacy_slug": "2383534-bootstrap",
    "lessons": [
     {
      "title": "Bootstrap Nedir? Alternatifleri Nelerdir?",
-     "slug": "7588746-bootstrap-nedir-alternatifleri-nelerdir",
+     "slug": "bootstrap-nedir-alternatifleri-nelerdir",
+     "legacy_slug": "7588746-bootstrap-nedir-alternatifleri-nelerdir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Arkana Yaslan: Online Platform ile Web Sitesi Yapımı ve Bootstrap'ı Özelleştirmek",
-     "slug": "7588743-arkana-yaslan-online-platform-ile-web-sitesi-yapimi-ve-bootstrap-i-ozellestirmek",
+     "slug": "arkana-yaslan-online-platform-ile-web-sitesi-yapimi-ve-bootstrap-i-ozellestirmek",
+     "legacy_slug": "7588743-arkana-yaslan-online-platform-ile-web-sitesi-yapimi-ve-bootstrap-i-ozellestirmek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bootstrap'ın Standardize Ettiği Renk İsimlendirmelerini Anlamak",
-     "slug": "7588744-bootstrap-in-standardize-ettigi-renk-isimlendirmelerini-anlamak",
+     "slug": "bootstrap-in-standardize-ettigi-renk-isimlendirmelerini-anlamak",
+     "legacy_slug": "7588744-bootstrap-in-standardize-ettigi-renk-isimlendirmelerini-anlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "UI Nedir? UX Nedir? Bu Kavramlar Neden Önemli?",
-     "slug": "7588750-ui-nedir-ux-nedir-bu-kavramlar-neden-onemli",
+     "slug": "ui-nedir-ux-nedir-bu-kavramlar-neden-onemli",
+     "legacy_slug": "7588750-ui-nedir-ux-nedir-bu-kavramlar-neden-onemli",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Container ve Grid(Izgara) Sistemini Anlamak",
-     "slug": "7588748-container-ve-grid-izgara-sistemini-anlamak",
+     "slug": "container-ve-grid-izgara-sistemini-anlamak",
+     "legacy_slug": "7588748-container-ve-grid-izgara-sistemini-anlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Grid Sistem ile Çalışmak",
-     "slug": "7588756-grid-sistem-ile-calismak",
+     "slug": "grid-sistem-ile-calismak",
+     "legacy_slug": "7588756-grid-sistem-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Responsive (Cihaz Uyumlu) Grid Sistem Oluşturmak",
-     "slug": "7588754-responsive-cihaz-uyumlu-grid-sistem-olusturmak",
+     "slug": "responsive-cihaz-uyumlu-grid-sistem-olusturmak",
+     "legacy_slug": "7588754-responsive-cihaz-uyumlu-grid-sistem-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Responsive Yapılarda Reordering(Cihaz Uyumlu Düzen Değişimi)",
-     "slug": "7588752-responsive-yapilarda-reordering-cihaz-uyumlu-duzen-degisimi",
+     "slug": "responsive-yapilarda-reordering-cihaz-uyumlu-duzen-degisimi",
+     "legacy_slug": "7588752-responsive-yapilarda-reordering-cihaz-uyumlu-duzen-degisimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Margin ve Padding Kullanımı",
-     "slug": "7588751-margin-ve-padding-kullanimi",
+     "slug": "margin-ve-padding-kullanimi",
+     "legacy_slug": "7588751-margin-ve-padding-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Responsive Uyumlu Olarak Yapıları Gizlemek veya Göstermek",
-     "slug": "7588755-responsive-uyumlu-olarak-yapilari-gizlemek-veya-gostermek",
+     "slug": "responsive-uyumlu-olarak-yapilari-gizlemek-veya-gostermek",
+     "legacy_slug": "7588755-responsive-uyumlu-olarak-yapilari-gizlemek-veya-gostermek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bootstrap Dokümantasyonunda Gezinti.. Özelliklerin İncelenmesi",
-     "slug": "7588760-bootstrap-dokumantasyonunda-gezinti-ozelliklerin-incelenmesi",
+     "slug": "bootstrap-dokumantasyonunda-gezinti-ozelliklerin-incelenmesi",
+     "legacy_slug": "7588760-bootstrap-dokumantasyonunda-gezinti-ozelliklerin-incelenmesi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Bölüm Sonu Projesi 1: Navbar ve Üst Bilgi",
-     "slug": "7588779-bolum-sonu-projesi-1-navbar-ve-ust-bilgi",
+     "slug": "bolum-sonu-projesi-1-navbar-ve-ust-bilgi",
+     "legacy_slug": "7588779-bolum-sonu-projesi-1-navbar-ve-ust-bilgi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Hero Info",
-     "slug": "7588758-bolum-sonu-projesi-1-hero-info",
+     "slug": "bolum-sonu-projesi-1-hero-info",
+     "legacy_slug": "7588758-bolum-sonu-projesi-1-hero-info",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Card Yapısının Oluşturulması",
-     "slug": "7588774-bolum-sonu-projesi-1-card-yapisinin-olusturulmasi",
+     "slug": "bolum-sonu-projesi-1-card-yapisinin-olusturulmasi",
+     "legacy_slug": "7588774-bolum-sonu-projesi-1-card-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Aside ve Makalelerin Oluşturulması",
-     "slug": "7588801-bolum-sonu-projesi-1-aside-ve-makalelerin-olusturulmasi",
+     "slug": "bolum-sonu-projesi-1-aside-ve-makalelerin-olusturulmasi",
+     "legacy_slug": "7588801-bolum-sonu-projesi-1-aside-ve-makalelerin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Aside ve Diğer İçeriklerin Zenginleştirilmesi",
-     "slug": "7588777-bolum-sonu-projesi-1-aside-ve-diger-iceriklerin-zenginlestirilmesi",
+     "slug": "bolum-sonu-projesi-1-aside-ve-diger-iceriklerin-zenginlestirilmesi",
+     "legacy_slug": "7588777-bolum-sonu-projesi-1-aside-ve-diger-iceriklerin-zenginlestirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Footer ve Görsellerin Eklenmesi",
-     "slug": "7588807-bolum-sonu-projesi-1-footer-ve-gorsellerin-eklenmesi",
+     "slug": "bolum-sonu-projesi-1-footer-ve-gorsellerin-eklenmesi",
+     "legacy_slug": "7588807-bolum-sonu-projesi-1-footer-ve-gorsellerin-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 1: Projenin Canlıya Alınması",
-     "slug": "7588789-bolum-sonu-projesi-1-projenin-canliya-alinmasi",
+     "slug": "bolum-sonu-projesi-1-projenin-canliya-alinmasi",
+     "legacy_slug": "7588789-bolum-sonu-projesi-1-projenin-canliya-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Layout: Navbar ve İlk Kısımların Düzenlemesi",
-     "slug": "7588804-bolum-sonu-projesi-2-starbucks-layout-navbar-ve-ilk-kisimlarin-duzenlemesi",
+     "slug": "bolum-sonu-projesi-2-starbucks-layout-navbar-ve-ilk-kisimlarin-duzenlemesi",
+     "legacy_slug": "7588804-bolum-sonu-projesi-2-starbucks-layout-navbar-ve-ilk-kisimlarin-duzenlemesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Layout: Genel Yapının Düzenlenmesi",
-     "slug": "7588805-bolum-sonu-projesi-2-starbucks-layout-genel-yapinin-duzenlenmesi",
+     "slug": "bolum-sonu-projesi-2-starbucks-layout-genel-yapinin-duzenlenmesi",
+     "legacy_slug": "7588805-bolum-sonu-projesi-2-starbucks-layout-genel-yapinin-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Layout: İçerik ve Card Yapısının Düzenlenmesi",
-     "slug": "7588829-bolum-sonu-projesi-2-starbucks-layout-icerik-ve-card-yapisinin-duzenlenmesi",
+     "slug": "bolum-sonu-projesi-2-starbucks-layout-icerik-ve-card-yapisinin-duzenlenmesi",
+     "legacy_slug": "7588829-bolum-sonu-projesi-2-starbucks-layout-icerik-ve-card-yapisinin-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Layout: Aside Layout Düzenlenmesi",
-     "slug": "7588810-bolum-sonu-projesi-2-starbucks-layout-aside-layout-duzenlenmesi",
+     "slug": "bolum-sonu-projesi-2-starbucks-layout-aside-layout-duzenlenmesi",
+     "legacy_slug": "7588810-bolum-sonu-projesi-2-starbucks-layout-aside-layout-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Layout: Footer Düzenlenmesi",
-     "slug": "7588833-bolum-sonu-projesi-2-starbucks-layout-footer-duzenlenmesi",
+     "slug": "bolum-sonu-projesi-2-starbucks-layout-footer-duzenlenmesi",
+     "legacy_slug": "7588833-bolum-sonu-projesi-2-starbucks-layout-footer-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Projesi 2: Starbucks Lyt: CSS Düzenleme ve Projenin Canlıya Alınması",
-     "slug": "7588815-bolum-sonu-projesi-2-starbucks-lyt-css-duzenleme-ve-projenin-canliya-alinmasi",
+     "slug": "bolum-sonu-projesi-2-starbucks-lyt-css-duzenleme-ve-projenin-canliya-alinmasi",
+     "legacy_slug": "7588815-bolum-sonu-projesi-2-starbucks-lyt-css-duzenleme-ve-projenin-canliya-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074653-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074653-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1215,317 +1396,370 @@
   },
   {
    "title": "JavaScript",
-   "slug": "2383535-javascript",
+   "slug": "javascript",
+   "legacy_slug": "2383535-javascript",
    "lessons": [
     {
      "title": "JavaScript ile İlk Kodun Oluşturulması ve İlk Çıktının Alınması",
-     "slug": "7588812-javascript-ile-ilk-kodun-olusturulmasi-ve-ilk-ciktinin-alinmasi",
+     "slug": "javascript-ile-ilk-kodun-olusturulmasi-ve-ilk-ciktinin-alinmasi",
+     "legacy_slug": "7588812-javascript-ile-ilk-kodun-olusturulmasi-ve-ilk-ciktinin-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "console.log Nedir? Nasıl Kullanılır?",
-     "slug": "7588816-console-log-nedir-nasil-kullanilir",
+     "slug": "console-log-nedir-nasil-kullanilir",
+     "legacy_slug": "7588816-console-log-nedir-nasil-kullanilir",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Değişken Tanımlama ve İsimlendirme Kuralları",
-     "slug": "7588822-degisken-tanimlama-ve-isimlendirme-kurallari",
+     "slug": "degisken-tanimlama-ve-isimlendirme-kurallari",
+     "legacy_slug": "7588822-degisken-tanimlama-ve-isimlendirme-kurallari",
      "kind": "video",
      "preview": false
     },
     {
      "title": "let, const, var ile Değişken Tanımlamak ve Aralarındaki Farklar",
-     "slug": "7588831-let-const-var-ile-degisken-tanimlamak-ve-aralarindaki-farklar",
+     "slug": "let-const-var-ile-degisken-tanimlamak-ve-aralarindaki-farklar",
+     "legacy_slug": "7588831-let-const-var-ile-degisken-tanimlamak-ve-aralarindaki-farklar",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Boolean Veri Tipi ile Çalışmak",
-     "slug": "7588824-boolean-veri-tipi-ile-calismak",
+     "slug": "boolean-veri-tipi-ile-calismak",
+     "legacy_slug": "7588824-boolean-veri-tipi-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Number Veri Tipi ile Çalışmak",
-     "slug": "7588830-number-veri-tipi-ile-calismak",
+     "slug": "number-veri-tipi-ile-calismak",
+     "legacy_slug": "7588830-number-veri-tipi-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Number Veri Tipi ile İlgili Ek Bilgiler",
-     "slug": "7588835-number-veri-tipi-ile-ilgili-ek-bilgiler",
+     "slug": "number-veri-tipi-ile-ilgili-ek-bilgiler",
+     "legacy_slug": "7588835-number-veri-tipi-ile-ilgili-ek-bilgiler",
      "kind": "video",
      "preview": false
     },
     {
      "title": "String(Metinsel) Veri Tipi ile Çalışmak",
-     "slug": "7588927-string-metinsel-veri-tipi-ile-calismak",
+     "slug": "string-metinsel-veri-tipi-ile-calismak",
+     "legacy_slug": "7588927-string-metinsel-veri-tipi-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Template Literals Kullanımı",
-     "slug": "7588867-template-literals-kullanimi",
+     "slug": "template-literals-kullanimi",
+     "legacy_slug": "7588867-template-literals-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Veri Türü Dönüşümü ve Veri Tipi Kontrolü",
-     "slug": "7588864-veri-turu-donusumu-ve-veri-tipi-kontrolu",
+     "slug": "veri-turu-donusumu-ve-veri-tipi-kontrolu",
+     "legacy_slug": "7588864-veri-turu-donusumu-ve-veri-tipi-kontrolu",
      "kind": "video",
      "preview": false
     },
     {
      "title": "prompt, alert ve confirm Kullanımı",
-     "slug": "7588856-prompt-alert-ve-confirm-kullanimi",
+     "slug": "prompt-alert-ve-confirm-kullanimi",
+     "legacy_slug": "7588856-prompt-alert-ve-confirm-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "DOM Öğelerine Erişmek",
-     "slug": "7588930-dom-ogelerine-erismek",
+     "slug": "dom-ogelerine-erismek",
+     "legacy_slug": "7588930-dom-ogelerine-erismek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "DOM Etiketleri ile İşlem Yapmak",
-     "slug": "7588929-dom-etiketleri-ile-islem-yapmak",
+     "slug": "dom-etiketleri-ile-islem-yapmak",
+     "legacy_slug": "7588929-dom-etiketleri-ile-islem-yapmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Açıklama Satırları ve Fazlası..",
-     "slug": "7588931-aciklama-satirlari-ve-fazlasi",
+     "slug": "aciklama-satirlari-ve-fazlasi",
+     "legacy_slug": "7588931-aciklama-satirlari-ve-fazlasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "DOM'da Yeni Etiket/Element Oluşturmak",
-     "slug": "7588939-dom-da-yeni-etiket-element-olusturmak",
+     "slug": "dom-da-yeni-etiket-element-olusturmak",
+     "legacy_slug": "7588939-dom-da-yeni-etiket-element-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Karşılaştırma Operatörleri",
-     "slug": "7588984-karsilastirma-operatorleri",
+     "slug": "karsilastirma-operatorleri",
+     "legacy_slug": "7588984-karsilastirma-operatorleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Koşullar ile Çalışmak",
-     "slug": "7588943-kosullar-ile-calismak",
+     "slug": "kosullar-ile-calismak",
+     "legacy_slug": "7588943-kosullar-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Çoklu Koşul Yapısı Oluşturmak",
-     "slug": "7588987-coklu-kosul-yapisi-olusturmak",
+     "slug": "coklu-kosul-yapisi-olusturmak",
+     "legacy_slug": "7588987-coklu-kosul-yapisi-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "while Döngüsü ile Çalışmak",
-     "slug": "7588954-while-dongusu-ile-calismak",
+     "slug": "while-dongusu-ile-calismak",
+     "legacy_slug": "7588954-while-dongusu-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "ternary operator(Short If) ile Tek Satırlık Koşullar Oluşturmak",
-     "slug": "7588944-ternary-operator-short-if-ile-tek-satirlik-kosullar-olusturmak",
+     "slug": "ternary-operator-short-if-ile-tek-satirlik-kosullar-olusturmak",
+     "legacy_slug": "7588944-ternary-operator-short-if-ile-tek-satirlik-kosullar-olusturmak",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Array ile Çalışmak",
-     "slug": "7588986-array-ile-calismak",
+     "slug": "array-ile-calismak",
+     "legacy_slug": "7588986-array-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Array Metodları ile Array İçerisindeki Verilerin Kontrolü ve Daha Fazlası",
-     "slug": "7588988-array-metodlari-ile-array-icerisindeki-verilerin-kontrolu-ve-daha-fazlasi",
+     "slug": "array-metodlari-ile-array-icerisindeki-verilerin-kontrolu-ve-daha-fazlasi",
+     "legacy_slug": "7588988-array-metodlari-ile-array-icerisindeki-verilerin-kontrolu-ve-daha-fazlasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Fonksiyonlar ile Çalışmak",
-     "slug": "7588996-fonksiyonlar-ile-calismak",
+     "slug": "fonksiyonlar-ile-calismak",
+     "legacy_slug": "7588996-fonksiyonlar-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Arrow Function(Fat Arrow =>) Fonksiyonları ile Çalışmak",
-     "slug": "7588989-arrow-function-fat-arrow-fonksiyonlari-ile-calismak",
+     "slug": "arrow-function-fat-arrow-fonksiyonlari-ile-calismak",
+     "legacy_slug": "7588989-arrow-function-fat-arrow-fonksiyonlari-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Object ile Çalışmak",
-     "slug": "7588997-object-ile-calismak",
+     "slug": "object-ile-calismak",
+     "legacy_slug": "7588997-object-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Object Kullanımı ve Diğer İşlemler",
-     "slug": "7588995-object-kullanimi-ve-diger-islemler",
+     "slug": "object-kullanimi-ve-diger-islemler",
+     "legacy_slug": "7588995-object-kullanimi-ve-diger-islemler",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Destructuring: Array ve/veya Object içerisinden Item Çıkartmak",
-     "slug": "7588998-destructuring-array-ve-veya-object-icerisinden-item-cikartmak",
+     "slug": "destructuring-array-ve-veya-object-icerisinden-item-cikartmak",
+     "legacy_slug": "7588998-destructuring-array-ve-veya-object-icerisinden-item-cikartmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Etiketlere Class Eklemek, Class Çıkartmak veya Toggle ile Ekle/Çıkar İşlemleri",
-     "slug": "7588994-etiketlere-class-eklemek-class-cikartmak-veya-toggle-ile-ekle-cikar-islemleri",
+     "slug": "etiketlere-class-eklemek-class-cikartmak-veya-toggle-ile-ekle-cikar-islemleri",
+     "legacy_slug": "7588994-etiketlere-class-eklemek-class-cikartmak-veya-toggle-ile-ekle-cikar-islemleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "DOM Hareketlerini(DOM Events) Yakalamak",
-     "slug": "7589001-dom-hareketlerini-dom-events-yakalamak",
+     "slug": "dom-hareketlerini-dom-events-yakalamak",
+     "legacy_slug": "7589001-dom-hareketlerini-dom-events-yakalamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Navbar Menu Dropdown Egzersizi",
-     "slug": "7589007-navbar-menu-dropdown-egzersizi",
+     "slug": "navbar-menu-dropdown-egzersizi",
+     "legacy_slug": "7589007-navbar-menu-dropdown-egzersizi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "For Döngüsü ile Çalışmak",
-     "slug": "7589004-for-dongusu-ile-calismak",
+     "slug": "for-dongusu-ile-calismak",
+     "legacy_slug": "7589004-for-dongusu-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "forEach Döngüsü ile Çalışmak (Array.prototype.forEach)",
-     "slug": "7589002-foreach-dongusu-ile-calismak-array-prototype-foreach",
+     "slug": "foreach-dongusu-ile-calismak-array-prototype-foreach",
+     "legacy_slug": "7589002-foreach-dongusu-ile-calismak-array-prototype-foreach",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Navbar Dropdown ve forEach Kullanımı",
-     "slug": "7589003-navbar-dropdown-ve-foreach-kullanimi",
+     "slug": "navbar-dropdown-ve-foreach-kullanimi",
+     "legacy_slug": "7589003-navbar-dropdown-ve-foreach-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Navbar Menu Dışına Tıklanınca Menünün Kapanması ve DOM Hareketlerinin Takibi",
-     "slug": "7589009-navbar-menu-disina-tiklaninca-menunun-kapanmasi-ve-dom-hareketlerinin-takibi",
+     "slug": "navbar-menu-disina-tiklaninca-menunun-kapanmasi-ve-dom-hareketlerinin-takibi",
+     "legacy_slug": "7589009-navbar-menu-disina-tiklaninca-menunun-kapanmasi-ve-dom-hareketlerinin-takibi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "JavaScript ile Form Yönetimi",
-     "slug": "7589017-javascript-ile-form-yonetimi",
+     "slug": "javascript-ile-form-yonetimi",
+     "legacy_slug": "7589017-javascript-ile-form-yonetimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "HTML Form Method ve Action Bilgileri",
-     "slug": "7589014-html-form-method-ve-action-bilgileri",
+     "slug": "html-form-method-ve-action-bilgileri",
+     "legacy_slug": "7589014-html-form-method-ve-action-bilgileri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "JavaScript ile Form içindeki Bilgilerin Alınması",
-     "slug": "7589020-javascript-ile-form-icindeki-bilgilerin-alinmasi",
+     "slug": "javascript-ile-form-icindeki-bilgilerin-alinmasi",
+     "legacy_slug": "7589020-javascript-ile-form-icindeki-bilgilerin-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "localStorage Kullanımı: Veri Eklemek, Veriyi Getirmek ve Veriyi Silmek",
-     "slug": "7589012-localstorage-kullanimi-veri-eklemek-veriyi-getirmek-ve-veriyi-silmek",
+     "slug": "localstorage-kullanimi-veri-eklemek-veriyi-getirmek-ve-veriyi-silmek",
+     "legacy_slug": "7589012-localstorage-kullanimi-veri-eklemek-veriyi-getirmek-ve-veriyi-silmek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Form Oluşturmak",
-     "slug": "7589015-bolum-sonu-calismasi-1-form-olusturmak",
+     "slug": "bolum-sonu-calismasi-1-form-olusturmak",
+     "legacy_slug": "7589015-bolum-sonu-calismasi-1-form-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Form Yapısının Dinamik Hale Getirilmesi",
-     "slug": "7589016-bolum-sonu-calismasi-1-form-yapisinin-dinamik-hale-getirilmesi",
+     "slug": "bolum-sonu-calismasi-1-form-yapisinin-dinamik-hale-getirilmesi",
+     "legacy_slug": "7589016-bolum-sonu-calismasi-1-form-yapisinin-dinamik-hale-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Form Bilgilerin localStorage'a Yazılması",
-     "slug": "7589027-bolum-sonu-calismasi-1-form-bilgilerin-localstorage-a-yazilmasi",
+     "slug": "bolum-sonu-calismasi-1-form-bilgilerin-localstorage-a-yazilmasi",
+     "legacy_slug": "7589027-bolum-sonu-calismasi-1-form-bilgilerin-localstorage-a-yazilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Renk Paletlerinin Sayfada Gösterilmesi",
-     "slug": "7589025-bolum-sonu-calismasi-1-renk-paletlerinin-sayfada-gosterilmesi",
+     "slug": "bolum-sonu-calismasi-1-renk-paletlerinin-sayfada-gosterilmesi",
+     "legacy_slug": "7589025-bolum-sonu-calismasi-1-renk-paletlerinin-sayfada-gosterilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Renk Paletine Tıklayınca Kopyalama - Clipboard Kullanımı",
-     "slug": "7589031-bolum-sonu-calismasi-1-renk-paletine-tiklayinca-kopyalama-clipboard-kullanimi",
+     "slug": "bolum-sonu-calismasi-1-renk-paletine-tiklayinca-kopyalama-clipboard-kullanimi",
+     "legacy_slug": "7589031-bolum-sonu-calismasi-1-renk-paletine-tiklayinca-kopyalama-clipboard-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Array: .filter Kullanımı",
-     "slug": "7589026-array-filter-kullanimi",
+     "slug": "array-filter-kullanimi",
+     "legacy_slug": "7589026-array-filter-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Array: .map Kullanımı",
-     "slug": "7589046-array-map-kullanimi",
+     "slug": "array-map-kullanimi",
+     "legacy_slug": "7589046-array-map-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Array: .reduce Kullanımı",
-     "slug": "7589029-array-reduce-kullanimi",
+     "slug": "array-reduce-kullanimi",
+     "legacy_slug": "7589029-array-reduce-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "JSON Stringify ve Parse Kullanımı",
-     "slug": "7589039-json-stringify-ve-parse-kullanimi",
+     "slug": "json-stringify-ve-parse-kullanimi",
+     "legacy_slug": "7589039-json-stringify-ve-parse-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Fetch API ile Çalışmak",
-     "slug": "7589066-fetch-api-ile-calismak",
+     "slug": "fetch-api-ile-calismak",
+     "legacy_slug": "7589066-fetch-api-ile-calismak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Hata Yönetimi",
-     "slug": "7589032-hata-yonetimi",
+     "slug": "hata-yonetimi",
+     "legacy_slug": "7589032-hata-yonetimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Hash Routing Yapısının Oluşturulması",
-     "slug": "7589065-bolum-sonu-calismasi-2-hash-routing-yapisinin-olusturulmasi",
+     "slug": "bolum-sonu-calismasi-2-hash-routing-yapisinin-olusturulmasi",
+     "legacy_slug": "7589065-bolum-sonu-calismasi-2-hash-routing-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Verilerin Fetch API ile Getirilmesi",
-     "slug": "7589073-bolum-sonu-calismasi-2-verilerin-fetch-api-ile-getirilmesi",
+     "slug": "bolum-sonu-calismasi-2-verilerin-fetch-api-ile-getirilmesi",
+     "legacy_slug": "7589073-bolum-sonu-calismasi-2-verilerin-fetch-api-ile-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074654-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074654-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1533,185 +1767,216 @@
   },
   {
    "title": "React Temelleri",
-   "slug": "2383536-react-temelleri",
+   "slug": "react-temelleri",
+   "legacy_slug": "2383536-react-temelleri",
    "lessons": [
     {
      "title": "React'ı Anlamak",
-     "slug": "7589061-react-i-anlamak",
+     "slug": "react-i-anlamak",
+     "legacy_slug": "7589061-react-i-anlamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Ek Bilgi: nokta(.) Yani Bu Klasör Kullanımını Anlamak",
-     "slug": "7589043-ek-bilgi-nokta-yani-bu-klasor-kullanimini-anlamak",
+     "slug": "ek-bilgi-nokta-yani-bu-klasor-kullanimini-anlamak",
+     "legacy_slug": "7589043-ek-bilgi-nokta-yani-bu-klasor-kullanimini-anlamak",
      "kind": "video",
      "preview": true
     },
     {
      "title": "React'ı Online Ortamda Çalıştırmak ve create-react-app ile Ortam Kurulumu",
-     "slug": "7589067-react-i-online-ortamda-calistirmak-ve-create-react-app-ile-ortam-kurulumu",
+     "slug": "react-i-online-ortamda-calistirmak-ve-create-react-app-ile-ortam-kurulumu",
+     "legacy_slug": "7589067-react-i-online-ortamda-calistirmak-ve-create-react-app-ile-ortam-kurulumu",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React'ı Vite ile Kurmak ve Çalıştırmak",
-     "slug": "7589074-react-i-vite-ile-kurmak-ve-calistirmak",
+     "slug": "react-i-vite-ile-kurmak-ve-calistirmak",
+     "legacy_slug": "7589074-react-i-vite-ile-kurmak-ve-calistirmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Projenin Klasör Yapısının İncelenmesi",
-     "slug": "7589077-projenin-klasor-yapisinin-incelenmesi",
+     "slug": "projenin-klasor-yapisinin-incelenmesi",
+     "legacy_slug": "7589077-projenin-klasor-yapisinin-incelenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "ReactJS - JSX Kuralları - 1",
-     "slug": "7589083-reactjs-jsx-kurallari-1",
+     "slug": "reactjs-jsx-kurallari-1",
+     "legacy_slug": "7589083-reactjs-jsx-kurallari-1",
      "kind": "video",
      "preview": false
     },
     {
      "title": "ReactJS - JSX Kuralları - 2",
-     "slug": "7589078-reactjs-jsx-kurallari-2",
+     "slug": "reactjs-jsx-kurallari-2",
+     "legacy_slug": "7589078-reactjs-jsx-kurallari-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "ReactJS - JSX Kuralları - 3",
-     "slug": "7589082-reactjs-jsx-kurallari-3",
+     "slug": "reactjs-jsx-kurallari-3",
+     "legacy_slug": "7589082-reactjs-jsx-kurallari-3",
      "kind": "video",
      "preview": false
     },
     {
      "title": "ReactJS - JSX Kuralları - 4",
-     "slug": "7589080-reactjs-jsx-kurallari-4",
+     "slug": "reactjs-jsx-kurallari-4",
+     "legacy_slug": "7589080-reactjs-jsx-kurallari-4",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Module Import ve Export Kullanımı - 1",
-     "slug": "7589081-module-import-ve-export-kullanimi-1",
+     "slug": "module-import-ve-export-kullanimi-1",
+     "legacy_slug": "7589081-module-import-ve-export-kullanimi-1",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Module Import ve Export Kullanımı - 2",
-     "slug": "7589085-module-import-ve-export-kullanimi-2",
+     "slug": "module-import-ve-export-kullanimi-2",
+     "legacy_slug": "7589085-module-import-ve-export-kullanimi-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Module Import ve Export Kullanımı - 3",
-     "slug": "7589084-module-import-ve-export-kullanimi-3",
+     "slug": "module-import-ve-export-kullanimi-3",
+     "legacy_slug": "7589084-module-import-ve-export-kullanimi-3",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Props Kullanımı - 1",
-     "slug": "7589092-react-props-kullanimi-1",
+     "slug": "react-props-kullanimi-1",
+     "legacy_slug": "7589092-react-props-kullanimi-1",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Props Kullanımı - 2",
-     "slug": "7589090-react-props-kullanimi-2",
+     "slug": "react-props-kullanimi-2",
+     "legacy_slug": "7589090-react-props-kullanimi-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Props ile Componentler Arası Bilgi Aktarımı",
-     "slug": "7589087-react-props-ile-componentler-arasi-bilgi-aktarimi",
+     "slug": "react-props-ile-componentler-arasi-bilgi-aktarimi",
+     "legacy_slug": "7589087-react-props-ile-componentler-arasi-bilgi-aktarimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Props children Kullanımı",
-     "slug": "7589086-react-props-children-kullanimi",
+     "slug": "react-props-children-kullanimi",
+     "legacy_slug": "7589086-react-props-children-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Props Drilling Nedir?",
-     "slug": "7589109-react-props-drilling-nedir",
+     "slug": "react-props-drilling-nedir",
+     "legacy_slug": "7589109-react-props-drilling-nedir",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Conditional Rendering - Koşullu Render Kullanımı",
-     "slug": "7589094-conditional-rendering-kosullu-render-kullanimi",
+     "slug": "conditional-rendering-kosullu-render-kullanimi",
+     "legacy_slug": "7589094-conditional-rendering-kosullu-render-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Optional Chain Kontrolü",
-     "slug": "7589093-optional-chain-kontrolu",
+     "slug": "optional-chain-kontrolu",
+     "legacy_slug": "7589093-optional-chain-kontrolu",
      "kind": "video",
      "preview": false
     },
     {
      "title": "useState: Component içindeki Bilgileri Değiştirebilmek için useState Kullanımı",
-     "slug": "7589096-usestate-component-icindeki-bilgileri-degistirebilmek-icin-usestate-kullanimi",
+     "slug": "usestate-component-icindeki-bilgileri-degistirebilmek-icin-usestate-kullanimi",
+     "legacy_slug": "7589096-usestate-component-icindeki-bilgileri-degistirebilmek-icin-usestate-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "useState ile Dinamik Yapılar Oluşturmak",
-     "slug": "7589105-usestate-ile-dinamik-yapilar-olusturmak",
+     "slug": "usestate-ile-dinamik-yapilar-olusturmak",
+     "legacy_slug": "7589105-usestate-ile-dinamik-yapilar-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "useState ve Props ile Componentler Arası İletişim Sağlamak",
-     "slug": "7589104-usestate-ve-props-ile-componentler-arasi-iletisim-saglamak",
+     "slug": "usestate-ve-props-ile-componentler-arasi-iletisim-saglamak",
+     "legacy_slug": "7589104-usestate-ve-props-ile-componentler-arasi-iletisim-saglamak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Yapının Oluşturulması ve PicoCSS Eklenmesi",
-     "slug": "7589103-bolum-sonu-calismasi-1-yapinin-olusturulmasi-ve-picocss-eklenmesi",
+     "slug": "bolum-sonu-calismasi-1-yapinin-olusturulmasi-ve-picocss-eklenmesi",
+     "legacy_slug": "7589103-bolum-sonu-calismasi-1-yapinin-olusturulmasi-ve-picocss-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 1: Taskların Tamamlanması",
-     "slug": "7589102-bolum-sonu-calismasi-1-tasklarin-tamamlanmasi",
+     "slug": "bolum-sonu-calismasi-1-tasklarin-tamamlanmasi",
+     "legacy_slug": "7589102-bolum-sonu-calismasi-1-tasklarin-tamamlanmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Genel Yapının Oluşturulması",
-     "slug": "7589095-bolum-sonu-calismasi-2-genel-yapinin-olusturulmasi",
+     "slug": "bolum-sonu-calismasi-2-genel-yapinin-olusturulmasi",
+     "legacy_slug": "7589095-bolum-sonu-calismasi-2-genel-yapinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Ürünler Yapısının Oluşturulması",
-     "slug": "7589099-bolum-sonu-calismasi-2-urunler-yapisinin-olusturulmasi",
+     "slug": "bolum-sonu-calismasi-2-urunler-yapisinin-olusturulmasi",
+     "legacy_slug": "7589099-bolum-sonu-calismasi-2-urunler-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: ProductCard Yapısının Oluşturulması ve Aktif Ürün Seçimi",
-     "slug": "7589106-bolum-sonu-calismasi-2-productcard-yapisinin-olusturulmasi-ve-aktif-urun-secimi",
+     "slug": "bolum-sonu-calismasi-2-productcard-yapisinin-olusturulmasi-ve-aktif-urun-secimi",
+     "legacy_slug": "7589106-bolum-sonu-calismasi-2-productcard-yapisinin-olusturulmasi-ve-aktif-urun-secimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Props Cehennemi :) Bilgilerin Alt Component'e Gönderimi",
-     "slug": "7589107-bolum-sonu-calismasi-2-props-cehennemi-bilgilerin-alt-component-e-gonderimi",
+     "slug": "bolum-sonu-calismasi-2-props-cehennemi-bilgilerin-alt-component-e-gonderimi",
+     "legacy_slug": "7589107-bolum-sonu-calismasi-2-props-cehennemi-bilgilerin-alt-component-e-gonderimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması 2: Filtreleme İşlemleri",
-     "slug": "7589123-bolum-sonu-calismasi-2-filtreleme-islemleri",
+     "slug": "bolum-sonu-calismasi-2-filtreleme-islemleri",
+     "legacy_slug": "7589123-bolum-sonu-calismasi-2-filtreleme-islemleri",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074657-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074657-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1719,83 +1984,97 @@
   },
   {
    "title": "React - Form ile Çalışmak",
-   "slug": "2383538-react-form-ile-calismak",
+   "slug": "react-form-ile-calismak",
+   "legacy_slug": "2383538-react-form-ile-calismak",
    "lessons": [
     {
      "title": "Yeni Projenin Oluşturulması ve Bootstrap'ın Eklenmesi",
-     "slug": "7589110-yeni-projenin-olusturulmasi-ve-bootstrap-in-eklenmesi",
+     "slug": "yeni-projenin-olusturulmasi-ve-bootstrap-in-eklenmesi",
+     "legacy_slug": "7589110-yeni-projenin-olusturulmasi-ve-bootstrap-in-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Form Submit İşleminin Denetimi için preventDefault Eklenmesi",
-     "slug": "7589108-form-submit-isleminin-denetimi-icin-preventdefault-eklenmesi",
+     "slug": "form-submit-isleminin-denetimi-icin-preventdefault-eklenmesi",
+     "legacy_slug": "7589108-form-submit-isleminin-denetimi-icin-preventdefault-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Form İçindeki Bilgilerin Yeni Task Olarak Eklenmesi",
-     "slug": "7589117-form-icindeki-bilgilerin-yeni-task-olarak-eklenmesi",
+     "slug": "form-icindeki-bilgilerin-yeni-task-olarak-eklenmesi",
+     "legacy_slug": "7589117-form-icindeki-bilgilerin-yeni-task-olarak-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Form İçindeki Bilgilerin UUID ile Eklenmesi ve İstenilen Öğenin Silinmesi",
-     "slug": "7589116-form-icindeki-bilgilerin-uuid-ile-eklenmesi-ve-istenilen-ogenin-silinmesi",
+     "slug": "form-icindeki-bilgilerin-uuid-ile-eklenmesi-ve-istenilen-ogenin-silinmesi",
+     "legacy_slug": "7589116-form-icindeki-bilgilerin-uuid-ile-eklenmesi-ve-istenilen-ogenin-silinmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Task Görünümü Düzenlemesi ve Düzenle Butonunun Eklenmesi",
-     "slug": "7589113-task-gorunumu-duzenlemesi-ve-duzenle-butonunun-eklenmesi",
+     "slug": "task-gorunumu-duzenlemesi-ve-duzenle-butonunun-eklenmesi",
+     "legacy_slug": "7589113-task-gorunumu-duzenlemesi-ve-duzenle-butonunun-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Task Düzenleme Aksiyonunun Oluşturulması",
-     "slug": "7589112-task-duzenleme-aksiyonunun-olusturulmasi",
+     "slug": "task-duzenleme-aksiyonunun-olusturulmasi",
+     "legacy_slug": "7589112-task-duzenleme-aksiyonunun-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "UI Düzenlemeleri ile Yapının İyileştirilmesi",
-     "slug": "7589122-ui-duzenlemeleri-ile-yapinin-iyilestirilmesi",
+     "slug": "ui-duzenlemeleri-ile-yapinin-iyilestirilmesi",
+     "legacy_slug": "7589122-ui-duzenlemeleri-ile-yapinin-iyilestirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Task Bilgilerinin Filtrelenmesi ve useEffect Kullanımı",
-     "slug": "7589129-task-bilgilerinin-filtrelenmesi-ve-useeffect-kullanimi",
+     "slug": "task-bilgilerinin-filtrelenmesi-ve-useeffect-kullanimi",
+     "legacy_slug": "7589129-task-bilgilerinin-filtrelenmesi-ve-useeffect-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "useEffect Nedir? Neden İhtiyaç Duyarız?",
-     "slug": "7589124-useeffect-nedir-neden-ihtiyac-duyariz",
+     "slug": "useeffect-nedir-neden-ihtiyac-duyariz",
+     "legacy_slug": "7589124-useeffect-nedir-neden-ihtiyac-duyariz",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Component Yapısının Düzenlenmesi",
-     "slug": "7589125-component-yapisinin-duzenlenmesi",
+     "slug": "component-yapisinin-duzenlenmesi",
+     "legacy_slug": "7589125-component-yapisinin-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Tasklar için --Bitti-- Yapısının Oluşturulması",
-     "slug": "7589130-tasklar-icin-bitti-yapisinin-olusturulmasi",
+     "slug": "tasklar-icin-bitti-yapisinin-olusturulmasi",
+     "legacy_slug": "7589130-tasklar-icin-bitti-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "useEffect ve localStorage Kullanımı ile Taskların localStorage İçinde Tutulması",
-     "slug": "7589132-useeffect-ve-localstorage-kullanimi-ile-tasklarin-localstorage-icinde-tutulmasi",
+     "slug": "useeffect-ve-localstorage-kullanimi-ile-tasklarin-localstorage-icinde-tutulmasi",
+     "legacy_slug": "7589132-useeffect-ve-localstorage-kullanimi-ile-tasklarin-localstorage-icinde-tutulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074659-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074659-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1803,77 +2082,90 @@
   },
   {
    "title": "React Router Dom ile Çalışmak",
-   "slug": "2383539-react-router-dom-ile-calismak",
+   "slug": "react-router-dom-ile-calismak",
+   "legacy_slug": "2383539-react-router-dom-ile-calismak",
    "lessons": [
     {
      "title": "React Router Dom Kullanımı ve Yapının Oluşturulması",
-     "slug": "7589133-react-router-dom-kullanimi-ve-yapinin-olusturulmasi",
+     "slug": "react-router-dom-kullanimi-ve-yapinin-olusturulmasi",
+     "legacy_slug": "7589133-react-router-dom-kullanimi-ve-yapinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Routes Yapısının Oluşturulması ve İstenilen Component'in URLe Göre Getirilmesi",
-     "slug": "7589138-routes-yapisinin-olusturulmasi-ve-istenilen-component-in-urle-gore-getirilmesi",
+     "slug": "routes-yapisinin-olusturulmasi-ve-istenilen-component-in-urle-gore-getirilmesi",
+     "legacy_slug": "7589138-routes-yapisinin-olusturulmasi-ve-istenilen-component-in-urle-gore-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Ana Sayfada Ürünlerin Gösterilmesi",
-     "slug": "7589139-ana-sayfada-urunlerin-gosterilmesi",
+     "slug": "ana-sayfada-urunlerin-gosterilmesi",
+     "legacy_slug": "7589139-ana-sayfada-urunlerin-gosterilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Ürünler Sayfasının Oluşturulması",
-     "slug": "7589147-urunler-sayfasinin-olusturulmasi",
+     "slug": "urunler-sayfasinin-olusturulmasi",
+     "legacy_slug": "7589147-urunler-sayfasinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Kategori Detay Sayfasının Oluşturulması",
-     "slug": "7589137-kategori-detay-sayfasinin-olusturulmasi",
+     "slug": "kategori-detay-sayfasinin-olusturulmasi",
+     "legacy_slug": "7589137-kategori-detay-sayfasinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Ürün Detay Sayfasının Oluşturulması",
-     "slug": "7589142-urun-detay-sayfasinin-olusturulmasi",
+     "slug": "urun-detay-sayfasinin-olusturulmasi",
+     "legacy_slug": "7589142-urun-detay-sayfasinin-olusturulmasi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Login ve Logout Yapısının Oluşturulması",
-     "slug": "7589146-login-ve-logout-yapisinin-olusturulmasi",
+     "slug": "login-ve-logout-yapisinin-olusturulmasi",
+     "legacy_slug": "7589146-login-ve-logout-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Protected-Private Route ile İstenilen Componentlerin Gösterimi",
-     "slug": "7589149-protected-private-route-ile-istenilen-componentlerin-gosterimi",
+     "slug": "protected-private-route-ile-istenilen-componentlerin-gosterimi",
+     "legacy_slug": "7589149-protected-private-route-ile-istenilen-componentlerin-gosterimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Site Yüklendiğinde localStorage ve useEffect ile Kullanıcının Getirilmesi",
-     "slug": "7589140-site-yuklendiginde-localstorage-ve-useeffect-ile-kullanicinin-getirilmesi",
+     "slug": "site-yuklendiginde-localstorage-ve-useeffect-ile-kullanicinin-getirilmesi",
+     "legacy_slug": "7589140-site-yuklendiginde-localstorage-ve-useeffect-ile-kullanicinin-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "User Bilgisinin Props ile Diğer Componentlere İletilmesi",
-     "slug": "7589150-user-bilgisinin-props-ile-diger-componentlere-iletilmesi",
+     "slug": "user-bilgisinin-props-ile-diger-componentlere-iletilmesi",
+     "legacy_slug": "7589150-user-bilgisinin-props-ile-diger-componentlere-iletilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Favoriler Yapısının Oluşturulması",
-     "slug": "7589181-favoriler-yapisinin-olusturulmasi",
+     "slug": "favoriler-yapisinin-olusturulmasi",
+     "legacy_slug": "7589181-favoriler-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074664-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074664-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1881,59 +2173,69 @@
   },
   {
    "title": "React - Context API ile Çalışmak",
-   "slug": "2383645-react-context-api-ile-calismak",
+   "slug": "react-context-api-ile-calismak",
+   "legacy_slug": "2383645-react-context-api-ile-calismak",
    "lessons": [
     {
      "title": "Context API ile Oluşturulacak Projenin Genel Yapısının Hazırlanması",
-     "slug": "7589229-context-api-ile-olusturulacak-projenin-genel-yapisinin-hazirlanmasi",
+     "slug": "context-api-ile-olusturulacak-projenin-genel-yapisinin-hazirlanmasi",
+     "legacy_slug": "7589229-context-api-ile-olusturulacak-projenin-genel-yapisinin-hazirlanmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React Router Dom'un Projeye Eklenmesi",
-     "slug": "7589223-react-router-dom-un-projeye-eklenmesi",
+     "slug": "react-router-dom-un-projeye-eklenmesi",
+     "legacy_slug": "7589223-react-router-dom-un-projeye-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Dark Theme Yapısının Oluşturulması ve Temanın Değiştirilebilmesi",
-     "slug": "7589230-dark-theme-yapisinin-olusturulmasi-ve-temanin-degistirilebilmesi",
+     "slug": "dark-theme-yapisinin-olusturulmasi-ve-temanin-degistirilebilmesi",
+     "legacy_slug": "7589230-dark-theme-yapisinin-olusturulmasi-ve-temanin-degistirilebilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Context API Yapısının Oluşturulması ve Tema Bilgisinin Site Genelinde Kullanımı",
-     "slug": "7589233-context-api-yapisinin-olusturulmasi-ve-tema-bilgisinin-site-genelinde-kullanimi",
+     "slug": "context-api-yapisinin-olusturulmasi-ve-tema-bilgisinin-site-genelinde-kullanimi",
+     "legacy_slug": "7589233-context-api-yapisinin-olusturulmasi-ve-tema-bilgisinin-site-genelinde-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Context API, useEffect ve localStorage'in Birlikte Kullanılması",
-     "slug": "7589227-context-api-useeffect-ve-localstorage-in-birlikte-kullanilmasi",
+     "slug": "context-api-useeffect-ve-localstorage-in-birlikte-kullanilmasi",
+     "legacy_slug": "7589227-context-api-useeffect-ve-localstorage-in-birlikte-kullanilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması: React Router Dom ile Yapının Kurulması",
-     "slug": "7633036-bolum-sonu-calismasi-react-router-dom-ile-yapinin-kurulmasi",
+     "slug": "bolum-sonu-calismasi-react-router-dom-ile-yapinin-kurulmasi",
+     "legacy_slug": "7633036-bolum-sonu-calismasi-react-router-dom-ile-yapinin-kurulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu Çalışması: Context API Yapısının Eklenmesi",
-     "slug": "7633061-bolum-sonu-calismasi-context-api-yapisinin-eklenmesi",
+     "slug": "bolum-sonu-calismasi-context-api-yapisinin-eklenmesi",
+     "legacy_slug": "7633061-bolum-sonu-calismasi-context-api-yapisinin-eklenmesi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Bölüm Sonu Çalışması: Tüm Componentlerin Context API İçerisinden Veri Alınması",
-     "slug": "7633060-bolum-sonu-calismasi-tum-componentlerin-context-api-icerisinden-veri-alinmasi",
+     "slug": "bolum-sonu-calismasi-tum-componentlerin-context-api-icerisinden-veri-alinmasi",
+     "legacy_slug": "7633060-bolum-sonu-calismasi-tum-componentlerin-context-api-icerisinden-veri-alinmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074665-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074665-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -1941,119 +2243,139 @@
   },
   {
    "title": "Styled-Components ile Çalışmak",
-   "slug": "2383540-styled-components-ile-calismak",
+   "slug": "styled-components-ile-calismak",
+   "legacy_slug": "2383540-styled-components-ile-calismak",
    "lessons": [
     {
      "title": "React: Styled Components Nedir ve Nasıl Kurulur?",
-     "slug": "7589232-react-styled-components-nedir-ve-nasil-kurulur",
+     "slug": "react-styled-components-nedir-ve-nasil-kurulur",
+     "legacy_slug": "7589232-react-styled-components-nedir-ve-nasil-kurulur",
      "kind": "video",
      "preview": true
     },
     {
      "title": "React: Styled-Components ile İlk Styled Button Yapısının Oluşturulması",
-     "slug": "7589231-react-styled-components-ile-ilk-styled-button-yapisinin-olusturulmasi",
+     "slug": "react-styled-components-ile-ilk-styled-button-yapisinin-olusturulmasi",
+     "legacy_slug": "7589231-react-styled-components-ile-ilk-styled-button-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components - Props Kullanımı",
-     "slug": "7589238-react-styled-components-props-kullanimi",
+     "slug": "react-styled-components-props-kullanimi",
+     "legacy_slug": "7589238-react-styled-components-props-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components - Extend Kullanımı",
-     "slug": "7589236-react-styled-components-extend-kullanimi",
+     "slug": "react-styled-components-extend-kullanimi",
+     "legacy_slug": "7589236-react-styled-components-extend-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components Attributes(Ek Özellik) Eklemek",
-     "slug": "7589234-react-styled-components-attributes-ek-ozellik-eklemek",
+     "slug": "react-styled-components-attributes-ek-ozellik-eklemek",
+     "legacy_slug": "7589234-react-styled-components-attributes-ek-ozellik-eklemek",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components Animasyon Oluşturmak",
-     "slug": "7589240-react-styled-components-animasyon-olusturmak",
+     "slug": "react-styled-components-animasyon-olusturmak",
+     "legacy_slug": "7589240-react-styled-components-animasyon-olusturmak",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components - Tema Kullanımı",
-     "slug": "7589336-react-styled-components-tema-kullanimi",
+     "slug": "react-styled-components-tema-kullanimi",
+     "legacy_slug": "7589336-react-styled-components-tema-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled-Components - Global Style Kullanımı",
-     "slug": "7589237-react-styled-components-global-style-kullanimi",
+     "slug": "react-styled-components-global-style-kullanimi",
+     "legacy_slug": "7589237-react-styled-components-global-style-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu Çalışması - Kurulum",
-     "slug": "7589239-react-styled-components-bolum-sonu-calismasi-kurulum",
+     "slug": "react-styled-components-bolum-sonu-calismasi-kurulum",
+     "legacy_slug": "7589239-react-styled-components-bolum-sonu-calismasi-kurulum",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React:Styled Components - Bölüm Sonu Çalışmsı - GlobalCSS Yapısının Kurgulanması",
-     "slug": "7589379-react-styled-components-bolum-sonu-calismsi-globalcss-yapisinin-kurgulanmasi",
+     "slug": "react-styled-components-bolum-sonu-calismsi-globalcss-yapisinin-kurgulanmasi",
+     "legacy_slug": "7589379-react-styled-components-bolum-sonu-calismsi-globalcss-yapisinin-kurgulanmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu Çalışması - Tema Oluşturulması",
-     "slug": "7589349-react-styled-components-bolum-sonu-calismasi-tema-olusturulmasi",
+     "slug": "react-styled-components-bolum-sonu-calismasi-tema-olusturulmasi",
+     "legacy_slug": "7589349-react-styled-components-bolum-sonu-calismasi-tema-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu Çalışması - Tema Yapısının Düzenlenmesi",
-     "slug": "7589354-react-styled-components-bolum-sonu-calismasi-tema-yapisinin-duzenlenmesi",
+     "slug": "react-styled-components-bolum-sonu-calismasi-tema-yapisinin-duzenlenmesi",
+     "legacy_slug": "7589354-react-styled-components-bolum-sonu-calismasi-tema-yapisinin-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu - Header Yapısının Tema ile Çalışması",
-     "slug": "7589373-react-styled-components-bolum-sonu-header-yapisinin-tema-ile-calismasi",
+     "slug": "react-styled-components-bolum-sonu-header-yapisinin-tema-ile-calismasi",
+     "legacy_slug": "7589373-react-styled-components-bolum-sonu-header-yapisinin-tema-ile-calismasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu - Context API Yapısının Oluştuşturulması",
-     "slug": "7589372-react-styled-components-bolum-sonu-context-api-yapisinin-olustusturulmasi",
+     "slug": "react-styled-components-bolum-sonu-context-api-yapisinin-olustusturulmasi",
+     "legacy_slug": "7589372-react-styled-components-bolum-sonu-context-api-yapisinin-olustusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu Çalışması - Tema ve Context API Kullanımı",
-     "slug": "7589353-react-styled-components-bolum-sonu-calismasi-tema-ve-context-api-kullanimi",
+     "slug": "react-styled-components-bolum-sonu-calismasi-tema-ve-context-api-kullanimi",
+     "legacy_slug": "7589353-react-styled-components-bolum-sonu-calismasi-tema-ve-context-api-kullanimi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: Styled Components - Bölüm Sonu Çalışması - Aside Yapısının Oluşturulması",
-     "slug": "7589365-react-styled-components-bolum-sonu-calismasi-aside-yapisinin-olusturulmasi",
+     "slug": "react-styled-components-bolum-sonu-calismasi-aside-yapisinin-olusturulmasi",
+     "legacy_slug": "7589365-react-styled-components-bolum-sonu-calismasi-aside-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Styled Components - Bölüm Sonu - Diğer Component Yapılarının Düzenlenmesi - 1",
-     "slug": "7589381-styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-1",
+     "slug": "styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-1",
+     "legacy_slug": "7589381-styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-1",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Styled Components - Bölüm Sonu - Diğer Component Yapılarının Düzenlenmesi - 2",
-     "slug": "7589382-styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-2",
+     "slug": "styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-2",
+     "legacy_slug": "7589382-styled-components-bolum-sonu-diger-component-yapilarinin-duzenlenmesi-2",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074668-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074668-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -2061,41 +2383,48 @@
   },
   {
    "title": "React: useReducer ile Çalışmak",
-   "slug": "2383543-react-usereducer-ile-calismak",
+   "slug": "react-usereducer-ile-calismak",
+   "legacy_slug": "2383543-react-usereducer-ile-calismak",
    "lessons": [
     {
      "title": "React: useReducer ile İlk Örnek Yapının Oluşturulması",
-     "slug": "7635620-react-usereducer-ile-ilk-ornek-yapinin-olusturulmasi",
+     "slug": "react-usereducer-ile-ilk-ornek-yapinin-olusturulmasi",
+     "legacy_slug": "7635620-react-usereducer-ile-ilk-ornek-yapinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: useReducer Yapısının useContext ile Kullanılması",
-     "slug": "7644879-react-usereducer-yapisinin-usecontext-ile-kullanilmasi",
+     "slug": "react-usereducer-yapisinin-usecontext-ile-kullanilmasi",
+     "legacy_slug": "7644879-react-usereducer-yapisinin-usecontext-ile-kullanilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: useReducer - Add Todo Yapısının Oluşturulması",
-     "slug": "7589255-react-usereducer-add-todo-yapisinin-olusturulmasi",
+     "slug": "react-usereducer-add-todo-yapisinin-olusturulmasi",
+     "legacy_slug": "7589255-react-usereducer-add-todo-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: useReducer - Todo Payload Bilgisinin Kullanılması",
-     "slug": "7589245-react-usereducer-todo-payload-bilgisinin-kullanilmasi",
+     "slug": "react-usereducer-todo-payload-bilgisinin-kullanilmasi",
+     "legacy_slug": "7589245-react-usereducer-todo-payload-bilgisinin-kullanilmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React: useReducer - Todo Payload Bilgisinin Context API ile Kullanılması",
-     "slug": "7589256-react-usereducer-todo-payload-bilgisinin-context-api-ile-kullanilmasi",
+     "slug": "react-usereducer-todo-payload-bilgisinin-context-api-ile-kullanilmasi",
+     "legacy_slug": "7589256-react-usereducer-todo-payload-bilgisinin-context-api-ile-kullanilmasi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074672-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074672-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -2103,47 +2432,55 @@
   },
   {
    "title": "React - Redux ile Çalışmak",
-   "slug": "2383544-react-redux-ile-calismak",
+   "slug": "react-redux-ile-calismak",
+   "legacy_slug": "2383544-react-redux-ile-calismak",
    "lessons": [
     {
      "title": "React - Redux Toolkit Kurulumu",
-     "slug": "7589257-react-redux-toolkit-kurulumu",
+     "slug": "react-redux-toolkit-kurulumu",
+     "legacy_slug": "7589257-react-redux-toolkit-kurulumu",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Redux Toolkit - Counter Yapısının Oluşturulması",
-     "slug": "7589265-react-redux-toolkit-counter-yapisinin-olusturulmasi",
+     "slug": "react-redux-toolkit-counter-yapisinin-olusturulmasi",
+     "legacy_slug": "7589265-react-redux-toolkit-counter-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Counter Slice ve Action Yapısının Oluşturulması",
-     "slug": "7589261-counter-slice-ve-action-yapisinin-olusturulmasi",
+     "slug": "counter-slice-ve-action-yapisinin-olusturulmasi",
+     "legacy_slug": "7589261-counter-slice-ve-action-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Redux Store Bilgisinin Farklı Componentlerde Kullanılabilmesi",
-     "slug": "7589262-react-redux-store-bilgisinin-farkli-componentlerde-kullanilabilmesi",
+     "slug": "react-redux-store-bilgisinin-farkli-componentlerde-kullanilabilmesi",
+     "legacy_slug": "7589262-react-redux-store-bilgisinin-farkli-componentlerde-kullanilabilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Redux Store'a İkinci Yapının Oluşturulması ve Kullanımı: Todo List",
-     "slug": "7589270-redux-store-a-ikinci-yapinin-olusturulmasi-ve-kullanimi-todo-list",
+     "slug": "redux-store-a-ikinci-yapinin-olusturulmasi-ve-kullanimi-todo-list",
+     "legacy_slug": "7589270-redux-store-a-ikinci-yapinin-olusturulmasi-ve-kullanimi-todo-list",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React - Redux Store İçindeki Todo Bilgisinin Silinmesi",
-     "slug": "7589263-react-redux-store-icindeki-todo-bilgisinin-silinmesi",
+     "slug": "react-redux-store-icindeki-todo-bilgisinin-silinmesi",
+     "legacy_slug": "7589263-react-redux-store-icindeki-todo-bilgisinin-silinmesi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074680-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074680-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }
@@ -2151,95 +2488,111 @@
   },
   {
    "title": "Redux Toolkit Query, Fetch ve Axios ile API Kullanımı(3 Yöntem) + ReactRouterDom",
-   "slug": "2383545-redux-toolkit-query-fetch-ve-axios-ile-api-kullanimi-3-yontem-reactrouterdom",
+   "slug": "redux-toolkit-query-fetch-ve-axios-ile-api-kullanimi-3-yontem-reactrouterdom",
+   "legacy_slug": "2383545-redux-toolkit-query-fetch-ve-axios-ile-api-kullanimi-3-yontem-reactrouterdom",
    "lessons": [
     {
      "title": "React - Redux Toolkit Query(RTK) - Ortam Kurulumu",
-     "slug": "7589266-react-redux-toolkit-query-rtk-ortam-kurulumu",
+     "slug": "react-redux-toolkit-query-rtk-ortam-kurulumu",
+     "legacy_slug": "7589266-react-redux-toolkit-query-rtk-ortam-kurulumu",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Projede Yapılacaklar Listesinin Oluşturulması ve Navbar Eklenmesi",
-     "slug": "7589273-projede-yapilacaklar-listesinin-olusturulmasi-ve-navbar-eklenmesi",
+     "slug": "projede-yapilacaklar-listesinin-olusturulmasi-ve-navbar-eklenmesi",
+     "legacy_slug": "7589273-projede-yapilacaklar-listesinin-olusturulmasi-ve-navbar-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Ana Sayfa, Container ve Row Yapılarının Oluşturulması",
-     "slug": "7589268-ana-sayfa-container-ve-row-yapilarinin-olusturulmasi",
+     "slug": "ana-sayfa-container-ve-row-yapilarinin-olusturulmasi",
+     "legacy_slug": "7589268-ana-sayfa-container-ve-row-yapilarinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "React Router Dom ve Diğer Sayfaların Eklenmesi",
-     "slug": "7589269-react-router-dom-ve-diger-sayfalarin-eklenmesi",
+     "slug": "react-router-dom-ve-diger-sayfalarin-eklenmesi",
+     "legacy_slug": "7589269-react-router-dom-ve-diger-sayfalarin-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": ".env (Environment) Yapısının Eklenmesi ve ENV Kullanımı",
-     "slug": "7589277-env-environment-yapisinin-eklenmesi-ve-env-kullanimi",
+     "slug": "env-environment-yapisinin-eklenmesi-ve-env-kullanimi",
+     "legacy_slug": "7589277-env-environment-yapisinin-eklenmesi-ve-env-kullanimi",
      "kind": "video",
      "preview": true
     },
     {
      "title": "Cat API Key Bilgisinin Eklenmesi",
-     "slug": "7589278-cat-api-key-bilgisinin-eklenmesi",
+     "slug": "cat-api-key-bilgisinin-eklenmesi",
+     "legacy_slug": "7589278-cat-api-key-bilgisinin-eklenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "1. Yöntem: Fetch API ile Kategori Verilerinin Çekilmesi",
-     "slug": "7589283-1-yontem-fetch-api-ile-kategori-verilerinin-cekilmesi",
+     "slug": "1-yontem-fetch-api-ile-kategori-verilerinin-cekilmesi",
+     "legacy_slug": "7589283-1-yontem-fetch-api-ile-kategori-verilerinin-cekilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "1. Yöntem: Fetch API ile Kategori Sayfasının Düzenlenmesi",
-     "slug": "7589275-1-yontem-fetch-api-ile-kategori-sayfasinin-duzenlenmesi",
+     "slug": "1-yontem-fetch-api-ile-kategori-sayfasinin-duzenlenmesi",
+     "legacy_slug": "7589275-1-yontem-fetch-api-ile-kategori-sayfasinin-duzenlenmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "1. Yöntem: customHook ile Fetch API Yapısının Oluşturulması",
-     "slug": "7589279-1-yontem-customhook-ile-fetch-api-yapisinin-olusturulmasi",
+     "slug": "1-yontem-customhook-ile-fetch-api-yapisinin-olusturulmasi",
+     "legacy_slug": "7589279-1-yontem-customhook-ile-fetch-api-yapisinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "1. Yöntem: Detay Sayfasındaki Bilgilerin Fetch API ile Getirilmesi",
-     "slug": "7589288-1-yontem-detay-sayfasindaki-bilgilerin-fetch-api-ile-getirilmesi",
+     "slug": "1-yontem-detay-sayfasindaki-bilgilerin-fetch-api-ile-getirilmesi",
+     "legacy_slug": "7589288-1-yontem-detay-sayfasindaki-bilgilerin-fetch-api-ile-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "1. Yöntem: Kategori Düzenlemeleri ve Fetch API ile Görsellerin Getirilmesi",
-     "slug": "7589284-1-yontem-kategori-duzenlemeleri-ve-fetch-api-ile-gorsellerin-getirilmesi",
+     "slug": "1-yontem-kategori-duzenlemeleri-ve-fetch-api-ile-gorsellerin-getirilmesi",
+     "legacy_slug": "7589284-1-yontem-kategori-duzenlemeleri-ve-fetch-api-ile-gorsellerin-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "2. Yöntem: Axios ile Kategorilerin Getirilmesi",
-     "slug": "7589289-2-yontem-axios-ile-kategorilerin-getirilmesi",
+     "slug": "2-yontem-axios-ile-kategorilerin-getirilmesi",
+     "legacy_slug": "7589289-2-yontem-axios-ile-kategorilerin-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "2. Yöntem: Axios ile Kategori Detay Sayfasının Getirilmesi",
-     "slug": "7589285-2-yontem-axios-ile-kategori-detay-sayfasinin-getirilmesi",
+     "slug": "2-yontem-axios-ile-kategori-detay-sayfasinin-getirilmesi",
+     "legacy_slug": "7589285-2-yontem-axios-ile-kategori-detay-sayfasinin-getirilmesi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "3: Yöntem: Redux Toolkit Query ile Tüm Yapının Oluşturulması",
-     "slug": "7589314-3-yontem-redux-toolkit-query-ile-tum-yapinin-olusturulmasi",
+     "slug": "3-yontem-redux-toolkit-query-ile-tum-yapinin-olusturulmasi",
+     "legacy_slug": "7589314-3-yontem-redux-toolkit-query-ile-tum-yapinin-olusturulmasi",
      "kind": "video",
      "preview": false
     },
     {
      "title": "Bölüm Sonu İleri Bildirim Formu",
-     "slug": "8074681-bolum-sonu-ileri-bildirim-formu",
+     "slug": "bolum-sonu-ileri-bildirim-formu",
+     "legacy_slug": "8074681-bolum-sonu-ileri-bildirim-formu",
      "kind": "text",
      "preview": false
     }

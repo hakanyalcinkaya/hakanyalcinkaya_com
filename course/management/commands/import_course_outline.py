@@ -15,6 +15,8 @@ from course.outline_import import OutlineError, import_outline
 REPORT_LABELS = (
     ("section_created", "yeni bölüm"),
     ("section_deleted", "silinen boş bölüm"),
+    ("section_renamed", "adresi yenilenen bölüm"),
+    ("lesson_renamed", "adresi yenilenen ders"),
     ("lesson_created", "yeni ders (taslak)"),
     ("lesson_kept", "var olan ders"),
     ("lesson_matched_by_number", "dosya numarasıyla eşleşen video"),

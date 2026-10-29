@@ -6,6 +6,7 @@ Taslak kurs, bölüm ve dersler yalnız personele görünür (stüdyodan yüklen
 """
 
 import json
+import re
 from collections import defaultdict
 from decimal import Decimal
 from functools import lru_cache
@@ -48,29 +49,46 @@ def visible_course(slug, user):
 
 
 @lru_cache(maxsize=1)
-def _legacy_section_slugs():
-    """Eski platform (Podia) kurs slug'ı → o kursun bölüm slug'ları (course/outlines taslaklarından)."""
-    slugs = {}
+def _legacy_outlines():
+    """course/outlines taslaklarından: eski (Podia) kurs slug'ı → bölüm slug'ları ve
+    (eski bölüm slug'ı, eski ders slug'ı) → (bölüm slug'ı, ders slug'ı)."""
+    sections, lessons = {}, {}
     for path in OUTLINE_DIR.glob("*.json"):
         outline = json.loads(path.read_text(encoding="utf-8"))
         if outline.get("podia_slug"):
-            slugs[outline["podia_slug"]] = [section["slug"] for section in outline.get("sections", ())]
-    return slugs
+            sections[outline["podia_slug"]] = [section["slug"] for section in outline.get("sections", ())]
+        for section in outline.get("sections", ()):
+            for lesson in section["lessons"]:
+                if section.get("legacy_slug") and lesson.get("legacy_slug"):
+                    lessons[(section["legacy_slug"], lesson["legacy_slug"])] = (section["slug"], lesson["slug"])
+    return sections, lessons
+
+
+def legacy_lesson_slugs(section_slug, lesson_slug):
+    """Eski ders adresinin bölüm ve ders slug'ları sitede neye karşılık gelir; taslakta yoksa baştaki sayı atılır."""
+    found = _legacy_outlines()[1].get((section_slug, lesson_slug))
+    if found:
+        return found
+    return re.sub(r"^\d+-", "", section_slug), re.sub(r"^\d+-", "", lesson_slug)
 
 
 def moved_course(slug, user):
     """Eski kurs adresi (Podia slug'ı): bölümleri taslaktakilerle eşleşen, görünen kurs; yoksa None.
     Kurs sitede başka slug'la açılmış olsa da eski bağlantılar doğru kursa yönlenir."""
-    sections = _legacy_section_slugs().get(slug)
+    sections = _legacy_outlines()[0].get(slug)
     if not sections:
         return None
     courses = Course.objects.all() if user.is_staff else Course.objects.published()
-    return courses.exclude(slug=slug).filter(sections__slug__in=sections).distinct().first()
+    # Bölüm adları kurslar arasında ortak olabilir ("html", "css"): en çok bölümü eşleşen kurs seçilir.
+    matched = courses.exclude(slug=slug).filter(sections__slug__in=sections).annotate(matched=models.Count("sections"))
+    return matched.order_by("-matched", "sort_order").first()
 
 
-def moved_lesson(section_slug, lesson_slug, user):
-    """Eski ders adresi: bölüm ve ders slug'ı aynı kalan tek görünen ders; yoksa (ya da birden çoksa) None."""
+def moved_lesson(section_slug, lesson_slug, user, course=None):
+    """Eski ders adresi: bölüm ve ders slug'ı eşleşen tek görünen ders (verilirse o kursta); yoksa ya da birden çoksa None."""
     lessons = Lesson.objects.filter(section__slug=section_slug, slug=lesson_slug).select_related("section__course")
+    if course is not None:
+        lessons = lessons.filter(section__course=course)
     if not user.is_staff:
         lessons = lessons.filter(
             status=Status.PUBLISHED, section__status=Status.PUBLISHED, section__course__status=Status.PUBLISHED
@@ -128,6 +146,8 @@ def curriculum(course, staff=False):
                 "lesson_slug": lesson.slug,
                 "url": lesson.get_absolute_url(),
                 "object": lesson,
+                # Taslağı yalnız personel görür; sayfada "Taslak" etiketiyle.
+                "draft": not lesson.is_published,
             }
             lessons.append(item)
             flat.append(item)
@@ -140,6 +160,7 @@ def curriculum(course, staff=False):
                 "id": f"bolum-{index}",
                 "name": section.title,
                 "slug": section.slug,
+                "draft": not section.is_published,
                 "lessons": lessons,
                 "count": len(lessons),
                 "preview_count": preview_count,
@@ -185,6 +206,7 @@ def _course_card(course, flat):
         lessons=len(flat),
         minutes=minutes,
         level_text=course.level_card_text,
+        draft=not course.is_published,
         duration=hours_minutes(minutes),
         preview_video=preview.get("src", ""),
         preview_poster=preview.get("poster", ""),

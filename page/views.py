@@ -200,12 +200,10 @@ def lesson(request, course_slug, section_slug, lesson_slug):
             LessonProgress.completed_lesson_ids(request.user, content.visible_lessons(course, staff)) if enrolled else set()
         )
         page = content.find_lesson(course, section_slug, lesson_slug, enrolled=enrolled, staff=staff, completed=completed)
-    elif (moved := content.moved_lesson(section_slug, lesson_slug, request.user)) is not None:
-        # Eski ders adresi (ör. Podia'daki kurs slug'ıyla): bölüm ve ders slug'ları aynı, kurs slug'ı farklı.
-        return redirect(moved.get_absolute_url(), permanent=True)
     elif (moved_course := content.moved_course(course_slug, request.user)) is not None:
-        # Eski kursun dersi sitede (henüz) yok ya da yayında değil: kursun sayfasına.
-        return redirect(moved_course.get_absolute_url())
+        # Eski kurs slug'ıyla açılan ders: aynı ders (eski ya da yeni slug'larıyla) varsa ona, yoksa kursun sayfasına.
+        moved = content.moved_lesson(*content.legacy_lesson_slugs(section_slug, lesson_slug), request.user, course=moved_course)
+        return redirect((moved or moved_course).get_absolute_url(), permanent=moved is not None)
     else:
         enrolled = owns_course(request.user, request.session, course_slug)
         page = find_lesson(course_slug, section_slug, lesson_slug, enrolled=enrolled)
@@ -233,6 +231,22 @@ def lesson(request, course_slug, section_slug, lesson_slug):
             "reviews": (content.course_reviews(course)["reviews"] if course is not None else reviews())[:3],
         },
     )
+
+
+def legacy_lesson(request, course_slug, section_slug, lesson_slug):
+    """Eski platformun (Podia) ders adresi (/p/courses/kurs/bölüm/ders/): aynı derse kalıcı yönlenir. Ders yoksa ya da
+    görünmüyorsa kursun sayfasına; kurs da yoksa 404."""
+    course = content.visible_course(course_slug, request.user) or content.moved_course(course_slug, request.user)
+    section, lesson = content.legacy_lesson_slugs(section_slug, lesson_slug)
+    moved = content.moved_lesson(section, lesson, request.user, course=course) if course is not None else None
+    if moved is not None:
+        return redirect(moved.get_absolute_url(), permanent=True)
+    if course is not None:
+        return redirect(course.get_absolute_url())
+    if find_lesson(course_slug, section_slug, lesson_slug) is not None:
+        # Yalnız örnek veride olan kurs: örnek ders yeni adres yapısında açılır.
+        return redirect(reverse("page:lesson", kwargs=dict(course_slug=course_slug, section_slug=section_slug, lesson_slug=lesson_slug)), permanent=True)
+    raise Http404
 
 
 def _member_lesson(request, lesson_id):

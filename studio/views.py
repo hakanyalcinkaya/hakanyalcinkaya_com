@@ -173,6 +173,7 @@ def _video_lesson_response(request, lesson, bulk):
     lesson = _lesson(lesson.pk)
     response = render(request, "studio/partials/_lesson.html", dict(lesson=lesson, bulk=bulk))
     response["X-Section-Id"] = str(lesson.section_id)
+    response["X-Lesson-Id"] = str(lesson.pk)
     response["X-Section-Block-Url"] = reverse("studio:section_block", args=[lesson.section_id])
     return response
 
@@ -180,12 +181,15 @@ def _video_lesson_response(request, lesson, bulk):
 @superuser_required
 @require_POST
 def course_videos(request, course_id):
-    """Kursa doğrudan bırakılan video "Genel" kategorisine eklenir."""
+    """Kursa doğrudan bırakılan video eşleşen videosuz derse yüklenir; eşleşme yoksa "Genel" kategorisine eklenir."""
     course = get_object_or_404(Course, pk=course_id)
     form = NewVideoLessonForm(request.POST, request.FILES)
     if not form.is_valid():
         return HttpResponseBadRequest(_first_error(form))
-    return _video_lesson_response(request, form.save(course.general_section(), request.user), bulk=True)
+    # Eşleşme "Genel" açılmadan aranır; yeni kategori bölüm sırasını kaydırmasın.
+    matched = form.matching_lesson(course, form.cleaned_data["file"].name)
+    section = matched.section if matched else course.general_section()
+    return _video_lesson_response(request, form.save(section, request.user, lesson=matched), bulk=True)
 
 
 @superuser_required

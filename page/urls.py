@@ -13,10 +13,11 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("thanks/", views.thanks, name="thanks"),
     path("p/products/library/", views.library, name="library"),
+    # Eski platform (Podia) ders adresi: yeni adrese kalıcı yönlenir.
     path(
         "p/courses/<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/",
-        views.lesson,
-        name="lesson",
+        views.legacy_lesson,
+        name="legacy_lesson",
     ),
     path("p/lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
     path("p/lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
@@ -54,4 +55,5 @@ urlpatterns = [
     path("<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
     path("<slug:slug>/buy/", views.buy, name="buy"),
     path("<slug:slug>/", views.course_detail, name="course_detail"),
+    path("<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/", views.lesson, name="lesson"),
 ]

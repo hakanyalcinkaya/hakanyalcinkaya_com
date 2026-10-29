@@ -141,7 +141,17 @@ class SectionCreateForm(forms.ModelForm):
 
 
 class NewVideoLessonForm(forms.Form):
-    """Sürükle-bırak yüklemesi: her dosya için bölümün sonuna taslak ders açılır, başlığı dosya adıdır."""
+    """Sürükle-bırak yüklemesi. Dosya adı kurstaki videosuz bir dersin başlığı ya da adresiyle aynıysa ya da sıra numarası
+    ("001-002" = 1. bölümün 2. dersi) bir derse denk geliyorsa video o derse yüklenir; değilse bölümün sonuna dosya adıyla
+    taslak ders açılır."""
+
+    @staticmethod
+    def matching_lesson(course, file_name):
+        """Dosyanın yükleneceği videosuz ders; yoksa None (yeni ders açılır)."""
+        lesson, _reason = course.match_lesson_for_file(file_name)
+        if lesson is None or not lesson.is_video or lesson.video_id or lesson.video_uploads.busy().exists():
+            return None
+        return lesson
 
     file = forms.FileField()
 
@@ -152,9 +162,9 @@ class NewVideoLessonForm(forms.Form):
         return upload
 
     @transaction.atomic
-    def save(self, section, user):
+    def save(self, section, user, lesson=None):
         upload_file = self.cleaned_data["file"]
-        lesson = Lesson.objects.create(
+        lesson = lesson or self.matching_lesson(section.course, upload_file.name) or Lesson.objects.create(
             section=section,
             title=Path(upload_file.name).stem[:250],
             kind=LessonKind.VIDEO,

@@ -21,6 +21,8 @@ from course import video_service
 from core.text import slugify_tr
 
 GENERAL_SECTION_SLUG = "genel"
+# Taslak aktarımında karşılığı olmayan derslerin bölümü (course.outline_import).
+LEFTOVER_SECTION_SLUG = "eslesmeyen-dersler"
 # Ders dosyalarının baştaki sıra numarası (ör. "018-014" ya da "007-022-003").
 LESSON_FILE_NUMBER = re.compile(r"^\d+(?:-\d+)*")
 PRICE_FIELD = {"max_digits": 10, "decimal_places": 2, "validators": [MinValueValidator(Decimal("0"))]}
@@ -380,7 +382,25 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
                 return numbered[0], None
             if len(numbered) > 1:
                 return None, _("Bu numarayla birden fazla ders var; dosya adını ders adıyla aynı yap.")
+            # Numara ders başlığında yoksa sıraya bakılır: "001-002" = 1. bölümün 2. dersi.
+            positioned = self.lesson_at(number.group(0))
+            if positioned is not None:
+                return positioned, None
         return None, _("Bu adda ders bulunamadı.")
+
+    def lesson_at(self, number):
+        """Sıra numarasıyla ders: "001-002" = 1. bölümün (sıraya göre) 2. dersi; yoksa None. "Genel" ve "Eşleşmeyen dersler"
+        sayılmaz (kursa bırakılan video "Genel"i en başa açar, sıra kaymasın)."""
+        parts = number.split("-")
+        if len(parts) != 2 or min(int(part) for part in parts) < 1:
+            return None
+        section_no, lesson_no = (int(part) for part in parts)
+        sections = self.sections.exclude(slug__in=(GENERAL_SECTION_SLUG, LEFTOVER_SECTION_SLUG)).order_by("sort_order", "created_at")
+        sections = list(sections[section_no - 1 : section_no])
+        if not sections:
+            return None
+        lessons = list(sections[0].lessons.order_by("sort_order", "created_at")[lesson_no - 1 : lesson_no])
+        return lessons[0] if lessons else None
 
     def lessons_needing_video_title_sync(self):
         return Lesson.objects.filter(section__course=self).exclude(video_id="").exclude(video_title=F("title"))

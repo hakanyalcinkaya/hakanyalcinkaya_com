@@ -25,7 +25,7 @@
       </nav>
 
       <header>
-        <h1 class="display-5 fw-semibold lh-1">{{ course.title }}</h1>
+        <h1 class="display-5 fw-semibold lh-1">{{ course.title }}{% if course.draft %} {% include "components/draft_badge.html" %}{% endif %}</h1>
         <p class="lead text-body-secondary mt-3 mb-0">{{ detail.subtitle }}</p>
         {% if course.rating.count %}<a href="#yorumlar" class="d-inline-flex align-items-center gap-2 small text-decoration-none mt-3">{% include "page/partials/stars.html" with rating=course.rating.stars %}<span class="fw-semibold text-body">{{ course.rating.average|floatformat:1 }}</span><span class="text-body-secondary">· {{ course.rating.count }} değerlendirme</span></a>{% endif %}
         <dl class="row row-cols-2 row-cols-sm-4 g-3 mt-3 mb-0" aria-label="Kurs özeti">
@@ -124,7 +124,7 @@
           {# Uzun müfredatta yalnız ilk bölüm açık gelir; "Tümünü aç" hepsini açar. #}
           <details class="hy-fold border-bottom"{% if forloop.first %} open{% endif %}>
             <summary class="px-3 py-3">
-              <span class="d-block fw-semibold">{{ section.index }}. {{ section.name }}</span>
+              <span class="d-block fw-semibold">{{ section.index }}. {{ section.name }}{% if section.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
               <span class="d-block small text-body-tertiary mt-1">{% if enrolled %}{{ section.meta_enrolled }}{% else %}{{ section.meta }}{% endif %}</span>
             </summary>
             <ul class="list-group list-group-flush">
@@ -132,9 +132,9 @@
               <li class="list-group-item bg-transparent d-flex align-items-center gap-3 px-4 py-2">
                 <span class="small text-body-tertiary">{% include "page/partials/lesson_meta.html" %}</span>
                 {% if lesson.locked %}
-                <span class="flex-grow-1 small">{{ lesson.title }}</span>
+                <span class="flex-grow-1 small">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
                 {% else %}
-                <a href="{{ lesson.url }}" class="flex-grow-1 small link-body-emphasis text-decoration-none">{{ lesson.title }}</a>
+                <a href="{{ lesson.url }}" class="flex-grow-1 small link-body-emphasis text-decoration-none">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</a>
                 {% if lesson.preview and not enrolled %}<a href="{{ lesson.url }}" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme">Önizleme</a>{% endif %}
                 {% endif %}
               </li>

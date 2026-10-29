@@ -138,7 +138,7 @@
           </ol>
         </nav>
         <div class="d-flex flex-wrap align-items-start gap-2 mt-1">
-          <h1 class="h3 fw-semibold mb-0 me-auto">{{ current.title }}</h1>
+          <h1 class="h3 fw-semibold mb-0 me-auto">{{ current.title }}{% if current.draft %} {% include "components/draft_badge.html" %}{% endif %}</h1>
           {% if current.preview %}<span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium mt-1">Ücretsiz önizleme</span>{% endif %}
         </div>
         {% if review_course %}<div class="mt-3">{% include "page/partials/review_box.html" with course=review_course review=None place="lesson" %}</div>{% endif %}
@@ -266,7 +266,7 @@
             <details class="hy-fold hy-lesson-fold border-bottom"{% if section.open %} open{% endif %}{% if section.current %} data-current-section{% endif %}{% if section.completed %} data-completed-section{% endif %}>
               <summary class="d-flex align-items-start gap-2 px-3 py-3 {% if section.completed %}hy-section-done{% else %}bg-body-secondary{% endif %}">
                 <span class="flex-grow-1 min-w-0">
-                  <span class="d-block small fw-semibold{% if section.current %} text-primary-emphasis{% endif %}">{% if section.current %}<span class="visually-hidden">Şu an bu bölümdesin: </span>{% endif %}{{ section.index }}. {{ section.name }}</span>
+                  <span class="d-block small fw-semibold{% if section.current %} text-primary-emphasis{% endif %}">{% if section.current %}<span class="visually-hidden">Şu an bu bölümdesin: </span>{% endif %}{{ section.index }}. {{ section.name }}{% if section.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
                   <span class="d-flex flex-wrap align-items-center gap-2 small text-body-tertiary mt-1">{% if preview %}{{ section.meta }}{% else %}{{ section.meta_enrolled }}{% endif %}{% if section.completed %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Tamamlandı</span>{% endif %}</span>
                 </span>
                 <i class="bi bi-chevron-down small text-body-tertiary mt-1 hy-fold-icon" aria-hidden="true"></i>
@@ -275,7 +275,7 @@
                 {% for lesson in section.lessons %}
                 <a href="{{ lesson.url }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 ps-4 pe-3 py-2 small{% if lesson.current %} active{% endif %}{% if lesson.locked and not lesson.current %} text-body-tertiary{% endif %}"{% if lesson.current %} aria-current="page"{% endif %}>
                   {% include "page/partials/lesson_meta.html" %}
-                  <span class="flex-grow-1">{{ lesson.title }}</span>
+                  <span class="flex-grow-1">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
                 </a>
                 {% endfor %}
               </div>

@@ -301,7 +301,16 @@
   }
 
   // Yeni ders satırı kendi kategorisinin sonuna eklenir; kategori sayfada yoksa (ilk "Genel") bloğu istenir.
+  // Video var olan (taslak) derse bağlandıysa o dersin satırı yerinde yenilenir.
   function placeLesson(xhr) {
+    var existing = document.getElementById("lesson-" + xhr.getResponseHeader("X-Lesson-Id"));
+    if (existing) {
+      existing.outerHTML = xhr.responseText;
+      var row = document.getElementById("lesson-" + xhr.getResponseHeader("X-Lesson-Id"));
+      if (row) window.htmx.process(row);
+      renumberAll();
+      return Promise.resolve();
+    }
     var list = document.getElementById("section-" + xhr.getResponseHeader("X-Section-Id") + "-lessons");
     if (list) {
       list.insertAdjacentHTML("beforeend", xhr.responseText);
