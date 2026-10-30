@@ -131,6 +131,9 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
   .navbar .nav-link.active::after{transform:scaleX(1)}
   .top-lg-nav{top:calc(var(--hy-nav-h) + 24px)}
 }
+/* Ayarlar sol menüsü: bulunulan bölüm sol vurgu çizgisi ve hafif zeminle işaretlenir (site.js). */
+.hy-settings-nav .list-group-item.active{background:var(--bs-primary-bg-subtle);color:var(--bs-primary-text-emphasis);border-color:var(--bs-list-group-border-color);box-shadow:inset 3px 0 0 var(--bs-primary);font-weight:500}
+.hy-settings-nav .list-group-item.active i{color:inherit!important}
 
 .hover-lift{transition:transform .25s,border-color .25s}
 .hover-lift:hover{transform:translateY(-2px);border-color:var(--bs-primary-border-subtle)!important}

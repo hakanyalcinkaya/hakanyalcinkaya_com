@@ -1052,6 +1052,40 @@
     }, Promise.resolve());
   }
 
+  // Ayarlar sol menüsü: ekranda olan bölümün bağlantısı işaretlenir (adres #bölüm ile açılınca da).
+  var settingsNav = document.querySelector("[data-settings-nav]");
+  if (settingsNav && "IntersectionObserver" in window) {
+    var settingsLinks = Array.prototype.slice.call(settingsNav.querySelectorAll('a[href^="#"]'));
+    var markSetting = function (id) {
+      settingsLinks.forEach(function (link) {
+        var on = link.getAttribute("href") === "#" + id;
+        link.classList.toggle("active", on);
+        if (on) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
+    };
+    // Sayfa sonuna inilince son bölüm(ler) ortadaki şeride giremez: en altta son bağlantı işaretlenir.
+    var atBottom = function () {
+      return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    };
+    var lastSetting = settingsLinks.length ? settingsLinks[settingsLinks.length - 1].getAttribute("href").slice(1) : "";
+    var settingsObserver = new IntersectionObserver(function (entries) {
+      if (atBottom()) return markSetting(lastSetting);
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) markSetting(entry.target.id);
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    window.addEventListener("scroll", function () {
+      if (atBottom()) markSetting(lastSetting);
+    }, { passive: true });
+    settingsLinks.forEach(function (link) {
+      var section = document.getElementById(link.getAttribute("href").slice(1));
+      if (section) settingsObserver.observe(section);
+      link.addEventListener("click", function () { markSetting(section ? section.id : ""); });
+    });
+    markSetting(window.location.hash.slice(1) || (settingsLinks[0] && settingsLinks[0].getAttribute("href").slice(1)));
+  }
+
   // İmleç spotlight'ı (kartlar + sayfa parıltısı): tek, rAF ile kısılmış dinleyici; HTMX ile sonradan gelen kartlarda da çalışır. Dokunmatikte ve azaltılmış hareket tercihinde kapalı.
   var SPOTLIGHT = ".card, .hy-site-dialog";
   if (document.body.hasAttribute("data-spotlight") &&
