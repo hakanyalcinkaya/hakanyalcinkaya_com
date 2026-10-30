@@ -22,7 +22,7 @@ from django_htmx.http import HttpResponseClientRedirect, reswap, trigger_client_
 
 from config.celery import worker_online
 from core.models import SiteSettings, Status, VideoPlatform
-from course import video_service
+from course import orphan_videos, video_service
 from course.models import (
     BUSY_UPLOAD_STATUSES,
     FINISHED_UPLOAD_STATUSES,
@@ -638,6 +638,56 @@ def settings_check(request, platform):
     except video_service.VideoServiceError as error:
         result, ok = str(error), False
     return render(request, "studio/partials/_settings_check.html", dict(result=result, ok=ok))
+
+
+# Fazla videolar: Bunny kütüphanesinde olup hiçbir derse ya da kurs tanıtımına bağlı olmayan videolar.
+ORPHAN_PLATFORM = VideoPlatform.BUNNY
+
+
+def _orphan_context():
+    service = video_service.get(ORPHAN_PLATFORM)
+    # Geliştirmede veritabanı canlıdakinden farklıdır; canlının videoları fazla görünür, bu yüzden silme kapalı.
+    context = dict(label=service.LABEL, can_delete=not settings.DEBUG, report=None, error="")
+    if not service.is_configured():
+        context["error"] = _("%(platform)s ayarları eksik.") % {"platform": service.LABEL}
+        return context
+    try:
+        context["report"] = orphan_videos.library_report(ORPHAN_PLATFORM)
+    except video_service.VideoServiceError as error:
+        context["error"] = str(error)
+    return context
+
+
+@superuser_required
+@require_GET
+def settings_orphan_videos(request):
+    """Sayfa hemen açılır; liste platformdan okunduğu için ayrı bir HTMX isteğiyle yüklenir."""
+    if request.htmx:
+        return render(request, "studio/partials/_orphan_videos.html", _orphan_context())
+    return render(request, "studio/orphan_videos.html", dict(label=video_service.get(ORPHAN_PLATFORM).LABEL))
+
+
+@superuser_required
+@require_POST
+def settings_orphan_videos_delete(request):
+    """Seçili (ya da `all` ile bütün) fazla videoları siler; kullanımda olanlar silinmeden önce yeniden elenir."""
+    if settings.DEBUG:
+        return _toast(reswap(HttpResponse(), "none"), "warning", _("Geliştirme ortamında silme kapalı."))
+    try:
+        if request.POST.get("all") == "1":
+            video_ids = [orphan.video.id for orphan in orphan_videos.library_report(ORPHAN_PLATFORM).orphans]
+        else:
+            video_ids = request.POST.getlist("video_id")
+        deleted, skipped, errors = orphan_videos.delete_orphans(ORPHAN_PLATFORM, video_ids)
+    except video_service.VideoServiceError as error:
+        return _toast(reswap(HttpResponse(), "none"), "error", str(error))
+    response = render(request, "studio/partials/_orphan_videos.html", _orphan_context())
+    text = _("%(count)s video silindi.") % {"count": deleted}
+    if skipped:
+        text += " " + _("%(count)s video kullanımda olduğu için atlandı.") % {"count": skipped}
+    if errors:
+        text += " " + _("%(count)s video silinemedi: %(error)s") % {"count": len(errors), "error": errors[0]}
+    return _toast(response, "warning" if errors or skipped else "success", text)
 
 
 # Yorumlar: kullanıcı yorumları onaya düşer; eski yorumlar buradan elle eklenir.

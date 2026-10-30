@@ -214,6 +214,34 @@
     refreshSelection();
   });
 
+  // Fazla videolar: seçim sayısı silme düğmesine yazılır; "Tümünü seç" kutusu kısmen seçiliyken ara durumda görünür.
+  function refreshOrphanSelection() {
+    var list = document.querySelector("[data-orphan-list]");
+    if (!list) return;
+    var checks = list.querySelectorAll("[data-orphan-check]");
+    var count = list.querySelectorAll("[data-orphan-check]:checked").length;
+    var all = list.querySelector("[data-orphan-all]");
+    var bulk = list.querySelector("[data-orphan-bulk]");
+    if (all) {
+      all.checked = checks.length > 0 && count === checks.length;
+      all.indeterminate = count > 0 && count < checks.length;
+    }
+    if (bulk) {
+      bulk.disabled = count === 0;
+      bulk.querySelector("[data-orphan-count]").textContent = count;
+    }
+  }
+
+  document.addEventListener("change", function (event) {
+    var all = event.target.closest("[data-orphan-all]");
+    if (all) {
+      all.closest("[data-orphan-list]").querySelectorAll("[data-orphan-check]").forEach(function (box) {
+        box.checked = all.checked;
+      });
+    }
+    if (all || event.target.closest("[data-orphan-check]")) refreshOrphanSelection();
+  });
+
   function contentAdded(element) {
     initSortables(element);
     renumberAll();

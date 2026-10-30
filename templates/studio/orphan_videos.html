@@ -1,0 +1,13 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Fazla videolar{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <a href="{% url 'studio:settings' %}" class="small link-secondary text-decoration-none"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Ayarlar</a>
+  <h1 class="h3 mb-1 mt-1">Fazla videolar · {{ label }}</h1>
+  <p class="text-body-secondary mb-0">Kütüphanede olup hiçbir derse ya da kurs tanıtımına bağlı olmayan, süren bir yüklemeye de ait olmayan videolar: eski yüklemelerden ve yarım kalan işlerden kalanlar. Tek tek ya da toplu silebilirsin; silme geri alınamaz.</p>
+</div>
+{% url 'studio:settings_orphan_videos' as orphans_url %}
+<div id="orphan-videos" hx-get="{{ orphans_url }}" hx-trigger="load" hx-swap="outerHTML">
+  <div class="border rounded p-4 text-center text-body-secondary"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>{{ label }} kütüphanesi okunuyor…</div>
+</div>
+{% endblock %}

@@ -10,6 +10,7 @@ import re
 import time
 import urllib.parse
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -29,6 +30,8 @@ TIMEOUT = 30
 TUS_CHUNK_SIZE = 32 * 1024 * 1024
 TUS_TIMEOUT = 300
 TUS_RETRIES = 3
+# Kütüphane listelenirken sayfa başına video/koleksiyon sayısı
+LIST_PAGE_SIZE = 100
 # TUS imzası bu süre geçerli; büyük dosyaların gönderimi bitene kadar yetmeli.
 UPLOAD_SIGNATURE_SECONDS = 6 * 60 * 60
 # Oynatma linkleri bu süre geçerli (CDN token koruması açıksa).
@@ -78,6 +81,27 @@ class VideoStatus:
     def key(self):
         # Bunny'de oynatma için ek anahtar gerekmez (Vimeo'daki gizli bağlantı anahtarının karşılığı).
         return ""
+
+
+@dataclass
+class LibraryVideo:
+    """Kütüphanedeki bir video (fazla videoları bulmak için listelenir)."""
+
+    id: str
+    title: str
+    collection_id: str
+    duration: int
+    size: int
+    uploaded_at: datetime | None
+    code: int
+
+    @property
+    def state(self):
+        return STATE_NAMES.get(self.code, str(self.code))
+
+    @property
+    def is_ready(self):
+        return self.code == 4
 
 
 def is_configured():
@@ -172,6 +196,47 @@ def rename_video(video_id, title):
 
 def delete_video(video_id):
     _ignore_missing(api, "DELETE", f"/videos/{video_id}")
+
+
+def _all_pages(path):
+    page = 1
+    while True:
+        data = api("GET", path, params={"page": page, "itemsPerPage": LIST_PAGE_SIZE})
+        items = data.get("items") or []
+        yield from items
+        if not items or page * LIST_PAGE_SIZE >= int(data.get("totalItems") or 0):
+            return
+        page += 1
+
+
+def _parse_date(value):
+    """Bunny tarihleri saat dilimi olmadan, UTC olarak verir."""
+    try:
+        parsed = datetime.fromisoformat(value) if value else None
+    except ValueError:
+        return None
+    return parsed.replace(tzinfo=UTC) if parsed and parsed.tzinfo is None else parsed
+
+
+def list_videos():
+    """Kütüphanedeki bütün videolar."""
+    return [
+        LibraryVideo(
+            id=item["guid"],
+            title=item.get("title") or "",
+            collection_id=item.get("collectionId") or "",
+            duration=int(item.get("length") or 0),
+            size=int(item.get("storageSize") or 0),
+            uploaded_at=_parse_date(item.get("dateUploaded")),
+            code=int(item.get("status") or 0),
+        )
+        for item in _all_pages("/videos")
+    ]
+
+
+def list_collections():
+    """Koleksiyon kimliği → adı."""
+    return {item["guid"]: item.get("name") or "" for item in _all_pages("/collections")}
 
 
 # Dosya gönderimi (TUS)

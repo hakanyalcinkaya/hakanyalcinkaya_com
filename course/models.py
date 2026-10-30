@@ -42,6 +42,23 @@ def retire_replaced_video(platform, video_id):
         transaction.on_commit(partial(delete_remote_video.delay, video_id, platform))
 
 
+def attached_video_ids(platform):
+    """Derslere ve kurs tanıtımlarına bağlı videoların platformdaki kimlikleri."""
+    lessons = Lesson.objects.filter(video_platform=platform).exclude(video_id="").values_list("video_id", flat=True)
+    previews = (
+        Course.objects.filter(preview_video_platform=platform)
+        .exclude(preview_video_id="")
+        .values_list("preview_video_id", flat=True)
+    )
+    return set(lessons) | set(previews)
+
+
+def video_ids_in_use(platform):
+    """Platformda silinmemesi gereken videolar: bağlı olanlar ve süren yüklemelerin henüz bağlanmamış videoları."""
+    uploads = VideoUpload.objects.busy().filter(platform=platform).exclude(video_id="").values_list("video_id", flat=True)
+    return attached_video_ids(platform) | set(uploads)
+
+
 def lesson_minutes_expression(prefix="", filter=None):
     """Her dersin süresi dakikaya yukarı yuvarlanıp toplanır (1 dk 27 sn → 2 dk)."""
     seconds = F(f"{prefix}duration_seconds")

@@ -1,0 +1,58 @@
+{% load core_tags %}
+{# Fazla videolar listesi; silme işlemleri bu bloğu yeniden çizer. Seçim ve sayaç studio.js'te. #}
+{% url 'studio:settings_orphan_videos' as orphans_url %}
+{% url 'studio:settings_orphan_videos_delete' as delete_url %}
+<div id="orphan-videos" data-orphan-list>
+  <div class="d-flex justify-content-end mb-2">
+    <button type="button" class="btn btn-link btn-sm link-secondary p-0" hx-get="{{ orphans_url }}" hx-target="#orphan-videos" hx-swap="outerHTML"><i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Yenile</button>
+  </div>
+  {% if error %}
+  <div class="alert alert-danger small" role="alert"><i class="bi bi-x-circle me-2" aria-hidden="true"></i>{{ label }} kütüphanesi okunamadı: {{ error }}</div>
+  {% else %}
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Kütüphanedeki video</div><div class="h4 mb-0">{{ report.total }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Kullanımda</div><div class="h4 mb-0">{{ report.in_use }}</div><div class="small text-body-tertiary">ders, tanıtım ve süren yükleme</div></div></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100{% if report.orphans %} border-warning-subtle bg-warning-subtle{% endif %}"><div class="small text-body-secondary">Fazla video</div><div class="h4 mb-0">{{ report.orphans|length }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100"><div class="small text-body-secondary">Fazla videoların boyutu</div><div class="h4 mb-0">{{ report.orphan_size|filesizeformat }}</div></div></div>
+  </div>
+  {% if report.missing %}
+  <div class="alert alert-warning small" role="alert"><i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>Sitede {{ report.missing }} ders ya da tanıtım videosu kayıtlı ama {{ label }} kütüphanesinde bulunamadı; bunlar oynamaz.</div>
+  {% endif %}
+  {% if not can_delete %}
+  <div class="alert alert-info small" role="alert"><i class="bi bi-info-circle me-2" aria-hidden="true"></i>Geliştirme ortamında silme kapalı: liste bu veritabanına göre hesaplanır, canlı sitenin videoları burada fazla görünebilir.</div>
+  {% endif %}
+  {% if report.orphans %}
+  {% if can_delete %}
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+    <div class="form-check mb-0 me-2">
+      <input class="form-check-input" type="checkbox" id="orphan-check-all" data-orphan-all>
+      <label class="form-check-label small" for="orphan-check-all">Tümünü seç</label>
+    </div>
+    <button type="button" class="btn btn-outline-danger btn-sm" data-orphan-bulk disabled hx-post="{{ delete_url }}" hx-include="[data-orphan-check]:checked" hx-target="#orphan-videos" hx-swap="outerHTML" hx-confirm="Seçili videolar {{ label }} kütüphanesinden silinsin mi? Bu geri alınamaz." hx-indicator="#orphan-spinner"><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Seçilenleri sil (<span data-orphan-count>0</span>)</button>
+    <button type="button" class="btn btn-danger btn-sm" hx-post="{{ delete_url }}" hx-vals='{"all": "1"}' hx-target="#orphan-videos" hx-swap="outerHTML" hx-confirm="Fazla videoların tümü ({{ report.orphans|length }} video, {{ report.orphan_size|filesizeformat }}) {{ label }} kütüphanesinden silinsin mi? Bu geri alınamaz." hx-indicator="#orphan-spinner">Tümünü sil ({{ report.orphans|length }})</button>
+    <span id="orphan-spinner" class="spinner-border spinner-border-sm htmx-indicator" aria-hidden="true"></span>
+  </div>
+  {% endif %}
+  <div class="list-group">
+    {% for orphan in report.orphans %}
+    <div class="list-group-item py-2">
+      <div class="d-flex align-items-center gap-3">
+        {% if can_delete %}<input class="form-check-input flex-shrink-0 m-0" type="checkbox" name="video_id" value="{{ orphan.video.id }}" aria-label="{{ orphan.video.title|default:orphan.video.id }} seç" data-orphan-check>{% endif %}
+        <img src="{{ orphan.thumbnail_url }}" alt="" width="96" height="54" loading="lazy" class="rounded bg-body-tertiary flex-shrink-0 object-fit-cover">
+        <div class="flex-grow-1 min-w-0">
+          <a href="{{ orphan.dashboard_url }}" target="_blank" rel="noopener" class="fw-medium link-body-emphasis text-decoration-none text-break">{{ orphan.video.title|default:"(adsız)" }}</a>
+          {% if not orphan.video.is_ready %} <span class="badge text-bg-secondary fw-normal">{{ orphan.video.state }}</span>{% endif %}
+          <div class="small text-body-tertiary">{% if orphan.collection %}{{ orphan.collection }} · {% endif %}{% if orphan.video.duration %}{{ orphan.video.duration|lesson_clock }} · {% endif %}{{ orphan.video.size|filesizeformat }}{% if orphan.video.uploaded_at %} · {{ orphan.video.uploaded_at|date:"d.m.Y H:i" }}{% endif %} · <span class="font-monospace">{{ orphan.video.id }}</span></div>
+        </div>
+        {% if can_delete %}
+        <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0" hx-post="{{ delete_url }}" hx-vals='{"video_id": "{{ orphan.video.id }}"}' hx-target="#orphan-videos" hx-swap="outerHTML" hx-confirm="“{{ orphan.video.title|default:orphan.video.id }}” {{ label }} kütüphanesinden silinsin mi? Bu geri alınamaz." aria-label="{{ orphan.video.title|default:orphan.video.id }} sil"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="border rounded p-4 text-center text-body-secondary"><i class="bi bi-check-circle me-1 text-success" aria-hidden="true"></i>Fazla video yok; kütüphanedeki her video kullanımda.</div>
+  {% endif %}
+  {% endif %}
+</div>
