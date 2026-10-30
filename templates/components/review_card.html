@@ -1,10 +1,14 @@
 {% load core_tags %}<figure class="card h-100 mb-0">
   <div class="card-body p-4">
-    {% if review.rating %}<div class="mb-2">{% include "page/partials/stars.html" with rating=review.rating %}</div>{% endif %}
+    <figcaption class="d-flex align-items-center gap-2 mb-3">
+      <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis small fw-semibold flex-shrink-0 hy-avatar" aria-hidden="true">{{ review.initial }}</span>
+      <span class="d-flex flex-wrap align-items-center column-gap-2 min-w-0">
+        <span class="fw-semibold">{{ review.name }}</span>
+        {% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% endif %}
+        {% if review.date %}<time class="small text-body-tertiary" datetime="{{ review.date|date:'c' }}" title="{{ review.date|date:'j F Y' }}">{{ review.date|ago }}</time>{% endif %}
+      </span>
+    </figcaption>
     <blockquote class="mb-0 text-pre-line">{{ review.text }}</blockquote>
   </div>
-  <figcaption class="card-footer bg-transparent d-flex align-items-center gap-2 fw-semibold px-4 py-3">
-    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis small hy-avatar" aria-hidden="true">{{ review.initial }}</span>
-    <span class="min-w-0">{{ review.name }}{% if review.date %}<span class="d-block small fw-normal text-body-tertiary"><time datetime="{{ review.date|date:'c' }}" title="{{ review.date|date:'j F Y' }}">{{ review.date|ago }}</time></span>{% endif %}</span>
-  </figcaption>
+  {% if show_course and review.course %}<div class="card-footer bg-transparent small text-body-secondary px-4 py-3"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>{{ review.course }}</div>{% endif %}
 </figure>
