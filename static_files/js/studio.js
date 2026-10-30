@@ -551,22 +551,75 @@
     progress.textContent = bulkBusy || bulkQueue.length ? "Gönderiliyor… " + bulkQueue.length + " dosya kaldı" : "Bitti";
   }
 
-  function enqueueBulk(box, fileList) {
-    box.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
-    var subtitles = box.getAttribute("data-bulk-kind") === "subtitle";
-    var accepted = subtitles ? SUBTITLE_FILE : CONTENT_FILE;
-    // Aynı seferde bırakılan dosyaların adları her dosyayla gönderilir: sunucu bölüm içinde sırayla hizalar.
-    var batch = Array.prototype.filter.call(fileList, function (file) { return accepted.test(file.name); }).map(function (file) {
-      return file.name;
-    });
+  // Dosyalar hangi kutuya bırakılırsa bırakılsın türüne göre ayrılır: altyazılar altyazı, ek bilgiler ek bilgi kutusuna.
+  // Aynı adın birden çok biçimi varsa (ders.srt + ders.vtt, ders.md + ders.txt) yalnız öncelikli olan gönderilir:
+  // klasörün tamamı bırakıldığında döküm (.txt) ek bilgilerin üzerine yazılmasın. Diğer türler (.json, .tsv) atlanır.
+  var BULK_PREFERENCE = [".srt", ".vtt", ".md", ".markdown", ".html", ".htm", ".txt"];
+
+  function fileExtension(name) {
+    var dot = name.lastIndexOf(".");
+    return dot === -1 ? "" : name.slice(dot).toLowerCase();
+  }
+
+  function bulkNote(box, text) {
+    var item = document.createElement("li");
+    item.className = "d-flex gap-2 py-1 border-bottom text-body-secondary";
+    var icon = document.createElement("i");
+    icon.className = "bi bi-info-circle";
+    icon.setAttribute("aria-hidden", "true");
+    var span = document.createElement("span");
+    span.className = "min-w-0";
+    span.textContent = text;
+    item.append(icon, span);
+    box.querySelector("[data-extra-bulk-list]").prepend(item);
+  }
+
+  function enqueueBulk(droppedBox, fileList) {
+    var chosen = {};
+    var duplicates = [];
+    var unsupported = [];
     Array.prototype.forEach.call(fileList, function (file) {
-      if (accepted.test(file.name)) {
-        bulkQueue.push({ box: box, file: file, batch: batch });
+      var kind = dropKind(file);
+      if (!kind) {
+        unsupported.push(file.name);
+        return;
+      }
+      var key = kind + ":" + file.name.slice(0, file.name.length - fileExtension(file.name).length);
+      var current = chosen[key];
+      var rank = BULK_PREFERENCE.indexOf(fileExtension(file.name));
+      if (!current) {
+        chosen[key] = file;
+      } else if (rank < BULK_PREFERENCE.indexOf(fileExtension(current.name))) {
+        duplicates.push(current.name);
+        chosen[key] = file;
       } else {
-        bulkLine(box, file.name, "error", subtitles ? "Desteklenmeyen tür; SRT ya da VTT olmalı." : "Desteklenmeyen tür; Markdown, TXT ya da HTML olmalı.");
+        duplicates.push(file.name);
       }
     });
-    bulkProgress(box);
+    var byKind = { subtitle: [], content: [] };
+    Object.keys(chosen).forEach(function (key) { byKind[dropKind(chosen[key])].push(chosen[key]); });
+    var used = [];
+    Object.keys(byKind).forEach(function (kind) {
+      var files = byKind[kind];
+      var box = files.length && document.querySelector('[data-extra-bulk][data-bulk-kind="' + kind + '"]');
+      if (!box) return;
+      box.open = true;
+      box.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
+      if (box !== droppedBox) bulkNote(box, files.length + " dosya türüne göre bu alana alındı.");
+      // Aynı seferde bırakılan dosyaların adları her dosyayla gönderilir: sunucu bölüm içinde sırayla hizalar.
+      var batch = files.map(function (file) { return file.name; });
+      files.forEach(function (file) { bulkQueue.push({ box: box, file: file, batch: batch }); });
+      used.push(box);
+    });
+    var noteBox = used[0] || droppedBox;
+    noteBox.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
+    if (duplicates.length) {
+      bulkNote(noteBox, duplicates.length + " dosya atlandı: aynı adın öncelikli biçimi (.srt / .md) gönderiliyor.");
+    }
+    if (unsupported.length) {
+      bulkNote(noteBox, unsupported.length + " dosya desteklenmeyen türde atlandı (ör. " + unsupported[0] + ").");
+    }
+    used.concat(droppedBox).forEach(bulkProgress);
     if (!bulkBusy) nextBulk();
   }
 
