@@ -194,9 +194,6 @@
           </div>
         </section>
 
-        {# Masaüstünde içeriğin altında; mobilde ders listesinden sonra (aşağıda). #}
-        {% include "page/partials/lesson_reviews.html" with place="icerik" section_class="mt-5 d-none d-lg-block" %}
-        {% if current.extra_html and not current.content_lesson %}{% include "page/partials/lesson_extra_info.html" with place="icerik" section_class="mt-5 d-none d-lg-block" %}{% endif %}
         {% else %}
         {% if site_settings.lesson_notes_enabled %}
         <section class="pt-4" aria-label="Notlar">
@@ -297,8 +294,13 @@
     </aside>
   </div>
   {% if preview %}
-  {% include "page/partials/lesson_reviews.html" with place="mobil" section_class="d-lg-none px-3 py-5 border-top" %}
-  {% if current.extra_html and not current.content_lesson %}<div class="d-lg-none px-3 pb-5">{% include "page/partials/lesson_extra_info.html" with place="mobil" %}</div>{% endif %}
+  {# Önizleme ziyaretçisi: yorumlar (kurs sayfasındaki kaydırmalı bileşen; sayfada tek olmalı) ve altında ek bilgiler. #}
+  {% if reviews %}
+  <section id="yorumlar" data-reviews aria-labelledby="yorum-baslik" aria-roledescription="carousel" class="px-3 px-lg-4 py-5 border-top">
+    {% include "components/review_carousel.html" with heading_class="h5 fw-semibold mb-1" heading="Öğrenciler ne diyor?" %}
+  </section>
+  {% endif %}
+  {% if current.extra_html and not current.content_lesson %}<div class="px-3 px-lg-4 pb-5{% if not reviews %} pt-5 border-top{% endif %}">{% include "page/partials/lesson_extra_info.html" with place="alt" %}</div>{% endif %}
   {% endif %}
 </div>
 

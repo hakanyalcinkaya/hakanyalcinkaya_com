@@ -235,17 +235,20 @@ def lesson(request, course_slug, section_slug, lesson_slug):
         # Kursu satın alıp değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
         if Enrollment.objects.has_access(request.user, course) and not Review.objects.filter(course=course, user=request.user).exists():
             review_course = course
+    # Önizleme ziyaretçisine kursun yorumları, kurs sayfasındaki gibi kaydırmalı ve "Tüm yorumlar" ile (örnek kursta örnekler).
+    review_context = {}
+    if page["preview"]:
+        review_context = content.course_reviews(course) if course is not None else dict(reviews=reviews(), review_total=len(reviews()))
     return render(
         request,
         "page/lesson.html",
         {
             **page,
+            **review_context,
             "favorite": favorite,
             "review_course": review_course,
             # Oynatıcı tercihleri (hız, kalite, altyazı, tam ekran); ziyaretçiye varsayılanlar.
             "player_preferences_json": json.dumps(PlayerPreference.for_user(request.user).player_options()),
-            # Önizleme ziyaretçisine kursun öne çıkan yorumları (örnek kursta örnek yorumlar).
-            "reviews": (content.course_reviews(course)["reviews"] if course is not None else reviews())[:3],
         },
     )
 
