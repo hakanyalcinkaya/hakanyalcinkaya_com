@@ -24,6 +24,9 @@ def site(request):
     cart_count = len(content.cart_cards(request, cards))
     nav_items = []
     for item_id, label in NAV:
+        # Giriş yapan üyeye tanıtım bölümleri (Öğrenci Yorumları, Hakkımda) gösterilmez; yalnız Kurslar.
+        if user.is_authenticated and item_id != "egitimler":
+            continue
         if item_id == "egitimler":
             href = course_list_url
         else:
