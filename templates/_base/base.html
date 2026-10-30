@@ -41,7 +41,7 @@
 </script>
 {% endif %}
 </head>
-<body class="d-flex flex-column min-vh-100"{% block spotlight %} data-spotlight{% endblock %} hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+<body class="d-flex flex-column min-vh-100"{% block spotlight %}{% if not account_user or account_user.cursor_spotlight %} data-spotlight{% endif %}{% endblock %} hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
 <a href="#icerik" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index:2000">İçeriğe geç</a>
 {% block navbar %}{% include "_base/navbar.html" %}{% endblock %}
 {% block messages %}{% include "_base/messages.html" %}{% endblock %}

@@ -252,6 +252,24 @@ class ProfileForm(StyledFormMixin, forms.ModelForm):
         )
 
 
+class AppearanceForm(StyledFormMixin, forms.ModelForm):
+    """Hesap ayarları → Görünüm: imleç ışık efekti (spotlight) açık mı."""
+
+    class Meta:
+        model = User
+        fields = ("cursor_spotlight",)
+        labels = {"cursor_spotlight": "İmleç ışık efekti"}
+        help_texts = {"cursor_spotlight": "Fare kartların ve sayfanın üzerinde gezerken imlecin çevresinde vurgu renginde hafif bir ışık belirir."}
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, instance=user, prefix="appearance", **kwargs)
+        self.helper.layout = Layout(
+            Hidden("action", "appearance"),
+            "cursor_spotlight",
+            submit("Kaydet", icon="bi-check-lg", css_class="btn-primary"),
+        )
+
+
 class ReviewForm(forms.Form):
     """Kursu alan kullanıcının değerlendirmesi: puan zorunlu, yorum isteğe bağlı. Her kayıt yeniden onaya gider."""
 

@@ -49,6 +49,9 @@ class User(BaseUUID, AbstractUser):
 
     username = None
     email = models.EmailField(_("e-posta"), unique=True)
+    cursor_spotlight = models.BooleanField(
+        _("imleç ışık efekti"), default=True, help_text=_("Kartlarda ve sayfada imleci izleyen vurgu ışığı.")
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

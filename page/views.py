@@ -41,6 +41,7 @@ from page.catalog import (
     reviews,
 )
 from page.forms import (
+    AppearanceForm,
     CheckoutForm,
     CouponForm,
     EmailChangeForm,
@@ -595,6 +596,7 @@ SETTINGS_FORMS = {
     "email": (EmailChangeForm, "E-posta adresin güncellendi."),
     "password": (PasswordChangeForm, "Şifren değiştirildi."),
     "player": (PlayerPreferenceForm, "Video oynatma tercihlerin kaydedildi."),
+    "appearance": (AppearanceForm, "Görünüm tercihlerin kaydedildi."),
 }
 
 
@@ -621,6 +623,7 @@ def account_settings(request):
             "email_form": forms["email"],
             "password_form": forms["password"],
             "player_form": forms["player"],
+            "appearance_form": forms["appearance"],
         },
     )
 
