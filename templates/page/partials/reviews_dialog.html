@@ -1,4 +1,4 @@
-{# "Tüm yorumlar" penceresi: onaylı yorumlar, en yeni önce. show_course: ana sayfadan açılınca kurs adı da yazılır; course_filter: kurs seçimi pencereyi yeniden yükler. #}
+{# "Tüm yorumlar" penceresi: onaylı yorumlar, en yeni önce. show_course: ana sayfadan açılınca kurs adı da yazılır; link_course: yoruma tıklayınca o yorumun kursuna gidilir; course_filter: kurs seçimi pencereyi yeniden yükler. #}
 {% load core_tags %}
 <div class="d-flex align-items-start justify-content-between gap-3 border-bottom px-3 px-md-4 py-3">
   <div>
@@ -18,13 +18,13 @@
 {% endif %}
 <div class="overflow-y-auto px-3 px-md-4 py-2 hy-site-dialog-scroll">
   {% for review in reviews %}
-  <article class="py-3{% if not forloop.last %} border-bottom{% endif %}">
+  <article class="py-3{% if not forloop.last %} border-bottom{% endif %}{% if link_course %} position-relative hy-review-link{% endif %}">
     <div class="d-flex flex-wrap align-items-center gap-2 small">
       <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis hy-avatar" aria-hidden="true">{{ review.initial }}</span>
       <span class="fw-semibold">{{ review.name }}</span>
       {% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% endif %}
       {% if review.date %}<time class="text-body-tertiary" datetime="{{ review.date|date:'c' }}" title="{{ review.date|date:'j F Y' }}">{{ review.date|ago }}</time>{% endif %}
-      {% if show_course %}<span class="badge rounded-1 border text-body-secondary fw-medium ms-auto">{{ review.course }}</span>{% endif %}
+      {% if link_course %}<a href="{{ review.course_url }}" class="badge rounded-1 border text-body-secondary fw-medium ms-auto text-decoration-none stretched-link" title="Kurs sayfasına git">{{ review.course }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>{% elif show_course %}<span class="badge rounded-1 border text-body-secondary fw-medium ms-auto">{{ review.course }}</span>{% endif %}
     </div>
     <p class="mt-2 mb-0 text-pre-line">{{ review.text }}</p>
   </article>

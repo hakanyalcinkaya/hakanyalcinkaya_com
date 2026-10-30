@@ -184,6 +184,7 @@ def all_reviews(request):
     context = dict(
         reviews=[item.card() for item in items],
         show_course=course is None,
+        link_course=True,
         course_filter=courses,
         total=sum(item["count"] for item in courses),
         selected=course.slug if course else "",

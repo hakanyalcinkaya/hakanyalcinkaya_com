@@ -1494,6 +1494,7 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
             rating=self.approved_rating,
             date=self.approved_written_at,
             course=self.course.short_title,
+            course_url=self.course.get_absolute_url(),
         )
 
 
