@@ -15,8 +15,6 @@ NAV = (
     ("hakkimda", "Hakkımda"),
 )
 
-SHOP_URL_NAMES = frozenset({"course_list", "course_detail", "cart", "checkout", "buy", "thanks"})
-
 DEFAULT_CART_SLUG = "sifirdan-projelerle-front-end-ve-react-18-x-ogren"
 
 # Model yokken sepet, kupon ve son sipariş oturumda tutulur.

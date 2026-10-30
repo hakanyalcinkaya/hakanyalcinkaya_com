@@ -12,15 +12,12 @@ from page import content
 from page.catalog import (
     NAV,
     NEWSLETTER_SESSION_KEY,
-    SHOP_URL_NAMES,
 )
 
 
 def site(request):
     index_url = reverse("page:index")
     course_list_url = reverse("page:course_list")
-    match = request.resolver_match
-    url_name = match.url_name if match else ""
     user = request.user
     cards = content.catalog_cards(user)
     cart_count = len(content.cart_cards(request, cards))
@@ -55,8 +52,8 @@ def site(request):
         "account_user": user if user.is_authenticated else None,
         # Sepet simgesi herkese, her zaman (boşken de) üst menüde görünür.
         "show_cart": True,
-        # "Kursları Keşfet" yalnız ziyaretçiye ve mağaza sayfaları dışında.
-        "show_explore": not user.is_authenticated and url_name not in SHOP_URL_NAMES,
+        # "Kursları Keşfet" ziyaretçiye her sayfada: misafir menüsü sayfadan sayfaya değişmez.
+        "show_explore": not user.is_authenticated,
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
         "library_url": reverse("page:library"),
