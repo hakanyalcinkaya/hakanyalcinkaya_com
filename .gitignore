@@ -204,3 +204,6 @@ Temporary Items
 
 # Frontend build
 frontend/node_modules/
+# Deploy'un yazdığı sürüm (v178 abc1234); core/version.py okur
+.version
+.version.tmp

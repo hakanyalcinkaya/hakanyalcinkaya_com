@@ -136,7 +136,9 @@ Sonra yerel kopyadaki özel anahtarı ve `hy_known_hosts`'u silebilirsin (anahta
 1. GitHub → **Actions → Deploy → Run workflow** (main). Push etmeden betiği bir kez çalıştırır.
 2. Çıktıda `Yeni commit yok (v178 abc1234)` ya da değişen dosyalar ve yapılan işler görünür.
 3. Sunucuda: `tail -n 50 /var/www/hakanyalcinkaya/log/deploy.log`
-4. Siteye superuser olarak gir: kullanıcı menüsündeki **v178** numarası yereldekiyle aynı olmalı.
+4. Siteye superuser olarak gir: kullanıcı menüsündeki ve Stüdyo'daki **v178** numarası yereldekiyle aynı olmalı.
+   Numara deploy'un yazdığı `.version` dosyasından okunur (`cat .version` → `v178 abc1234`); uygulama `www-data` ile
+   çalıştığı için `.git`'e bakmasına gerek kalmaz.
 
 ## Günlük kullanım
 
@@ -159,4 +161,5 @@ Sonra yerel kopyadaki özel anahtarı ve `hy_known_hosts`'u silebilirsin (anahta
 | `Not possible to fast-forward` | Sunucuda elle değiştirilmiş dosya var: `git status`; değişiklik geri alınır ya da commit'e taşınır |
 | `sudo: a password is required` | Adım 5; komut yolu sudoers'takiyle birebir aynı olmalı |
 | `deploy.log: Permission denied` | Adım 3 |
+| Menüde sürüm yok ya da eski | Sunucu elle `git pull` ile güncellendiyse `.version` yenilenmez: `bash _server/deploy.sh` çalıştır (yeni commit yoksa yalnız `.version`'ı yazar) |
 | Site açılmıyor (502) | `sudo journalctl -u uwsgi -n 50`, `tail /var/www/hakanyalcinkaya/log/uwsgi.log` |

@@ -35,6 +35,7 @@ main() {
     # Sunucuda elle değiştirilmiş dosya varsa birleştirme durur; hiçbir şey silinmez.
     git merge --ff-only --quiet origin/main
     new=$(git rev-parse HEAD)
+    write_version
     if [[ "$old" == "$new" ]]; then
         echo "Yeni commit yok ($(version))."
         return 0
@@ -84,6 +85,11 @@ main() {
 
 version() {
     echo "v$(git rev-list --count HEAD) $(git rev-parse --short HEAD)"
+}
+
+# Uygulama sürümü bu dosyadan okur (core/version.py): www-data .git'i okuyamasa da superuser menüde v178 görür.
+write_version() {
+    version > "$APP_DIR/.version.tmp" && mv "$APP_DIR/.version.tmp" "$APP_DIR/.version"
 }
 
 main "$@"
