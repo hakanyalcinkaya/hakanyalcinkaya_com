@@ -5,11 +5,13 @@
   <div class="container">
     <h2 id="liste-baslik" class="visually-hidden">Kurs listesi</h2>
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      {% if filters %}
       <div role="radiogroup" aria-label="Konuya göre filtrele" class="btn-group">
         {% for item in filters %}
         <a href="{{ item.url }}" hx-get="{{ item.url }}" hx-target="#kurs-listesi" hx-swap="outerHTML" hx-push-url="true" hx-sync="#kurs-listesi:replace" role="radio" aria-checked="{% if item.checked %}true{% else %}false{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}">{{ item.label }} <span class="text-body-tertiary ms-1">{{ item.count }}</span></a>
         {% endfor %}
       </div>
+      {% endif %}
       <p class="small text-body-tertiary mb-0" aria-live="polite">{{ result_text }}</p>
     </div>
 

@@ -29,7 +29,6 @@ from page.catalog import (
     TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
     catalog_stats,
-    course_filters,
     course_page,
     courses_by_slugs,
     curriculum,
@@ -95,7 +94,9 @@ def index(request):
 
 def course_list(request):
     cards = content.catalog_cards(request.user)
-    topic, courses = filter_courses(request.GET.get("topic", ""), cards)
+    # Konu filtresi şimdilik kapalı: düğmeler gösterilmez, eski ?topic= adresleri de tüm kursları listeler.
+    # Açmak için: konu GET'ten okunur (request.GET.get("topic", "")) ve "filters" course_filters(topic, cards) olur.
+    topic, courses = filter_courses("", cards)
     form, done = _newsletter(request)
     if done:
         return done
@@ -106,7 +107,7 @@ def course_list(request):
         "topic": topic,
         "page_title": f"{topic_label} kursları — Hakan Yalçınkaya" if topic_label else "Kurslar — Hakan Yalçınkaya",
         "course_list": content.with_ratings(courses),
-        "filters": course_filters(topic, cards),
+        "filters": [],
         "result_text": f"{count} kurs",
         "empty": count == 0,
         "stats": catalog_stats(cards),
