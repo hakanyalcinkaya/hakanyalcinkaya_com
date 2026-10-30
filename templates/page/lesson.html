@@ -267,7 +267,7 @@
               </summary>
               <div class="list-group list-group-flush py-1">
                 {% for lesson in section.lessons %}
-                <a href="{{ lesson.url }}" class="list-group-item list-group-item-action border-0 d-flex gap-2 ps-4 pe-3 py-2 small{% if lesson.current %} active{% endif %}{% if lesson.locked and not lesson.current %} text-body-tertiary{% endif %}"{% if lesson.current %} aria-current="page"{% endif %}>
+                <a href="{{ lesson.url }}{% if preview %}?play=1{% endif %}" class="list-group-item list-group-item-action border-0 d-flex gap-2 ps-4 pe-3 py-2 small{% if lesson.current %} active{% endif %}{% if lesson.locked and not lesson.current %} text-body-tertiary{% endif %}"{% if lesson.current %} aria-current="page"{% endif %}>
                   {% include "page/partials/lesson_meta.html" %}
                   <span class="flex-grow-1">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}{% if lesson.preview and not preview %} {% include "components/preview_badge.html" %}{% endif %}</span>
                 </a>
