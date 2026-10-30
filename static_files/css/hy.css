@@ -222,6 +222,7 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-preview[aria-busy="true"] .hy-preview-play{opacity:.7}
 .hy-video{background:#000}
 .hy-next-preview{z-index:5;background:rgba(0,0,0,.78)}
+.hy-unmute{position:absolute;top:.75rem;left:.75rem;z-index:4}
 /* Tanıtım videosu penceresi: ekranın %95'i; video oranı korunarak sığabildiği en büyük boyutta ortalanır. */
 .hy-video-dialog{width:95vw;height:95vh;max-width:none;max-height:none;padding:0;border:0;border-radius:var(--bs-border-radius-lg);background:#000;color:#fff;overflow:hidden}
 .hy-video-dialog[open]{display:flex;align-items:center;justify-content:center}

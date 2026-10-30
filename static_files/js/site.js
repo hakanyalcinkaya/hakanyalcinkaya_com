@@ -538,13 +538,15 @@
       media.setAttribute("crossorigin", "");
       if (options.poster) media.setAttribute("poster", options.poster);
       if (options.autoplay) {
-        // Tıklamayla açıldığı için sesli başlar; tarayıcı sesli otomatik oynatmayı reddederse sessiz başlatılır.
+        // Tıklamayla açıldığı için sesli başlar; tarayıcı sesli otomatik oynatmayı reddederse (sayfada henüz etkileşim
+        // yokken, ör. önizleme bağlantısı ya da sıradaki önizlemeye geçiş) sessiz başlatılır ve sesi açma yolu sunulur.
         media.addEventListener("loadedmetadata", function () {
           var started = media.play();
           if (started && started.catch) {
             started.catch(function () {
               media.muted = true;
               media.play();
+              offerUnmute(media, i18n);
             });
           }
         }, { once: true });
@@ -575,6 +577,31 @@
       if (frame) frame.referrerPolicy = VIMEO_REFERRER_POLICY;
       return media;
     });
+  }
+
+  // Sessiz başlayan video: üstünde "Sesi aç" düğmesi durur; sayfadaki ilk tıklama ya da tuş da sesi açar (tarayıcı sesi
+  // ancak kullanıcı etkileşimiyle açtırır). Ses açılınca (oynatıcının kendi düğmesiyle de) düğme kalkar.
+  function offerUnmute(media, container) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-light btn-sm shadow d-inline-flex align-items-center gap-2 hy-unmute";
+    button.innerHTML = '<i class="bi bi-volume-mute-fill" aria-hidden="true"></i>Sesi aç';
+    if (window.getComputedStyle(container).position === "static") container.style.position = "relative";
+    container.appendChild(button);
+    function unmute() {
+      media.muted = false;
+      if (media.volume === 0) media.volume = 1;
+    }
+    function cleanup() {
+      if (media.muted) return;
+      button.remove();
+      document.removeEventListener("click", unmute, true);
+      document.removeEventListener("keydown", unmute, true);
+      media.removeEventListener("volumechange", cleanup);
+    }
+    document.addEventListener("click", unmute, true);
+    document.addEventListener("keydown", unmute, true);
+    media.addEventListener("volumechange", cleanup);
   }
 
   function showPlayerError(element) {
