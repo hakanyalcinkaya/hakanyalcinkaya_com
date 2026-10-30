@@ -1052,7 +1052,7 @@
     }, Promise.resolve());
   }
 
-  // İmleç spotlight'ı: tek, rAF ile kısılmış dinleyici; HTMX ile sonradan gelen kartlarda da çalışır. Dokunmatikte ve azaltılmış hareket tercihinde kapalı.
+  // İmleç spotlight'ı (kartlar + sayfa parıltısı): tek, rAF ile kısılmış dinleyici; HTMX ile sonradan gelen kartlarda da çalışır. Dokunmatikte ve azaltılmış hareket tercihinde kapalı.
   var SPOTLIGHT = ".card, .hy-site-dialog";
   if (document.body.hasAttribute("data-spotlight") &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
@@ -1060,6 +1060,10 @@
     var lit = null;
     var spotFrame = 0;
     var spotEvent = null;
+    var glow = document.createElement("div");
+    glow.className = "hy-cursor-glow";
+    glow.setAttribute("aria-hidden", "true");
+    document.body.appendChild(glow);
     var light = function (el) {
       if (el === lit) return;
       if (lit) lit.classList.remove("is-lit");
@@ -1068,6 +1072,8 @@
     };
     var spot = function () {
       spotFrame = 0;
+      glow.style.transform = "translate3d(" + spotEvent.clientX + "px," + spotEvent.clientY + "px,0)";
+      glow.classList.add("is-on");
       var el = spotEvent.target instanceof Element ? spotEvent.target.closest(SPOTLIGHT) : null;
       if (el) {
         var rect = el.getBoundingClientRect();
@@ -1081,7 +1087,10 @@
       spotEvent = event;
       if (!spotFrame) spotFrame = window.requestAnimationFrame(spot);
     }, { passive: true });
-    document.documentElement.addEventListener("pointerleave", function () { light(null); });
+    document.documentElement.addEventListener("pointerleave", function () {
+      light(null);
+      glow.classList.remove("is-on");
+    });
   }
 
   syncTheme();
