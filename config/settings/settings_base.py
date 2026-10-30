@@ -89,7 +89,7 @@ AUTH_USER_MODEL = "account.User"
 # ziyaretçi alttaki bantta izin verince yüklenir; kapalıyken her sayfada doğrudan yüklenir. Çerez ve Gizlilik
 # Politikası'ndaki analitik metinleri bu ayara göre değişir.
 GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="")
-GOOGLE_ANALYTICS_CONSENT = env.bool("GOOGLE_ANALYTICS_CONSENT", default=False)
+GOOGLE_ANALYTICS_CONSENT = env.bool("GOOGLE_ANALYTICS_CONSENT", default=True)
 
 # Bunny Stream (varsayılan platform): yönetim panelinden video/altyazı yükleme, başlık güncelleme, süre okuma ve sitede HLS oynatma.
 # Kütüphane kimliği ve API anahtarı tanımlı değilse işler hata verir.
