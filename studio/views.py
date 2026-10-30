@@ -45,6 +45,7 @@ from studio.forms import (
     LessonBulkForm,
     LessonTitleForm,
     NewVideoLessonForm,
+    ReviewBulkForm,
     ReviewImportForm,
     SectionCreateForm,
     SectionTitleForm,
@@ -694,6 +695,9 @@ def settings_orphan_videos_delete(request):
 REVIEW_FILTERS = {
     "pending": (gettext_lazy("Onay bekleyen"), lambda reviews: reviews.awaiting()),
     "published": (gettext_lazy("Yayında"), lambda reviews: reviews.visible()),
+    "home": (gettext_lazy("Ana sayfada"), lambda reviews: reviews.filter(show_on_home=True)),
+    "featured": (gettext_lazy("Kursta öne çıkan"), lambda reviews: reviews.filter(featured=True)),
+    "not_visible": (gettext_lazy("Sitede görünmeyen"), lambda reviews: reviews.exclude(pk__in=reviews.visible())),
     "hidden": (gettext_lazy("Gizli"), lambda reviews: reviews.filter(status=Status.ARCHIVED)),
     "all": (gettext_lazy("Tümü"), lambda reviews: reviews),
 }
@@ -707,20 +711,15 @@ REVIEW_ACTIONS = {
 REVIEW_RATING_FILTERS = {str(value): dict(rating=value) for value in range(5, 0, -1)} | {"none": dict(rating__isnull=True)}
 
 
-def _review_filter(request):
-    key = request.GET.get("status", "pending")
-    return key if key in REVIEW_FILTERS else "pending"
-
-
-@superuser_required
-def reviews(request):
-    """Yorumlar: filtre (durum, kurs, puan) GET parametresinde; HTMX isteğinde yalnız liste döner."""
-    key = _review_filter(request)
+def _review_list_context(params):
+    """Yorum listesinin verisi; filtreler (durum, kurs, puan) GET'ten ya da toplu işlemde POST'tan gelir."""
+    key = params.get("status", "pending")
+    key = key if key in REVIEW_FILTERS else "pending"
     base = Review.objects.select_related("course", "user")
-    course_id = request.GET.get("course", "")
+    course_id = params.get("course", "")
     if course_id:
         base = base.filter(course_id=course_id) if Course.objects.filter(pk=course_id).exists() else base.none()
-    rating = request.GET.get("rating", "")
+    rating = params.get("rating", "")
     if rating in REVIEW_RATING_FILTERS:
         base = base.filter(**REVIEW_RATING_FILTERS[rating])
     else:
@@ -730,7 +729,7 @@ def reviews(request):
         dict(key=name, label=label, count=apply(base).count(), checked=name == key)
         for name, (label, apply) in REVIEW_FILTERS.items()
     ]
-    context = dict(
+    return dict(
         reviews=items,
         filters=filters,
         review_filter=key,
@@ -741,10 +740,28 @@ def reviews(request):
         filter_query=urlencode({name: value for name, value in (("course", course_id), ("rating", rating)) if value}),
         courses=Course.objects.order_by("title"),
     )
+
+
+@superuser_required
+def reviews(request):
+    """Yorumlar: filtre (durum, kurs, puan) GET parametresinde; HTMX isteğinde yalnız liste döner."""
+    context = _review_list_context(request.GET)
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_review_list.html", context)
     context["import_form"] = ReviewImportForm()
     return render(request, "studio/reviews.html", context)
+
+
+@superuser_required
+@require_POST
+def review_bulk(request):
+    """Seçilen yorumlara toplu işlem; liste aynı filtrelerle yeniden çizilir, seçim temizlenir."""
+    form = ReviewBulkForm(request.POST)
+    if not form.is_valid():
+        return _toast(reswap(HttpResponse(), "none"), "warning", _first_error(form))
+    count = form.save()
+    response = render(request, "studio/partials/_review_list.html", _review_list_context(request.POST))
+    return _toast(response, "success", form.message(count))
 
 
 @superuser_required

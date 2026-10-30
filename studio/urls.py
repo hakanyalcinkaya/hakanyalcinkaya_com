@@ -63,6 +63,7 @@ urlpatterns = [
     path("emails/<slug:key>/send-test/", views.email_send_test, name="email_send_test"),
     path("reviews/", views.reviews, name="reviews"),
     path("reviews/new/", views.review_create, name="review_create"),
+    path("reviews/bulk/", views.review_bulk, name="review_bulk"),
     path("reviews/<uuid:review_id>/edit/", views.review_edit, name="review_edit"),
     path("reviews/<uuid:review_id>/delete/", views.review_delete, name="review_delete"),
     path("reviews/<uuid:review_id>/<slug:action>/", views.review_action, name="review_action"),

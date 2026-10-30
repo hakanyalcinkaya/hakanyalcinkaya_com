@@ -3,6 +3,7 @@
 <div class="list-group-item py-3" id="review-{{ review.id }}">
   {# Aksiyonlar en solda, sabit sırada: her zaman olanlar başta, koşullu olanlar sonda; olmayan buton yerinde görünmez boşluk bırakır, satırlar hep aynı hizada kalır. #}
   <div class="d-flex flex-wrap align-items-center gap-2 small">
+    <input class="form-check-input m-0 flex-shrink-0" type="checkbox" name="reviews" value="{{ review.id }}" data-review-check aria-label="{{ review.display_name|default:'Yorum' }} yorumunu seç">
     <div class="d-flex gap-1 flex-shrink-0">
       <button type="button" class="btn btn-sm {% if review.featured %}btn-primary{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:review_action' review.id 'featured' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" aria-pressed="{{ review.featured|yesno:'true,false' }}" title="Kurs sayfasında öne çıkan yorumlarda göster"><i class="bi bi-pin-angle" aria-hidden="true"></i><span class="visually-hidden">Kursta öne çıkar</span></button>
       <button type="button" class="btn btn-sm {% if review.show_on_home %}btn-primary{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:review_action' review.id 'home' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" aria-pressed="{{ review.show_on_home|yesno:'true,false' }}" title="Ana sayfada göster"><i class="bi bi-house" aria-hidden="true"></i><span class="visually-hidden">Ana sayfada göster</span></button>

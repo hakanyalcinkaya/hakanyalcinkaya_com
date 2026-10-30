@@ -1,9 +1,9 @@
-{# Yorum listesi; filtreler GET parametresinde (durum, kurs, puan), HTMX ile yalnız bu blok yenilenir. #}
-{% url 'studio:reviews' as reviews_url %}
+{# Yorum listesi; filtreler GET parametresinde (durum, kurs, puan), HTMX ile yalnız bu blok yenilenir. Seçili yorumlara toplu işlem (studio.js). #}
+{% url 'studio:reviews' as reviews_url %}{% url 'studio:review_bulk' as bulk_url %}
 <div id="review-list">
-  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" hx-get="{{ reviews_url }}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change" hx-sync="this:replace">
+  <form id="review-filters" class="d-flex flex-wrap align-items-center gap-2 mb-3" hx-get="{{ reviews_url }}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change" hx-sync="this:replace">
     <input type="hidden" name="status" value="{{ review_filter }}">
-    <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
+    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Durum">
       {% for item in filters %}
       <a href="{{ reviews_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}" hx-get="{{ reviews_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
@@ -18,6 +18,33 @@
       <option value="none"{% if rating == "none" %} selected{% endif %}>Puansız</option>
     </select>
   </form>
+  {% if reviews %}
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2 small" data-review-bulk>
+    <label class="form-check d-inline-flex align-items-center gap-2 mb-0 ps-3">
+      <input class="form-check-input m-0" type="checkbox" data-review-all>
+      <span>Tümünü seç</span>
+    </label>
+    <div class="d-none flex-wrap align-items-center gap-2" data-review-bar role="region" aria-label="Seçili yorumlar için işlemler">
+      <span class="fw-medium"><span data-review-count>0</span> yorum seçili</span>
+      {% with include="[data-review-check]:checked, #review-filters" %}
+      <div class="btn-group btn-group-sm" role="group" aria-label="Onay">
+        <button type="button" class="btn btn-outline-success" hx-post="{{ bulk_url }}" hx-vals='{"action": "approve"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Onayla</button>
+        <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "hide"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i>Gizle</button>
+      </div>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Ana sayfa">
+        <button type="button" class="btn btn-outline-primary" hx-post="{{ bulk_url }}" hx-vals='{"action": "home_on"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML"><i class="bi bi-house me-1" aria-hidden="true"></i>Ana sayfada göster</button>
+        <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "home_off"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML">Ana sayfadan kaldır</button>
+      </div>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Kursta öne çıkan">
+        <button type="button" class="btn btn-outline-primary" hx-post="{{ bulk_url }}" hx-vals='{"action": "featured_on"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML"><i class="bi bi-pin-angle me-1" aria-hidden="true"></i>Kursta öne çıkar</button>
+        <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "featured_off"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML">Öne çıkarma</button>
+      </div>
+      <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete"}' hx-include="{{ include }}" hx-target="#review-list" hx-swap="outerHTML" hx-confirm="Seçili yorumlar silinsin mi? Geri alınamaz."><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Sil</button>
+      {% endwith %}
+      <button type="button" class="btn btn-link btn-sm link-secondary" data-review-clear>Seçimi temizle</button>
+    </div>
+  </div>
+  {% endif %}
   <div class="list-group">
     {% for review in reviews %}{% include "studio/partials/_review_row.html" %}{% empty %}
     <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede yorum yok.</div>

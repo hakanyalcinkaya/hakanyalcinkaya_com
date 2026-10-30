@@ -1332,13 +1332,19 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
         self.needs_review = False
         self.save(update_fields=["status", "needs_review", "updated_at"])
 
-    def toggle_featured(self):
-        self.featured = not self.featured
+    def set_featured(self, value):
+        self.featured = value
         self.save(update_fields=["featured", "updated_at"])
 
-    def toggle_home(self):
-        self.show_on_home = not self.show_on_home
+    def toggle_featured(self):
+        self.set_featured(not self.featured)
+
+    def set_home(self, value):
+        self.show_on_home = value
         self.save(update_fields=["show_on_home", "updated_at"])
+
+    def toggle_home(self):
+        self.set_home(not self.show_on_home)
 
     def card(self):
         """Sitedeki yorum kartının verisi (onaylı sürüm)."""

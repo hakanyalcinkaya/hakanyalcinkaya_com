@@ -242,6 +242,35 @@
     if (all || event.target.closest("[data-orphan-check]")) refreshOrphanSelection();
   });
 
+  // Yorumlar: tek tek ya da "Tümünü seç" ile seçilir; seçim varken işlem çubuğu görünür.
+  function refreshReviewSelection() {
+    var bulk = document.querySelector("[data-review-bulk]");
+    if (!bulk) return;
+    var checks = document.querySelectorAll("[data-review-check]");
+    var count = document.querySelectorAll("[data-review-check]:checked").length;
+    var all = bulk.querySelector("[data-review-all]");
+    all.checked = checks.length > 0 && count === checks.length;
+    all.indeterminate = count > 0 && count < checks.length;
+    var bar = bulk.querySelector("[data-review-bar]");
+    bar.querySelector("[data-review-count]").textContent = count;
+    bar.classList.toggle("d-none", count === 0);
+    bar.classList.toggle("d-flex", count > 0);
+  }
+
+  document.addEventListener("change", function (event) {
+    var all = event.target.closest("[data-review-all]");
+    if (all) {
+      document.querySelectorAll("[data-review-check]").forEach(function (box) { box.checked = all.checked; });
+    }
+    if (all || event.target.closest("[data-review-check]")) refreshReviewSelection();
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest("[data-review-clear]")) return;
+    document.querySelectorAll("[data-review-check]:checked").forEach(function (box) { box.checked = false; });
+    refreshReviewSelection();
+  });
+
   function contentAdded(element) {
     initSortables(element);
     renumberAll();
@@ -252,6 +281,7 @@
   document.body.addEventListener("htmx:afterSettle", function () {
     renumberAll();
     refreshSelection();
+    refreshReviewSelection();
   });
 
   // Video yükleme: dosyalar adlarına göre sıralanır ve sırayla, tek tek gönderilir; her biri bir ders satırı olur.

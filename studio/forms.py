@@ -371,6 +371,57 @@ class ExtraContentForm(forms.ModelForm):
         return self.instance
 
 
+class ReviewBulkAction(models.TextChoices):
+    APPROVE = "approve", _("Onayla")
+    HIDE = "hide", _("Gizle")
+    HOME_ON = "home_on", _("Ana sayfada göster")
+    HOME_OFF = "home_off", _("Ana sayfadan kaldır")
+    FEATURED_ON = "featured_on", _("Kursta öne çıkar")
+    FEATURED_OFF = "featured_off", _("Kursta öne çıkarma")
+    DELETE = "delete", _("Sil")
+
+
+class ReviewBulkForm(forms.Form):
+    """Yorum listesinde seçilen yorumlara toplu işlem."""
+
+    action = forms.ChoiceField(choices=ReviewBulkAction.choices)
+    reviews = forms.ModelMultipleChoiceField(queryset=Review.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reviews"].error_messages["required"] = _("Önce yorum seç.")
+
+    @transaction.atomic
+    def save(self):
+        """İşlemi uygular, etkilenen yorum sayısını döner."""
+        action = self.cleaned_data["action"]
+        reviews = list(self.cleaned_data["reviews"])
+        for review in reviews:
+            if action == ReviewBulkAction.APPROVE:
+                review.approve()
+            elif action == ReviewBulkAction.HIDE:
+                review.hide()
+            elif action in (ReviewBulkAction.HOME_ON, ReviewBulkAction.HOME_OFF):
+                review.set_home(action == ReviewBulkAction.HOME_ON)
+            elif action in (ReviewBulkAction.FEATURED_ON, ReviewBulkAction.FEATURED_OFF):
+                review.set_featured(action == ReviewBulkAction.FEATURED_ON)
+            else:
+                review.delete()
+        return len(reviews)
+
+    def message(self, count):
+        texts = {
+            ReviewBulkAction.APPROVE: _("%(count)s yorum onaylandı; sitede görünüyor."),
+            ReviewBulkAction.HIDE: _("%(count)s yorum gizlendi."),
+            ReviewBulkAction.HOME_ON: _("%(count)s yorum ana sayfada gösterilecek."),
+            ReviewBulkAction.HOME_OFF: _("%(count)s yorum ana sayfadan kaldırıldı."),
+            ReviewBulkAction.FEATURED_ON: _("%(count)s yorum kursta öne çıkarıldı."),
+            ReviewBulkAction.FEATURED_OFF: _("%(count)s yorum kursta öne çıkanlardan kaldırıldı."),
+            ReviewBulkAction.DELETE: _("%(count)s yorum silindi."),
+        }
+        return texts[self.cleaned_data["action"]] % {"count": count}
+
+
 class ReviewImportForm(forms.ModelForm):
     """Eski yorum: ad elle yazılır, puan isteğe bağlı. "Hemen onayla" seçiliyse sitede görünür (öne çıkarma seçenekleriyle)."""
 
