@@ -563,6 +563,8 @@ def course_extra_contents(request, course_id):
     badge = render_to_string("studio/partials/_lesson_extra.html", dict(lesson=lesson), request=request)
     status = "skipped" if form.skipped else "saved"
     message = _("Atlandı; derste ek içerik zaten var.") if form.skipped else _("Kaydedildi.")
+    if form.learned:
+        message = f"{message} {_('Video dosya adı derse yazıldı.')}"
     return JsonResponse(
         dict(status=status, message=str(message), lesson=lesson.title, badge_id=f"lesson-{lesson.pk}-extra", badge=badge)
     )
@@ -584,6 +586,8 @@ def course_subtitles(request, course_id):
         message = _("Atlandı; derste %(language)s altyazı zaten var.") % {"language": language}
     else:
         message = _("%(language)s altyazı kaydedildi.") % {"language": language}
+    if form.learned:
+        message = f"{message} {_('Video dosya adı derse yazıldı.')}"
     return JsonResponse(
         dict(
             status="skipped" if form.skipped else "saved",

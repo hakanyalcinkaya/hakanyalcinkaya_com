@@ -3,6 +3,11 @@
     <label class="visually-hidden" for="{{ form.title.id_for_label }}">Ders başlığı</label>
     {{ form.title }}
     {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    {% if form.video_file_name %}
+    <label class="form-label small text-body-secondary mt-2 mb-1" for="{{ form.video_file_name.id_for_label }}">Video dosya adı <span class="text-body-tertiary">· ek bilgi ve altyazı dosyaları bu adla eşleşir</span></label>
+    {{ form.video_file_name }}
+    {% for error in form.video_file_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    {% endif %}
   </div>
   <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
   <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:lesson_title' lesson.id %}" hx-target="#lesson-{{ lesson.id }}-title" hx-swap="outerHTML">Vazgeç</button>

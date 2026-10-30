@@ -656,10 +656,21 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
     def video_file_stems(self):
         """Videonun dosya adı (uzantısız); ek bilgi ve altyazı dosyaları bu adla oluşturulur. Dosya adı tutulmadan önce
         yüklenen derslerde platformdaki video başlığı dosya adından geldiği için o da denenir (ders adına çevrilmediyse)."""
-        stems = [Path(self.video_file_name).stem] if self.video_file_name else []
+        name = Path(self.video_file_name)
+        # Ek bilgi / altyazı dosyasından öğrenilen ad uzantısız kaydedilir; yalnız video uzantısı atılır ("react-18.x" kalsın).
+        stems = [name.stem if name.suffix.lower() in VIDEO_EXTENSIONS else name.name] if self.video_file_name else []
         if self.video_title and self.video_title != self.title:
             stems.append(self.video_title)
         return stems
+
+    def learn_video_file_name(self, file_name):
+        """Ek bilgi ve altyazı dosyaları videoyla aynı adla oluşturulur: dosya adı bilinmeyen videolu derse eşleşen dosyanın
+        adı (uzantısız) yazılır, sonraki yüklemeler doğrudan adla eşleşir. Ad yazıldıysa True döner."""
+        if not self.video_id or self.video_file_name:
+            return False
+        self.video_file_name = Path(file_name).stem[:255]
+        self.save(update_fields=["video_file_name", "updated_at"])
+        return True
 
     @property
     def video_file_label(self):

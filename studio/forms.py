@@ -117,10 +117,22 @@ def _extension(upload):
 
 
 class LessonTitleForm(forms.ModelForm):
+    """Ders başlığı; video derslerinde videonun dosya adı da (ek bilgi ve altyazı dosyaları bu adla eşleşir)."""
+
     class Meta:
         model = Lesson
-        fields = ("title",)
-        widgets = {"title": forms.TextInput(attrs={"class": "form-control form-control-sm", "autofocus": True})}
+        fields = ("title", "video_file_name")
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control form-control-sm", "autofocus": True}),
+            "video_file_name": forms.TextInput(
+                attrs={"class": "form-control form-control-sm font-monospace", "placeholder": _("ör. 001-005-ders-adi_without_silence")}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.is_video:
+            del self.fields["video_file_name"]
 
 
 class SectionTitleForm(forms.ModelForm):
@@ -355,6 +367,7 @@ class ExtraContentBulkForm(forms.Form):
     def save(self):
         if not self.skipped:
             self.lesson.set_extra_content(self.text)
+        self.learned = self.lesson.learn_video_file_name(self.cleaned_data["file"].name)
         return self.lesson
 
 
@@ -377,8 +390,8 @@ class SubtitleBulkForm(forms.Form):
         upload = cleaned.get("file")
         if upload is None:
             return cleaned
-        name, self.language = subtitle_language(upload.name)
-        self.lesson, reason = self.course.match_lesson_for_file(name)
+        self.match_name, self.language = subtitle_language(upload.name)
+        self.lesson, reason = self.course.match_lesson_for_file(self.match_name)
         if self.lesson is None:
             raise forms.ValidationError(reason)
         if not self.lesson.is_video:
@@ -390,6 +403,7 @@ class SubtitleBulkForm(forms.Form):
     def save(self):
         if not self.skipped:
             LessonSubtitle.attach(self.lesson, self.language, self.cleaned_data["file"])
+        self.learned = self.lesson.learn_video_file_name(self.match_name)
         return self.lesson
 
 
