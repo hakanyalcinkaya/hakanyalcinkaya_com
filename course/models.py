@@ -858,8 +858,13 @@ class VideoUpload(BaseModel):
         verbose_name=_("kurs (tanıtım videosu)"),
     )
     platform = models.CharField(_("platform"), max_length=20, choices=VideoPlatform, default=VideoPlatform.BUNNY)
+    # Ders dosya adları uzun olabilir (ör. "..._without_silence.mp4"); varsayılan 100 karakter yetmez.
     file = models.FileField(
-        _("dosya"), upload_to="video_uploads/%Y/%m/", blank=True, help_text=_("Platform videoyu işleyince silinir.")
+        _("dosya"),
+        upload_to="video_uploads/%Y/%m/",
+        max_length=255,
+        blank=True,
+        help_text=_("Platform videoyu işleyince silinir."),
     )
     original_name = models.CharField(_("dosya adı"), max_length=255)
     size = models.PositiveBigIntegerField(_("boyut (bayt)"), default=0)
@@ -1132,7 +1137,7 @@ class LessonSubtitle(BaseModel):
 
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="subtitles", verbose_name=_("ders"))
     language = models.CharField(_("dil"), max_length=10, choices=SubtitleLanguage)
-    file = models.FileField(_("dosya"), upload_to="subtitles/%Y/%m/")
+    file = models.FileField(_("dosya"), upload_to="subtitles/%Y/%m/", max_length=255)
     status = models.CharField(
         _("durum"), max_length=20, choices=SubtitleStatus, default=SubtitleStatus.QUEUED, db_index=True
     )
