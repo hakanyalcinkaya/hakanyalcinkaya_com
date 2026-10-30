@@ -9,13 +9,15 @@
     <div class="col-md-6">
       <form class="studio-extra-drop h-100 border border-2 border-dashed rounded p-3" hx-post="{% url 'studio:lesson_subtitles' lesson.id %}" hx-encoding="multipart/form-data" hx-target="#lesson-{{ lesson.id }}-form" data-upload-form data-extra-drop="subtitle">
         <div class="fw-medium small"><i class="bi bi-badge-cc me-1" aria-hidden="true"></i>Altyazı</div>
-        <p class="small text-body-secondary mb-2">SRT / VTT dosyasını buraya bırak; dil dosya adından seçilir.</p>
+        <p class="small text-body-secondary mb-2">SRT / VTT dosyasını buraya bırak; altyazılar şimdilik Türkçe kaydedilir.</p>
         <div class="row g-2 align-items-end">
+          {% comment %} Altyazı dili seçimi şimdilik kapalı (varsayılan Türkçe). Açmak için bu bloğu geri al ve dosya sütununu col-sm-7 yap.
           <div class="col-sm-5">
             <label class="form-label small mb-1" for="{{ subtitle_form.language.id_for_label }}">{{ subtitle_form.language.label }}</label>
             {{ subtitle_form.language }}
           </div>
-          <div class="col-sm-7">
+          {% endcomment %}
+          <div class="col-12">
             <label class="form-label small mb-1" for="{{ subtitle_form.file.id_for_label }}">{{ subtitle_form.file.label }}</label>
             {{ subtitle_form.file }}
           </div>

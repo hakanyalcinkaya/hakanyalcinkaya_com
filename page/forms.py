@@ -288,7 +288,9 @@ class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
 
     class Meta:
         model = PlayerPreference
-        fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play")
+        # Altyazı dili şimdilik seçilmez (varsayılan Türkçe, PlayerPreference.subtitle_language). Açmak için alanı geri ekle:
+        # fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play")
+        fields = ("playback_rate", "quality", "subtitles_enabled", "fullscreen_on_play")
         widgets = {
             "playback_rate": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
             "quality": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
@@ -297,7 +299,7 @@ class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
         labels = {"fullscreen_on_play": "Oynat'a basınca tam ekrana geç"}
         help_texts = {
             "quality": "Videoda bu kalite yoksa bağlantına göre otomatik seçilir.",
-            "subtitles_enabled": "Açıksa altyazısı olan videolarda seçtiğin dil kendiliğinden açılır.",
+            "subtitles_enabled": "Açıksa altyazısı olan videolarda Türkçe altyazı kendiliğinden açılır.",
         }
 
     def __init__(self, *args, user, **kwargs):
@@ -305,7 +307,8 @@ class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
         self.helper.layout = Layout(
             Hidden("action", "player"),
             Row(Column("playback_rate", css_class="col-sm-6"), Column("quality", css_class="col-sm-6")),
-            Row(Column("subtitles_enabled", css_class="col-sm-6"), Column("subtitle_language", css_class="col-sm-6")),
+            # Altyazı dili seçimi açılınca: Row(Column("subtitles_enabled", css_class="col-sm-6"), Column("subtitle_language", css_class="col-sm-6")),
+            "subtitles_enabled",
             "fullscreen_on_play",
             HTML('<p class="small text-body-secondary">Oynatıcıda hızı, kaliteyi ya da altyazıyı değiştirdiğinde bu ayarlar kendiliğinden güncellenir.</p>'),
             submit("Kaydet", icon="bi-check-lg", css_class="btn-primary"),

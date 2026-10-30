@@ -232,10 +232,13 @@ class VideoUploadForm(forms.ModelForm):
 
 
 class SubtitleForm(forms.Form):
-    # data-* öznitelikleri: studio.js dili dosya adından tahmin edip listeyi seçer (ör. ders.en.srt → English).
+    # Altyazı dili şimdilik seçilmez, hepsi Türkçe kaydedilir (dil listesi panelde yorum satırında). Liste geri
+    # açılınca data-* öznitelikleriyle studio.js dili dosya adından tahmin edip seçer (ör. ders.en.srt → English).
     language = forms.ChoiceField(
         label=_("Dil"),
         choices=SubtitleLanguage.choices,
+        required=False,
+        initial=SubtitleLanguage.TR,
         widget=forms.Select(attrs={"class": "form-select form-select-sm", "data-subtitle-language": ""}),
     )
     file = forms.FileField(
@@ -265,7 +268,7 @@ class SubtitleForm(forms.Form):
 
     def save(self):
         """Aynı dilde altyazı varsa dosyası değiştirilir; platformdaki eskisinin yerine geçer."""
-        language = self.cleaned_data["language"]
+        language = self.cleaned_data.get("language") or SubtitleLanguage.TR
         subtitle = LessonSubtitle.objects.filter(lesson=self.lesson, language=language).first()
         if subtitle is None:
             subtitle = LessonSubtitle(lesson=self.lesson, language=language)
