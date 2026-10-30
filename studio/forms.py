@@ -48,6 +48,7 @@ class LessonBulkAction(models.TextChoices):
     PREVIEW_OFF = "preview_off", _("Önizlemeyi kapat")
     TO_TEXT = "to_text", _("İçerik dersine çevir")
     TO_VIDEO = "to_video", _("Video dersine çevir")
+    MOVE = "move", _("Bölüme taşı")
     DELETE = "delete", _("Sil")
     DELETE_REMOTE = "delete_remote", _("Sil ve videolarını platformdan sil")
 
@@ -57,17 +58,31 @@ class LessonBulkForm(forms.Form):
 
     action = forms.ChoiceField(choices=LessonBulkAction.choices)
     lessons = forms.ModelMultipleChoiceField(queryset=Lesson.objects.none())
+    # Yalnız "Bölüme taşı" için: dersler bu bölümün sonuna gider.
+    section = forms.ModelChoiceField(queryset=Section.objects.none(), required=False)
 
     def __init__(self, *args, course, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["lessons"].queryset = Lesson.objects.filter(section__course=course)
+        self.fields["lessons"].queryset = Lesson.objects.filter(section__course=course).select_related("section")
         self.fields["lessons"].error_messages["required"] = _("Önce video seç.")
+        self.fields["section"].queryset = course.sections.all()
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("action") == LessonBulkAction.MOVE and not cleaned.get("section"):
+            raise forms.ValidationError(_("Taşınacak bölümü seç."))
+        return cleaned
 
     @transaction.atomic
     def save(self):
         """İşlemi uygular, etkilenen ders sayısını döner."""
         action = self.cleaned_data["action"]
         lessons = list(self.cleaned_data["lessons"])
+        if action == LessonBulkAction.MOVE:
+            # Seçilen dersler düzenleyicideki sıralarıyla hedef bölümün sonuna eklenir.
+            lessons.sort(key=lambda lesson: (lesson.section.sort_order, lesson.sort_order))
+            self.cleaned_data["section"].append_lessons(lessons)
+            return len(lessons)
         for lesson in lessons:
             if action == LessonBulkAction.PUBLISH:
                 lesson.publish()
@@ -90,10 +105,12 @@ class LessonBulkForm(forms.Form):
             LessonBulkAction.PREVIEW_OFF: _("%(count)s videoda önizleme kapatıldı."),
             LessonBulkAction.TO_TEXT: _("%(count)s ders içerik dersine çevrildi."),
             LessonBulkAction.TO_VIDEO: _("%(count)s ders video dersine çevrildi."),
+            LessonBulkAction.MOVE: _("%(count)s ders “%(section)s” bölümünün sonuna taşındı."),
             LessonBulkAction.DELETE: _("%(count)s video silindi; platformdaki videoları duruyor."),
             LessonBulkAction.DELETE_REMOTE: _("%(count)s video silindi; platformdaki videoları da silinecek."),
         }
-        return texts[action] % {"count": count}
+        section = self.cleaned_data.get("section")
+        return texts[action] % {"count": count, "section": section.title if section else ""}
 
 
 class SiteSettingsForm(forms.ModelForm):

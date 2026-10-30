@@ -15,6 +15,11 @@
       <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "to_text"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-file-text me-1" aria-hidden="true"></i>İçerik dersi yap</button>
       <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "to_video"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Video dersi yap</button>
     </div>
+    {# Bölüme taşı: seçenekler çubuk açılınca sayfadaki güncel bölümlerden doldurulur (studio.js). #}
+    <div class="input-group input-group-sm w-auto mw-100" role="group" aria-label="Bölüme taşı">
+      <select class="form-select form-select-sm" name="section" aria-label="Hedef bölüm" data-move-section></select>
+      <button type="button" class="btn btn-outline-primary" hx-post="{{ bulk_url }}" hx-vals='{"action": "move"}' hx-include="[data-lesson-check]:checked, [data-move-section]" hx-target="#course-sections" hx-swap="outerHTML" hx-confirm="Seçili dersler bu bölümün sonuna taşınsın mı?"><i class="bi bi-arrow-return-right me-1" aria-hidden="true"></i>Bölüme taşı</button>
+    </div>
     <div class="btn-group btn-group-sm" role="group" aria-label="Silme">
       <button type="button" class="btn btn-outline-danger" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML" hx-confirm="Seçili videolar (dersler) silinsin mi? Platformdaki video dosyaları durur."><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Sil</button>
       <button type="button" class="btn btn-danger" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete_remote"}' hx-include="[data-lesson-check]:checked" hx-target="#course-sections" hx-swap="outerHTML" hx-confirm="Seçili videolar ve platformdaki (Bunny/Vimeo) video dosyaları silinsin mi? Bu geri alınamaz.">Sil + video dosyalarını sil</button>

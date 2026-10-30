@@ -195,8 +195,27 @@
     });
     var count = document.querySelectorAll("[data-lesson-check]:checked").length;
     bar.querySelector("[data-bulk-count]").textContent = count;
+    if (count > 0 && bar.classList.contains("d-none")) fillMoveSections(bar);
     bar.classList.toggle("d-none", count === 0);
   }
+
+  // "Bölüme taşı" listesi: sayfadaki bölümler (eklenen, yeniden adlandırılan, sıralanan dahil) sırasıyla.
+  function fillMoveSections(bar) {
+    var select = bar.querySelector("[data-move-section]");
+    if (!select) return;
+    var selected = select.value;
+    select.replaceChildren();
+    document.querySelectorAll("#course-sections [data-section-id]").forEach(function (section, index) {
+      var name = section.querySelector("[data-section-name]");
+      var option = new Option((index + 1) + ". " + (name ? name.textContent.trim() : ""), section.getAttribute("data-section-id"));
+      select.append(option);
+    });
+    if (selected) select.value = selected;
+  }
+
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches && event.target.matches("[data-move-section]")) fillMoveSections(event.target.closest("[data-bulk-bar]"));
+  });
 
   document.addEventListener("change", function (event) {
     var sectionBox = event.target.closest("[data-section-check]");
