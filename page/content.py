@@ -432,6 +432,9 @@ def _detail(course, card):
         }
     if course.subtitle:
         detail["subtitle"] = course.subtitle
+    # "Kategori" satırı: kursun kategorisi ve alt kategorileri ("Teknolojiler" satırı teknolojilerden gelir).
+    names = [course.category.name, *(category.name for category in course.subcategories.all())]
+    detail["categories"] = list(dict.fromkeys(names))
     return detail
 
 
