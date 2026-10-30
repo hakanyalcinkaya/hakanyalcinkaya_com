@@ -285,6 +285,10 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .studio-dropzone.is-dragover{background:var(--bs-primary-bg-subtle);border-color:var(--bs-primary)!important}
 .studio-section.is-dragover{outline:2px dashed var(--bs-primary);outline-offset:2px}
 .studio-lesson.is-dragover{background:var(--bs-primary-bg-subtle)}
+.studio-lesson:hover{z-index:3}
+.studio-file-tip{position:relative}
+.studio-file-tip::after{content:attr(data-file-name);position:absolute;left:0;top:calc(100% + .25rem);z-index:1080;max-width:min(36rem,80vw);padding:.25rem .5rem;border-radius:var(--bs-border-radius-sm);background:var(--bs-emphasis-color);color:var(--bs-body-bg);font-size:.75rem;font-weight:400;white-space:normal;overflow-wrap:anywhere;width:max-content;pointer-events:none;opacity:0;visibility:hidden}
+.studio-lesson:hover .studio-file-tip::after{opacity:1;visibility:visible}
 .studio-lessons{min-height:2.75rem}
 .studio-empty-hint{display:none}
 .studio-lessons:not(:has([data-lesson-id])) + .studio-empty-hint{display:block}

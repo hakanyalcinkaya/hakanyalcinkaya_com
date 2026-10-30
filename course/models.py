@@ -576,6 +576,8 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         blank=True,
         help_text=_("Ders başlığından farklıysa platforma yeniden gönderilir."),
     )
+    # Stüdyoda ders başlığının üstüne gelince gösterilir; yükleme işi kuyruktan temizlense de kalır.
+    video_file_name = models.CharField(_("yüklenen dosya adı"), max_length=255, blank=True)
     # Videonun altında "Ek bilgiler" olarak görünür. Kaynak Markdown'dır (HTML de yazılabilir); kaydedilince temizlenmiş
     # HTML'i üretilir, sayfa onu gösterir.
     extra_content = models.TextField(
@@ -643,6 +645,14 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         # video_uploads önceden yüklendiyse (prefetch) ek sorgu yapılmaz; sıralama en yeni önce.
         uploads = self.video_uploads.all()
         return uploads[0] if uploads else None
+
+    @property
+    def video_file_label(self):
+        """Videonun yüklendiği dosyanın adı; eski derslerde kuyrukta duran son yüklemeden okunur."""
+        if self.video_file_name:
+            return self.video_file_name
+        upload = self.latest_upload
+        return upload.original_name if upload else ""
 
     @property
     def has_busy_upload(self):
@@ -738,15 +748,24 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
             transaction.on_commit(partial(delete_remote_video.delay, self.video_id, self.video_platform))
         self.delete()
 
-    def attach_video(self, platform, video_id, video_key, duration_seconds, video_title):
+    def attach_video(self, platform, video_id, video_key, duration_seconds, video_title, file_name=""):
         replaced = (self.video_platform, self.video_id)
         self.video_platform = platform
         self.video_id = video_id
         self.video_key = video_key
         self.duration_seconds = duration_seconds or None
         self.video_title = video_title
+        self.video_file_name = file_name
         self.save(
-            update_fields=["video_platform", "video_id", "video_key", "duration_seconds", "video_title", "updated_at"]
+            update_fields=[
+                "video_platform",
+                "video_id",
+                "video_key",
+                "duration_seconds",
+                "video_title",
+                "video_file_name",
+                "updated_at",
+            ]
         )
         # Video işlenirken ders adı değişmiş olabilir (o sırada senkron kuyruğa alınamaz); güncel ad platforma da yazılır.
         self.refresh_from_db(fields=["title"])
@@ -995,9 +1014,17 @@ class VideoUpload(BaseModel):
         """Biten işi kuyruktan kaldırır; yerel dosya da silinir. Derse bağlanmış video etkilenmez."""
         if not self.can_discard:
             return False
+        self.keep_file_name()
         self.discard_file()
         self.delete()
         return True
+
+    def keep_file_name(self):
+        """Bu işin videosu derste duruyorsa dosya adı derse yazılır; iş silinince ad kaybolmasın (alan öncesi dersler)."""
+        if self.lesson_id and self.video_id:
+            Lesson.objects.filter(pk=self.lesson_id, video_id=self.video_id, video_file_name="").update(
+                video_file_name=self.original_name
+            )
 
     # İşçi geçişleri (Celery)
 
@@ -1040,7 +1067,9 @@ class VideoUpload(BaseModel):
             self.course.attach_preview_video(self.platform, self.video_id, status.key, self.video_title)
         else:
             duration = status.duration or self.duration_seconds
-            self.lesson.attach_video(self.platform, self.video_id, status.key, duration, self.video_title)
+            self.lesson.attach_video(
+                self.platform, self.video_id, status.key, duration, self.video_title, self.original_name
+            )
         return True
 
     def mark_failed(self, error):
