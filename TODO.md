@@ -14,6 +14,7 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 ## 2. İçerik temizliği (yayından önce)
 - [ ] Örnek veriyi kaldır: kurs sayfası tanıtım metnini aynı slug'lı örnek kurstan birleştiriyor (`page/content.py` `course_card` ve kurs detayı, `catalog.course_by_slug`); sepette oturumdaki örnek kurs yolu (`page/catalog.py` `cart_add`, `page/content.py` sepet) ve yayında kurs yokken gösterilen örnek kurslar. Gerçek kursların madde listeleri (CourseHighlight) dolu.
 - [ ] Yasal metinlerde eski alan adı: Gizlilik ve Kullanım Şartları "hakanyalcinkaya.dev" diyor (`page/catalog.py`); `hakanyalcinkaya.com` olmalı. Yasal metinlerin hukuki incelemesi.
+- [ ] Sitede görünen `[PLACEHOLDER]` metinleri: giriş/kayıt sayfaları altı (`templates/page/account/auth_base.html`), şifre sıfırlama gönderildi (`password_reset_sent.html`), hesap ayarlarında e-posta değişikliği (`settings.html`), teşekkürler sayfasında sipariş no ve e-posta bildirimi (`thanks.html`, `order.number` var), yasal sayfalar (`legal.html`; `page/catalog.py`'de iletişim e-postası ×2, iade politikası).
 - [ ] Kurs fiyatları yer tutucu (₺100 / ₺100 / ₺99,79): gerçek fiyatlar girilmeli.
 - [ ] Django ve Python kurslarının erişim notu "platformdan izlemeye başlayabilirsin" diyor; sadeleştir (Stüdyo → Kurs bilgileri → Erişim notu).
 - [ ] Ders adlarındaki yazım hataları ("Kulllanımı", "Klasorlerin", ...).
