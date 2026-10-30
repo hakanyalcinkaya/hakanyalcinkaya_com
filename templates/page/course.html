@@ -134,7 +134,7 @@
                 <span class="flex-grow-1 small">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</span>
                 {% else %}
                 <a href="{{ lesson.url }}" class="flex-grow-1 small link-body-emphasis text-decoration-none">{{ lesson.title }}{% if lesson.draft %} {% include "components/draft_badge.html" %}{% endif %}</a>
-                {% if lesson.preview %}{% if enrolled %}<span class="flex-shrink-0">{% include "components/preview_badge.html" %}</span>{% else %}<a href="{{ lesson.url }}?play=1" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme">Önizleme</a>{% endif %}{% endif %}
+                {% if lesson.preview %}<a href="{{ lesson.url }}?play=1" class="btn btn-sm btn-outline-primary flex-shrink-0" aria-label="{{ lesson.title }} — önizleme videosunu oynat">Önizleme</a>{% endif %}
                 {% endif %}
               </li>
               {% endfor %}

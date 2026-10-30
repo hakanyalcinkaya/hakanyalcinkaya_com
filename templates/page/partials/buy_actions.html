@@ -6,6 +6,8 @@
 {% else %}
 <div class="d-grid gap-2 mt-3">
   <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+  {# Kurs sayfasında: ilk önizleme dersi açılır, video kendiliğinden başlar (ders sayfasında first_preview yoktur). #}
+  {% if first_preview %}<a href="{{ first_preview.url }}?play=1" class="btn btn-outline-primary btn-lg fs-6"><i class="bi bi-play-circle me-2" aria-hidden="true"></i>Önizleme videolarını incele</a>{% endif %}
   <form method="post" action="{{ course.cart_url }}" class="d-grid">
     {% csrf_token %}
     <button type="submit" class="btn btn-outline-secondary btn-lg fs-6"><i class="bi bi-bag-plus me-2" aria-hidden="true"></i>Sepete Ekle</button>
