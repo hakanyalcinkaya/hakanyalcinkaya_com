@@ -82,7 +82,8 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 :root{--hy-glass-bg:linear-gradient(140deg,rgba(255,255,255,.78),rgba(255,255,255,.52));--hy-glass-border:rgba(255,255,255,.7);--hy-glass-edge:rgba(15,23,42,.08);--hy-glass-shadow:0 10px 30px -12px rgba(15,23,42,.18);--hy-glass-hover:rgba(15,23,42,.04)}
 [data-bs-theme=dark]{--hy-glass-bg:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.025));--hy-glass-border:rgba(255,255,255,.14);--hy-glass-edge:rgba(255,255,255,.06);--hy-glass-shadow:0 14px 40px -16px rgba(0,0,0,.6);--hy-glass-hover:rgba(255,255,255,.05)}
 .hy-glass,.hy-site-dialog{background:var(--hy-glass-bg);border:1px solid var(--hy-glass-edge);box-shadow:inset 0 1px 0 var(--hy-glass-border),var(--hy-glass-shadow);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
-.hy-site-dialog{--hy-glass-bg:linear-gradient(140deg,rgba(var(--bs-body-bg-rgb),.82),rgba(var(--bs-body-bg-rgb),.62))}
+/* Pencere: arkası net kalır (::backdrop yalnız hafif karartır), camın bulanıklığı ve vurgu parıltısı pencerenin içinde görünür. */
+.hy-site-dialog{--hy-glass-bg:radial-gradient(60% 45% at 0% 0%,rgba(var(--bs-primary-rgb),.22),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(var(--bs-primary-rgb),.14),transparent 70%),linear-gradient(140deg,rgba(var(--bs-body-bg-rgb),.62),rgba(var(--bs-body-bg-rgb),.4));border-color:var(--hy-glass-border);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%)}
 .hy-glass .card-footer{border-top-color:var(--hy-glass-edge)}
 .hy-site-dialog .border-bottom{border-bottom-color:var(--hy-glass-edge)!important}
 [data-reviews]{position:relative;isolation:isolate}
@@ -334,7 +335,7 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-site-dialog{width:min(48rem,95vw);max-height:90vh;padding:0;border-radius:var(--bs-border-radius-lg);color:var(--bs-body-color)}
 .hy-site-dialog[open]{display:flex;flex-direction:column}
 .hy-site-dialog>div{display:flex;flex-direction:column;min-height:0}
-.hy-site-dialog::backdrop{background:rgba(0,0,0,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.hy-site-dialog::backdrop{background:rgba(0,0,0,.3)}
 .hy-site-dialog-scroll{max-height:calc(90vh - 6rem);min-height:0}
 .hy-review-link{margin-inline:calc(-1 * var(--bs-gutter-x, 1rem));padding-inline:var(--bs-gutter-x, 1rem);border-radius:var(--bs-border-radius)}
 .hy-review-link:hover{background:var(--hy-glass-hover)}
