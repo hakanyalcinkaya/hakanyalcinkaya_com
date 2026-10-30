@@ -85,9 +85,11 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = "account.User"
 
-# Google Analytics ölçüm kimliği (G-…): boşsa analitik ve çerez izni bandı hiç gösterilmez. Etiket yalnız ziyaretçi
-# izin verince yüklenir (Çerez Politikası).
+# Google Analytics ölçüm kimliği (G-…): boşsa analitik hiç yüklenmez. GOOGLE_ANALYTICS_CONSENT açıkken etiket yalnız
+# ziyaretçi alttaki bantta izin verince yüklenir; kapalıyken her sayfada doğrudan yüklenir. Çerez ve Gizlilik
+# Politikası'ndaki analitik metinleri bu ayara göre değişir.
 GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="")
+GOOGLE_ANALYTICS_CONSENT = env.bool("GOOGLE_ANALYTICS_CONSENT", default=False)
 
 # Bunny Stream (varsayılan platform): yönetim panelinden video/altyazı yükleme, başlık güncelleme, süre okuma ve sitede HLS oynatma.
 # Kütüphane kimliği ve API anahtarı tanımlı değilse işler hata verir.

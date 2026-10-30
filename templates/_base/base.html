@@ -31,6 +31,15 @@
 <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/hy.css' %}">
 <script src="{% static 'js/theme.js' %}"></script>
+{% if google_analytics_id and not analytics_consent %}{# İzin bandı kapalıyken Google Analytics her sayfada yüklenir. #}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ google_analytics_id }}');
+</script>
+{% endif %}
 </head>
 <body class="d-flex flex-column min-vh-100" hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
 <a href="#icerik" class="visually-hidden-focusable btn btn-primary position-absolute top-0 start-0 m-2" style="z-index:2000">İçeriğe geç</a>

@@ -5,6 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -794,6 +795,33 @@ _COOKIES = (
 
 COOKIE_COLUMNS = ("Ad", "Tür", "Amaç", "Süre")
 
+# Analitik izin bandı kapalıyken (GOOGLE_ANALYTICS_CONSENT=False) Google Analytics her ziyaretçide yüklenir; metinler
+# bunu söyler, izin kaydı satırı çıkar. Anahtar: (belge, bölüm başlığı).
+_ANALYTICS_WITHOUT_CONSENT = {
+    ("privacy", "Verilerin aktarılması"): "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme, e-posta gönderimi) ve ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
+    ("cookies", "Kullandığımız çerezler"): "Sitede hizmetin çalışması için zorunlu çerezler, senin seçtiğin tercihleri hatırlayan tarayıcı kayıtları ve ziyaretleri ölçen analitik çerezler kullanılır.",
+    ("cookies", "Analitik ve reklam çerezleri"): "Ziyaretleri ölçmek için Google Analytics kullanılır. Analitik çerezleri tarayıcı ayarlarından engelleyebilir ya da Google'ın Analytics devre dışı bırakma eklentisini kullanabilirsin. Reklam amaçlı çerez kullanılmıyor.",
+}
+
+
+def _analytics_rows(kind, rows):
+    """Belgenin bölümleri; izin bandı kapalıysa analitik metinleri ve çerez tablosu ona göre."""
+    if settings.GOOGLE_ANALYTICS_CONSENT:
+        return rows
+    result = []
+    for title, text, *table in rows:
+        text = _ANALYTICS_WITHOUT_CONSENT.get((kind, title), text)
+        if table:
+            table = [
+                tuple(
+                    (name, "Analitik çerez", *rest) if name.startswith("_ga") else (name, kind_label, *rest)
+                    for name, kind_label, *rest in table[0]
+                    if name != "hy-analytics-consent"
+                )
+            ]
+        result.append((title, text, *table))
+    return result
+
 LEGAL_DOCUMENTS = (
     (
         "privacy",
@@ -842,6 +870,6 @@ def legal_page(kind):
         "title": title,
         "intro": intro,
         "updated": LEGAL_UPDATED,
-        "sections": _legal_sections(rows),
+        "sections": _legal_sections(_analytics_rows(kind, rows)),
         "others": others,
     }

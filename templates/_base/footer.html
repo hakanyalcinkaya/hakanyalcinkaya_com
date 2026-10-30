@@ -34,7 +34,7 @@
         <a class="text-body-tertiary text-decoration-none link-hover" href="{{ privacy_url }}">Gizlilik Politikası</a>
         <a class="text-body-tertiary text-decoration-none link-hover" href="{{ terms_url }}">Kullanım Şartları</a>
         <a class="text-body-tertiary text-decoration-none link-hover" href="{{ cookies_url }}">Çerez Politikası</a>
-        {% if google_analytics_id %}<button type="button" class="btn btn-link p-0 small text-body-tertiary text-decoration-none link-hover align-baseline" data-consent-open>Çerez tercihleri</button>{% endif %}
+        {% if google_analytics_id and analytics_consent %}<button type="button" class="btn btn-link p-0 small text-body-tertiary text-decoration-none link-hover align-baseline" data-consent-open>Çerez tercihleri</button>{% endif %}
       </div>
     </div>
   </div>
