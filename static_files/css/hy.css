@@ -96,10 +96,10 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 [data-spotlight] :is(.card,.hy-site-dialog).is-lit{--hy-spot-a:1}
 [data-spotlight] :is(.hy-glass,.hy-site-dialog){background-image:var(--hy-spot),var(--hy-glass-bg)}
 [data-spotlight] .card.hover-lift{transition:transform .25s,border-color .25s,--hy-spot-a .35s ease-out}
-/* Sayfa spotlight'ı: imleci izleyen geniş, yumuşak parıltı. Opak bölümlerin altında kalmasın diye içeriğin üstünde, blend mode ile:
-   koyuda screen yalnız koyu alanları aydınlatır, açıkta multiply beyazı vurgu rengine çeker; yazı iki durumda da keskin kalır. Konum transform ile (site.js). */
-.hy-cursor-glow{position:fixed;top:0;left:0;z-index:1000;width:720px;height:720px;margin:-360px 0 0 -360px;pointer-events:none;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.09),rgba(var(--bs-primary-rgb),.035) 45%,transparent);mix-blend-mode:multiply;opacity:0;transition:opacity .4s ease-out;will-change:transform}
-[data-bs-theme=dark] .hy-cursor-glow{background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.13),rgba(var(--bs-primary-rgb),.045) 45%,transparent);mix-blend-mode:screen}
+/* Sayfa spotlight'ı: imleci izleyen geniş, yumuşak parıltı. Opak bölümlerin altında kalmasın diye içeriğin üstünde, düz ve çok hafif saydamlıkla.
+   mix-blend-mode kullanılmaz: cam (backdrop-filter) kartlarla üst üste binince Chrome karenin kenarında keskin bir şerit çiziyordu. Konum transform ile (site.js). */
+.hy-cursor-glow{position:fixed;top:0;left:0;z-index:1000;width:720px;height:720px;margin:-360px 0 0 -360px;pointer-events:none;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.06),rgba(var(--bs-primary-rgb),.02) 45%,transparent);opacity:0;transition:opacity .4s ease-out;will-change:transform}
+[data-bs-theme=dark] .hy-cursor-glow{background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.08),rgba(var(--bs-primary-rgb),.03) 45%,transparent)}
 .hy-cursor-glow.is-on{opacity:1}
 [data-reviews]::before{content:"";position:absolute;inset:10% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(40% 55% at 18% 60%,rgba(var(--bs-primary-rgb),.22),transparent 70%),radial-gradient(35% 50% at 82% 40%,rgba(var(--bs-primary-rgb),.14),transparent 70%)}
 [data-theme-root]>.dropdown-menu{top:100%;right:0;left:auto}
