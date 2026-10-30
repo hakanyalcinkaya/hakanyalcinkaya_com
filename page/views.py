@@ -6,11 +6,12 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -48,6 +49,7 @@ from page.forms import (
     NewsletterForm,
     NewsletterManageForm,
     NewsletterUnsubscribeForm,
+    NewPasswordForm,
     PasswordChangeForm,
     PasswordResetForm,
     PlayerPreferenceAutoForm,
@@ -562,8 +564,18 @@ def password_reset_sent(request):
     )
 
 
-def password_reset_complete(request):
-    return render(request, "page/account/password_reset_complete.html")
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Sıfırlama bağlantısındaki yeni şifre formu; şifre kaydedilince oturum açılır, giriş ekranına dönülmez."""
+
+    template_name = "page/account/password_reset_confirm.html"
+    form_class = NewPasswordForm
+    post_reset_login = True
+    success_url = reverse_lazy("page:library")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Şifren değiştirildi ve giriş yaptın. Diğer cihazlardaki oturumların kapatıldı.")
+        return response
 
 
 @require_POST

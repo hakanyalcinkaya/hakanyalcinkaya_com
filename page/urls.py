@@ -1,9 +1,7 @@
-from django.contrib.auth import views as auth_views
-from django.urls import path, reverse_lazy
+from django.urls import path
 from django.views.generic import RedirectView
 
 from page import views
-from page.forms import NewPasswordForm
 
 app_name = "page"
 
@@ -34,16 +32,7 @@ urlpatterns = [
     path("account/logout/", views.logout, name="logout"),
     path("account/password-reset/", views.password_reset, name="password_reset"),
     path("account/password-reset/sent/", views.password_reset_sent, name="password_reset_sent"),
-    path(
-        "account/password-reset/<uidb64>/<token>/",
-        auth_views.PasswordResetConfirmView.as_view(
-            template_name="page/account/password_reset_confirm.html",
-            form_class=NewPasswordForm,
-            success_url=reverse_lazy("page:password_reset_complete"),
-        ),
-        name="password_reset_confirm",
-    ),
-    path("account/password-reset/complete/", views.password_reset_complete, name="password_reset_complete"),
+    path("account/password-reset/<uidb64>/<token>/", views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("account/settings/", views.account_settings, name="account_settings"),
     path("account/player-preferences/", views.player_preferences, name="player_preferences"),
     path("newsletter/confirm/", views.newsletter_confirm, name="newsletter_confirm"),
