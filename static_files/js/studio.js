@@ -259,15 +259,34 @@
 
   var uploading = false;
 
-  function queueItem(zone, label) {
+  function queueItem(list, label) {
     var item = document.createElement("li");
     item.innerHTML =
       '<div class="d-flex justify-content-between gap-2"><span class="text-truncate" data-upload-name></span>' +
       '<span class="text-body-secondary text-nowrap" data-upload-state>Bekliyor</span></div>' +
       '<div class="progress studio-progress mt-1" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:0%"></div></div>';
     item.querySelector("[data-upload-name]").textContent = label;
-    zone.querySelector("[data-upload-list]").appendChild(item);
+    list.appendChild(item);
     return item;
+  }
+
+  // Satıra bırakılan videonun ilerlemesi kategorinin altında değil, o dersin satırında görünür.
+  function rowUploadList(row) {
+    var list = row.querySelector(":scope > [data-upload-list]");
+    if (!list) {
+      list = document.createElement("ul");
+      list.className = "list-unstyled small mt-2 mb-0 vstack gap-2";
+      list.setAttribute("data-upload-list", "");
+      list.setAttribute("aria-live", "polite");
+      row.insertBefore(list, row.querySelector(":scope > [id$='-form']"));
+    }
+    return list;
+  }
+
+  function removeItem(item) {
+    var list = item.parentNode;
+    item.remove();
+    if (list && !list.children.length && list.closest("[data-lesson-id]")) list.remove();
   }
 
   function enqueue(zone, fileList) {
@@ -276,16 +295,16 @@
     if (skipped) toast("warning", skipped + " dosya video olmadığı için atlandı.");
     files.sort(function (a, b) { return a.name.localeCompare(b.name, "tr", { numeric: true }); });
     files.forEach(function (file) {
-      uploadQueue.push({ url: zone.getAttribute("data-upload-url"), file: file, item: queueItem(zone, file.name), place: placeLesson });
+      // Kategorinin kendi listesi; satırlardaki listeler (satıra bırakılan videolar) atlanır.
+      var list = zone.querySelector(":scope > [data-upload-list]");
+      uploadQueue.push({ url: zone.getAttribute("data-upload-url"), file: file, item: queueItem(list, file.name), place: placeLesson });
     });
     pump();
   }
 
   function enqueueLesson(row, file) {
-    var zone = row.closest("[data-upload-zone]");
-    var number = row.querySelector("[data-lesson-no]");
-    var label = file.name + (number ? " → " + number.textContent.trim() : "");
-    uploadQueue.push({ url: row.getAttribute("data-video-url"), file: file, item: queueItem(zone, label), place: placeVideoCell });
+    var item = queueItem(rowUploadList(row), file.name);
+    uploadQueue.push({ url: row.getAttribute("data-video-url"), file: file, item: item, place: placeVideoCell });
     pump();
   }
 
@@ -322,7 +341,7 @@
         }
         state.textContent = "Sunucuda";
         job.place(xhr).then(function () {
-          job.item.remove();
+          removeItem(job.item);
           resolve();
         });
       };
@@ -665,13 +684,23 @@
     if (element) element.classList.add("is-dragover");
   }
 
+  // Hedef imlecin altından okunur. Tarayıcının verdiği hedef geride kalabilir: kendini yenileyen video hücresi (her 3 sn)
+  // ya da biten yüklemenin kalkan satırı sayfayı oynatınca bırakılan öğe imlecin altındaki değil, eski öğe olur.
+  function pointerTarget(event) {
+    var found = document.elementFromPoint(event.clientX, event.clientY);
+    if (found && found.closest) return found;
+    var target = event.target;
+    return target && target.isConnected && target.closest ? target : null;
+  }
+
   function dropTarget(event) {
-    if (!event.target.closest) return null;
+    var target = pointerTarget(event);
+    if (!target) return null;
     return (
-      event.target.closest("[data-extra-bulk-zone]") ||
-      event.target.closest("[data-extra-drop]") ||
-      event.target.closest("[data-subtitle-drop]") ||
-      event.target.closest("[data-upload-zone]")
+      target.closest("[data-extra-bulk-zone]") ||
+      target.closest("[data-extra-drop]") ||
+      target.closest("[data-lesson-id]") ||
+      target.closest("[data-upload-zone]")
     );
   }
 
@@ -690,12 +719,14 @@
     event.preventDefault();
     highlight(null);
     var files = Array.prototype.slice.call(event.dataTransfer.files);
-    var bulkZone = event.target.closest && event.target.closest("[data-extra-bulk-zone]");
+    var target = pointerTarget(event);
+    if (!target) return;
+    var bulkZone = target.closest("[data-extra-bulk-zone]");
     if (bulkZone) {
       enqueueBulk(bulkZone.closest("[data-extra-bulk]"), files);
       return;
     }
-    var extraZone = event.target.closest && event.target.closest("[data-extra-drop]");
+    var extraZone = target.closest("[data-extra-drop]");
     if (extraZone) {
       var kind = extraZone.getAttribute("data-extra-drop");
       var match = files.filter(function (file) { return dropKind(file) === kind; })[0];
@@ -707,19 +738,24 @@
       return;
     }
     // Satıra tek video bırakıldıysa o derse gider; birden çok video kategoriye bırakılmış sayılır (ada göre eşleşir).
-    var lessonRow = event.target.closest && event.target.closest("[data-video-url]");
+    var lessonRow = target.closest("[data-lesson-id]");
     var videos = files.filter(function (file) { return VIDEO_FILE.test(file.name); });
     if (lessonRow && videos.length === 1) {
-      enqueueLesson(lessonRow, videos[0]);
+      if (lessonRow.hasAttribute("data-video-url")) {
+        enqueueLesson(lessonRow, videos[0]);
+      } else {
+        // İçerik dersine bırakılan video yeni ders açmaz; önce dersin türü değiştirilmeli.
+        toast("warning", "Bu bir içerik dersi; videoyu eklemek için önce türünü Video yap.");
+      }
       return;
     }
-    var row = event.target.closest && event.target.closest("[data-subtitle-drop]");
+    var row = target.closest("[data-subtitle-drop]");
     var extra = files.filter(function (file) { return dropKind(file); })[0];
     if (row && extra) {
       openExtrasPanel(row, extra);
       return;
     }
-    var zone = event.target.closest && event.target.closest("[data-upload-zone]");
+    var zone = target.closest("[data-upload-zone]");
     if (zone) {
       enqueue(zone, files);
     } else if (extra) {
