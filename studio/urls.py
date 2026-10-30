@@ -17,6 +17,7 @@ urlpatterns = [
     path("courses/<uuid:course_id>/sections/", views.section_create, name="section_create"),
     path("courses/<uuid:course_id>/lessons/bulk/", views.lesson_bulk, name="lesson_bulk"),
     path("courses/<uuid:course_id>/extra-contents/", views.course_extra_contents, name="course_extra_contents"),
+    path("courses/<uuid:course_id>/subtitles/", views.course_subtitles, name="course_subtitles"),
     path("sections/<uuid:section_id>/", views.section_detail, name="section_detail"),
     path("sections/<uuid:section_id>/block/", views.section_block, name="section_block"),
     path("sections/<uuid:section_id>/videos/", views.section_videos, name="section_videos"),

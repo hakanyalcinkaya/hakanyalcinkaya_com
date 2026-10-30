@@ -395,8 +395,9 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
     def match_lesson_for_file(self, file_name, lessons=None):
         """Dosyanın (ör. ders notu .md) ait olduğu dersi bulur; (ders, None) ya da (None, sebep) döner.
 
-        Önce dosya adı ders başlığı ya da slug'ıyla birebir karşılaştırılır (videolar dosya adıyla açıldığı için).
-        Bulunamazsa baştaki sıra numarası (ör. "018-014") yalnız tek bir dersle uyuşuyorsa kullanılır.
+        Önce dersin videosunun dosya adıyla birebir karşılaştırılır (ek bilgi ve altyazı dosyaları video dosyasıyla aynı
+        adla oluşturulur), sonra ders başlığı ya da slug'ıyla (videolar dosya adıyla açıldığı için). Bulunamazsa baştaki
+        sıra numarası (ör. "018-014") yalnız tek bir dersle uyuşuyorsa kullanılır.
         """
         if lessons is None:
             lessons = list(Lesson.objects.filter(section__course=self))
@@ -405,6 +406,11 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
             return unicodedata.normalize("NFC", text).strip().casefold()
 
         stem = key(Path(file_name).stem)
+        by_video = [lesson for lesson in lessons if stem in {key(name) for name in lesson.video_file_stems}]
+        if len(by_video) == 1:
+            return by_video[0], None
+        if len(by_video) > 1:
+            return None, _("Birden fazla dersin videosu bu dosya adında.")
         exact = [lesson for lesson in lessons if key(lesson.title) == stem or lesson.slug == slugify_tr(stem)]
         if len(exact) == 1:
             return exact[0], None
@@ -645,6 +651,15 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         # video_uploads önceden yüklendiyse (prefetch) ek sorgu yapılmaz; sıralama en yeni önce.
         uploads = self.video_uploads.all()
         return uploads[0] if uploads else None
+
+    @property
+    def video_file_stems(self):
+        """Videonun dosya adı (uzantısız); ek bilgi ve altyazı dosyaları bu adla oluşturulur. Dosya adı tutulmadan önce
+        yüklenen derslerde platformdaki video başlığı dosya adından geldiği için o da denenir (ders adına çevrilmediyse)."""
+        stems = [Path(self.video_file_name).stem] if self.video_file_name else []
+        if self.video_title and self.video_title != self.title:
+            stems.append(self.video_title)
+        return stems
 
     @property
     def video_file_label(self):
@@ -1134,6 +1149,19 @@ class LessonSubtitle(BaseModel):
     @property
     def file_name(self):
         return Path(self.file.name).name
+
+    @classmethod
+    def attach(cls, lesson, language, file):
+        """Dersin bu dildeki altyazısı olur; aynı dilde altyazı varsa dosyası değiştirilir, platformdakinin yerine geçer."""
+        subtitle = cls.objects.filter(lesson=lesson, language=language).first()
+        if subtitle is None:
+            subtitle = cls(lesson=lesson, language=language)
+        elif subtitle.file:
+            subtitle.file.delete(save=False)
+        subtitle.file = file
+        subtitle.save()
+        subtitle.schedule()
+        return subtitle
 
     def schedule(self):
         """Videosu hazırsa platforma gönderilmek üzere sıraya alır, değilse video hazır olunca gönderilir."""

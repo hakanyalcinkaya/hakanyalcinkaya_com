@@ -32,6 +32,7 @@ from course.models import (
     LessonSubtitle,
     Review,
     Section,
+    SubtitleLanguage,
     VideoUpload,
 )
 from core.markup import render_markdown
@@ -50,6 +51,7 @@ from studio.forms import (
     SectionCreateForm,
     SectionTitleForm,
     SiteSettingsForm,
+    SubtitleBulkForm,
     SubtitleForm,
     VideoUploadForm,
 )
@@ -561,7 +563,36 @@ def course_extra_contents(request, course_id):
     badge = render_to_string("studio/partials/_lesson_extra.html", dict(lesson=lesson), request=request)
     status = "skipped" if form.skipped else "saved"
     message = _("Atlandı; derste ek içerik zaten var.") if form.skipped else _("Kaydedildi.")
-    return JsonResponse(dict(status=status, message=str(message), lesson=lesson.title, lesson_id=str(lesson.pk), badge=badge))
+    return JsonResponse(
+        dict(status=status, message=str(message), lesson=lesson.title, badge_id=f"lesson-{lesson.pk}-extra", badge=badge)
+    )
+
+
+@superuser_required
+@require_POST
+def course_subtitles(request, course_id):
+    """Toplu altyazı: tek dosya alır, dosya adından (önce video dosya adı) dersi bulup kaydeder; dil dosya adındaki
+    ekten (ders.en.srt), yoksa Türkçe. Satırdaki altyazı rozetleri de yenilenir."""
+    course = get_object_or_404(Course, pk=course_id)
+    form = SubtitleBulkForm(request.POST, request.FILES, course=course)
+    if not form.is_valid():
+        return JsonResponse(dict(status="error", message=str(_first_error(form))))
+    lesson = form.save()
+    badge = render_to_string("studio/partials/_lesson_subtitles.html", dict(lesson=_lesson(lesson.pk)), request=request)
+    language = SubtitleLanguage(form.language).label
+    if form.skipped:
+        message = _("Atlandı; derste %(language)s altyazı zaten var.") % {"language": language}
+    else:
+        message = _("%(language)s altyazı kaydedildi.") % {"language": language}
+    return JsonResponse(
+        dict(
+            status="skipped" if form.skipped else "saved",
+            message=str(message),
+            lesson=lesson.title,
+            badge_id=f"lesson-{lesson.pk}-subtitles",
+            badge=badge,
+        )
+    )
 
 
 @superuser_required

@@ -506,8 +506,8 @@
     });
   }
 
-  // Ek bilgileri toplu yükleme: dosyalar sırayla gönderilir, sunucu dosya adından dersi bulur.
-  // Her dosyanın sonucu listeye yazılır; eşleşen dersin satırındaki "Ek bilgi" rozeti yenilenir.
+  // Ek bilgileri ve altyazıları toplu yükleme: dosyalar sırayla gönderilir, sunucu dosya adından dersi bulur.
+  // Her dosyanın sonucu listeye yazılır; eşleşen dersin satırındaki rozet (ek bilgi ya da altyazı) yenilenir.
   var bulkQueue = [];
   var bulkBusy = false;
 
@@ -534,11 +534,12 @@
 
   function enqueueBulk(box, fileList) {
     box.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
+    var subtitles = box.getAttribute("data-bulk-kind") === "subtitle";
     Array.prototype.forEach.call(fileList, function (file) {
-      if (CONTENT_FILE.test(file.name)) {
+      if ((subtitles ? SUBTITLE_FILE : CONTENT_FILE).test(file.name)) {
         bulkQueue.push({ box: box, file: file });
       } else {
-        bulkLine(box, file.name, "error", "Desteklenmeyen tür; Markdown, TXT ya da HTML olmalı.");
+        bulkLine(box, file.name, "error", subtitles ? "Desteklenmeyen tür; SRT ya da VTT olmalı." : "Desteklenmeyen tür; Markdown, TXT ya da HTML olmalı.");
       }
     });
     bulkProgress(box);
@@ -563,10 +564,10 @@
       })
       .then(function (result) {
         bulkLine(job.box, job.file.name, result.status, result.message, result.lesson);
-        var badge = result.lesson_id && document.getElementById("lesson-" + result.lesson_id + "-extra");
+        var badge = result.badge_id && document.getElementById(result.badge_id);
         if (badge && result.badge) {
           badge.outerHTML = result.badge;
-          window.htmx.process(document.getElementById("lesson-" + result.lesson_id + "-extra"));
+          window.htmx.process(document.getElementById(result.badge_id));
         }
       })
       .catch(function (error) {

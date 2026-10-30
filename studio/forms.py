@@ -253,31 +253,36 @@ class SubtitleForm(forms.Form):
         super().__init__(*args, **kwargs)
 
     def clean_file(self):
-        upload = self.cleaned_data["file"]
-        if _extension(upload) not in SUBTITLE_EXTENSIONS:
-            raise forms.ValidationError(_("Yalnız .srt ve .vtt dosyaları yüklenebilir."))
-        if upload.size > SUBTITLE_MAX_BYTES:
-            raise forms.ValidationError(_("Altyazı dosyası en fazla 2 MB olabilir."))
-        # Oynatıcı altyazıyı UTF-8 bekler; farklı kodlamada Türkçe karakterler bozulur.
-        try:
-            upload.read().decode("utf-8-sig")
-        except UnicodeDecodeError:
-            raise forms.ValidationError(_("Dosya UTF-8 kodlamalı olmalı."))
-        upload.seek(0)
-        return upload
+        return check_subtitle(self.cleaned_data["file"])
 
     def save(self):
         """Aynı dilde altyazı varsa dosyası değiştirilir; platformdaki eskisinin yerine geçer."""
         language = self.cleaned_data.get("language") or SubtitleLanguage.TR
-        subtitle = LessonSubtitle.objects.filter(lesson=self.lesson, language=language).first()
-        if subtitle is None:
-            subtitle = LessonSubtitle(lesson=self.lesson, language=language)
-        elif subtitle.file:
-            subtitle.file.delete(save=False)
-        subtitle.file = self.cleaned_data["file"]
-        subtitle.save()
-        subtitle.schedule()
-        return subtitle
+        return LessonSubtitle.attach(self.lesson, language, self.cleaned_data["file"])
+
+
+def check_subtitle(upload):
+    """Altyazı dosyasını doğrular: .srt/.vtt, en fazla 2 MB, UTF-8."""
+    if _extension(upload) not in SUBTITLE_EXTENSIONS:
+        raise forms.ValidationError(_("Yalnız .srt ve .vtt dosyaları yüklenebilir."))
+    if upload.size > SUBTITLE_MAX_BYTES:
+        raise forms.ValidationError(_("Altyazı dosyası en fazla 2 MB olabilir."))
+    # Oynatıcı altyazıyı UTF-8 bekler; farklı kodlamada Türkçe karakterler bozulur.
+    try:
+        upload.read().decode("utf-8-sig")
+    except UnicodeDecodeError:
+        raise forms.ValidationError(_("Dosya UTF-8 kodlamalı olmalı."))
+    upload.seek(0)
+    return upload
+
+
+def subtitle_language(file_name):
+    """Dosya adındaki dil eki: "ders.en.srt" → ("ders.srt", "en"); eki yoksa Türkçe sayılır."""
+    path = Path(file_name)
+    base, _dot, code = path.stem.rpartition(".")
+    if base and code.lower() in SubtitleLanguage.values:
+        return base + path.suffix, code.lower()
+    return file_name, SubtitleLanguage.TR
 
 
 def read_extra_content(upload):
@@ -350,6 +355,41 @@ class ExtraContentBulkForm(forms.Form):
     def save(self):
         if not self.skipped:
             self.lesson.set_extra_content(self.text)
+        return self.lesson
+
+
+class SubtitleBulkForm(forms.Form):
+    """Toplu altyazı: her istekte bir dosya gelir, kursun dersleriyle (önce video dosya adı) eşleştirilir."""
+
+    file = forms.FileField()
+    overwrite = forms.BooleanField(required=False)
+
+    def __init__(self, *args, course, **kwargs):
+        self.course = course
+        self.lesson = None
+        super().__init__(*args, **kwargs)
+
+    def clean_file(self):
+        return check_subtitle(self.cleaned_data["file"])
+
+    def clean(self):
+        cleaned = super().clean()
+        upload = cleaned.get("file")
+        if upload is None:
+            return cleaned
+        name, self.language = subtitle_language(upload.name)
+        self.lesson, reason = self.course.match_lesson_for_file(name)
+        if self.lesson is None:
+            raise forms.ValidationError(reason)
+        if not self.lesson.is_video:
+            raise forms.ValidationError(_("Eşleşen ders video dersi değil."))
+        # Bu dilde altyazısı olan ders, üzerine yazma seçilmediyse değişmez.
+        self.skipped = self.lesson.subtitles.filter(language=self.language).exists() and not cleaned.get("overwrite")
+        return cleaned
+
+    def save(self):
+        if not self.skipped:
+            LessonSubtitle.attach(self.lesson, self.language, self.cleaned_data["file"])
         return self.lesson
 
 
