@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
@@ -46,6 +47,8 @@ def site(request):
         "privacy_url": reverse("page:privacy"),
         "terms_url": reverse("page:terms"),
         "cookies_url": reverse("page:cookies"),
+        # Google Analytics: tanımlıysa çerez izni bandı gösterilir, etiket yalnız izinle yüklenir (site.js).
+        "google_analytics_id": settings.GOOGLE_ANALYTICS_ID,
         "nav_member": user.is_authenticated,
         "account_user": user if user.is_authenticated else None,
         # Sepet simgesi herkese, her zaman (boşken de) üst menüde görünür.

@@ -28,3 +28,6 @@ SECURE_HSTS_PRELOAD = False
 SECURE_CONTENT_TYPE_NOSNIFF = True
 # Alt alan adları ayrı platformlar olduğu için HSTS onları kapsamaz ve preload listesine girilmez (bilerek).
 SILENCED_SYSTEM_CHECKS = ["security.W005", "security.W021"]
+
+# Canlı sitenin Google Analytics mülkü (yalnız ziyaretçi izniyle yüklenir).
+GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="G-QSLPC9JZR6")  # noqa: F405

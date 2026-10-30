@@ -44,6 +44,7 @@
 {% block footer %}{% include "_base/footer.html" %}{% endblock %}
 {# Ortak pencere (ör. "Tüm yorumlar"): içerik hx-target="#site-dialog-body" ile yüklenince açılır (site.js). #}
 <dialog class="hy-site-dialog" id="site-dialog" aria-labelledby="site-dialog-title"><div id="site-dialog-body"></div></dialog>
+{% include "_base/consent.html" %}
 <script src="{% static 'js/htmx.min.js' %}"></script>
 <script src="{% static 'js/sweetalert2.min.js' %}"></script>
 <script src="{% static 'js/site.js' %}"></script>

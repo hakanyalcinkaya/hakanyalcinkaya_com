@@ -975,6 +975,65 @@
     }
   });
 
+  // Google Analytics yalnız izinle: seçim tarayıcıda saklanır ("granted" / "denied"), seçim yoksa alttaki bant görünür.
+  // "Çerez tercihleri" bandı yeniden açar; izin geri alınırsa ölçüm durur ve _ga çerezleri silinir.
+  var CONSENT_KEY = "hy-analytics-consent";
+  var consent = document.querySelector("[data-consent]");
+  if (consent) {
+    var analyticsId = consent.getAttribute("data-analytics-id");
+    var storedConsent = function () {
+      try {
+        return window.localStorage.getItem(CONSENT_KEY);
+      } catch (error) {
+        return null;
+      }
+    };
+    var loadAnalytics = function () {
+      window["ga-disable-" + analyticsId] = false;
+      if (window.gtag) return;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", analyticsId);
+      var script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(analyticsId);
+      document.head.appendChild(script);
+    };
+    var stopAnalytics = function () {
+      window["ga-disable-" + analyticsId] = true;
+      var host = window.location.hostname.replace(/^www\./, "");
+      document.cookie.split(";").forEach(function (item) {
+        var name = item.split("=")[0].trim();
+        if (name !== "_ga" && name.indexOf("_ga_") !== 0) return;
+        ["", "; domain=" + host, "; domain=." + host].forEach(function (domain) {
+          document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/" + domain;
+        });
+      });
+    };
+    var choice = storedConsent();
+    if (choice === "granted") {
+      loadAnalytics();
+    } else if (choice !== "denied") {
+      consent.classList.remove("d-none");
+    }
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-consent-choice]");
+      if (button) {
+        var value = button.getAttribute("data-consent-choice");
+        try {
+          window.localStorage.setItem(CONSENT_KEY, value);
+        } catch (error) {
+          // Depolama kapalıysa seçim yalnız bu sayfa için geçerli olur.
+        }
+        consent.classList.add("d-none");
+        if (value === "granted") loadAnalytics(); else stopAnalytics();
+      } else if (event.target.closest("[data-consent-open]")) {
+        consent.classList.remove("d-none");
+      }
+    });
+  }
+
   window.hyToast = function (level, text) {
     if (!toast) return Promise.resolve();
     // Üst çubuğun yüksekliği sayfaya ve ekran genişliğine göre değişir; bildirim hep altında açılır.

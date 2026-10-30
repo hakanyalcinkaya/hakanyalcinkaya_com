@@ -709,7 +709,7 @@ _PRIVACY = (
     ),
     (
         "Verilerin aktarılması",
-        "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme, e-posta gönderimi) paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
+        "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme, e-posta gönderimi) ve izin verirsen ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
     ),
     (
         "Saklama süresi",
@@ -768,17 +768,19 @@ _COOKIES = (
     ),
     (
         "Kullandığımız çerezler",
-        "Sitede yalnız hizmetin çalışması için zorunlu çerezler ve senin seçtiğin tercihleri hatırlayan tarayıcı kayıtları kullanılır.",
+        "Sitede hizmetin çalışması için zorunlu çerezler, senin seçtiğin tercihleri hatırlayan tarayıcı kayıtları ve yalnız izin verirsen analitik çerezler kullanılır.",
         (
             ("sessionid", "Zorunlu çerez", "Oturumunu açık tutar; sepetini ve siparişini hatırlar.", "2 hafta"),
             ("csrftoken", "Zorunlu çerez", "Formları sahte isteklere karşı korur.", "1 yıl"),
             ("messages", "Zorunlu çerez", "“Kaydedildi” gibi bildirimleri bir sonraki sayfaya taşır.", "Bir sonraki sayfaya kadar"),
             ("site-theme, site-accent", "Tarayıcı depolaması (tercih)", "Seçtiğin tema ve vurgu rengini hatırlar.", "Sen silene kadar"),
+            ("hy-analytics-consent", "Tarayıcı depolaması (tercih)", "Analitik çerezlere izin verip vermediğini hatırlar.", "Sen silene kadar"),
+            ("_ga, _ga_*", "Analitik çerez (izinle)", "Google Analytics: hangi sayfaların ziyaret edildiğini ve sitenin nasıl kullanıldığını istatistik olarak ölçer.", "2 yıl"),
         ),
     ),
     (
         "Analitik ve reklam çerezleri",
-        "Şu an ziyaretini ölçen ya da reklam amaçlı çerez kullanılmıyor. İleride eklenirse yüklenmeden önce iznin istenecek ve tercihini istediğin zaman değiştirebileceksin.",
+        "Ziyaretleri ölçmek için Google Analytics kullanılır; yalnız alttaki bantta “Kabul et” dersen yüklenir, reddedersen hiç yüklenmez. Tercihini sayfanın altındaki “Çerez tercihleri” bağlantısıyla istediğin zaman değiştirebilirsin; izni geri alırsan analitik çerezler silinir. Reklam amaçlı çerez kullanılmıyor.",
     ),
     (
         "Çerezleri yönetmek",

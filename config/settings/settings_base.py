@@ -85,6 +85,10 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = "account.User"
 
+# Google Analytics ölçüm kimliği (G-…): boşsa analitik ve çerez izni bandı hiç gösterilmez. Etiket yalnız ziyaretçi
+# izin verince yüklenir (Çerez Politikası).
+GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="")
+
 # Bunny Stream (varsayılan platform): yönetim panelinden video/altyazı yükleme, başlık güncelleme, süre okuma ve sitede HLS oynatma.
 # Kütüphane kimliği ve API anahtarı tanımlı değilse işler hata verir.
 BUNNY_LIBRARY_ID = env("BUNNY_LIBRARY_ID", default="")
