@@ -436,7 +436,7 @@ def find_lesson(course_slug, section_slug, lesson_slug, enrolled=None):
     total = len(flat)
     for section in sections:
         section["current"] = section["index"] == current["section_index"]
-        section["open"] = section["current"]
+        section["open"] = preview or section["current"]
         for lesson in section["lessons"]:
             lesson["current"] = lesson["n"] == current["n"]
             lesson["done"] = not preview and lesson["n"] <= done

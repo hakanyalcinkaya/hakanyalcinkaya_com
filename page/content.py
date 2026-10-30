@@ -484,7 +484,8 @@ def find_lesson(course, section_slug, lesson_slug, enrolled=False, staff=False, 
     preview = not enrolled
     for section in sections:
         section["current"] = section["index"] == current["section_index"]
-        section["open"] = section["current"]
+        # Kursu almayan tüm içerik ağacını açık görür; kayıtlı öğrenci yalnız bulunduğu bölümü.
+        section["open"] = preview or section["current"]
         for item in section["lessons"]:
             item["current"] = item["n"] == current["n"]
             item["done"] = not preview and item["object"].pk in completed
