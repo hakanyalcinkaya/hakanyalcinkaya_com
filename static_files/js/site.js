@@ -695,6 +695,9 @@
       tracks = [];
     }
     var preferencesUrl = holder.getAttribute("data-preferences-url");
+    var nextUrl = holder.getAttribute("data-next-url");
+    var nextTitle = holder.getAttribute("data-next-title");
+    var frame = holder.closest(".ratio");
     mountPlayer(holder, {
       playerSrc: holder.getAttribute("data-player-src"),
       platform: holder.getAttribute("data-video-platform"),
@@ -707,10 +710,61 @@
     }).then(function (media) {
       if (!media) return;
       watchCompletion(media);
+      if (nextUrl && frame) autoAdvance(media, frame, nextUrl, nextTitle);
       applyPreferences(media, preferences);
       if (preferencesUrl) watchPreferences(media, preferences, preferencesUrl);
     }).catch(playerFailed);
   });
+
+  // Önizleme bitince (kursu almamış ziyaretçi) birkaç saniyelik geri sayımla sıradaki önizleme dersi açılır ve
+  // kendiliğinden başlar; "İptal" ile durdurulur, "Şimdi izle" ile beklemeden geçilir. Video yeniden oynatılırsa kapanır.
+  var AUTO_ADVANCE_SECONDS = 5;
+
+  function autoAdvance(media, frame, url, title) {
+    var panel = null;
+    var timer = null;
+    function close() {
+      clearInterval(timer);
+      if (panel) panel.remove();
+      panel = null;
+    }
+    media.addEventListener("play", close);
+    media.addEventListener("ended", function () {
+      close();
+      var left = AUTO_ADVANCE_SECONDS;
+      panel = document.createElement("div");
+      panel.className = "d-flex flex-column align-items-center justify-content-center gap-2 p-3 text-center text-white hy-next-preview";
+      panel.setAttribute("role", "status");
+      var label = document.createElement("div");
+      label.className = "small text-white-50";
+      var name = document.createElement("div");
+      name.className = "fw-semibold";
+      name.textContent = title || "";
+      var actions = document.createElement("div");
+      actions.className = "d-flex gap-2 mt-1";
+      var go = document.createElement("a");
+      go.className = "btn btn-primary btn-sm";
+      go.href = url;
+      go.textContent = "Şimdi izle";
+      var cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "btn btn-outline-light btn-sm";
+      cancel.textContent = "İptal";
+      cancel.addEventListener("click", close);
+      actions.append(go, cancel);
+      panel.append(label, name, actions);
+      frame.appendChild(panel);
+      function tick() {
+        label.textContent = "Sıradaki önizleme " + left + " sn içinde başlıyor";
+        if (left-- <= 0) {
+          clearInterval(timer);
+          window.location.href = url;
+        }
+      }
+      tick();
+      timer = setInterval(tick, 1000);
+    });
+  }
 
   // Oynatıcı tercihleri (hesap ayarları → Video oynatma): hız, altyazı ve oynatınca tam ekran. Kalite createPlayer'da.
   function captionTracks(media) {
