@@ -1052,5 +1052,37 @@
     }, Promise.resolve());
   }
 
+  // İmleç spotlight'ı: tek, rAF ile kısılmış dinleyici; HTMX ile sonradan gelen kartlarda da çalışır. Dokunmatikte ve azaltılmış hareket tercihinde kapalı.
+  var SPOTLIGHT = ".card, .hy-site-dialog";
+  if (document.body.hasAttribute("data-spotlight") &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var lit = null;
+    var spotFrame = 0;
+    var spotEvent = null;
+    var light = function (el) {
+      if (el === lit) return;
+      if (lit) lit.classList.remove("is-lit");
+      lit = el;
+      if (lit) lit.classList.add("is-lit");
+    };
+    var spot = function () {
+      spotFrame = 0;
+      var el = spotEvent.target instanceof Element ? spotEvent.target.closest(SPOTLIGHT) : null;
+      if (el) {
+        var rect = el.getBoundingClientRect();
+        el.style.setProperty("--hy-mx", (spotEvent.clientX - rect.left) + "px");
+        el.style.setProperty("--hy-my", (spotEvent.clientY - rect.top) + "px");
+      }
+      light(el);
+    };
+    document.addEventListener("pointermove", function (event) {
+      if (event.pointerType !== "mouse") return;
+      spotEvent = event;
+      if (!spotFrame) spotFrame = window.requestAnimationFrame(spot);
+    }, { passive: true });
+    document.documentElement.addEventListener("pointerleave", function () { light(null); });
+  }
+
   syncTheme();
 })();
