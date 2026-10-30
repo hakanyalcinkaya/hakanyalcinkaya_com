@@ -138,7 +138,7 @@ def upload_subtitle(subtitle_id):
 
 @shared_task
 def delete_remote_video(video_id, platform=VideoPlatform.BUNNY):
-    """Silinen dersin ya da iptal edilen yüklemenin platformdaki videosu."""
+    """Silinen dersin, iptal edilen yüklemenin ya da yerine yenisi konan videonun platformdaki kopyası."""
     _delete_quietly(video_service.get(platform), video_id)
 
 

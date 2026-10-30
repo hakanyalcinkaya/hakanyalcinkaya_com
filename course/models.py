@@ -28,6 +28,20 @@ LESSON_FILE_NUMBER = re.compile(r"^\d+(?:-\d+)*")
 PRICE_FIELD = {"max_digits": 10, "decimal_places": 2, "validators": [MinValueValidator(Decimal("0"))]}
 
 
+def retire_replaced_video(platform, video_id):
+    """Yerine yenisi konan videoyu platformdan siler (kayıt tamamlanınca, Celery'de). Video başka bir derste ya da kurs
+    tanıtımında hâlâ kullanılıyorsa silinmez."""
+    from course.tasks import delete_remote_video
+
+    if not video_id:
+        return
+    in_use = Lesson.objects.filter(video_platform=platform, video_id=video_id).exists() or Course.objects.filter(
+        preview_video_platform=platform, preview_video_id=video_id
+    ).exists()
+    if not in_use:
+        transaction.on_commit(partial(delete_remote_video.delay, video_id, platform))
+
+
 def lesson_minutes_expression(prefix="", filter=None):
     """Her dersin süresi dakikaya yukarı yuvarlanıp toplanır (1 dk 27 sn → 2 dk)."""
     seconds = F(f"{prefix}duration_seconds")
@@ -276,6 +290,7 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         return True
 
     def attach_preview_video(self, platform, video_id, video_key, video_title):
+        replaced = (self.preview_video_platform, self.preview_video_id)
         self.preview_video_platform = platform
         self.preview_video_id = video_id
         self.preview_video_key = video_key
@@ -292,6 +307,9 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         # Video işlenirken kurs başlığı değişmiş olabilir; güncel başlık platforma da yazılır.
         self.refresh_from_db(fields=["title"])
         self.queue_preview_title_sync()
+        # Eski tanıtım videosu platformdan silinir (yenisi hazır).
+        if replaced != (platform, video_id):
+            retire_replaced_video(*replaced)
 
     @property
     def level_card_text(self):
@@ -704,6 +722,7 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         self.delete()
 
     def attach_video(self, platform, video_id, video_key, duration_seconds, video_title):
+        replaced = (self.video_platform, self.video_id)
         self.video_platform = platform
         self.video_id = video_id
         self.video_key = video_key
@@ -719,6 +738,9 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
         for subtitle in self.subtitles.all():
             subtitle.remote_language = ""
             subtitle.schedule()
+        # Eski video (altyazılarıyla birlikte) platformdan silinir; yenisi hazır olduğu için ders hiç videosuz kalmaz.
+        if replaced != (platform, video_id):
+            retire_replaced_video(*replaced)
 
 
 class VideoUploadStatus(models.TextChoices):

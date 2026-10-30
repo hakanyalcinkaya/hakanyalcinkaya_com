@@ -50,6 +50,5 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 - [ ] Site geneli schema: ana sayfaya `Person` (`sameAs` ile sosyal hesaplar) ve `WebSite`, görünen breadcrumb'lar için `BreadcrumbList`. İsteğe bağlı `/llms.txt`.
 - [ ] Google Analytics. KVKK gereği analitik çerez izin alınmadan yüklenemez: çerez izin bandı (Kabul et / Reddet, kategori seçimi) ve Çerez Politikası güncellemesi birlikte yapılmalı.
 - [ ] Bülten servisi ve İYS kaydı.
-- [ ] Ders/tanıtım videosu değiştirilince eski video Bunny'de kalıyor; istenirse yeni video hazır olunca eskisini silme seçeneği.
 - [ ] `django-admin-sortable2` Django 6.1 desteği ekleyince projedeki uyumluluk dosyalarını sil: `templates/adminsortable2/edit_inline/*-django-6.1.html`, `static_files/adminsortable2/js/actions-6.1.js`.
 - [ ] `django-admin-honeypot-updated-2021` bakımsız; Django yükseltmesinde sorun çıkarsa kendi sahte giriş sayfamızı yaz.
