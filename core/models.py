@@ -96,6 +96,11 @@ class VideoPlatform(models.TextChoices):
     BUNNY = "bunny", "Bunny Stream"
     VIMEO = "vimeo", "Vimeo"
 
+    @property
+    def short_label(self):
+        """Stüdyodaki dar video hücresi için kısaltma."""
+        return {"bunny": "BS", "vimeo": "VM"}[self.value]
+
 
 class SiteSettings(BaseCreatedAtUpdatedAt):
     """Sitenin tek kayıtlık ayarları; stüdyodaki "Ayarlar" sayfasından değiştirilir."""

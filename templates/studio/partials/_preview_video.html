@@ -1,2 +1,2 @@
 {% url 'studio:course_preview_status' course.id as status_url %}
-{% with upload=course.latest_preview_upload %}{% include "studio/partials/_video_status.html" with cell_id="course-preview-video" video_id=course.preview_video_id video_url=course.preview_video_dashboard_url platform_label=course.get_preview_video_platform_display duration=upload.duration_display %}{% endwith %}
+{% with upload=course.latest_preview_upload %}{% include "studio/partials/_video_status.html" with cell_id="course-preview-video" video_id=course.preview_video_id video_url=course.preview_video_dashboard_url platform_label=course.preview_video_platform_short platform_title=course.get_preview_video_platform_display duration=upload.duration_display %}{% endwith %}

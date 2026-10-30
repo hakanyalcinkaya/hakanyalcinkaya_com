@@ -247,6 +247,10 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         return bool(self.preview_video_id)
 
     @property
+    def preview_video_platform_short(self):
+        return VideoPlatform(self.preview_video_platform).short_label
+
+    @property
     def latest_preview_upload(self):
         uploads = self.preview_uploads.all()
         return uploads[0] if uploads else None
@@ -594,6 +598,10 @@ class Lesson(SlugFromTitleMixin, BaseModel, BaseStatus, BaseSortOrder):
     @property
     def is_video(self):
         return self.kind == LessonKind.VIDEO
+
+    @property
+    def video_platform_short(self):
+        return VideoPlatform(self.video_platform).short_label
 
     @property
     def latest_upload(self):

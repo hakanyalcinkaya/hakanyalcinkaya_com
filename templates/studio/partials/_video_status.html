@@ -1,6 +1,6 @@
 {# Ortak video durumu hücresi (ders videosu ve kurs tanıtım videosu). Yükleme sürerken her 3 saniyede kendini yeniler. #}
 {% load studio_tags %}
-{# Beklenen: cell_id, status_url, upload, video_id, video_url, platform_label, duration (boş olabilir), oob. #}
+{# Beklenen: cell_id, status_url, upload, video_id, video_url, platform_label (kısaltma), platform_title, duration (boş olabilir), oob. #}
 <div id="{{ cell_id }}" class="small"{% if oob %} hx-swap-oob="true"{% endif %}{% if upload.is_busy %} hx-get="{{ status_url }}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %}>
   {% if upload.is_busy %}
   <div class="d-flex justify-content-between gap-2">
@@ -20,7 +20,7 @@
     <div class="progress-bar{% if not upload.is_uploading %} progress-bar-striped progress-bar-animated{% endif %}" style="width:{% if upload.is_uploading %}{{ upload.progress }}{% else %}100{% endif %}%"></div>
   </div>
   {% elif video_id %}
-  <a href="{{ video_url }}" target="_blank" rel="noopener" class="link-success text-decoration-none"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ platform_label }}</a>
+  <a href="{{ video_url }}" target="_blank" rel="noopener" class="link-success text-decoration-none" title="{{ platform_title }}"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ platform_label }}</a>
   {% if duration %}<span class="text-body-secondary">· <span class="font-monospace">{{ duration }}</span></span>{% endif %}
   {% else %}
   <span class="text-body-tertiary">Video yok</span>
