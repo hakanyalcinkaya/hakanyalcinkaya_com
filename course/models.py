@@ -450,14 +450,15 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
                 seen.add(lesson.pk)
                 lesson.move_to(own_sections[section_id], lesson_index)
 
-    def match_lesson_for_file(self, file_name, lessons=None, batch=None):
+    def match_lesson_for_file(self, file_name, lessons=None, batch=None, aligned=None):
         """Dosyanın (ör. ders notu .md, altyazı) ait olduğu dersi bulur; (ders, nasıl, None) ya da (None, None, sebep) döner.
 
         Sıra: dersin videosunun dosya adı (ek bilgi ve altyazı dosyaları video dosyasıyla aynı adla oluşturulur), ders
         başlığı ya da slug'ı (numaralı ya da numarasız), başlığındaki numara. `batch` (birlikte yüklenen dosya adları)
         verilirse dosya, numarasının bölümünde (ör. "004-…" → 4. bölüm) derslerle sırası korunarak hizalanır: numaralar ders
         sırasıyla birebir uyuşmayabilir ("004-005-002" araya girer, "Bölüm 1/2/3" aynı numarayı taşır). Verilmezse eski
-        davranış: numaraya göre sıradaki ders. `nasıl`: "file", "name", "aligned" ya da "position".
+        davranış: numaraya göre sıradaki ders. `nasıl`: "file", "name", "aligned" ya da "position". `aligned`: batch'in
+        önceden hesaplanmış hizalaması (align_files); çok dosyada her dosya için yeniden hesaplanmasın.
         """
         if lessons is None:
             lessons = list(Lesson.objects.filter(section__course=self))
@@ -486,9 +487,11 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
             return None, None, _("Bu numarayla birden fazla ders var; dosya adını ders adıyla aynı yap.")
         if batch is not None:
             # Yalnız bu dosyanın bölümündeki dosyalar hizalanır.
-            section_no = number.split("-")[0]
-            same_section = {name for name in batch if _file_number_and_name(_file_key(Path(name).stem))[0].split("-")[0] == section_no}
-            lesson = self.align_files(same_section | {file_name}, lessons).get(file_name)
+            if aligned is None:
+                section_no = number.split("-")[0]
+                same_section = {name for name in batch if _file_number_and_name(_file_key(Path(name).stem))[0].split("-")[0] == section_no}
+                aligned = self.align_files(same_section | {file_name}, lessons)
+            lesson = aligned.get(file_name)
             if lesson is None:
                 return None, None, _("Bölümündeki derslerle eşleşmedi; dersin video dosya adını elle yaz.")
             return lesson, "aligned", None
@@ -497,6 +500,44 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         if positioned is not None:
             return positioned, "position", None
         return None, None, _("Bu adda ders bulunamadı.")
+
+    def match_video_files(self, names):
+        """Toplu video eşleştirmesi: her dosya adı için dict(name, lesson, how, reason, has_video, busy).
+
+        Adlar birlikte verilir (batch); dosya, numarasının bölümündeki derslerle sırası korunarak hizalanır. Video olmayan
+        derse ya da önceki bir dosyanın aldığı derse eşleşen dosya eşleşmemiş sayılır (iki video aynı derse gitmesin).
+        """
+        lessons = list(Lesson.objects.filter(section__course=self).select_related("section"))
+        busy = set(
+            VideoUpload.objects.busy().filter(lesson__section__course=self).values_list("lesson_id", flat=True)
+        )
+        # Hizalama bölüm bölüm bir kez hesaplanır (align_files dosyaları zaten numaralarının bölümüne ayırır).
+        aligned = self.align_files(set(names), lessons)
+        rows, taken = [], set()
+        for name in names:
+            lesson, how, reason = self.match_lesson_for_file(name, lessons, batch=names, aligned=aligned)
+            if lesson is not None and not lesson.is_video:
+                lesson, how, reason = None, None, _("Eşleşen ders video dersi değil.")
+            if lesson is not None and lesson.pk in taken:
+                lesson, how, reason = None, None, _("Bu ders listedeki başka bir dosyayla eşleşti.")
+            if lesson is not None:
+                taken.add(lesson.pk)
+            rows.append(
+                dict(
+                    name=name,
+                    lesson=lesson,
+                    how=how,
+                    reason=reason,
+                    has_video=bool(lesson and lesson.video_id),
+                    busy=bool(lesson and lesson.pk in busy),
+                )
+            )
+        return rows
+
+    def video_lesson_groups(self):
+        """Eşleşmeyi elle düzeltirken seçilecek video dersleri, bölüm bölüm (sıralı)."""
+        lessons = models.Prefetch("lessons", queryset=Lesson.objects.filter(kind=LessonKind.VIDEO).order_by("sort_order", "created_at"))
+        return self.sections.order_by("sort_order", "created_at").prefetch_related(lessons)
 
     def align_files(self, file_names, lessons):
         """Dosyaları numaralarının bölümündeki derslerle sırası korunarak eşler; {dosya adı: ders}.

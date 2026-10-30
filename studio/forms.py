@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, time
 from pathlib import Path
+from uuid import UUID
 
 from django import forms
 from django.db import models, transaction
@@ -365,6 +366,44 @@ def file_batch(value):
     except ValueError:
         return None
     return [str(name) for name in names] if isinstance(names, list) else None
+
+
+class VideoMatchForm(forms.Form):
+    """Toplu video yüklemesinden önce eşleşme önizlemesi: bırakılan video dosyalarının adları (JSON liste)."""
+
+    names = forms.CharField()
+
+    def clean_names(self):
+        names = file_batch(self.cleaned_data["names"])
+        if not names:
+            raise forms.ValidationError(_("Dosya adı gelmedi."))
+        return names
+
+
+class PlatformVideoLinkForm(forms.Form):
+    """Platformdaki bağlı olmayan videoları derslere bağlama: işaretli her video (`video`) için seçilen ders
+    (`lesson-<video kimliği>`). Sonuç `links`: [(video kimliği, ders kimliği)]."""
+
+    video = forms.MultipleChoiceField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Kimlikler platformdan gelir; geçerlilikleri kaydederken (link_videos) yeniden denetlenir.
+        self.fields["video"].choices = [(value, value) for value in self.data.getlist("video")]
+
+    def clean(self):
+        cleaned = super().clean()
+        links = []
+        for video_id in cleaned.get("video") or []:
+            lesson_id = self.data.get(f"lesson-{video_id}", "")
+            try:
+                links.append((video_id, str(UUID(lesson_id))))
+            except ValueError:
+                continue
+        if not links:
+            raise forms.ValidationError(_("Bağlanacak video seçilmedi."))
+        cleaned["links"] = links
+        return cleaned
 
 
 class ExtraContentBulkForm(forms.Form):

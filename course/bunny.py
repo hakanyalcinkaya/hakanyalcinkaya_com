@@ -30,8 +30,8 @@ TIMEOUT = 30
 TUS_CHUNK_SIZE = 32 * 1024 * 1024
 TUS_TIMEOUT = 300
 TUS_RETRIES = 3
-# Kütüphane listelenirken sayfa başına video/koleksiyon sayısı
-LIST_PAGE_SIZE = 100
+# Kütüphane listelenirken sayfa başına video/koleksiyon sayısı (Bunny en çok 1000 verir; her sayfa ayrı istek, ~1-2 sn)
+LIST_PAGE_SIZE = 1000
 # TUS imzası bu süre geçerli; büyük dosyaların gönderimi bitene kadar yetmeli.
 UPLOAD_SIGNATURE_SECONDS = 6 * 60 * 60
 # Oynatma linkleri bu süre geçerli (CDN token koruması açıksa).

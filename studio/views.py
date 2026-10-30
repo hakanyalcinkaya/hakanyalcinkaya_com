@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_GET, require_POST
-from django_htmx.http import HttpResponseClientRedirect, reswap, trigger_client_event
+from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, reswap, trigger_client_event
 
 from config.celery import worker_online
 from core.models import SiteSettings, Status, VideoPlatform
@@ -46,6 +46,7 @@ from studio.forms import (
     LessonBulkForm,
     LessonTitleForm,
     NewVideoLessonForm,
+    PlatformVideoLinkForm,
     ReviewBulkForm,
     ReviewImportForm,
     SectionCreateForm,
@@ -53,6 +54,7 @@ from studio.forms import (
     SiteSettingsForm,
     SubtitleBulkForm,
     SubtitleForm,
+    VideoMatchForm,
     VideoUploadForm,
 )
 
@@ -186,15 +188,66 @@ def _video_lesson_response(request, lesson, bulk):
 @superuser_required
 @require_POST
 def course_videos(request, course_id):
-    """Kursa doğrudan bırakılan video eşleşen videosuz derse yüklenir; eşleşme yoksa "Genel" kategorisine eklenir."""
+    """Kursa bırakılan video eşleşen videosuz derse yüklenir; eşleşme yoksa "Genel" kategorisine eklenir.
+
+    Toplu yüklemede "Yeni ders" seçilen dosya ?new=1 ile gelir: eşleşme aranmadan "Genel"de yeni ders açılır.
+    """
     course = get_object_or_404(Course, pk=course_id)
     form = NewVideoLessonForm(request.POST, request.FILES)
     if not form.is_valid():
         return HttpResponseBadRequest(_first_error(form))
     # Eşleşme "Genel" açılmadan aranır; yeni kategori bölüm sırasını kaydırmasın.
-    matched = form.matching_lesson(course, form.cleaned_data["file"].name)
+    matched = None if request.GET.get("new") == "1" else form.matching_lesson(course, form.cleaned_data["file"].name)
     section = matched.section if matched else course.general_section()
     return _video_lesson_response(request, form.save(section, request.user, lesson=matched), bulk=True)
+
+
+@superuser_required
+@require_POST
+def course_video_match(request, course_id):
+    """Toplu video yüklemesinden önce dosya → ders eşleşme tablosu; hiçbir dosya henüz gönderilmez. Tablo stüdyo
+    penceresinde açılır, onaylanınca dosyalar seçilen derslere sırayla yüklenir (studio.js)."""
+    course = get_object_or_404(Course, pk=course_id)
+    form = VideoMatchForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest(_first_error(form))
+    context = dict(course=course, rows=course.match_video_files(form.cleaned_data["names"]), groups=course.video_lesson_groups())
+    return render(request, "studio/partials/_video_match.html", context)
+
+
+@superuser_required
+def course_platform_videos(request, course_id):
+    """Platform panelinden toplu yüklenen (hiçbir yere bağlı olmayan) videoları başlıklarına göre kursun derslerine
+    bağlar. GET: stüdyo penceresinde eşleşme tablosu; POST: işaretli videolar seçilen derslere bağlanır."""
+    course = get_object_or_404(Course, pk=course_id)
+    service = video_service.get(ORPHAN_PLATFORM)
+    if request.method == "POST":
+        # Geliştirmede liste canlının videolarını gösterir; bağlamak platformdaki başlıkları da değiştirir, kapalı.
+        if settings.DEBUG:
+            return _toast(reswap(HttpResponse(), "none"), "warning", _("Geliştirme ortamında bağlama kapalı."))
+        form = PlatformVideoLinkForm(request.POST)
+        if not form.is_valid():
+            return _toast(reswap(HttpResponse(), "none"), "warning", _first_error(form))
+        try:
+            linked, skipped = orphan_videos.link_videos(course, ORPHAN_PLATFORM, form.cleaned_data["links"])
+        except video_service.VideoServiceError as error:
+            return _toast(reswap(HttpResponse(), "none"), "error", str(error))
+        text = _("%(count)s video derslerine bağlandı.") % {"count": linked}
+        if skipped:
+            text = f"{text} {_('%(count)s video atlandı (başka yere bağlanmış ya da ders uygun değil).') % {'count': skipped}}"
+        messages.success(request, text)
+        return HttpResponseClientRefresh()
+    context = dict(
+        course=course, label=service.LABEL, candidates=[], groups=course.video_lesson_groups(), error="", can_link=not settings.DEBUG
+    )
+    if not service.is_configured():
+        context["error"] = _("%(platform)s ayarları eksik.") % {"platform": service.LABEL}
+    else:
+        try:
+            context["candidates"] = orphan_videos.link_candidates(course, ORPHAN_PLATFORM)
+        except video_service.VideoServiceError as error:
+            context["error"] = str(error)
+    return render(request, "studio/partials/_platform_videos.html", context)
 
 
 @superuser_required

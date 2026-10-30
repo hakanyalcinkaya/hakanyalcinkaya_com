@@ -45,7 +45,9 @@
   <span class="small text-body-secondary"><i class="bi bi-grip-vertical" aria-hidden="true"></i> tutamağından sürükleyerek kategorileri ve videoları sırala, videoyu başka kategoriye taşı.</span>
 </div>
 {% url 'studio:course_videos' course.id as course_videos_url %}
-{% include "studio/partials/_upload_zone.html" with upload_url=course_videos_url hint="Bırakılan videolar Genel kategorisine eklenir; sonra kategorilere taşıyabilirsin." %}
+{% url 'studio:course_video_match' course.id as course_video_match_url %}
+{% url 'studio:course_platform_videos' course.id as course_platform_videos_url %}
+{% include "studio/partials/_upload_zone.html" with upload_url=course_videos_url match_url=course_video_match_url platform_url=course_platform_videos_url platform_label="Bunny" hint="Videoların hepsini birden bırak: önce derslerle eşleşme tablosu açılır, onaylarsan her video kendi dersine yüklenir. Bunny panelinden toplu yüklediysen yandaki düğmeyle bağla." %}
 {% include "studio/partials/_extra_bulk.html" %}
 {% include "studio/partials/_lesson_bulk_bar.html" %}
 {% include "studio/partials/_course_sections.html" %}

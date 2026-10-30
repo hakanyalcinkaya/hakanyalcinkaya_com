@@ -1,0 +1,39 @@
+{% comment %}Toplu video yükleme önizlemesi (pencere): hiçbir dosya henüz gönderilmedi. İşaretli satırlar seçilen derslere sırayla
+   yüklenir; satırlar bırakılan dosyalarla aynı sıradadır (data-index). Videosu olan derse giden video eskisinin yerini alır.{% endcomment %}
+<div class="d-flex flex-column h-100" data-match data-video-match data-new-url="{% url 'studio:course_videos' course.id %}?new=1">
+  <div class="d-flex align-items-start justify-content-between gap-2 border-bottom px-3 py-2">
+    <div class="min-w-0">
+      <h2 class="h6 mb-0">Toplu video yükleme</h2>
+      <div class="small text-body-secondary">{{ rows|length }} dosya · eşleşmeyi kontrol et, gerekirse dersi değiştir; işaretli olanlar yüklenir.</div>
+    </div>
+    <button type="button" class="btn-close" data-dialog-close aria-label="Kapat"></button>
+  </div>
+  <div class="flex-grow-1 overflow-auto">
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="sticky-top bg-body">
+        <tr>
+          <th scope="col" class="ps-3" style="width:2rem"><input class="form-check-input" type="checkbox" aria-label="Tümünü seç" data-match-all></th>
+          <th scope="col">Dosya</th>
+          <th scope="col" style="width:40%">Ders</th>
+          <th scope="col" class="pe-3">Eşleşme</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr data-match-row data-index="{{ forloop.counter0 }}">
+          <td class="ps-3"><input class="form-check-input" type="checkbox" aria-label="{{ row.name }} yüklensin" data-match-check{% if row.lesson and not row.has_video and not row.busy %} checked{% endif %}></td>
+          <td class="text-break">{{ row.name }}</td>
+          <td>{% include "studio/partials/_lesson_choice.html" with name="lesson" label=row.name|add:" için ders" lesson=row.lesson %}</td>
+          <td class="pe-3">{% include "studio/partials/_video_match_how.html" %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-2 border-top px-3 py-2">
+    <span class="form-text m-0 me-auto">Videosu olan derse yüklenen video eskisinin yerini alır. Yükleme bitene kadar sayfayı kapatma.</span>
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-dialog-close>Vazgeç</button>
+    <button type="button" class="btn btn-primary btn-sm" data-video-match-start><i class="bi bi-cloud-arrow-up me-1" aria-hidden="true"></i>Seçilenleri yükle (<span data-match-count>0</span>)</button>
+  </div>
+  {% include "studio/partials/_lesson_options.html" with allow_new=True %}
+</div>

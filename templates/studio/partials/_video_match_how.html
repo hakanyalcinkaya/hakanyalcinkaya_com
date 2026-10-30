@@ -1,0 +1,9 @@
+{# Eşleşmenin nasıl bulunduğu (Course.match_lesson_for_file "how") ya da neden bulunamadığı. #}
+{% if row.lesson %}
+{% if row.busy %}<span class="badge text-bg-warning">Yüklemesi sürüyor</span>
+{% elif row.has_video %}<span class="badge text-bg-secondary">Videosu var · değiştirilir</span>
+{% elif row.how == "file" %}<span class="badge text-bg-success">Dosya adı</span>
+{% elif row.how == "name" %}<span class="badge text-bg-success">Ders adı</span>
+{% elif row.how == "aligned" %}<span class="badge text-bg-info">Bölüm sırası</span>
+{% else %}<span class="badge text-bg-info">Numara</span>{% endif %}
+{% else %}<span class="small text-danger-emphasis">{{ row.reason }}</span>{% endif %}

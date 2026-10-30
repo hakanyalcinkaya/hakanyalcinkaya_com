@@ -1,9 +1,11 @@
 {% load studio_tags %}
-{# Toplu video yükleme alanı: dosyalar sürüklenir ya da seçilir, adlarına göre sıralanıp tek tek sunucuya gönderilir (studio.js). #}
-<div class="studio-dropzone border border-2 rounded-3 p-4 text-center" data-upload-zone data-upload-url="{{ upload_url }}">
+{% comment %}Toplu video yükleme alanı: dosyalar sürüklenir ya da seçilir, adlarına göre sıralanıp tek tek sunucuya gönderilir (studio.js).
+   match_url verilirse (kurs) önce dosya → ders eşleşme tablosu açılır, onaylanan dosyalar seçilen derslere yüklenir.{% endcomment %}
+<div class="studio-dropzone border border-2 rounded-3 p-4 text-center" data-upload-zone data-upload-url="{{ upload_url }}"{% if match_url %} data-video-match-url="{{ match_url }}"{% endif %}>
   <i class="bi bi-cloud-arrow-up fs-3 text-body-tertiary" aria-hidden="true"></i>
   <div class="fw-medium mt-1">Videoları buraya sürükle</div>
   <div class="small text-body-secondary">{{ hint }}</div>
   <label class="btn btn-outline-secondary btn-sm mt-2 mb-0">Dosya seç<input type="file" class="visually-hidden" accept="{% video_accept %}" multiple data-upload-input></label>
+  {% if platform_url %}<button type="button" class="btn btn-outline-secondary btn-sm mt-2 ms-1" hx-get="{{ platform_url }}" hx-target="#studio-dialog-body" hx-indicator="#platform-videos-spinner"><i class="bi bi-link-45deg me-1" aria-hidden="true"></i>{{ platform_label }}'deki videoları bağla <span id="platform-videos-spinner" class="spinner-border spinner-border-sm htmx-indicator ms-1" aria-hidden="true"></span></button>{% endif %}
   <ul class="list-unstyled text-start small mt-3 mb-0 vstack gap-2" data-upload-list aria-live="polite"></ul>
 </div>

@@ -1,14 +1,18 @@
 """Platformdaki fazla videolar: hiçbir derse ya da kurs tanıtımına bağlı olmayan, süren bir yüklemeye de ait olmayan
-videolar (eski yüklemelerden, yarım kalan işlerden kalanlar). Stüdyoda listelenir, tek tek ya da toplu silinir.
+videolar (eski yüklemelerden, yarım kalan işlerden kalanlar). Stüdyoda listelenir, tek tek ya da toplu silinir; platform
+panelinden toplu yüklenen videolar da buradan başlıklarına göre kursun derslerine bağlanır.
 
 Karşılaştırma bu sunucunun veritabanıyla yapılır; başka bir veritabanına bağlı kopyada (ör. geliştirme) sonuç yanlıştır.
 """
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from pathlib import Path
+
+from django.db import transaction
 
 from course import video_service
-from course.models import attached_video_ids, video_ids_in_use
+from course.models import VIDEO_EXTENSIONS, Lesson, LessonKind, attached_video_ids, video_ids_in_use
 from course.video_service import VideoServiceError
 
 # Toplu silmede platforma aynı anda gönderilen istek sayısı
@@ -81,3 +85,55 @@ def delete_orphans(platform, video_ids):
     with ThreadPoolExecutor(max_workers=DELETE_WORKERS) as pool:
         errors = [error for error in pool.map(delete, sorted(targets)) if error]
     return len(targets) - len(errors), len(requested - targets), errors
+
+
+def _file_name(title):
+    """Platformdaki başlık dosya adı gibi eşleştirilir; uzantısız başlıkta ("React 18.x") son nokta uzantı sanılmasın."""
+    return title if Path(title).suffix.lower() in VIDEO_EXTENSIONS else f"{title}.mp4"
+
+
+def link_candidates(course, platform):
+    """Bağlı olmayan platform videoları ve kursun dersleriyle eşleşmeleri: [(OrphanVideo, eşleşme satırı)].
+
+    Yalnız kursun koleksiyonundaki ve koleksiyonsuz (kütüphane kökündeki) videolar; başka kursun koleksiyonundaki video
+    aynı adlı derse eşleşmesin. Eşleşenler önce (ders sırasıyla), sonra eşleşmeyenler gelir. Satır
+    `Course.match_video_files` biçimindedir.
+    """
+    collections = {"", getattr(course, video_service.get(platform).FOLDER_FIELD)}
+    orphans = [orphan for orphan in library_report(platform).orphans if orphan.video.collection_id in collections]
+    rows = course.match_video_files([_file_name(orphan.video.title) for orphan in orphans])
+    pairs = list(zip(orphans, rows))
+    pairs.sort(
+        key=lambda pair: (
+            pair[1]["lesson"] is None,
+            (pair[1]["lesson"].section.sort_order, pair[1]["lesson"].sort_order) if pair[1]["lesson"] else (0, 0),
+            pair[0].video.title,
+        )
+    )
+    return pairs
+
+
+def link_videos(course, platform, links):
+    """Seçilen platform videolarını derslere bağlar; `links`: [(video kimliği, ders kimliği)].
+
+    O arada başka yere bağlanmış ya da platformda bulunamayan video, kursa ait olmayan / video olmayan ders, aynı derse
+    ikinci kez seçilen video atlanır. (bağlanan, atlanan) döner.
+    """
+    videos = {video.id: video for video in video_service.get(platform).list_videos()}
+    in_use = video_ids_in_use(platform)
+    lessons = {
+        str(lesson.pk): lesson
+        for lesson in Lesson.objects.filter(section__course=course, kind=LessonKind.VIDEO, pk__in=[lesson_id for _video_id, lesson_id in links])
+    }
+    linked, seen = 0, set()
+    with transaction.atomic():
+        for video_id, lesson_id in links:
+            video = videos.get(video_id)
+            lesson = lessons.get(lesson_id)
+            if video is None or video_id in in_use or lesson is None or lesson.pk in seen:
+                continue
+            seen.add(lesson.pk)
+            in_use.add(video_id)
+            lesson.attach_video(platform, video.id, "", video.duration, video.title, file_name=video.title)
+            linked += 1
+    return linked, len(links) - linked

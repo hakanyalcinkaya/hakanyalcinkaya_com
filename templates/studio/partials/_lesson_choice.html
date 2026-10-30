@@ -1,0 +1,5 @@
+{# Satırdaki ders seçimi: başta yalnız eşleşen ders; tıklanınca bütün dersler (_lesson_options.html) yüklenir. #}
+<select class="form-select form-select-sm" name="{{ name }}" aria-label="{{ label }}" data-lesson-choice>
+  <option value="">{{ empty_label|default:"— Yükleme —" }}</option>
+  {% if lesson %}<option value="{{ lesson.id }}" selected>{{ lesson.title }}{% if lesson.video_id %} · videolu{% endif %}</option>{% endif %}
+</select>

@@ -343,6 +343,8 @@
     var skipped = fileList.length - files.length;
     if (skipped) toast("warning", skipped + " dosya video olmadığı için atlandı.");
     files.sort(function (a, b) { return a.name.localeCompare(b.name, "tr", { numeric: true }); });
+    // Kursa bırakılan videolar hemen gönderilmez: önce dosya → ders eşleşme tablosu açılır.
+    if (zone.hasAttribute("data-video-match-url") && files.length) return openVideoMatch(zone, files);
     files.forEach(function (file) {
       // Kategorinin kendi listesi; satırlardaki listeler (satıra bırakılan videolar) atlanır.
       var list = zone.querySelector(":scope > [data-upload-list]");
@@ -450,6 +452,118 @@
     });
     return Promise.resolve();
   }
+
+  // Toplu video yükleme önizlemesi: dosya adları sunucuya gider, eşleşme tablosu stüdyo penceresinde açılır. Dosyalar
+  // tarayıcıda bekler; "Seçilenleri yükle" ile her biri seçilen dersin satırına (ya da "Yeni ders" ile Genel'e) sıraya girer.
+  var videoMatch = null;
+
+  function openVideoMatch(zone, files) {
+    var data = new FormData();
+    data.append("names", JSON.stringify(files.map(function (file) { return file.name; })));
+    fetch(zone.getAttribute("data-video-match-url"), { method: "POST", body: data, headers: { "X-CSRFToken": csrfToken(), "HX-Request": "true" } })
+      .then(function (response) {
+        return response.text().then(function (text) {
+          if (!response.ok) throw new Error(text || "Sunucu hatası (" + response.status + ")");
+          return text;
+        });
+      })
+      .then(function (html) {
+        var body = document.getElementById("studio-dialog-body");
+        var dialog = document.getElementById("studio-dialog");
+        videoMatch = { zone: zone, files: files };
+        body.innerHTML = html;
+        window.htmx.process(body);
+        refreshMatch(body.querySelector("[data-match]"));
+        if (!dialog.open) dialog.showModal();
+      })
+      .catch(function (error) { toast("error", error.message); });
+  }
+
+  // Eşleşme tabloları (toplu yükleme ve platformdan bağlama): seçim sayacı, tümünü seç, satır seçimi.
+  function refreshMatch(box) {
+    if (!box) return;
+    var checks = Array.prototype.slice.call(box.querySelectorAll("[data-match-check]:not(:disabled)"));
+    var checked = checks.filter(function (check) { return check.checked; }).length;
+    var count = box.querySelector("[data-match-count]");
+    if (count) count.textContent = checked;
+    var all = box.querySelector("[data-match-all]");
+    if (all) {
+      all.checked = checks.length > 0 && checked === checks.length;
+      all.indeterminate = checked > 0 && checked < checks.length;
+    }
+  }
+
+  // Satırdaki ders listesi başta yalnız eşleşen dersi içerir; ilk tıklamada bütün dersler şablondan kopyalanır.
+  function fillLessonChoice(select) {
+    if (select.hasAttribute("data-filled")) return;
+    var template = select.closest("[data-match]").querySelector("template[data-lesson-options]");
+    if (!template) return;
+    var value = select.value;
+    select.innerHTML = template.innerHTML;
+    select.value = value;
+    select.setAttribute("data-filled", "");
+  }
+  document.addEventListener("pointerdown", function (event) {
+    var select = event.target.closest && event.target.closest("select[data-lesson-choice]");
+    if (select) fillLessonChoice(select);
+  });
+  document.addEventListener("focusin", function (event) {
+    if (event.target.matches && event.target.matches("select[data-lesson-choice]")) fillLessonChoice(event.target);
+  });
+
+  document.addEventListener("change", function (event) {
+    var target = event.target;
+    var box = target.closest && target.closest("[data-match]");
+    if (!box) return;
+    if (target.matches("[data-match-all]")) {
+      box.querySelectorAll("[data-match-check]:not(:disabled)").forEach(function (check) { check.checked = target.checked; });
+    } else if (target.matches("select[data-lesson-choice]")) {
+      // Ders seçilen satır işaretlenir, "— Yükleme —" seçilen satırın işareti kalkar.
+      var check = target.closest("tr").querySelector("[data-match-check]");
+      if (check && !check.disabled) check.checked = Boolean(target.value);
+    }
+    refreshMatch(box);
+  });
+
+  document.body.addEventListener("htmx:afterSwap", function (event) {
+    if (event.detail.target.id === "studio-dialog-body") refreshMatch(event.detail.target.querySelector("[data-match]"));
+  });
+
+  document.addEventListener("click", function (event) {
+    var start = event.target.closest("[data-video-match-start]");
+    if (!start || !videoMatch) return;
+    var box = start.closest("[data-video-match]");
+    var jobs = [];
+    var seen = {};
+    var problem = "";
+    box.querySelectorAll("[data-match-row]").forEach(function (row) {
+      if (!row.querySelector("[data-match-check]").checked) return;
+      var file = videoMatch.files[Number(row.getAttribute("data-index"))];
+      var value = row.querySelector("select[data-lesson-choice]").value;
+      if (!file || !value) return;
+      if (value === "new") return jobs.push({ file: file });
+      if (seen[value]) problem = "“" + file.name + "” ile “" + seen[value] + "” aynı derse seçilmiş.";
+      seen[value] = file.name;
+      var lessonRow = document.getElementById("lesson-" + value);
+      if (!lessonRow || !lessonRow.hasAttribute("data-video-url")) problem = "“" + file.name + "” için seçilen ders sayfada bulunamadı.";
+      jobs.push({ file: file, row: lessonRow });
+    });
+    if (problem) return toast("error", problem);
+    if (!jobs.length) return toast("warning", "Yüklenecek dosya seçilmedi.");
+    var list = videoMatch.zone.querySelector(":scope > [data-upload-list]");
+    var newUrl = box.getAttribute("data-new-url");
+    jobs.forEach(function (job) {
+      if (job.row) {
+        uploadQueue.push({ url: job.row.getAttribute("data-video-url"), file: job.file, item: queueItem(rowUploadList(job.row), job.file.name), place: placeVideoCell });
+      } else {
+        uploadQueue.push({ url: newUrl, file: job.file, item: queueItem(list, job.file.name), place: placeLesson });
+      }
+    });
+    videoMatch = null;
+    document.getElementById("studio-dialog").close();
+    toast("success", jobs.length + " video yükleme sırasına alındı.");
+    pump();
+  });
 
   // "Videoyu değiştir" formu dosyayı kendisi göndermez: dosya sıraya girer, form kapanır.
   document.body.addEventListener("htmx:confirm", function (event) {

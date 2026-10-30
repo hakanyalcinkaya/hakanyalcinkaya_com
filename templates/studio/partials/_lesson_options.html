@@ -1,0 +1,11 @@
+{% comment %}Eşleşmeyi elle düzeltirken seçilecek dersler: bölüm bölüm video dersleri, videosu olanlar işaretli. Yüzlerce satırda
+   her select'e kopyalanmasın diye bir kez <template> içinde çizilir; satırdaki select tıklanınca doldurulur (studio.js).{% endcomment %}
+<template data-lesson-options>
+  <option value="">{{ empty_label|default:"— Yükleme —" }}</option>
+  {% if allow_new %}<option value="new">+ Yeni ders (Genel)</option>{% endif %}
+  {% for section in groups %}{% if section.lessons.all %}
+  <optgroup label="{{ forloop.counter }}. {{ section.title }}">
+    {% for lesson in section.lessons.all %}<option value="{{ lesson.id }}">{{ lesson.title }}{% if lesson.video_id %} · videolu{% endif %}</option>{% endfor %}
+  </optgroup>
+  {% endif %}{% endfor %}
+</template>

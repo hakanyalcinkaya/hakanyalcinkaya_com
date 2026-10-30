@@ -1,0 +1,57 @@
+{% load core_tags %}
+{% comment %}Platformdan bağlama (pencere): platform panelinden toplu yüklenen, hiçbir yere bağlı olmayan videolar başlıklarına göre
+   kursun dersleriyle eşleşir. İşaretli olanlar seçilen derse bağlanır; işlenmesi bitmemiş video seçilemez.{% endcomment %}
+<form class="d-flex flex-column h-100" hx-post="{% url 'studio:course_platform_videos' course.id %}" hx-confirm="İşaretli videolar seçilen derslere bağlansın mı? Videosu olan dersin eski videosu {{ label }} kütüphanesinden silinir." data-match>
+  <div class="d-flex align-items-start justify-content-between gap-2 border-bottom px-3 py-2">
+    <div class="min-w-0">
+      <h2 class="h6 mb-0">{{ label }}'deki videoları bağla</h2>
+      <div class="small text-body-secondary">Kursun {{ label }} koleksiyonunda ya da kütüphane kökünde olup hiçbir derse bağlı olmayan videolar; başlıkları (dosya adı) kursun dersleriyle eşleştirildi.</div>
+    </div>
+    <button type="button" class="btn-close" data-dialog-close aria-label="Kapat"></button>
+  </div>
+  <div class="flex-grow-1 overflow-auto">
+    {% if error %}
+    <div class="alert alert-danger small m-3" role="alert"><i class="bi bi-x-circle me-2" aria-hidden="true"></i>{{ label }} kütüphanesi okunamadı: {{ error }}</div>
+    {% elif not candidates %}
+    <div class="text-center text-body-secondary p-4"><i class="bi bi-check-circle me-1 text-success" aria-hidden="true"></i>Kursun {{ label }} koleksiyonunda ve kütüphane kökünde bağlanmamış video yok.</div>
+    {% else %}
+    {% if not can_link %}
+    <div class="alert alert-info small m-3 mb-0" role="alert"><i class="bi bi-info-circle me-2" aria-hidden="true"></i>Geliştirme ortamında bağlama kapalı: liste canlı sitenin kütüphanesini gösterir, bağlamak oradaki başlıkları da değiştirir.</div>
+    {% endif %}
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="sticky-top bg-body">
+        <tr>
+          <th scope="col" class="ps-3" style="width:2rem"><input class="form-check-input" type="checkbox" aria-label="Tümünü seç" data-match-all></th>
+          <th scope="col">Video</th>
+          <th scope="col" style="width:38%">Ders</th>
+          <th scope="col" class="pe-3">Eşleşme</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for orphan, row in candidates %}
+        <tr data-match-row>
+          <td class="ps-3"><input class="form-check-input" type="checkbox" name="video" value="{{ orphan.video.id }}" aria-label="{{ orphan.video.title|default:orphan.video.id }} bağlansın" data-match-check{% if not orphan.video.is_ready %} disabled{% elif row.lesson and not row.has_video and not row.busy %} checked{% endif %}></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <img src="{{ orphan.thumbnail_url }}" alt="" width="64" height="36" loading="lazy" class="rounded bg-body-tertiary flex-shrink-0 object-fit-cover">
+              <div class="min-w-0">
+                <a href="{{ orphan.dashboard_url }}" target="_blank" rel="noopener" class="link-body-emphasis text-decoration-none text-break">{{ orphan.video.title|default:"(adsız)" }}</a>
+                <div class="text-body-tertiary">{% if not orphan.video.is_ready %}<span class="badge text-bg-secondary fw-normal">{{ orphan.video.state }}</span> {% endif %}{% if orphan.collection %}{{ orphan.collection }} · {% endif %}{% if orphan.video.duration %}{{ orphan.video.duration|lesson_clock }}{% endif %}</div>
+              </div>
+            </div>
+          </td>
+          <td>{% include "studio/partials/_lesson_choice.html" with name="lesson-"|add:orphan.video.id label=orphan.video.title|add:" için ders" lesson=row.lesson empty_label="— Bağlama —" %}</td>
+          <td class="pe-3">{% include "studio/partials/_video_match_how.html" %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-2 border-top px-3 py-2">
+    <span class="form-text m-0 me-auto">Bağlanan videonun {{ label }}'deki başlığı ders adı olur; dosya adı ek bilgi ve altyazı eşleşmesi için saklanır.</span>
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-dialog-close>Vazgeç</button>
+    <button type="submit" class="btn btn-primary btn-sm"{% if not candidates or not can_link %} disabled{% endif %}><i class="bi bi-link-45deg me-1" aria-hidden="true"></i>Seçilenleri bağla (<span data-match-count>0</span>)</button>
+  </div>
+  {% include "studio/partials/_lesson_options.html" with allow_new=False empty_label="— Bağlama —" %}
+</form>
