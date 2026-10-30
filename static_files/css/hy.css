@@ -90,16 +90,16 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 /* İmleç spotlight'ı: kartlar ve site penceresi imlecin altında vurgu renginde hafifçe aydınlanır (site.js --hy-mx/--hy-my yazar).
    Pseudo-element yerine arka plan katmanı: içeriğin üstüne binmez, overflow gerekmez; --hy-spot-a kayıtlı olduğu için girip çıkarken yumuşak geçer. */
 @property --hy-spot-a{syntax:"<number>";inherits:false;initial-value:0}
-:root{--hy-spot-max:.09;--hy-spot-size:360px}
-[data-bs-theme=dark]{--hy-spot-max:.16}
+:root{--hy-spot-max:.06;--hy-spot-size:320px}
+[data-bs-theme=dark]{--hy-spot-max:.1}
 [data-spotlight] :is(.card,.hy-site-dialog){--hy-spot:radial-gradient(var(--hy-spot-size) circle at var(--hy-mx,50%) var(--hy-my,50%),rgba(var(--bs-primary-rgb),calc(var(--hy-spot-a) * var(--hy-spot-max))),transparent 70%);background-image:var(--hy-spot);transition:--hy-spot-a .35s ease-out}
 [data-spotlight] :is(.card,.hy-site-dialog).is-lit{--hy-spot-a:1}
 [data-spotlight] :is(.hy-glass,.hy-site-dialog){background-image:var(--hy-spot),var(--hy-glass-bg)}
 [data-spotlight] .card.hover-lift{transition:transform .25s,border-color .25s,--hy-spot-a .35s ease-out}
 /* Sayfa spotlight'ı: imleci izleyen geniş, yumuşak parıltı. Opak bölümlerin altında kalmasın diye içeriğin üstünde, blend mode ile:
    koyuda screen yalnız koyu alanları aydınlatır, açıkta multiply beyazı vurgu rengine çeker; yazı iki durumda da keskin kalır. Konum transform ile (site.js). */
-.hy-cursor-glow{position:fixed;top:0;left:0;z-index:1000;width:900px;height:900px;margin:-450px 0 0 -450px;pointer-events:none;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.2),rgba(var(--bs-primary-rgb),.08) 45%,transparent);mix-blend-mode:multiply;opacity:0;transition:opacity .4s ease-out;will-change:transform}
-[data-bs-theme=dark] .hy-cursor-glow{background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.3),rgba(var(--bs-primary-rgb),.11) 45%,transparent);mix-blend-mode:screen}
+.hy-cursor-glow{position:fixed;top:0;left:0;z-index:1000;width:720px;height:720px;margin:-360px 0 0 -360px;pointer-events:none;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.09),rgba(var(--bs-primary-rgb),.035) 45%,transparent);mix-blend-mode:multiply;opacity:0;transition:opacity .4s ease-out;will-change:transform}
+[data-bs-theme=dark] .hy-cursor-glow{background:radial-gradient(closest-side,rgba(var(--bs-primary-rgb),.13),rgba(var(--bs-primary-rgb),.045) 45%,transparent);mix-blend-mode:screen}
 .hy-cursor-glow.is-on{opacity:1}
 [data-reviews]::before{content:"";position:absolute;inset:10% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(40% 55% at 18% 60%,rgba(var(--bs-primary-rgb),.22),transparent 70%),radial-gradient(35% 50% at 82% 40%,rgba(var(--bs-primary-rgb),.14),transparent 70%)}
 [data-theme-root]>.dropdown-menu{top:100%;right:0;left:auto}
