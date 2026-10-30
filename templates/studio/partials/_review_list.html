@@ -8,11 +8,11 @@
       <a href="{{ reviews_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}" hx-get="{{ reviews_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" hx-target="#review-list" hx-swap="outerHTML" hx-push-url="true"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
       {% endfor %}
     </div>
-    <select name="course" class="form-select form-select-sm w-auto" aria-label="Kurs">
+    <select name="course" class="form-select form-select-sm w-auto mw-100" aria-label="Kurs">
       <option value="">Tüm kurslar</option>
       {% for course in courses %}<option value="{{ course.pk }}"{% if course_id == course.pk|stringformat:"s" %} selected{% endif %}>{{ course.title }}</option>{% endfor %}
     </select>
-    <select name="rating" class="form-select form-select-sm w-auto" aria-label="Puan">
+    <select name="rating" class="form-select form-select-sm w-auto mw-100" aria-label="Puan">
       <option value="">Tüm puanlar</option>
       {% for value, stars in ratings %}<option value="{{ value }}"{% if rating == value %} selected{% endif %}>{{ stars }} {{ value }}</option>{% endfor %}
       <option value="none"{% if rating == "none" %} selected{% endif %}>Puansız</option>

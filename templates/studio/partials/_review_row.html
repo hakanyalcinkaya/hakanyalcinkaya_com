@@ -1,13 +1,13 @@
 {# Yorum satırı: durum, puan, metin; değiştirilmiş onaylı yorumda sitedeki (onaylı) hali de gösterilir. #}
 {% load core_tags %}
 <div class="list-group-item py-3" id="review-{{ review.id }}">
-  {# Aksiyonlar en solda, sabit sırada; olmayan buton yerinde görünmez boşluk bırakır, satırlar hep aynı hizada kalır. #}
+  {# Aksiyonlar en solda, sabit sırada: her zaman olanlar başta, koşullu olanlar sonda; olmayan buton yerinde görünmez boşluk bırakır, satırlar hep aynı hizada kalır. #}
   <div class="d-flex flex-wrap align-items-center gap-2 small">
     <div class="d-flex gap-1 flex-shrink-0">
-      {% if review.needs_review or not review.is_visible %}<button type="button" class="btn btn-success btn-sm" hx-post="{% url 'studio:review_action' review.id 'approve' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" title="Onayla"><i class="bi bi-check2" aria-hidden="true"></i><span class="visually-hidden">Onayla</span></button>{% else %}<span class="btn btn-sm invisible" aria-hidden="true"><i class="bi bi-check2"></i></span>{% endif %}
-      {% if review.status != "archived" %}<button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:review_action' review.id 'hide' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" title="Sitede gösterme"><i class="bi bi-eye-slash" aria-hidden="true"></i><span class="visually-hidden">Gösterme</span></button>{% else %}<span class="btn btn-sm invisible" aria-hidden="true"><i class="bi bi-eye-slash"></i></span>{% endif %}
       <button type="button" class="btn btn-sm {% if review.featured %}btn-primary{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:review_action' review.id 'featured' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" aria-pressed="{{ review.featured|yesno:'true,false' }}" title="Kurs sayfasında öne çıkan yorumlarda göster"><i class="bi bi-pin-angle" aria-hidden="true"></i><span class="visually-hidden">Kursta öne çıkar</span></button>
       <button type="button" class="btn btn-sm {% if review.show_on_home %}btn-primary{% else %}btn-outline-secondary{% endif %}" hx-post="{% url 'studio:review_action' review.id 'home' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" aria-pressed="{{ review.show_on_home|yesno:'true,false' }}" title="Ana sayfada göster"><i class="bi bi-house" aria-hidden="true"></i><span class="visually-hidden">Ana sayfada göster</span></button>
+      {% if review.status != "archived" %}<button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:review_action' review.id 'hide' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" title="Sitede gösterme"><i class="bi bi-eye-slash" aria-hidden="true"></i><span class="visually-hidden">Gösterme</span></button>{% else %}<span class="btn btn-sm invisible" aria-hidden="true"><i class="bi bi-eye-slash"></i></span>{% endif %}
+      {% if review.needs_review or not review.is_visible %}<button type="button" class="btn btn-success btn-sm" hx-post="{% url 'studio:review_action' review.id 'approve' %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" title="Onayla"><i class="bi bi-check2" aria-hidden="true"></i><span class="visually-hidden">Onayla</span></button>{% else %}<span class="btn btn-sm invisible" aria-hidden="true"><i class="bi bi-check2"></i></span>{% endif %}
       {% if not review.user %}<button type="button" class="btn btn-outline-secondary btn-sm" hx-get="{% url 'studio:review_edit' review.id %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" title="Düzenle"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Düzenle</span></button>{% else %}<span class="btn btn-sm invisible" aria-hidden="true"><i class="bi bi-pencil"></i></span>{% endif %}
       <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{% url 'studio:review_delete' review.id %}" hx-target="#review-{{ review.id }}" hx-swap="outerHTML" hx-confirm="Yorum silinsin mi? Geri alınamaz." title="Sil"><i class="bi bi-trash3" aria-hidden="true"></i><span class="visually-hidden">Sil</span></button>
     </div>
@@ -18,11 +18,11 @@
     {% if review.featured %}<span class="badge bg-primary-subtle text-primary-emphasis fw-normal"><i class="bi bi-pin-angle me-1" aria-hidden="true"></i>Kursta öne çıkan</span>{% endif %}
     {% if review.show_on_home %}<span class="badge bg-primary-subtle text-primary-emphasis fw-normal"><i class="bi bi-house me-1" aria-hidden="true"></i>Ana sayfada</span>{% endif %}
     <span class="fw-medium">{{ review.display_name|default:"—" }}</span>
+    {% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% else %}<span class="text-body-tertiary">Puan yok</span>{% endif %}
     {% if review.user %}<span class="text-body-tertiary">{{ review.user.email }}</span>{% else %}<span class="badge rounded-1 border text-body-secondary fw-normal">Eski yorum</span>{% endif %}
     <span class="text-body-tertiary">· <time datetime="{{ review.written_at|date:'c' }}" title="{{ review.written_at|date:'d.m.Y H:i' }}">{{ review.written_at|ago }}</time></span>
   </div>
-  <div class="mt-2">{% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% else %}<span class="small text-body-tertiary">Puan yok</span>{% endif %}</div>
-  {% if review.text %}<p class="small mt-1 mb-0 text-pre-line">{{ review.text }}</p>{% else %}<p class="small text-body-tertiary mt-1 mb-0">Yorum yazılmamış (yalnız puan).</p>{% endif %}
+  {% if review.text %}<p class="small mt-2 mb-0 text-pre-line">{{ review.text }}</p>{% else %}<p class="small text-body-tertiary mt-2 mb-0">Yorum yazılmamış (yalnız puan).</p>{% endif %}
   {% if review.has_pending_changes %}
   <div class="small border-start border-2 ps-2 mt-2 text-body-secondary">
     <span class="fw-medium">Sitede görünen (onaylı) hali:</span> {% if review.approved_rating %}{% include "page/partials/stars.html" with rating=review.approved_rating %}{% endif %}
