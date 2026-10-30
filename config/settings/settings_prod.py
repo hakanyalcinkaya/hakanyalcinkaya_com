@@ -2,6 +2,10 @@ from .settings_base import *  # noqa: F403
 
 STATIC_ROOT = BASE_DIR.parent / "static_cdn" / "static_files"
 MEDIA_ROOT = BASE_DIR.parent / "static_cdn" / "media_files"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "config.storage.VersionedStaticFilesStorage"},
+}
 
 # Alan adı: asıl adres hakanyalcinkaya.com; www kalıcı olarak ona yönlendirilir (Nginx'te de yapılmalı).
 # link.hakanyalcinkaya.com gibi alt alan adları ayrı platformlardır: burada izinli değiller, çerezler yalnız bu adrese

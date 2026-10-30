@@ -33,5 +33,5 @@ if EMAIL_TRACKING_URL:  # noqa: F405
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "config.storage.DevStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "config.storage.VersionedStaticFilesStorage"},
 }
