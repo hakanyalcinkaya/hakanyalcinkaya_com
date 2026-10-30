@@ -580,6 +580,16 @@
       });
   }
 
+  // Sonuçları temizle: liste ve sayaçlar sıfırlanır; gönderim sürüyorsa kalan dosyalar gönderilmeye devam eder.
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-extra-bulk-clear]");
+    if (!button) return;
+    var box = button.closest("[data-extra-bulk]");
+    box.querySelector("[data-extra-bulk-list]").replaceChildren();
+    box.querySelectorAll("[data-count]").forEach(function (counter) { counter.textContent = "0"; });
+    if (!bulkBusy && !bulkQueue.length) box.querySelector("[data-extra-bulk-summary]").classList.add("d-none");
+  });
+
   document.addEventListener("change", function (event) {
     var input = event.target;
     if (!input.matches || !input.matches("[data-extra-bulk-input]") || !input.files.length) return;
@@ -727,6 +737,9 @@
   function dropTarget(event) {
     var target = pointerTarget(event);
     if (!target) return null;
+    // Toplu yükleme kutusunun her yeri (başlık, sonuç listesi) bırakma alanıdır; vurgu kesik çizgili alanda görünür.
+    var bulkBox = target.closest("[data-extra-bulk]");
+    if (bulkBox) return bulkBox.querySelector("[data-extra-bulk-zone]");
     return (
       target.closest("[data-extra-bulk-zone]") ||
       target.closest("[data-extra-drop]") ||
@@ -752,9 +765,10 @@
     var files = Array.prototype.slice.call(event.dataTransfer.files);
     var target = pointerTarget(event);
     if (!target) return;
-    var bulkZone = target.closest("[data-extra-bulk-zone]");
-    if (bulkZone) {
-      enqueueBulk(bulkZone.closest("[data-extra-bulk]"), files);
+    var bulkBox = target.closest("[data-extra-bulk]");
+    if (bulkBox) {
+      bulkBox.open = true;
+      enqueueBulk(bulkBox, files);
       return;
     }
     var extraZone = target.closest("[data-extra-drop]");

@@ -1,4 +1,5 @@
-{# Toplu yükleme kutusu (kind: content | subtitle). Üzerine yazma varsayılan açık: dosya adı eşleşen ders güncellenir. #}
+{# Toplu yükleme kutusu (kind: content | subtitle). Kutunun her yerine dosya bırakılabilir; sonuçlar "Temizle" ile silinir. #}
+{# Üzerine yazma varsayılan açık: dosya adı eşleşen ders güncellenir. #}
 <details class="border rounded mt-3 studio-extra-bulk" data-extra-bulk data-bulk-kind="{{ kind }}" data-url="{{ url }}">
   <summary class="px-3 py-2 small fw-medium"><i class="bi {{ icon }} me-1" aria-hidden="true"></i>{{ title }} <span class="fw-normal text-body-secondary">· {{ types }}, dosya adı video dosyasının adıyla eşleşir</span></summary>
   <div class="px-3 pb-3">
@@ -18,6 +19,7 @@
       <span class="text-body-secondary"><i class="bi bi-skip-forward me-1" aria-hidden="true"></i><span data-count="skipped">0</span> atlandı</span>
       <span class="text-danger-emphasis"><i class="bi bi-x-circle me-1" aria-hidden="true"></i><span data-count="error">0</span> eşleşmedi / hata</span>
       <span class="text-body-tertiary ms-auto" data-extra-bulk-progress></span>
+      <button type="button" class="btn btn-outline-secondary btn-sm" data-extra-bulk-clear><i class="bi bi-x-lg me-1" aria-hidden="true"></i>Temizle</button>
     </div>
     <ul class="list-unstyled small mb-0 mt-2 studio-extra-bulk-list" data-extra-bulk-list></ul>
   </div>
