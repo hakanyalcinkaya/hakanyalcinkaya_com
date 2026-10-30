@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 
 from core.models import SiteSettings
+from core.version import app_version
 from core.site_url import absolute_url
 from newsletter.models import Subscriber
 
@@ -56,6 +57,8 @@ def site(request):
         "library_url": reverse("page:library"),
         # Stüdyo "Ayarlar"ı (ör. not alma açık mı); yalnız şablonda kullanılırsa okunur.
         "site_settings": SimpleLazyObject(SiteSettings.load),
+        # Superuser'a menüde sürüm (v + commit sayısı): yerel ile sunucunun aynı commit'te olup olmadığı görülür.
+        "app_version": SimpleLazyObject(app_version) if user.is_superuser else None,
         # Bülten kutusu: form yerine gösterilecek durum (abonesin / onay bekliyor / gönderildi); yoksa form.
         "newsletter_state": SimpleLazyObject(
             lambda: Subscriber.state_for(user, request.session.get(NEWSLETTER_SESSION_KEY, "")) or {}

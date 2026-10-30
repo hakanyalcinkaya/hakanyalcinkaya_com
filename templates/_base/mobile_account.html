@@ -4,7 +4,7 @@
 <div class="d-lg-none pt-3 pb-3" aria-label="Hesap">
   <div class="d-flex align-items-center gap-2 pb-3 mb-1 border-bottom">
     <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials flex-shrink-0" aria-hidden="true">{{ account_user.initials }}</span>
-    <span class="min-w-0"><span class="d-block fw-semibold text-truncate">{{ account_user.display_name }}</span><span class="d-block small text-body-tertiary text-truncate">{{ account_user.email }}</span></span>
+    <span class="min-w-0"><span class="d-flex align-items-center gap-2 fw-semibold"><span class="text-truncate">{{ account_user.display_name }}</span>{% if app_version and app_version.label %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace" title="Sürüm {{ app_version.label }} · commit {{ app_version.commit }}">{{ app_version.label }}</span>{% endif %}</span><span class="d-block small text-body-tertiary text-truncate">{{ account_user.email }}</span></span>
   </div>
   <ul class="navbar-nav">
     {% if lesson_links %}

@@ -8,6 +8,7 @@
   <div class="container d-flex flex-wrap align-items-center column-gap-3 row-gap-2">
     <a href="{% url 'studio:course_list' %}" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6 me-auto">
       <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>Stüdyo
+      {% if app_version and app_version.label %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace" title="Sürüm {{ app_version.label }} · commit {{ app_version.commit }}">{{ app_version.label }}</span>{% endif %}
     </a>
     <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 small">
       <a href="{% url 'studio:course_list' %}" class="studio-nav-link{% if section == 'courses' %} active{% endif %}"{% if section == 'courses' %} aria-current="page"{% endif %}><i class="bi bi-collection-play me-1" aria-hidden="true"></i>Kurslar</a>

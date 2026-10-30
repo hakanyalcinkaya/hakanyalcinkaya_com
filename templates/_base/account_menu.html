@@ -2,7 +2,8 @@
 <div class="dropdown d-none d-lg-block" data-dropdown>
   <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="hesap-menusu" aria-label="Hesap menüsü">
     <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>
-    <span class="d-none d-xl-inline">Hesabım</span><i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
+    <span class="d-none d-xl-inline">Hesabım</span>
+    {% if app_version and app_version.label %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace" title="Sürüm {{ app_version.label }} · commit {{ app_version.commit }}">{{ app_version.label }}</span>{% endif %}<i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
   </button>
   <ul id="hesap-menusu" class="dropdown-menu dropdown-menu-end shadow py-2" data-dropdown-menu data-bs-popper="static" style="width:280px">
     <li class="px-3 pt-1 pb-2"><div class="fw-semibold small">{{ account_user.display_name }}</div><div class="small text-body-tertiary text-truncate">{{ account_user.email }}</div></li>

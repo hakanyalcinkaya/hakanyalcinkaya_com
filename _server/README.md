@@ -226,6 +226,9 @@ echo '30 3 * * * postgres pg_dump -Fc hakanyalcinkaya > /var/backups/hakanyalcin
 
 ## Güncelleme (deploy)
 
+`main`'e push edilince GitHub Actions sunucuyu kendisi günceller: kurulum ve kullanım [DEPLOY.md](DEPLOY.md). Elle
+çalıştırmak için `bash _server/deploy.sh` (yalnız gereken servisleri yeniden başlatır). Betik olmadan elle:
+
 ```bash
 cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj
 PY=/var/Env/hakanyalcinkaya_312/bin/python

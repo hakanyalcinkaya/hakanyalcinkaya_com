@@ -1,0 +1,3 @@
+# /etc/sudoers.d/hakanyalcinkaya-deploy — deploy betiğinin şifresiz çalıştırabileceği komutlar (yalnız bunlar).
+# DEPLOY_USER yerine sunucuda repoyu çeken kullanıcının adı yazılır. Kurulum: _server/DEPLOY.md, adım 5.
+DEPLOY_USER ALL=(root) NOPASSWD: /usr/bin/systemctl restart hakanyalcinkaya-celery, /usr/bin/systemctl daemon-reload, /usr/bin/systemctl reload nginx, /usr/sbin/nginx -t

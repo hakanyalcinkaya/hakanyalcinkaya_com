@@ -1,0 +1,39 @@
+# main'e push olunca sunucuyu günceller: SSH ile bağlanır, sunucudaki _server/deploy.sh çalışır.
+# Sunucudaki anahtar kısıtlıdır (authorized_keys "command=..."): bağlantı yalnız deploy betiğini çalıştırabilir.
+# Kurulum ve gerekli Secrets: _server/DEPLOY.md
+# Elle çalıştırmak için: GitHub → Actions → Deploy → Run workflow. Commit mesajında [skip ci] varsa çalışmaz.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Aynı anda tek deploy; arka arkaya push'larda sıradaki bekler, yarıda kesilmez.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: SSH anahtarı
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Sunucuyu güncelle
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+        # Komut sunucudaki authorized_keys satırında sabit; burada ayrıca komut gönderilmez.
+        run: ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST"
