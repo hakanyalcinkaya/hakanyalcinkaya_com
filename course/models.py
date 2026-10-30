@@ -2,6 +2,7 @@ import re
 import unicodedata
 from datetime import timedelta
 from decimal import Decimal
+from difflib import SequenceMatcher
 from functools import partial
 from pathlib import Path
 
@@ -25,6 +26,63 @@ GENERAL_SECTION_SLUG = "genel"
 LEFTOVER_SECTION_SLUG = "eslesmeyen-dersler"
 # Ders dosyalarının baştaki sıra numarası (ör. "018-014" ya da "007-022-003").
 LESSON_FILE_NUMBER = re.compile(r"^\d+(?:-\d+)*")
+# Dosya adlarındaki ad dışı ekler (sessizlik kırpılmış video): eşleştirmede yok sayılır.
+FILE_NAME_NOISE = re.compile(r"[-_]?without[-_]silence$")
+# Hizalamada eşlenecek dosya ve dersin ad benzerliği (0-1) en az bu kadar olmalı.
+ALIGN_MIN_SIMILARITY = 0.25
+
+
+def _file_key(text):
+    return unicodedata.normalize("NFC", text).strip().casefold()
+
+
+def _file_number_and_name(stem):
+    """"004-003-Ilk-HTML_without_silence" → ("004-003", "ilk-html"); numara yoksa ("", ad)."""
+    number = LESSON_FILE_NUMBER.match(stem)
+    rest = stem[number.end() :] if number else stem
+    return (number.group(0) if number else ""), FILE_NAME_NOISE.sub("", slugify_tr(rest))
+
+
+def _align(files, lessons):
+    """Sıralı dosyalar ile sıralı dersleri sırayı koruyarak eşler (toplam puanı en yüksek); {dosya adı: ders}."""
+
+    def score(file, lesson):
+        if _file_key(Path(file[2]).stem) in {_file_key(name) for name in lesson.video_file_stems}:
+            return 2.0
+        similarity = SequenceMatcher(None, file[1], lesson.slug).ratio()
+        return similarity if similarity >= ALIGN_MIN_SIMILARITY else None
+
+    rows, cols = len(files), len(lessons)
+    best = [[0.0] * (cols + 1) for _row in range(rows + 1)]
+    for i in range(rows - 1, -1, -1):
+        for j in range(cols - 1, -1, -1):
+            options = [best[i + 1][j], best[i][j + 1]]
+            pair = score(files[i], lessons[j])
+            if pair is not None:
+                options.append(pair + best[i + 1][j + 1])
+            best[i][j] = max(options)
+    result, i, j = {}, 0, 0
+    while i < rows and j < cols:
+        pair = score(files[i], lessons[j])
+        if pair is not None and best[i][j] == pair + best[i + 1][j + 1]:
+            result[files[i][2]] = lessons[j]
+            i, j = i + 1, j + 1
+        elif best[i][j] == best[i + 1][j]:
+            i += 1
+        else:
+            j += 1
+    # Adı benzemeyen (ör. İngilizce) dosya, iki eşlenmiş komşusunun arasında boşta tek bir ders kalmışsa ona gider.
+    position = {lesson.pk: index for index, lesson in enumerate(lessons)}
+    taken = {lesson.pk for lesson in result.values()}
+    for index in range(1, rows - 1):
+        before, current, after = (result.get(files[index + step][2]) for step in (-1, 0, 1))
+        if current is None and before is not None and after is not None:
+            gap = position[after.pk] - position[before.pk]
+            middle = lessons[position[before.pk] + 1] if gap == 2 else None
+            if middle is not None and middle.pk not in taken:
+                result[files[index][2]] = middle
+                taken.add(middle.pk)
+    return result
 PRICE_FIELD = {"max_digits": 10, "decimal_places": 2, "validators": [MinValueValidator(Decimal("0"))]}
 
 
@@ -392,46 +450,78 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
                 seen.add(lesson.pk)
                 lesson.move_to(own_sections[section_id], lesson_index)
 
-    def match_lesson_for_file(self, file_name, lessons=None):
-        """Dosyanın (ör. ders notu .md) ait olduğu dersi bulur; (ders, None) ya da (None, sebep) döner.
+    def match_lesson_for_file(self, file_name, lessons=None, batch=None):
+        """Dosyanın (ör. ders notu .md, altyazı) ait olduğu dersi bulur; (ders, nasıl, None) ya da (None, None, sebep) döner.
 
-        Önce dersin videosunun dosya adıyla birebir karşılaştırılır (ek bilgi ve altyazı dosyaları video dosyasıyla aynı
-        adla oluşturulur), sonra ders başlığı ya da slug'ıyla (videolar dosya adıyla açıldığı için). Bulunamazsa baştaki
-        sıra numarası (ör. "018-014") yalnız tek bir dersle uyuşuyorsa kullanılır.
+        Sıra: dersin videosunun dosya adı (ek bilgi ve altyazı dosyaları video dosyasıyla aynı adla oluşturulur), ders
+        başlığı ya da slug'ı (numaralı ya da numarasız), başlığındaki numara. `batch` (birlikte yüklenen dosya adları)
+        verilirse dosya, numarasının bölümünde (ör. "004-…" → 4. bölüm) derslerle sırası korunarak hizalanır: numaralar ders
+        sırasıyla birebir uyuşmayabilir ("004-005-002" araya girer, "Bölüm 1/2/3" aynı numarayı taşır). Verilmezse eski
+        davranış: numaraya göre sıradaki ders. `nasıl`: "file", "name", "aligned" ya da "position".
         """
         if lessons is None:
             lessons = list(Lesson.objects.filter(section__course=self))
-
-        def key(text):
-            return unicodedata.normalize("NFC", text).strip().casefold()
-
-        stem = key(Path(file_name).stem)
-        by_video = [lesson for lesson in lessons if stem in {key(name) for name in lesson.video_file_stems}]
+        stem = _file_key(Path(file_name).stem)
+        by_video = [lesson for lesson in lessons if stem in {_file_key(name) for name in lesson.video_file_stems}]
         if len(by_video) == 1:
-            return by_video[0], None
+            return by_video[0], "file", None
         if len(by_video) > 1:
-            return None, _("Birden fazla dersin videosu bu dosya adında.")
-        exact = [lesson for lesson in lessons if key(lesson.title) == stem or lesson.slug == slugify_tr(stem)]
+            return None, None, _("Birden fazla dersin videosu bu dosya adında.")
+        number, name = _file_number_and_name(stem)
+        exact = [lesson for lesson in lessons if _file_key(lesson.title) == stem or lesson.slug in (slugify_tr(stem), name)]
         if len(exact) == 1:
-            return exact[0], None
+            return exact[0], "name", None
         if len(exact) > 1:
-            return None, _("Birden fazla ders aynı ada sahip.")
-        number = LESSON_FILE_NUMBER.match(stem)
-        if number:
-            numbered = [
-                lesson
-                for lesson in lessons
-                if (match := LESSON_FILE_NUMBER.match(key(lesson.title))) and match.group(0) == number.group(0)
-            ]
-            if len(numbered) == 1:
-                return numbered[0], None
-            if len(numbered) > 1:
-                return None, _("Bu numarayla birden fazla ders var; dosya adını ders adıyla aynı yap.")
-            # Numara ders başlığında yoksa sıraya bakılır: "001-002" = 1. bölümün 2. dersi.
-            positioned = self.lesson_at(number.group(0))
-            if positioned is not None:
-                return positioned, None
-        return None, _("Bu adda ders bulunamadı.")
+            return None, None, _("Birden fazla ders aynı ada sahip.")
+        if not number:
+            return None, None, _("Bu adda ders bulunamadı.")
+        numbered = [
+            lesson
+            for lesson in lessons
+            if (match := LESSON_FILE_NUMBER.match(_file_key(lesson.title))) and match.group(0) == number
+        ]
+        if len(numbered) == 1:
+            return numbered[0], "name", None
+        if len(numbered) > 1:
+            return None, None, _("Bu numarayla birden fazla ders var; dosya adını ders adıyla aynı yap.")
+        if batch is not None:
+            # Yalnız bu dosyanın bölümündeki dosyalar hizalanır.
+            section_no = number.split("-")[0]
+            same_section = {name for name in batch if _file_number_and_name(_file_key(Path(name).stem))[0].split("-")[0] == section_no}
+            lesson = self.align_files(same_section | {file_name}, lessons).get(file_name)
+            if lesson is None:
+                return None, None, _("Bölümündeki derslerle eşleşmedi; dersin video dosya adını elle yaz.")
+            return lesson, "aligned", None
+        # Numara ders başlığında yoksa sıraya bakılır: "001-002" = 1. bölümün 2. dersi.
+        positioned = self.lesson_at(number)
+        if positioned is not None:
+            return positioned, "position", None
+        return None, None, _("Bu adda ders bulunamadı.")
+
+    def align_files(self, file_names, lessons):
+        """Dosyaları numaralarının bölümündeki derslerle sırası korunarak eşler; {dosya adı: ders}.
+
+        Bölüm bölüm, dosyalar numara sırasıyla ("004-005" < "004-005-002" < "004-006") derslerin sırasına hizalanır; çift
+        puanı dersin video dosya adıyla birebir aynıysa yüksek, değilse ad benzerliğidir (0-1). Toplam puanı en yüksek,
+        sırayı bozmayan eşleme seçilir; benzerliği çok düşük çift eşlenmez (dosyası olmayan ders, dersi olmayan dosya).
+        """
+        sections = list(self.ordered_sections())
+        by_section = {}
+        for file_name in file_names:
+            number, name = _file_number_and_name(_file_key(Path(file_name).stem))
+            parts = [int(part) for part in number.split("-")] if number else []
+            if parts and 1 <= parts[0] <= len(sections):
+                by_section.setdefault(sections[parts[0] - 1].pk, []).append((parts, name, file_name))
+        result = {}
+        for section_id, files in by_section.items():
+            files.sort(key=lambda item: (item[0], item[1]))
+            row = sorted((lesson for lesson in lessons if lesson.section_id == section_id), key=lambda lesson: lesson.sort_order)
+            result.update(_align(files, row))
+        return result
+
+    def ordered_sections(self):
+        """Dosya numaralarının saydığı bölümler: "Genel" ve "Eşleşmeyen dersler" hariç, sıralı."""
+        return self.sections.exclude(slug__in=(GENERAL_SECTION_SLUG, LEFTOVER_SECTION_SLUG)).order_by("sort_order", "created_at")
 
     def lesson_at(self, number):
         """Sıra numarasıyla ders: "001-002" = 1. bölümün (sıraya göre) 2. dersi; yoksa None. "Genel" ve "Eşleşmeyen dersler"
@@ -440,8 +530,7 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
         if len(parts) != 2 or min(int(part) for part in parts) < 1:
             return None
         section_no, lesson_no = (int(part) for part in parts)
-        sections = self.sections.exclude(slug__in=(GENERAL_SECTION_SLUG, LEFTOVER_SECTION_SLUG)).order_by("sort_order", "created_at")
-        sections = list(sections[section_no - 1 : section_no])
+        sections = list(self.ordered_sections()[section_no - 1 : section_no])
         if not sections:
             return None
         lessons = list(sections[0].lessons.order_by("sort_order", "created_at")[lesson_no - 1 : lesson_no])

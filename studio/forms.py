@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, time
 from pathlib import Path
 
@@ -183,7 +184,7 @@ class NewVideoLessonForm(forms.Form):
     @staticmethod
     def matching_lesson(course, file_name):
         """Dosyanın yükleneceği videosuz ders; yoksa None (yeni ders açılır)."""
-        lesson, _reason = course.match_lesson_for_file(file_name)
+        lesson, _how, _reason = course.match_lesson_for_file(file_name)
         if lesson is None or not lesson.is_video or lesson.video_id or lesson.video_uploads.busy().exists():
             return None
         return lesson
@@ -357,11 +358,22 @@ class ExtraContentUploadForm(forms.Form):
         return self.lesson
 
 
+def file_batch(value):
+    """Tarayıcının dosyayla birlikte gönderdiği, aynı seferde bırakılan dosya adları (JSON liste); yoksa None."""
+    try:
+        names = json.loads(value) if value else None
+    except ValueError:
+        return None
+    return [str(name) for name in names] if isinstance(names, list) else None
+
+
 class ExtraContentBulkForm(forms.Form):
-    """Toplu ek içerik: her istekte bir dosya gelir, kursun dersleriyle dosya adına göre eşleştirilir."""
+    """Toplu ek içerik: her istekte bir dosya gelir, kursun dersleriyle dosya adına göre eşleştirilir; aynı seferde
+    bırakılan dosyaların adları (batch) bölüm içindeki sıralı hizalamada kullanılır."""
 
     file = forms.FileField()
     overwrite = forms.BooleanField(required=False)
+    batch = forms.CharField(required=False)
 
     def __init__(self, *args, course, **kwargs):
         self.course = course
@@ -374,7 +386,7 @@ class ExtraContentBulkForm(forms.Form):
         if upload is None:
             return cleaned
         self.text = read_extra_content(upload)
-        self.lesson, reason = self.course.match_lesson_for_file(upload.name)
+        self.lesson, self.how, reason = self.course.match_lesson_for_file(upload.name, batch=file_batch(cleaned.get("batch")) or [])
         if self.lesson is None:
             raise forms.ValidationError(reason)
         # İçeriği olan ders, üzerine yazma seçilmediyse değişmez.
@@ -384,15 +396,18 @@ class ExtraContentBulkForm(forms.Form):
     def save(self):
         if not self.skipped:
             self.lesson.set_extra_content(self.text)
-        self.learned = self.lesson.learn_video_file_name(self.cleaned_data["file"].name)
+        # Sıra numarasıyla (position) eşleşme yanlış olabilir; o durumda dosya adı derse yazılmaz.
+        self.learned = self.how in ("name", "aligned") and self.lesson.learn_video_file_name(self.cleaned_data["file"].name)
         return self.lesson
 
 
 class SubtitleBulkForm(forms.Form):
-    """Toplu altyazı: her istekte bir dosya gelir, kursun dersleriyle (önce video dosya adı) eşleştirilir."""
+    """Toplu altyazı: her istekte bir dosya gelir, kursun dersleriyle (önce video dosya adı) eşleştirilir; aynı seferde
+    bırakılan dosyaların adları (batch) bölüm içindeki sıralı hizalamada kullanılır."""
 
     file = forms.FileField()
     overwrite = forms.BooleanField(required=False)
+    batch = forms.CharField(required=False)
 
     def __init__(self, *args, course, **kwargs):
         self.course = course
@@ -408,7 +423,8 @@ class SubtitleBulkForm(forms.Form):
         if upload is None:
             return cleaned
         self.match_name, self.language = subtitle_language(upload.name)
-        self.lesson, reason = self.course.match_lesson_for_file(self.match_name)
+        batch = [subtitle_language(name)[0] for name in file_batch(cleaned.get("batch")) or []]
+        self.lesson, self.how, reason = self.course.match_lesson_for_file(self.match_name, batch=batch)
         if self.lesson is None:
             raise forms.ValidationError(reason)
         if not self.lesson.is_video:
@@ -420,7 +436,7 @@ class SubtitleBulkForm(forms.Form):
     def save(self):
         if not self.skipped:
             LessonSubtitle.attach(self.lesson, self.language, self.cleaned_data["file"])
-        self.learned = self.lesson.learn_video_file_name(self.match_name)
+        self.learned = self.how in ("name", "aligned") and self.lesson.learn_video_file_name(self.match_name)
         return self.lesson
 
 

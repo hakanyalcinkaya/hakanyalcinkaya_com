@@ -554,9 +554,14 @@
   function enqueueBulk(box, fileList) {
     box.querySelector("[data-extra-bulk-summary]").classList.remove("d-none");
     var subtitles = box.getAttribute("data-bulk-kind") === "subtitle";
+    var accepted = subtitles ? SUBTITLE_FILE : CONTENT_FILE;
+    // Aynı seferde bırakılan dosyaların adları her dosyayla gönderilir: sunucu bölüm içinde sırayla hizalar.
+    var batch = Array.prototype.filter.call(fileList, function (file) { return accepted.test(file.name); }).map(function (file) {
+      return file.name;
+    });
     Array.prototype.forEach.call(fileList, function (file) {
-      if ((subtitles ? SUBTITLE_FILE : CONTENT_FILE).test(file.name)) {
-        bulkQueue.push({ box: box, file: file });
+      if (accepted.test(file.name)) {
+        bulkQueue.push({ box: box, file: file, batch: batch });
       } else {
         bulkLine(box, file.name, "error", subtitles ? "Desteklenmeyen tür; SRT ya da VTT olmalı." : "Desteklenmeyen tür; Markdown, TXT ya da HTML olmalı.");
       }
@@ -575,6 +580,7 @@
     bulkProgress(job.box);
     var data = new FormData();
     data.append("file", job.file);
+    data.append("batch", JSON.stringify(job.batch));
     if (job.box.querySelector("[data-extra-bulk-overwrite]").checked) data.append("overwrite", "on");
     fetch(job.box.getAttribute("data-url"), { method: "POST", body: data, headers: { "X-CSRFToken": csrfToken() } })
       .then(function (response) {
