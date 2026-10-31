@@ -22,7 +22,7 @@ from course.models import Course
 from learning.models import Enrollment
 from newsletter.models import Subscriber
 from order.models import Order, OrderItem, OrderStatus
-from studio import cart_stats, course_stats
+from studio import cart_stats, course_stats, order_stats, periods
 from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
@@ -46,12 +46,24 @@ def _list_response(request, name, context):
 # Siparişler
 @superuser_required
 def orders(request):
-    """Siparişler: durum, kurs, paket, ödeme yolu, para birimi, kod, tarih aralığı ve arama filtreleri."""
+    """Ayın satış istatistikleri (?month=YYYY-AA) ve siparişler: durum, kurs, paket, ödeme yolu, para birimi, kod, tarih
+    aralığı ve arama filtreleri."""
     base = Order.objects.all()
     filters = OrderFilterForm(request.GET, orders=base)
     rows = filters.filter(base)
     page = _page(request, rows.select_related("user").prefetch_related("items").order_by("-created_at", "id"))
-    return _list_response(request, "orders", dict(page=page, filters=filters, revenue=course_stats.revenue(rows.paid())))
+    context = dict(page=page, filters=filters, revenue=course_stats.revenue(rows.paid()))
+    if not request.htmx or request.htmx.boosted:
+        period = periods.month_period(request.GET.get("month", ""))
+        context.update(
+            period=period,
+            stats=order_stats.summary(period),
+            providers=order_stats.providers(period["start"], period["end"]),
+            products=order_stats.products(period["start"], period["end"]),
+            codes=order_stats.codes(period["start"], period["end"]),
+            trend=order_stats.trend(period),
+        )
+    return _list_response(request, "orders", context)
 
 
 @superuser_required
@@ -133,7 +145,7 @@ def carts(request):
     page = _page(request, rows.order_by("-updated_at", "id"))
     context = dict(page=page, status=key, query=query, filters=filters)
     if not request.htmx or request.htmx.boosted:
-        period = cart_stats.month_period(request.GET.get("month", ""))
+        period = periods.month_period(request.GET.get("month", ""))
         context.update(
             period=period,
             funnel=cart_stats.funnel(period["start"], period["end"]),

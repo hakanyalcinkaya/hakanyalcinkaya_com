@@ -6,7 +6,7 @@ sepetinde sayılır. Çıkarılan ürünler ve ödeme adımına geçiş, kaydı 
 """
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.db.models import Count, Exists, OuterRef, Q, Sum
 from django.db.models.functions import Coalesce
@@ -19,28 +19,6 @@ from order.models import Order, OrderStatus
 
 # Sepet bu kadar gün değişmezse "uzun süredir bekliyor" sayılır.
 IDLE_DAYS = 7
-
-MONTHS = (
-    _("Ocak"), _("Şubat"), _("Mart"), _("Nisan"), _("Mayıs"), _("Haziran"),
-    _("Temmuz"), _("Ağustos"), _("Eylül"), _("Ekim"), _("Kasım"), _("Aralık"),
-)
-
-
-def month_period(value=""):
-    """?month=YYYY-AA değerinden ayın başı ve sonu (yerel saat); geçersiz ya da boşsa bu ay."""
-    today = timezone.localdate()
-    try:
-        year, month = (int(part) for part in value.split("-"))
-        datetime(year, month, 1)
-    except (TypeError, ValueError):
-        year, month = today.year, today.month
-    zone = timezone.get_current_timezone()
-    start = datetime(year, month, 1, tzinfo=zone)
-    end = datetime(year + month // 12, month % 12 + 1, 1, tzinfo=zone)
-    previous = (start - timedelta(days=1)).strftime("%Y-%m")
-    following = end.strftime("%Y-%m") if end.date() <= today else None
-    label = f"{MONTHS[month - 1]} {year}"
-    return dict(start=start, end=end, key=start.strftime("%Y-%m"), label=label, previous=previous, following=following)
 
 
 def _percent(part, whole):

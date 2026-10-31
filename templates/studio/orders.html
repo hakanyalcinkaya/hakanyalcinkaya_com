@@ -8,5 +8,7 @@
   </div>
   <a href="{% url 'studio:order_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Sipariş oluştur</a>
 </div>
+{% include "studio/partials/_order_stats.html" %}
+<h2 class="h6 mb-2">Siparişler</h2>
 {% include "studio/partials/_orders_list.html" %}
 {% endblock %}

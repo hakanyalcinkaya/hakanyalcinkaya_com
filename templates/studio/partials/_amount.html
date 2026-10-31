@@ -1,0 +1,1 @@
+{% load core_tags %}{% if currency == "TRY" %}{{ amount|money }}{% else %}{{ amount }} {{ currency }}{% endif %}

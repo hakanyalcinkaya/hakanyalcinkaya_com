@@ -1,0 +1,101 @@
+{# Ayın satış istatistikleri; ödeme tarihine göre. Tutarlar para birimine göre ayrı. #}
+{% url 'studio:orders' as orders_url %}
+<section class="mb-4" aria-labelledby="order-month-title">
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+    <h2 id="order-month-title" class="h6 mb-0">{{ period.label }} satışları</h2>
+    <a href="{{ orders_url }}?status=paid&date_from={{ period.start|date:'Y-m-d' }}&date_to={{ period.last_day|date:'Y-m-d' }}" class="small">siparişleri listele</a>
+    <nav class="btn-group btn-group-sm ms-auto" aria-label="Ay">
+      <a href="{{ orders_url }}?month={{ period.previous }}" class="btn btn-outline-secondary" aria-label="Önceki ay"><i class="bi bi-chevron-left" aria-hidden="true"></i></a>
+      {% if period.following %}<a href="{{ orders_url }}?month={{ period.following }}" class="btn btn-outline-secondary" aria-label="Sonraki ay"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>{% else %}<span class="btn btn-outline-secondary disabled" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>{% endif %}
+    </nav>
+  </div>
+  <div class="row g-3">
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+      <div class="small text-body-secondary">Ödenen sipariş</div>
+      <div class="fs-3 fw-semibold">{{ stats.count }}</div>
+      <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.count_change %}{{ stats.items }} ürün{% if stats.with_code %} · {{ stats.with_code }} kodlu{% endif %}</div>
+    </div></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+      <div class="small text-body-secondary">Gelir</div>
+      {% for row in stats.revenue %}
+      <div class="{% if forloop.first %}fs-3{% else %}fs-6{% endif %} fw-semibold">{% include "studio/partials/_amount.html" with amount=row.total currency=row.currency %}</div>
+      <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=row.change %}ort. {% include "studio/partials/_amount.html" with amount=row.average currency=row.currency %}{% if row.discount %} · −{% include "studio/partials/_amount.html" with amount=row.discount currency=row.currency %} indirim{% endif %}</div>
+      {% empty %}
+      <div class="fs-3 fw-semibold">—</div>
+      <div class="small text-body-tertiary">Bu ay ödeme yok</div>
+      {% endfor %}
+    </div></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+      <div class="small text-body-secondary">Alıcı</div>
+      <div class="fs-3 fw-semibold">{{ stats.buyers }}</div>
+      <div class="small text-body-tertiary">{{ stats.new_buyers }} ilk kez · {{ stats.returning_buyers }} tekrar alan</div>
+    </div></div>
+    <div class="col-6 col-lg-3"><a href="{{ orders_url }}?status=pending" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Ödeme bekleyen</div>
+      <div class="fs-3 fw-semibold">{{ stats.pending_count }}</div>
+      <div class="small text-body-tertiary">{% for row in stats.pending %}{% include "studio/partials/_amount.html" with amount=row.total currency=row.currency %}{% if not forloop.last %} · {% endif %}{% empty %}Bekleyen yok{% endfor %}{% if stats.failed %} · bu ay {{ stats.failed }} başarısız{% endif %}</div>
+    </a></div>
+  </div>
+</section>
+
+<div class="row g-4 mb-4">
+  <section class="col-lg-7" aria-labelledby="order-products-title">
+    <div class="border rounded p-3 h-100">
+      <h2 id="order-products-title" class="h6">Satılan ürünler</h2>
+      {% if products %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle small mb-0">
+          <thead><tr class="text-body-secondary"><th scope="col" class="fw-medium">Kurs / paket</th><th scope="col" class="fw-medium text-end">Adet</th><th scope="col" class="fw-medium text-end" title="Liste fiyatının altında (kodla ya da sahip olunan kurs düşülerek) satılan">İndirimli</th><th scope="col" class="fw-medium text-end">Ödenen</th></tr></thead>
+          <tbody>
+            {% for row in products %}
+            <tr>
+              <td>{% if row.is_bundle %}{{ row.title }} <span class="text-body-tertiary">(paket)</span>{% else %}<a href="{% url 'studio:course_stats' row.course_id %}" class="link-body-emphasis">{{ row.title }}</a>{% endif %}</td>
+              <td class="text-end">{{ row.count }}</td>
+              <td class="text-end">{{ row.discounted }}</td>
+              <td class="text-end text-nowrap">{% for amount in row.amounts %}{% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="small text-body-secondary mb-0">Bu ay satış yok.</p>
+      {% endif %}
+    </div>
+  </section>
+  <div class="col-lg-5 d-grid gap-4 align-content-start">
+    <section class="border rounded p-3" aria-labelledby="order-providers-title">
+      <h2 id="order-providers-title" class="h6">Ödeme yolu</h2>
+      <ul class="list-unstyled small mb-0 d-grid gap-1">
+        {% for row in providers %}
+        <li class="d-flex gap-2"><span>{{ row.label }}</span><span class="ms-auto text-body-secondary text-end">{{ row.count }} · {% for amount in row.amounts %}{% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% if not forloop.last %}, {% endif %}{% endfor %}</span></li>
+        {% empty %}
+        <li class="text-body-secondary">Bu ay satış yok.</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="border rounded p-3" aria-labelledby="order-codes-title">
+      <h2 id="order-codes-title" class="h6">İndirim kodları</h2>
+      <ul class="list-unstyled small mb-0 d-grid gap-1">
+        {% for row in codes %}
+        <li class="d-flex gap-2"><span class="font-monospace">{% if row.discount_id %}<a href="{% url 'studio:catalog_edit' 'discounts' row.discount_id %}" class="link-body-emphasis">{{ row.discount_code }}</a>{% else %}{{ row.discount_code }}{% endif %}</span><span class="ms-auto text-body-secondary text-end">{{ row.count }} kullanım · −{% include "studio/partials/_amount.html" with amount=row.discount currency=row.currency %}</span></li>
+        {% empty %}
+        <li class="text-body-secondary">Bu ay kod kullanılmadı.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="order-trend-title">
+  <h2 id="order-trend-title" class="h6 mb-3">Son 12 ay</h2>
+  <div class="d-grid gap-2">
+    {% for row in trend %}
+    <a href="{{ orders_url }}?month={{ row.key }}" class="row g-2 align-items-center small text-decoration-none link-body-emphasis{% if row.is_current %} fw-semibold{% endif %}"{% if row.is_current %} aria-current="true"{% endif %}>
+      <span class="col-4 col-md-2">{{ row.label }}</span>
+      <span class="col"><span class="studio-bar d-block" role="img" aria-label="{{ row.count }} sipariş"><span style="width: {{ row.percent }}%"></span></span></span>
+      <span class="col-4 col-md-3 text-end text-body-secondary">{{ row.count }}{% for amount in row.amounts %} · {% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% endfor %}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>

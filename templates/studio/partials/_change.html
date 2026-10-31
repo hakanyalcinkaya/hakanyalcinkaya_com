@@ -1,0 +1,1 @@
+{% if change %}<span class="{% if change.value > 0 %}text-success-emphasis{% elif change.value < 0 %}text-danger-emphasis{% endif %}" title="Önceki aya göre">{{ change.label }}</span> · {% endif %}
