@@ -302,22 +302,24 @@ class ReviewForm(forms.Form):
 
 
 class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
-    """Hesap ayarları → Video oynatma: varsayılan hız, kalite, altyazı, oynatınca tam ekran ve bitince sonraki derse geçiş."""
+    """Hesap ayarları → Video oynatma: varsayılan hız, kalite, altyazı, oynatınca tam ekran, ders açılınca oynatma ve bitince
+    sonraki derse geçiş."""
 
     class Meta:
         model = PlayerPreference
         # Altyazı dili şimdilik seçilmez (varsayılan Türkçe, PlayerPreference.subtitle_language). Açmak için alanı geri ekle:
-        # fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play", "autoplay_next")
-        fields = ("playback_rate", "quality", "subtitles_enabled", "fullscreen_on_play", "autoplay_next")
+        # fields = ("playback_rate", "quality", "subtitles_enabled", "subtitle_language", "fullscreen_on_play", "autoplay", "autoplay_next")
+        fields = ("playback_rate", "quality", "subtitles_enabled", "fullscreen_on_play", "autoplay", "autoplay_next")
         widgets = {
             "playback_rate": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
             "quality": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
             "subtitle_language": forms.Select(attrs={"class": "form-select form-select-lg fs-6"}),
         }
-        labels = {"fullscreen_on_play": "Oynat'a basınca tam ekrana geç", "autoplay_next": "Video bitince sonraki derse otomatik geç"}
+        labels = {"fullscreen_on_play": "Oynat'a basınca tam ekrana geç", "autoplay": "Ders açılınca videoyu otomatik oynat", "autoplay_next": "Video bitince sonraki derse otomatik geç"}
         help_texts = {
             "quality": "Videoda bu kalite yoksa bağlantına göre otomatik seçilir.",
             "subtitles_enabled": "Açıksa altyazısı olan videolarda Türkçe altyazı kendiliğinden açılır.",
+            "autoplay": "Tarayıcı sesli başlatmaya izin vermezse video sessiz başlar; sesi tek dokunuşla açarsın.",
             "autoplay_next": "Ders videosu bitince sıradaki ders hemen açılır ve kendiliğinden başlar.",
         }
 
@@ -329,6 +331,7 @@ class PlayerPreferenceForm(StyledFormMixin, forms.ModelForm):
             # Altyazı dili seçimi açılınca: Row(Column("subtitles_enabled", css_class="col-sm-6"), Column("subtitle_language", css_class="col-sm-6")),
             "subtitles_enabled",
             "fullscreen_on_play",
+            "autoplay",
             "autoplay_next",
             HTML('<p class="small text-body-secondary">Oynatıcıda hızı, kaliteyi ya da altyazıyı değiştirdiğinde bu ayarlar kendiliğinden güncellenir.</p>'),
             submit("Kaydet", icon="bi-check-lg", css_class="btn-primary"),
