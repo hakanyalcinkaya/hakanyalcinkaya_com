@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from cart.request_cart import current_cart
+from core import ratelimit
 from core.turnstile import client_ip
 from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
@@ -61,9 +62,19 @@ from page.forms import (
 )
 
 
+# Bülten aboneliği sınırı: IP başına saatte, e-posta başına günde (başkasının kutusuna onay e-postası yağdırılmasın).
+NEWSLETTER_IP_LIMIT = (5, 60 * 60)
+NEWSLETTER_EMAIL_LIMIT = (3, 24 * 60 * 60)
+
+
 def _newsletter(request):
     if request.method == "POST":
         form = NewsletterForm(request.POST)
+        if form.is_valid() and not (
+            ratelimit.allow("newsletter-ip", client_ip(request), *NEWSLETTER_IP_LIMIT)
+            and ratelimit.allow("newsletter-email", form.cleaned_data["email"], *NEWSLETTER_EMAIL_LIMIT)
+        ):
+            form.add_error(None, "Çok fazla abonelik isteği geldi; lütfen bir süre sonra tekrar dene.")
         if form.is_valid():
             # Form her sayfadan ana sayfaya gönderilir; kaynak olarak geldiği sayfa saklanır.
             source = urlparse(request.META.get("HTTP_REFERER", "")).path or request.path

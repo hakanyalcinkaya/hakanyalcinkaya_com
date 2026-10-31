@@ -109,6 +109,17 @@ VIMEO_EMBED_DOMAINS = env.list("VIMEO_EMBED_DOMAINS", default=["hakanyalcinkaya.
 
 # Celery: uzun süren video işleri (yükleme, işleme takibi, altyazı) arka planda çalışır.
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+
+# Önbellek: varsayılan süreç içi; istek sınırı sayaçları (core.ratelimit) bütün işçilerde ortak olsun diye Redis'te.
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "ratelimit": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("RATELIMIT_REDIS_URL", default=CELERY_BROKER_URL),
+        "KEY_PREFIX": "hy-ratelimit",
+        "OPTIONS": {"socket_timeout": 1, "socket_connect_timeout": 1},
+    },
+}
 CELERY_TASK_IGNORE_RESULT = True
 CELERY_TIMEZONE = "Europe/Istanbul"
 # Yükleme görevleri dakikalar sürer; işçi aynı anda tek görev alsın ki sıradakiler başka işçiye gidebilsin.
