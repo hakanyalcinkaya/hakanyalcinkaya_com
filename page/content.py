@@ -578,6 +578,24 @@ def rating_by_slug():
     return {row["course__slug"]: rating_summary(row["average"], row["count"]) for row in rows}
 
 
+def with_continue(cards, user):
+    """Sahip olunan kurs kartlarına kaldığı dersin adresi (Kurslarım'daki gibi): izlemeye başladıysa "devam et",
+    başlamadıysa ilk derse "başla"."""
+    if not user.is_authenticated or not any(card["owned"] for card in cards):
+        return cards
+    enrollments = Enrollment.objects.filter(user=user, course__status=Status.PUBLISHED).select_related("course")
+    lessons = {}
+    for enrollment in enrollments:
+        lesson = enrollment.continue_lesson()
+        if lesson is not None:
+            lessons[enrollment.course.slug] = (lesson.get_absolute_url(), bool(enrollment.last_lesson_id))
+    result = []
+    for card in cards:
+        url, started = lessons.get(card["slug"], (None, False)) if card["owned"] else (None, False)
+        result.append(dict(card, continue_url=url, continue_started=started))
+    return result
+
+
 def with_ratings(cards):
     ratings = rating_by_slug()
     return [dict(card, rating=ratings.get(card["slug"])) for card in cards]

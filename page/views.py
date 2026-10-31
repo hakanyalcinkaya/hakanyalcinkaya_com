@@ -87,7 +87,7 @@ def index(request):
         {
             "form": form,
             **content.home_reviews(),
-            "courses": content.with_ratings(cards),
+            "courses": content.with_ratings(content.with_continue(cards, request.user)),
             "stats": catalog_stats(cards),
         },
     )
@@ -107,7 +107,7 @@ def course_list(request):
         "form": form,
         "topic": topic,
         "page_title": f"{topic_label} kursları — Hakan Yalçınkaya" if topic_label else "Kurslar — Hakan Yalçınkaya",
-        "course_list": content.with_ratings(courses),
+        "course_list": content.with_ratings(content.with_continue(courses, request.user)),
         "filters": [],
         "result_text": f"{count} kurs",
         "empty": count == 0,

@@ -114,10 +114,12 @@ class Enrollment(BaseModel):
         return round(self.completed_lesson_count() / total * 100) if total else 0
 
     def continue_lesson(self):
-        """Kaldığı ders; yoksa tamamlanmamış ilk ders, o da yoksa ilk ders."""
+        """Kaldığı ders (hâlâ yayındaysa); yoksa tamamlanmamış ilk ders, o da yoksa ilk ders."""
+        lessons = self.course.published_lessons().select_related("section__course").order_by("section__sort_order", "sort_order")
         if self.last_lesson_id:
-            return self.last_lesson
-        lessons = self.course.published_lessons().order_by("section__sort_order", "sort_order")
+            last = lessons.filter(pk=self.last_lesson_id).first()
+            if last is not None:
+                return last
         done = LessonProgress.objects.filter(user=self.user, completed_at__isnull=False).values("lesson")
         return lessons.exclude(pk__in=done).first() or lessons.first()
 
