@@ -45,16 +45,26 @@
   {% endif %}
 
   <div class="row g-4 g-lg-5 mt-1">
+    {% if show_course_list %}
     <section class="{% if site_settings.lesson_notes_enabled %}col-lg-8{% else %}col-12{% endif %}" aria-labelledby="kurslar-baslik">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
         <h2 id="kurslar-baslik" class="h5 fw-semibold mb-0">Tüm kurslarım</h2>
+        {% if owned_count %}
         <div role="radiogroup" aria-label="Kurs filtresi" class="btn-group btn-group-sm">
           {% for item in filters %}
           <a href="{{ item.url }}" role="radio" aria-checked="{% if item.checked %}true{% else %}false{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}">{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
           {% endfor %}
         </div>
+        {% endif %}
       </div>
-      {% if empty %}
+      {% if not owned_count %}
+      <div class="text-center border rounded p-5 mt-3">
+        <i class="bi bi-collection-play fs-2 text-body-tertiary" aria-hidden="true"></i>
+        <p class="fw-semibold mt-2 mb-1">Satın aldığın bir kurs yok</p>
+        <p class="small text-body-secondary mb-3">Bir kursa kaydolduğunda burada listelenir; kaldığın yerden devam edebilirsin.</p>
+        <a href="{% url 'page:course_list' %}" class="btn btn-primary btn-sm">Kursları keşfet <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+      </div>
+      {% elif empty %}
       <div class="text-center border rounded p-5 mt-3">
         <i class="bi bi-collection-play fs-2 text-body-tertiary" aria-hidden="true"></i>
         <p class="fw-semibold mt-2 mb-1">Bu filtrede kurs yok</p>
@@ -87,9 +97,10 @@
       </div>
       {% endif %}
     </section>
+    {% endif %}
 
     {% if site_settings.lesson_notes_enabled %}
-    <aside class="col-lg-4" aria-labelledby="not-baslik">
+    <aside class="{% if show_course_list %}col-lg-4{% else %}col-12{% endif %}" aria-labelledby="not-baslik">
       <div class="d-flex align-items-center justify-content-between gap-2">
         <h2 id="not-baslik" class="h5 fw-semibold mb-0">Son notların</h2>
         <span class="small text-body-tertiary">{{ notes|length }} not</span>

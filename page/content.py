@@ -394,12 +394,15 @@ def library_page(user, status):
     ]
     shown = groups[status]
     owned_ids = {row["course_id"] for row in owned}
+    continue_course = next((row for row in owned if not row["finished"] and row["total"]), None)
     return {
         "owned": shown,
         "owned_count": len(owned),
         "others": [card for card in catalog_cards(user) if card.get("course_id") not in owned_ids and not card["owned"]],
         "filters": filters,
-        "continue_course": next((row for row in owned if not row["finished"] and row["total"]), None),
+        "continue_course": continue_course,
+        # Tek kurs "Kaldığın yer" kartında zaten görünüyorsa "Tüm kurslarım" listesi aynı kursu tekrarlamaz.
+        "show_course_list": not (len(owned) == 1 and continue_course is not None),
         "empty": not shown,
         "notes": [],
         "summary": f"{len(owned)} kurs",

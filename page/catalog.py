@@ -658,6 +658,7 @@ def library_page(status):
         "others": others,
         "filters": filters,
         "continue_course": continue_course,
+        "show_course_list": not (len(owned) == 1 and continue_course is not None),
         "empty": not shown,
         "notes": _library_notes(),
         "summary": f"{len(owned)} kurs · örnek ilerleme",
