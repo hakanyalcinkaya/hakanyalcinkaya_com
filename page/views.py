@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from cart.request_cart import current_cart
+from core.turnstile import client_ip
 from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
@@ -536,7 +537,7 @@ def anonymous_required(view):
 
 @anonymous_required
 def login(request):
-    form = LoginForm(request.POST if request.method == "POST" else None, request=request)
+    form = LoginForm(request.POST if request.method == "POST" else None, request=request, remote_ip=client_ip(request))
     if form.is_valid():
         auth_login(request, form.user)
         messages.success(request, f"Hoş geldin, {form.user.display_name}.")
@@ -546,7 +547,7 @@ def login(request):
 
 @anonymous_required
 def signup(request):
-    form = SignupForm(request.POST if request.method == "POST" else None)
+    form = SignupForm(request.POST if request.method == "POST" else None, remote_ip=client_ip(request))
     if form.is_valid():
         user = form.save()
         auth_login(request, user)
@@ -557,7 +558,7 @@ def signup(request):
 
 @anonymous_required
 def password_reset(request):
-    form = PasswordResetForm(request.POST if request.method == "POST" else None)
+    form = PasswordResetForm(request.POST if request.method == "POST" else None, remote_ip=client_ip(request))
     if form.is_valid():
         form.send_link(request)
         request.session[RESET_SESSION_KEY] = form.cleaned_data["email"]

@@ -4,9 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
-from ipware import get_client_ip
-
-from support import turnstile
+from core.turnstile import client_ip
 from support.forms import GuestTicketForm, ReplyForm, TicketForm
 from support.models import Ticket
 
@@ -15,7 +13,7 @@ def support(request):
     """Üye: yeni talep formu (konu, mesaj) ve kendi talepleri. Ziyaretçi: ad, e-posta, konu, mesaj ve bot doğrulaması."""
     data = request.POST if request.method == "POST" else None
     member = request.user.is_authenticated
-    form = TicketForm(data) if member else GuestTicketForm(data, remote_ip=get_client_ip(request)[0] or "")
+    form = TicketForm(data) if member else GuestTicketForm(data, remote_ip=client_ip(request))
     if form.is_valid():
         ticket = form.save(request.user if member else None)
         if member:
@@ -23,7 +21,7 @@ def support(request):
             return redirect(ticket)
         return redirect("support:sent")
     tickets = Ticket.objects.for_user(request.user).annotate(message_count=Count("messages"))
-    context = dict(form=form, tickets=tickets, turnstile=not member and turnstile.is_enabled())
+    context = dict(form=form, tickets=tickets)
     return render(request, "support/index.html", context)
 
 

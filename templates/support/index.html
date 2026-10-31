@@ -3,7 +3,7 @@
 
 {% block title %}Destek — Hakan Yalçınkaya{% endblock %}
 {% block description %}Kurslar, ödeme ya da hesabınla ilgili soruların için bize yaz.{% endblock %}
-{% block head %}{% if turnstile %}<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>{% endif %}{% endblock %}
+{% block head %}{% include "_base/turnstile_script.html" %}{% endblock %}
 
 {% block content %}
 <div class="container py-5">

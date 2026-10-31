@@ -1,9 +1,8 @@
-from crispy_forms.layout import HTML, Column, Layout, Row
+from crispy_forms.layout import Column, Layout, Row
 from django import forms
-from django.conf import settings
 
+from core.turnstile import TurnstileMixin
 from page.forms import StyledForm, email_field, name_field, submit
-from support import turnstile
 from support.models import MESSAGE_MAX_LENGTH, Ticket
 
 
@@ -43,30 +42,23 @@ class TicketForm(StyledForm):
         return Ticket.open(subject=data["subject"], body=data["body"], user=user)
 
 
-class GuestTicketForm(TicketForm):
+class GuestTicketForm(TurnstileMixin, TicketForm):
     """Giriş yapmamış kullanıcı: ad, e-posta, konu, mesaj ve Turnstile doğrulaması."""
 
     name = name_field()
     email = email_field()
 
-    def __init__(self, *args, remote_ip="", **kwargs):
-        self.remote_ip = remote_ip
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.order_fields(["name", "email", "subject", "body"])
 
     def layout_fields(self):
-        fields = [Row(Column("name", css_class="col-sm-6"), Column("email", css_class="col-sm-6")), "subject", "body"]
-        if turnstile.is_enabled():
-            fields.append(
-                HTML(f'<div class="cf-turnstile mb-3" data-sitekey="{settings.TURNSTILE_SITE_KEY}" data-theme="auto" data-language="tr"></div>')
-            )
-        return fields
-
-    def clean(self):
-        cleaned = super().clean()
-        if not turnstile.verify(self.data.get(turnstile.TOKEN_FIELD, ""), self.remote_ip):
-            raise forms.ValidationError("Robot olmadığını doğrulayamadık; kutucuğu işaretleyip tekrar dene.")
-        return cleaned
+        return [
+            Row(Column("name", css_class="col-sm-6"), Column("email", css_class="col-sm-6")),
+            "subject",
+            "body",
+            *self.turnstile_fields(),
+        ]
 
     def save(self, user=None):
         data = self.cleaned_data

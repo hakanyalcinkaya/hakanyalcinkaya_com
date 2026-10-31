@@ -1,0 +1,2 @@
+{# Cloudflare Turnstile betiği; yalnız doğrulamalı form olan sayfada (form.uses_turnstile) yüklenir. #}
+{% if form.uses_turnstile %}<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>{% endif %}

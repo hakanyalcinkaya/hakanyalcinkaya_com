@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from account.models import User
+from core.turnstile import TurnstileMixin
 from discount.models import Discount
 from learning.models import PlayerPreference
 
@@ -89,7 +90,7 @@ class NewsletterForm(StyledForm):
         )
 
 
-class LoginForm(StyledForm):
+class LoginForm(TurnstileMixin, StyledForm):
     email = email_field()
     password = password_field("Şifre", "current-password")
 
@@ -108,6 +109,7 @@ class LoginForm(StyledForm):
                     reverse("page:password_reset"),
                 )
             ),
+            *self.turnstile_fields(),
             submit("Giriş Yap"),
         )
 
@@ -122,7 +124,7 @@ class LoginForm(StyledForm):
         return cleaned
 
 
-class SignupForm(StyledFormMixin, forms.ModelForm):
+class SignupForm(TurnstileMixin, StyledFormMixin, forms.ModelForm):
     first_name = name_field(label="Ad", autocomplete="given-name")
     last_name = name_field(label="Soyad", placeholder="Soyadın", autocomplete="family-name", noun="soyadını")
     email = email_field()
@@ -148,6 +150,7 @@ class SignupForm(StyledFormMixin, forms.ModelForm):
             "email",
             "password",
             "terms",
+            *self.turnstile_fields(),
             submit("Hesap oluştur"),
         )
 
@@ -175,14 +178,14 @@ class SignupForm(StyledFormMixin, forms.ModelForm):
         return user
 
 
-class PasswordResetForm(StyledFormMixin, auth_forms.PasswordResetForm):
+class PasswordResetForm(TurnstileMixin, StyledFormMixin, auth_forms.PasswordResetForm):
     """Django'nun sıfırlama formu: kayıtlı adrese tek kullanımlık bağlantı gönderir, kayıtsız adreste sessiz kalır."""
 
     email = email_field()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.layout = Layout("email", submit("Sıfırlama bağlantısı gönder", icon="bi-send"))
+        self.helper.layout = Layout("email", *self.turnstile_fields(), submit("Sıfırlama bağlantısı gönder", icon="bi-send"))
 
     def send_link(self, request):
         self.save(request=request, use_https=request.is_secure())

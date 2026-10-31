@@ -1,6 +1,6 @@
 {% extends "_base/base.html" %}
 
-{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% include "_base/turnstile_script.html" %}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
