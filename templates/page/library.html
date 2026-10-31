@@ -26,8 +26,7 @@
       </div>
       <div class="col-md-7 d-flex flex-column">
         <div class="card-body p-4 p-lg-5">
-          <div class="small text-body-tertiary">Kaldığın yer</div>
-          <h2 id="devam-baslik" class="h4 fw-semibold mt-1">{{ continue_course.short }}</h2>
+          <h2 id="devam-baslik" class="h4 fw-semibold">{{ continue_course.short }}</h2>
           <p class="text-body-secondary mb-0"><span class="fw-medium text-body">{{ continue_course.continue_label }}</span> {{ continue_course.continue_title }}<br><span class="small">{{ continue_course.continue_section }}</span></p>
           {% if continue_course.last_watched %}
           <p class="small text-body-tertiary mt-3 mb-0"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Son izleme tarihi: <time datetime="{{ continue_course.last_watched|date:'c' }}" class="text-body-secondary">{{ continue_course.last_watched|date:"j F Y, H:i" }}</time></p>
