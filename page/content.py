@@ -18,6 +18,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 
 from account.models import User
+from cart.models import CartRemovalReason
 from cart.pricing import price_cart
 from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
@@ -267,7 +268,7 @@ def cart_cards(request, cards=None):
         for item in cart.items.filter(course__isnull=False).select_related("course"):
             card = cards.get(item.course.slug)
             if card is not None and card["owned"]:
-                cart.remove_item(item)
+                cart.remove_item(item, reason=CartRemovalReason.OWNED)
             elif card is not None:
                 kept.append(card)
     slugs = catalog.cart_slugs(request.session)

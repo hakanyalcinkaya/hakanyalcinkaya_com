@@ -12,6 +12,14 @@ class CartStatus(models.TextChoices):
     ACTIVE = "active", _("Aktif")
     EMPTIED = "emptied", _("Boşaltıldı")
     CONVERTED = "converted", _("Siparişe dönüştü")
+    GIFTED = "gifted", _("Hediye edildi")
+    MERGED = "merged", _("Üye sepetine katıldı")
+
+
+class CartRemovalReason(models.TextChoices):
+    REMOVED = "removed", _("Ziyaretçi çıkardı")
+    BUNDLE = "bundle", _("Paket eklenince çıktı")
+    OWNED = "owned", _("Kursa sahip olunca düştü")
 
 
 class CartQuerySet(models.QuerySet):
@@ -25,6 +33,15 @@ class CartQuerySet(models.QuerySet):
         key = request.session.session_key
         return self.active().filter(user__isnull=True, session_key=key).first() if key else None
 
+    def countable(self):
+        """İstatistikte sayılan sepetler: üye sepetine katılan misafir sepetleri hariç (ürünleri üye sepetinde sayılır).
+        Eskiden katılan sepet "siparişe dönüştü" olarak, dönüşme tarihi boş kalırdı."""
+        return self.exclude(status=CartStatus.MERGED).exclude(status=CartStatus.CONVERTED, converted_at__isnull=True)
+
+    def with_products(self):
+        """İçine en az bir ürün eklenmiş sepetler (sonradan çıkarılmış olsa da)."""
+        return self.filter(Q(items__isnull=False) | Q(removals__isnull=False)).distinct()
+
 
 class Cart(BaseModel):
     user = models.ForeignKey(
@@ -37,6 +54,8 @@ class Cart(BaseModel):
     )
     emptied_at = models.DateTimeField(_("boşaltılma"), null=True, blank=True)
     converted_at = models.DateTimeField(_("siparişe dönüşme"), null=True, blank=True)
+    checkout_at = models.DateTimeField(_("ödeme adımına geçiş"), null=True, blank=True)
+    gifted_at = models.DateTimeField(_("hediye edilme"), null=True, blank=True)
 
     objects = CartQuerySet.as_manager()
 
@@ -57,6 +76,10 @@ class Cart(BaseModel):
     @property
     def is_active(self):
         return self.status == CartStatus.ACTIVE
+
+    @property
+    def is_merged(self):
+        return self.status == CartStatus.MERGED or (self.status == CartStatus.CONVERTED and self.converted_at is None)
 
     def _check_active(self):
         if not self.is_active:
@@ -80,15 +103,25 @@ class Cart(BaseModel):
         """Paketi ekler; paketin içindeki tek kurslar sepetten çıkar ve listesi döner (bildirim için)."""
         self._check_active()
         with transaction.atomic():
-            contained = self.items.filter(course__in=bundle.courses.all())
-            removed = [item.course for item in contained.select_related("course")]
-            contained.delete()
+            contained = list(self.items.filter(course__in=bundle.courses.all()).select_related("course"))
+            removed = [item.course for item in contained]
+            for item in contained:
+                self.remove_item(item, reason=CartRemovalReason.BUNDLE)
             self.items.get_or_create(bundle=bundle)
         return removed
 
-    def remove_item(self, item):
+    def remove_item(self, item, reason=CartRemovalReason.REMOVED):
+        """Ürünü sepetten çıkarır; istatistik için ne zaman eklenip neden çıktığı kaydedilir."""
         self._check_active()
-        item.delete()
+        with transaction.atomic():
+            self.removals.create(course_id=item.course_id, bundle_id=item.bundle_id, reason=reason, added_at=item.created_at)
+            item.delete()
+
+    def reach_checkout(self):
+        """Ödeme adımına ilk geçiş (sepet → ödeme hunisi); sonraki ziyaretler değiştirmez."""
+        if self.checkout_at is None and self.is_active:
+            self.checkout_at = timezone.now()
+            self.save(update_fields=["checkout_at", "updated_at"])
 
     def apply_discount(self, discount, user=None):
         self._check_active()
@@ -115,6 +148,29 @@ class Cart(BaseModel):
         self.converted_at = timezone.now()
         self.save(update_fields=["status", "converted_at", "updated_at"])
 
+    def gift(self):
+        """Yönetici sepetteki kursları üyeye hediye eder (paketlerin kursları dahil); sahip olunanlar atlanır, sepet
+        "hediye edildi" olarak kapanır. Açılan kurs kayıtlarının listesi döner."""
+        from learning.models import Enrollment, EnrollmentSource
+
+        self._check_active()
+        if not self.user_id:
+            raise ValidationError(_("Misafir sepeti hediye edilemez; önce üye olması gerekir."))
+        created = []
+        with transaction.atomic():
+            for item in self.items.select_related("course", "bundle").prefetch_related("bundle__courses"):
+                courses = item.bundle.courses.all() if item.bundle_id else [item.course]
+                for course in courses:
+                    enrollment, is_new = Enrollment.objects.get_or_create(
+                        user=self.user, course=course, defaults={"source": EnrollmentSource.GIFT, "bundle": item.bundle}
+                    )
+                    if is_new:
+                        created.append(enrollment)
+            self.status = CartStatus.GIFTED
+            self.gifted_at = timezone.now()
+            self.save(update_fields=["status", "gifted_at", "updated_at"])
+        return created
+
     def merge_into(self, target):
         """Misafir sepetini giriş yapan kullanıcının sepetine taşır; sahip olunan kurslar taşınmaz. Bu sepet kapanır."""
         with transaction.atomic():
@@ -129,7 +185,10 @@ class Cart(BaseModel):
             if self.discount_id and not target.discount_id:
                 target.discount = self.discount
                 target.save(update_fields=["discount", "updated_at"])
-            self.status = CartStatus.CONVERTED
+            if self.checkout_at and not target.checkout_at:
+                target.checkout_at = self.checkout_at
+                target.save(update_fields=["checkout_at", "updated_at"])
+            self.status = CartStatus.MERGED
             self.save(update_fields=["status", "updated_at"])
         return target
 
@@ -173,6 +232,39 @@ class CartItem(BaseModel):
             models.UniqueConstraint(fields=("cart", "course"), condition=Q(course__isnull=False), name="cart_item_unique_course"),
             models.UniqueConstraint(fields=("cart", "bundle"), condition=Q(bundle__isnull=False), name="cart_item_unique_bundle"),
         ]
+
+    def __str__(self):
+        return str(self.product)
+
+    @property
+    def product(self):
+        return self.bundle if self.bundle_id else self.course
+
+
+class CartItemRemovalQuerySet(models.QuerySet):
+    def countable(self):
+        return self.filter(cart__in=Cart.objects.countable())
+
+
+class CartItemRemoval(BaseModel):
+    """Sepetten çıkan ürün (istatistik için): ne zaman eklendiği ve neden çıktığı. created_at çıkma zamanıdır."""
+
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="removals", verbose_name=_("sepet"))
+    course = models.ForeignKey(
+        "course.Course", on_delete=models.CASCADE, null=True, blank=True, related_name="cart_removals", verbose_name=_("kurs")
+    )
+    bundle = models.ForeignKey(
+        "course.Bundle", on_delete=models.CASCADE, null=True, blank=True, related_name="cart_removals", verbose_name=_("paket")
+    )
+    reason = models.CharField(_("neden"), max_length=20, choices=CartRemovalReason, default=CartRemovalReason.REMOVED)
+    added_at = models.DateTimeField(_("sepete eklenme"))
+
+    objects = CartItemRemovalQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("sepetten çıkan ürün")
+        verbose_name_plural = _("sepetten çıkan ürünler")
+        ordering = ("-created_at",)
 
     def __str__(self):
         return str(self.product)

@@ -1,0 +1,78 @@
+{% load core_tags %}
+{% url 'studio:carts' as carts_url %}
+{# Şu an bekleyenler: kartlar listedeki filtrelere bağlanır. #}
+<section class="mb-4" aria-labelledby="cart-waiting-title">
+  <h2 id="cart-waiting-title" class="h6 mb-2">Şu an</h2>
+  <div class="row g-3">
+    <div class="col-6 col-lg-3"><a href="{{ carts_url }}?status=active" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Sepette bekleyen</div>
+      <div class="fs-3 fw-semibold">{{ waiting.total }}</div>
+      <div class="small text-body-tertiary">{{ waiting.members }} üye · {{ waiting.guests }} misafir · {{ waiting.item_total }} ürün</div>
+    </a></div>
+    <div class="col-6 col-lg-3"><a href="{{ carts_url }}?status=cart-step" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Ödeme adımına geçmeyen</div>
+      <div class="fs-3 fw-semibold">{{ waiting.cart_step }}</div>
+      <div class="small text-body-tertiary">Sepet sayfasında kaldı</div>
+    </a></div>
+    <div class="col-6 col-lg-3"><a href="{{ carts_url }}?status=checkout-step" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Ödeme adımında kalan</div>
+      <div class="fs-3 fw-semibold">{{ waiting.checkout_step }}</div>
+      <div class="small text-body-tertiary">{% if waiting.pending_order %}{{ waiting.pending_order }} siparişi ödeme bekliyor{% else %}Ödeme sayfasını açıp ödemedi{% endif %}</div>
+    </a></div>
+    <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
+      <div class="small text-body-secondary">Bekleyen tutar</div>
+      <div class="fs-3 fw-semibold">{{ waiting.amount|money }}</div>
+      <div class="small text-body-tertiary">Liste fiyatıyla · {{ waiting.idle }} sepet {{ waiting.idle_days }}+ gündür değişmedi</div>
+    </div></div>
+  </div>
+</section>
+
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="cart-month-title">
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <h2 id="cart-month-title" class="h6 mb-0">{{ period.label }}</h2>
+    <nav class="btn-group btn-group-sm ms-auto" aria-label="Ay">
+      <a href="{{ carts_url }}?month={{ period.previous }}" class="btn btn-outline-secondary" aria-label="Önceki ay"><i class="bi bi-chevron-left" aria-hidden="true"></i></a>
+      {% if period.following %}<a href="{{ carts_url }}?month={{ period.following }}" class="btn btn-outline-secondary" aria-label="Sonraki ay"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>{% else %}<span class="btn btn-outline-secondary disabled" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>{% endif %}
+    </nav>
+  </div>
+  <p class="small text-body-secondary">Bu ay açılıp içine ürün eklenen {{ funnel.total }} sepet ({{ funnel.members }} üye, {{ funnel.guests }} misafir). Bugün: {{ funnel.open }} açık, {{ funnel.emptied }} boşaltıldı{% if funnel.gifted %}, {{ funnel.gifted }} hediye edildi{% endif %}.</p>
+  <div class="d-grid gap-2 mb-4">
+    {% for step in funnel.steps %}
+    <div class="row g-2 align-items-center small">
+      <span class="col-5 col-md-3">{{ step.label }}</span>
+      <span class="col"><span class="studio-bar d-block" role="img" aria-label="%{{ step.percent }}"><span style="width: {{ step.percent }}%"></span></span></span>
+      <span class="col-4 col-md-3 text-end text-body-secondary">{{ step.count }} · %{{ step.percent }}{% if not forloop.first and step.lost %} <span class="text-danger-emphasis">−{{ step.lost }}</span>{% endif %}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h3 class="h6">Ürünler</h3>
+  {% if products %}
+  <div class="table-responsive">
+    <table class="table table-sm align-middle small mb-0">
+      <thead>
+        <tr class="text-body-secondary">
+          <th scope="col" class="fw-medium">Kurs / paket</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay sepete eklenme sayısı">Eklenen</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay ziyaretçinin sepetten çıkardığı">Çıkarılan</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay ödenen siparişle sepetten satın alınan">Satın alınan</th>
+          <th scope="col" class="fw-medium text-end" title="Bugün açık sepetlerde">Şu an sepette</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in products %}
+        <tr>
+          <td>{% if row.is_bundle %}{{ row.product.title }} <span class="text-body-tertiary">(paket)</span>{% else %}<a href="{% url 'studio:course_stats' row.product.pk %}" class="link-body-emphasis">{{ row.product.title }}</a>{% endif %}</td>
+          <td class="text-end">{{ row.added }}</td>
+          <td class="text-end">{{ row.removed }}{% if row.removed %} <span class="text-body-tertiary">%{{ row.removed_percent }}</span>{% endif %}{% if row.dropped %}<div class="text-body-tertiary" title="Paket eklenince ya da kursa sahip olunca sepetten düştü">+{{ row.dropped }} otomatik</div>{% endif %}</td>
+          <td class="text-end">{{ row.purchased }}</td>
+          <td class="text-end">{{ row.waiting }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="small text-body-secondary mb-0">Bu ay sepete ürün eklenmedi.</p>
+  {% endif %}
+</section>

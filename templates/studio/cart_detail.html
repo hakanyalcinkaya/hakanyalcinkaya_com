@@ -1,0 +1,107 @@
+{% extends "studio/base.html" %}
+{% load core_tags %}
+{% block studio_title %}Sepet · {% if cart.user %}{{ cart.user.email }}{% else %}Misafir{% endif %}{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:carts' %}" class="link-secondary text-decoration-none">Sepetler</a> <span class="text-body-tertiary">/</span></nav>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">{% if cart.user %}{{ cart.user.email }}{% else %}Misafir sepeti{% endif %}</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2 small text-body-secondary">
+      <span class="badge rounded-1 border text-body-secondary fw-medium">{{ cart.get_status_display }}</span>
+      {% if cart.is_active and cart.checkout_at %}<span class="badge rounded-1 text-bg-warning fw-medium">Ödeme adımında</span>{% endif %}
+      {% if cart.user %}<a href="{% url 'studio:student_detail' cart.user_id %}">üye sayfası</a>{% else %}<span class="font-monospace">{{ cart.session_key|truncatechars:12|default:"—" }}</span>{% endif %}
+    </div>
+  </div>
+  {% if cart.is_active and cart.user_id and summary.count %}
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'studio:order_create' %}?cart={{ cart.id }}" class="btn btn-primary btn-sm"><i class="bi bi-bank me-1" aria-hidden="true"></i>Havale/EFT siparişi oluştur</a>
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:cart_gift' cart.id %}" hx-confirm="Sepetteki kurslar {{ cart.user.email }} hesabına hediye olarak açılsın mı? Sipariş ve ödeme oluşmaz, sepet kapanır."><i class="bi bi-gift me-1" aria-hidden="true"></i>Hediye et</button>
+  </div>
+  {% endif %}
+</div>
+{% if cart.is_active and not cart.user_id and summary.count %}
+<div class="alert alert-secondary small" role="status">Misafir sepeti: sipariş açmak ya da hediye etmek için kişinin üye olması gerekir. Giriş yapınca bu sepet üyenin sepetine katılır.</div>
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="border rounded mb-4" aria-labelledby="cart-items-title">
+      <h2 id="cart-items-title" class="h6 px-3 pt-3 mb-1">Sepettekiler</h2>
+      <p class="small text-body-tertiary px-3 mb-2">Bugünkü fiyatlarla{% if cart.discount %} ve {{ cart.discount.code }} koduyla{% endif %}; pakette üyenin sahip olduğu kursların ödediği tutar düşülür.</p>
+      <ul class="list-group list-group-flush">
+        {% for line in summary.lines %}
+        <li class="list-group-item">
+          <div class="d-flex flex-wrap gap-2">
+            <span>{% if line.item.course_id %}<a href="{% url 'studio:course_stats' line.item.course_id %}" class="link-body-emphasis">{{ line.product.title }}</a>{% else %}{{ line.product.title }} <span class="small text-body-tertiary">(paket)</span>{% endif %}</span>
+            <span class="ms-auto">{% if line.final_price != line.base_price %}<s class="small text-body-tertiary me-1">{{ line.base_price|money }}</s>{% endif %}{{ line.final_price|money }}</span>
+          </div>
+          <div class="small text-body-tertiary">{{ line.item.created_at|date:"d.m.Y H:i" }} eklendi{% if line.owned_courses %} · sahip olduğu: {% for course in line.owned_courses %}{{ course.title }}{% if not forloop.last %}, {% endif %}{% endfor %} (−{{ line.owned_credit|money }}){% endif %}</div>
+        </li>
+        {% empty %}
+        <li class="list-group-item small text-body-secondary py-3 text-center">Sepette ürün yok.</li>
+        {% endfor %}
+        {% if summary.count %}
+        <li class="list-group-item small text-body-secondary d-flex"><span>Ara toplam</span><span class="ms-auto">{{ summary.subtotal|money }}</span></li>
+        {% if summary.discount_total %}<li class="list-group-item small text-body-secondary d-flex"><span>İndirim{% if cart.discount %} (<a href="{% url 'studio:catalog_edit' 'discounts' cart.discount_id %}" class="link-secondary">{{ cart.discount.code }}</a>){% endif %}</span><span class="ms-auto">−{{ summary.discount_total|money }}</span></li>{% endif %}
+        <li class="list-group-item d-flex fw-semibold"><span>Toplam (KDV dahil)</span><span class="ms-auto">{{ summary.total|money }}</span></li>
+        {% endif %}
+      </ul>
+    </section>
+
+    <section class="border rounded mb-4" aria-labelledby="cart-removals-title">
+      <h2 id="cart-removals-title" class="h6 px-3 pt-3">Sepetten çıkanlar</h2>
+      <ul class="list-group list-group-flush">
+        {% for removal in removals %}
+        <li class="list-group-item small">
+          <div class="d-flex flex-wrap gap-2"><span>{{ removal.product.title }}{% if removal.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}</span><span class="ms-auto text-body-secondary">{{ removal.get_reason_display }}</span></div>
+          <div class="text-body-tertiary">{{ removal.added_at|date:"d.m.Y H:i" }} eklendi · {{ removal.created_at|date:"d.m.Y H:i" }} çıktı</div>
+        </li>
+        {% empty %}
+        <li class="list-group-item small text-body-secondary">Çıkarılan ürün yok.</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="border rounded" aria-labelledby="cart-orders-title">
+      <h2 id="cart-orders-title" class="h6 px-3 pt-3">Siparişler</h2>
+      <div class="list-group list-group-flush">
+        {% for order in orders %}
+        <a href="{% url 'studio:order_detail' order.id %}" class="list-group-item list-group-item-action py-2">
+          <div class="d-flex flex-wrap align-items-center gap-2"><span class="font-monospace small">{{ order.number }}</span>{% include "studio/partials/_order_status.html" %}<span class="small text-body-tertiary">{{ order.payment_method_label }}</span><span class="ms-auto fw-medium">{% if order.currency == "TRY" %}{{ order.total|money }}{% else %}{{ order.total }} {{ order.currency }}{% endif %}</span></div>
+          <div class="small text-body-secondary">{% for item in order.items.all %}{{ item.title }}{% if not forloop.last %} · {% endif %}{% endfor %} · {{ order.paid_at|default:order.created_at|date:"d.m.Y" }}</div>
+        </a>
+        {% empty %}
+        <div class="list-group-item small text-body-secondary">Bu sepetten sipariş açılmadı.</div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <div class="col-lg-5">
+    <section class="border rounded p-3 mb-4" aria-labelledby="cart-steps-title">
+      <h2 id="cart-steps-title" class="h6">Adımlar</h2>
+      <ol class="list-unstyled small mb-0 d-grid gap-2">
+        <li class="d-flex gap-2"><i class="bi bi-cart-plus text-body-tertiary" aria-hidden="true"></i><span>Sepet açıldı</span><span class="ms-auto text-body-secondary">{{ cart.created_at|date:"d.m.Y H:i" }}</span></li>
+        <li class="d-flex gap-2"><i class="bi bi-credit-card text-body-tertiary" aria-hidden="true"></i><span>Ödeme adımına geçti</span><span class="ms-auto text-body-secondary">{{ cart.checkout_at|date:"d.m.Y H:i"|default:"—" }}</span></li>
+        {% if cart.emptied_at %}<li class="d-flex gap-2"><i class="bi bi-cart-x text-body-tertiary" aria-hidden="true"></i><span>Boşaltıldı</span><span class="ms-auto text-body-secondary">{{ cart.emptied_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
+        {% if cart.converted_at %}<li class="d-flex gap-2"><i class="bi bi-check2-circle text-success" aria-hidden="true"></i><span>Ödendi, sipariş oldu</span><span class="ms-auto text-body-secondary">{{ cart.converted_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
+        {% if cart.gifted_at %}<li class="d-flex gap-2"><i class="bi bi-gift text-success" aria-hidden="true"></i><span>Hediye edildi</span><span class="ms-auto text-body-secondary">{{ cart.gifted_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
+        {% if cart.is_merged %}<li class="d-flex gap-2"><i class="bi bi-person-check text-body-tertiary" aria-hidden="true"></i><span>Giriş yapınca üye sepetine katıldı</span></li>{% endif %}
+        <li class="d-flex gap-2"><i class="bi bi-clock-history text-body-tertiary" aria-hidden="true"></i><span>Son değişiklik</span><span class="ms-auto text-body-secondary" title="{{ cart.updated_at|date:'d.m.Y H:i' }}">{{ cart.updated_at|ago }}</span></li>
+      </ol>
+    </section>
+    {% if cart.user %}
+    <section class="border rounded p-3" aria-labelledby="cart-owned-title">
+      <h2 id="cart-owned-title" class="h6">Üyenin kursları</h2>
+      <ul class="list-unstyled small mb-0">
+        {% for enrollment in owned %}
+        <li class="d-flex gap-2"><span>{{ enrollment.course.title }}</span><span class="ms-auto text-body-tertiary">{{ enrollment.get_source_display }}</span></li>
+        {% empty %}
+        <li class="text-body-secondary">Henüz kursu yok.</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

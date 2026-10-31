@@ -1,13 +1,24 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from cart.models import Cart, CartItem
+from cart.models import Cart, CartItem, CartItemRemoval
 
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
     extra = 0
     autocomplete_fields = ("course", "bundle")
+
+
+class CartItemRemovalInline(admin.TabularInline):
+    model = CartItemRemoval
+    extra = 0
+    can_delete = False
+    fields = ("course", "bundle", "reason", "added_at", "created_at")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Cart)
@@ -17,8 +28,8 @@ class CartAdmin(admin.ModelAdmin):
     search_fields = ("user__email", "session_key")
     list_select_related = ("user", "discount")
     autocomplete_fields = ("user", "discount")
-    readonly_fields = ("emptied_at", "converted_at", "created_at", "updated_at")
-    inlines = (CartItemInline,)
+    readonly_fields = ("checkout_at", "emptied_at", "converted_at", "gifted_at", "created_at", "updated_at")
+    inlines = (CartItemInline, CartItemRemovalInline)
 
     @admin.display(description=_("ürün"))
     def item_count(self, obj):

@@ -442,6 +442,8 @@ def checkout(request):
         return redirect("page:cart")
     member = request.user.is_authenticated
     cart = current_cart(request)
+    if cart is not None:
+        cart.reach_checkout()
     action = request.POST.get("action", "pay") if request.method == "POST" else None
     coupon_form, done = _coupon(request, cart, items, action, "page:checkout")
     if done:

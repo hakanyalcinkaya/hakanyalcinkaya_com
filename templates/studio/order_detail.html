@@ -43,6 +43,7 @@
     <dl class="border rounded p-3 small mb-0">
       <dt>Alıcı</dt>
       <dd>{{ order.email }}{% if order.user %} · <a href="{% url 'studio:student_detail' order.user_id %}">üye sayfası</a>{% endif %}</dd>
+      {% if order.cart_id %}<dt>Sepet</dt><dd><a href="{% url 'studio:cart_detail' order.cart_id %}">sepet ayrıntısı</a></dd>{% endif %}
       <dt>Ödeme yolu</dt><dd>{{ order.payment_method_label|default:"—" }}</dd>
       <dt>Ödeme referansı</dt><dd class="font-monospace text-break">{{ order.payment_reference|default:"—" }}</dd>
       <dt>Para birimi</dt><dd class="mb-0">{{ order.currency }}</dd>

@@ -68,7 +68,7 @@
     </div>
   </section>
   <section class="col-lg-5" aria-labelledby="member-cart-title">
-    <h2 id="member-cart-title" class="h5">Sepetinde</h2>
+    <div class="d-flex align-items-baseline gap-2"><h2 id="member-cart-title" class="h5">Sepetinde</h2>{% if cart_items %}<a href="{% url 'studio:cart_detail' cart_items.0.cart_id %}" class="ms-auto small">Sepet ayrıntısı</a>{% endif %}</div>
     <ul class="list-group">
       {% for item in cart_items %}
       <li class="list-group-item small d-flex"><span>{{ item.product.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}</span><span class="ms-auto text-body-tertiary">{{ item.created_at|ago }}</span></li>

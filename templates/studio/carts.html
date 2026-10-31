@@ -3,7 +3,9 @@
 {% block studio_content %}
 <div class="mb-4">
   <h1 class="h3 mb-1">Sepetler</h1>
-  <p class="text-body-secondary mb-0">İçinde ürün olan sepetler. Boşaltılan sepet silinmez; ödemeyle siparişe dönüşür. Kurs bazında “sepette bırakanlar” kursun istatistik sayfasında.</p>
+  <p class="text-body-secondary mb-0">Sepet hunisi, ürünler ve içinde ürün olan sepetler. Boşaltılan sepet silinmez; ödemeyle siparişe dönüşür. Ayrıntı ve elle işlemler (havale/EFT siparişi, hediye) için sepete tıkla.</p>
 </div>
+{% include "studio/partials/_cart_stats.html" %}
+<h2 class="h6 mb-2">Sepetler</h2>
 {% include "studio/partials/_carts_list.html" %}
 {% endblock %}

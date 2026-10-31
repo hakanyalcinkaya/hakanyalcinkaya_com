@@ -4,6 +4,7 @@ Listeler filtreyi GET parametresinde tutar; HTMX isteğinde liste, kaydırınca 
 """
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch, Q
 from django.http import HttpResponseBadRequest
@@ -16,11 +17,12 @@ from django_htmx.http import HttpResponseClientRedirect
 
 from account.models import User
 from cart.models import Cart, CartItem, CartStatus
+from cart.pricing import price_cart
 from course.models import Course
 from learning.models import Enrollment
 from newsletter.models import Subscriber
 from order.models import Order, OrderItem, OrderStatus
-from studio import course_stats
+from studio import cart_stats, course_stats
 from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
@@ -105,15 +107,18 @@ def order_mark_paid(request, order_id):
 # Sepetler
 CART_FILTERS = {
     "active": (gettext_lazy("Açık"), Q(status=CartStatus.ACTIVE)),
+    "cart-step": (gettext_lazy("Sepette bekleyen"), Q(status=CartStatus.ACTIVE, checkout_at__isnull=True)),
+    "checkout-step": (gettext_lazy("Ödeme adımında kalan"), Q(status=CartStatus.ACTIVE, checkout_at__isnull=False)),
     "emptied": (gettext_lazy("Boşaltılan"), Q(status=CartStatus.EMPTIED)),
-    "converted": (gettext_lazy("Siparişe dönüşen"), Q(status=CartStatus.CONVERTED)),
+    "converted": (gettext_lazy("Siparişe dönüşen"), Q(status=CartStatus.CONVERTED, converted_at__isnull=False)),
+    "gifted": (gettext_lazy("Hediye edilen"), Q(status=CartStatus.GIFTED)),
     "all": (gettext_lazy("Tümü"), Q()),
 }
 
 
 @superuser_required
 def carts(request):
-    """İçinde ürün olan sepetler: açık, boşaltılan, siparişe dönüşen; e-posta araması."""
+    """Sepet istatistikleri (ay seçilir, ?month=YYYY-AA) ve içinde ürün olan sepetler: duruma göre filtre, e-posta araması."""
     key = request.GET.get("status", "active")
     if key not in CART_FILTERS:
         key = "active"
@@ -126,7 +131,50 @@ def carts(request):
     items = CartItem.objects.select_related("course", "bundle")
     rows = base.filter(CART_FILTERS[key][1]).select_related("user", "discount").prefetch_related(Prefetch("items", queryset=items))
     page = _page(request, rows.order_by("-updated_at", "id"))
-    return _list_response(request, "carts", dict(page=page, status=key, query=query, filters=filters))
+    context = dict(page=page, status=key, query=query, filters=filters)
+    if not request.htmx or request.htmx.boosted:
+        period = cart_stats.month_period(request.GET.get("month", ""))
+        context.update(
+            period=period,
+            funnel=cart_stats.funnel(period["start"], period["end"]),
+            products=cart_stats.products(period["start"], period["end"]),
+            waiting=cart_stats.waiting(),
+        )
+    return _list_response(request, "carts", context)
+
+
+def _cart(cart_id):
+    return get_object_or_404(Cart.objects.select_related("user", "discount"), pk=cart_id)
+
+
+@superuser_required
+def cart_detail(request, cart_id):
+    """Sepetin içeriği bugünkü fiyatlarla, adımları (açılış, ödeme adımı, kapanış), çıkarılan ürünler ve siparişleri;
+    açık üye sepetinde havale/EFT siparişi açma ya da hediye etme."""
+    cart = _cart(cart_id)
+    context = dict(
+        cart=cart,
+        summary=price_cart(cart),
+        removals=cart.removals.select_related("course", "bundle"),
+        orders=cart.orders.prefetch_related("items").order_by("-created_at", "id"),
+        owned=Enrollment.objects.filter(user=cart.user).select_related("course").order_by("course__title") if cart.user_id else [],
+    )
+    return render(request, "studio/cart_detail.html", context)
+
+
+@superuser_required
+@require_POST
+def cart_gift(request, cart_id):
+    """Sepetteki kursları üyeye hediye eder; sepet "hediye edildi" olarak kapanır, ödeme ya da sipariş açılmaz."""
+    cart = _cart(cart_id)
+    try:
+        created = cart.gift()
+    except ValidationError as error:
+        messages.error(request, " ".join(error.messages))
+    else:
+        messages.success(request, _("%(count)s kurs erişimi hediye olarak açıldı; sepet kapandı.") % {"count": len(created)})
+    url = reverse("studio:cart_detail", args=[cart.pk])
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
 
 
 # Öğrenciler (üyeler)

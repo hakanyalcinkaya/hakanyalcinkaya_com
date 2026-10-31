@@ -1,12 +1,13 @@
 {% load core_tags %}
 {% for cart in page %}
-<div class="list-group-item py-2">
+<div class="list-group-item list-group-item-action py-2 position-relative">
   <div class="d-flex flex-wrap align-items-center gap-2">
-    {% if cart.user %}<a href="{% url 'studio:student_detail' cart.user_id %}" class="fw-medium link-body-emphasis">{{ cart.user.email }}</a>{% else %}<span class="fw-medium text-body-secondary">Misafir</span>{% endif %}
+    <a href="{% url 'studio:cart_detail' cart.id %}" class="fw-medium link-body-emphasis text-decoration-none stretched-link">{% if cart.user %}{{ cart.user.email }}{% else %}Misafir{% endif %}</a>
     <span class="badge rounded-1 border text-body-secondary fw-medium">{{ cart.get_status_display }}</span>
+    {% if cart.is_active and cart.checkout_at %}<span class="badge rounded-1 text-bg-warning fw-medium">Ödeme adımında</span>{% endif %}
     {% if cart.discount %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace">{{ cart.discount.code }}</span>{% endif %}
     <time class="ms-auto small text-body-tertiary" datetime="{{ cart.updated_at|date:'c' }}" title="{{ cart.updated_at|date:'d.m.Y H:i' }}">{{ cart.updated_at|ago }}</time>
-    {% if cart.user_id and cart.is_active %}<a href="{% url 'studio:order_create' %}?cart={{ cart.id }}" class="btn btn-outline-primary btn-sm py-0">Sipariş oluştur</a>{% endif %}
+    {% if cart.user_id and cart.is_active %}<a href="{% url 'studio:order_create' %}?cart={{ cart.id }}" class="btn btn-outline-primary btn-sm py-0 position-relative z-2">Sipariş oluştur</a>{% endif %}
   </div>
   <div class="small text-body-secondary">{% for item in cart.items.all %}{{ item.product.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
 </div>
