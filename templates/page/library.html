@@ -9,7 +9,7 @@
   <header class="d-flex flex-wrap align-items-end justify-content-between gap-3">
     <div>
       <h1 class="display-6 fw-semibold mb-1">Kurslarım</h1>
-      <p class="text-body-secondary mb-0">{{ summary }}</p>
+      {% if owned_count %}<p class="text-body-secondary mb-0">{{ summary }}</p>{% endif %}
     </div>
     <a href="{% url 'page:course_list' %}" class="btn btn-outline-secondary">Tüm Kurslar</a>
   </header>
