@@ -1,0 +1,55 @@
+{# Destek listesi; filtreler (durum, arama, kimden) GET parametresinde, HTMX ile yalnız bu blok yenilenir. Seçilenlere toplu işlem (studio.js, data-bulk-*). #}
+{% url 'studio:support_list' as list_url %}{% url 'studio:support_bulk' as bulk_url %}
+<div id="support-list">
+  <form id="support-filters" class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#support-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
+    <input type="hidden" name="status" value="{{ status }}">
+    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Durum">
+      {% for item in filters %}
+      <a href="{{ list_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}" hx-get="{{ list_url }}?status={{ item.key }}{% if filter_query %}&{{ filter_query }}{% endif %}" hx-target="#support-list" hx-swap="outerHTML" hx-push-url="true"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+      {% endfor %}
+    </div>
+    <select name="sender" class="form-select form-select-sm w-auto mw-100" aria-label="Kimden">
+      <option value="">Herkes</option>
+      {% for key, label in senders %}<option value="{{ key }}"{% if sender == key %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto flex-grow-1" style="min-width:12rem;max-width:22rem" placeholder="Konu, ad, e-posta ya da mesajda ara" aria-label="Ara">
+  </form>
+
+  {% if tickets %}
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-2 small" data-bulk-scope>
+    <label class="form-check d-inline-flex align-items-center gap-2 mb-0 ps-3">
+      <input class="form-check-input m-0" type="checkbox" data-bulk-all>
+      <span>Tümünü seç</span>
+    </label>
+    <div class="d-none flex-wrap align-items-center gap-2" data-bulk-bar role="region" aria-label="Seçili talepler için işlemler">
+      <span class="fw-medium"><span data-bulk-count>0</span> talep seçili</span>
+      {% with include="[data-bulk-check]:checked, #support-filters" %}
+      <div class="btn-group btn-group-sm" role="group" aria-label="Durum">
+        <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "close"}' hx-include="{{ include }}" hx-target="#support-list" hx-swap="outerHTML"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Kapat</button>
+        <button type="button" class="btn btn-outline-secondary" hx-post="{{ bulk_url }}" hx-vals='{"action": "reopen"}' hx-include="{{ include }}" hx-target="#support-list" hx-swap="outerHTML"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Yeniden aç</button>
+        <button type="button" class="btn btn-outline-success" hx-post="{{ bulk_url }}" hx-vals='{"action": "answered"}' hx-include="{{ include }}" hx-target="#support-list" hx-swap="outerHTML" title="E-postayla site dışında yanıtladıysan; kullanıcıya bildirim gitmez"><i class="bi bi-envelope-check me-1" aria-hidden="true"></i>Yanıtlandı say</button>
+      </div>
+      <button type="button" class="btn btn-outline-danger btn-sm" hx-post="{{ bulk_url }}" hx-vals='{"action": "delete"}' hx-include="{{ include }}" hx-target="#support-list" hx-swap="outerHTML" hx-confirm="Seçili talepler ve bütün mesajları silinsin mi? Geri alınamaz."><i class="bi bi-trash3 me-1" aria-hidden="true"></i>Sil</button>
+      {% endwith %}
+      <button type="button" class="btn btn-link btn-sm link-secondary" data-bulk-clear>Seçimi temizle</button>
+    </div>
+    <span class="ms-auto text-body-secondary">{{ total }} talep{% if total > tickets|length %} · ilk {{ tickets|length }} gösteriliyor{% endif %}</span>
+  </div>
+  <div class="list-group">
+    {% for ticket in tickets %}
+    <div class="list-group-item list-group-item-action d-flex align-items-start gap-3 py-3 position-relative">
+      <input class="form-check-input mt-1 flex-shrink-0 position-relative z-2" type="checkbox" name="tickets" value="{{ ticket.id }}" data-bulk-check aria-label="{{ ticket.subject }} talebini seç">
+      <div class="min-w-0 flex-grow-1">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <a href="{{ ticket.get_studio_url }}" class="fw-semibold text-truncate flex-grow-1 link-body-emphasis text-decoration-none stretched-link">{{ ticket.subject }}</a>
+          <span class="badge {{ ticket.status_badge }} fw-medium">{{ ticket.get_status_display }}</span>
+        </div>
+        <div class="small text-body-secondary mt-1">{{ ticket.name }} · {{ ticket.email }}{% if ticket.is_guest %} · <span class="text-body-tertiary">hesabı yok</span>{% endif %} · {{ ticket.message_count }} mesaj · <time datetime="{{ ticket.last_message_at|date:'c' }}">{{ ticket.last_message_at|date:"j F Y, H:i" }}</time></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="border rounded p-4 text-center text-body-secondary"><i class="bi bi-inbox fs-3 d-block text-body-tertiary mb-2" aria-hidden="true"></i>Bu filtrede talep yok.</div>
+  {% endif %}
+</div>

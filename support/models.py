@@ -37,6 +37,22 @@ class TicketQuerySet(models.QuerySet):
         """Üyenin henüz görmediği yanıtı olanlar (site menüsündeki "yeni mesaj" rozeti)."""
         return self.filter(has_unread_reply=True)
 
+    def search(self, text):
+        """Konu, ad, e-posta ya da mesaj metninde geçenler."""
+        text = text.strip()
+        if not text:
+            return self
+        return self.filter(
+            models.Q(subject__icontains=text)
+            | models.Q(name__icontains=text)
+            | models.Q(email__icontains=text)
+            | models.Q(messages__body__icontains=text)
+        ).distinct()
+
+    def set_status(self, status):
+        """Toplu durum değişikliği (stüdyo); e-posta gönderilmez. Etkilenen talep sayısı döner."""
+        return self.update(status=status, updated_at=timezone.now())
+
 
 class Ticket(BaseModel):
     user = models.ForeignKey(

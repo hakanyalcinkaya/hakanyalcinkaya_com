@@ -37,6 +37,7 @@ from discount.forms import DiscountTargetsMixin
 from discount.models import Discount
 from newsletter.models import AudienceKind, Issue
 from order.models import ADMIN_PAYMENT_METHODS, PAYMENT_METHODS, Order, OrderStatus
+from support.models import Ticket, TicketStatus
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
 EXTRA_CONTENT_EXTENSIONS = (".md", ".markdown", ".txt", ".html", ".htm")
@@ -1063,3 +1064,45 @@ class ManualOrderForm(forms.Form):
             discount_code=cart.discount.code if cart.discount_id else "",
             cart=cart.pk,
         )
+
+
+class SupportBulkAction(models.TextChoices):
+    CLOSE = "close", _("Kapat")
+    REOPEN = "reopen", _("Yeniden aç")
+    ANSWERED = "answered", _("Yanıtlandı say")
+    DELETE = "delete", _("Sil")
+
+
+class SupportBulkForm(forms.Form):
+    """Destek listesinde seçilen taleplere toplu işlem; e-posta gönderilmez."""
+
+    action = forms.ChoiceField(choices=SupportBulkAction.choices)
+    tickets = forms.ModelMultipleChoiceField(queryset=Ticket.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tickets"].error_messages["required"] = _("Önce talep seç.")
+
+    @transaction.atomic
+    def save(self):
+        action = self.cleaned_data["action"]
+        tickets = Ticket.objects.filter(pk__in=[ticket.pk for ticket in self.cleaned_data["tickets"]])
+        if action == SupportBulkAction.DELETE:
+            count = tickets.count()
+            tickets.delete()
+            return count
+        status = {
+            SupportBulkAction.CLOSE: TicketStatus.CLOSED,
+            SupportBulkAction.REOPEN: TicketStatus.OPEN,
+            SupportBulkAction.ANSWERED: TicketStatus.ANSWERED,
+        }[action]
+        return tickets.set_status(status)
+
+    def message(self, count):
+        texts = {
+            SupportBulkAction.CLOSE: _("%(count)s talep kapatıldı."),
+            SupportBulkAction.REOPEN: _("%(count)s talep yeniden açıldı."),
+            SupportBulkAction.ANSWERED: _("%(count)s talep yanıtlandı olarak işaretlendi."),
+            SupportBulkAction.DELETE: _("%(count)s talep silindi."),
+        }
+        return texts[self.cleaned_data["action"]] % {"count": count}

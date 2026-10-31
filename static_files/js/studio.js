@@ -262,6 +262,32 @@
   });
 
   // Yorumlar: tek tek ya da "Tümünü seç" ile seçilir; seçim varken işlem çubuğu görünür.
+  // Genel toplu seçim (ör. Destek): [data-bulk-scope] içinde tümünü seç, sayaç ve işlem çubuğu; satırlar [data-bulk-check].
+  function refreshBulkSelection() {
+    var scope = document.querySelector("[data-bulk-scope]");
+    if (!scope) return;
+    var checks = document.querySelectorAll("[data-bulk-check]");
+    var count = document.querySelectorAll("[data-bulk-check]:checked").length;
+    var all = scope.querySelector("[data-bulk-all]");
+    all.checked = checks.length > 0 && count === checks.length;
+    all.indeterminate = count > 0 && count < checks.length;
+    var bar = scope.querySelector("[data-bulk-bar]");
+    bar.querySelector("[data-bulk-count]").textContent = count;
+    bar.classList.toggle("d-none", count === 0);
+    bar.classList.toggle("d-flex", count > 0);
+  }
+  document.addEventListener("change", function (event) {
+    var all = event.target.closest("[data-bulk-all]");
+    if (all) document.querySelectorAll("[data-bulk-check]").forEach(function (box) { box.checked = all.checked; });
+    if (all || event.target.closest("[data-bulk-check]")) refreshBulkSelection();
+  });
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest("[data-bulk-clear]")) return;
+    document.querySelectorAll("[data-bulk-check]:checked").forEach(function (box) { box.checked = false; });
+    refreshBulkSelection();
+  });
+  document.body.addEventListener("htmx:afterSettle", refreshBulkSelection);
+
   function refreshReviewSelection() {
     var bulk = document.querySelector("[data-review-bulk]");
     if (!bulk) return;
