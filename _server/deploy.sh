@@ -7,6 +7,7 @@
 #   requirements.txt          → pip install (+ collectstatic, uWSGI, Celery)
 #   */migrations/*            → migrate
 #   static_files/**           → collectstatic
+#   *.html, *.js, *.py, *.css → build_icons (kullanılan ikonlar; yeniden üretildiyse collectstatic)
 #   *.py                      → Celery yeniden başlar (şablon/CSS/JS değişikliğinde başlamaz; süren yükleme kesilmesin)
 #   _server/celery/*.service  → systemctl daemon-reload + Celery
 #   _server/*nginx.conf       → nginx -t && reload (restart değil; bağlantılar kopmaz)
@@ -52,11 +53,20 @@ main() {
         echo "→ pip install"
         "$VENV/bin/pip" install --quiet -r requirements.txt
     fi
+    # İkon fontu git'te değil (static_files/icons/); kodda kullanılan ikonlar değiştiyse yeniden üretilir.
+    local icons=0
+    if has '\.(html|js|py|css)$|^requirements\.txt$|^frontend/bootstrap-icons/'; then
+        echo "→ build_icons"
+        local out
+        out=$("$VENV/bin/python" manage.py build_icons)
+        echo "  $out"
+        [[ $out == *"yeniden üretildi"* ]] && icons=1
+    fi
     if has '/migrations/'; then
         echo "→ migrate"
         "$VENV/bin/python" manage.py migrate --noinput
     fi
-    if has '^static_files/|^requirements\.txt$'; then
+    if [[ $icons == 1 ]] || has '^static_files/|^requirements\.txt$'; then
         echo "→ collectstatic"
         "$VENV/bin/python" manage.py collectstatic --noinput --verbosity 0
     fi

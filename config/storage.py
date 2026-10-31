@@ -7,7 +7,8 @@ from django.contrib.staticfiles.storage import StaticFilesStorage
 from core.version import app_version
 
 VERSIONED_EXTENSIONS = (".css", ".js")
-# Bootstrap (ve ikonları) sürümüyle birlikte değişir; her deploy'da yeniden indirilmesine gerek yok.
+# Bootstrap sürümüyle birlikte değişir; her deploy'da yeniden indirilmesine gerek yok. (İkonlar icons/ altında, kullanılan
+# ikonlar değiştikçe yeniden üretildiği için sürümlenir.)
 UNVERSIONED_PREFIXES = ("css/bootstrap",)
 
 

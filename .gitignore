@@ -204,6 +204,8 @@ Temporary Items
 
 # Frontend build
 frontend/node_modules/
+# manage.py build_icons çıktısı (kullanılan ikonlar); geliştirmede runserver, sunucuda deploy üretir
+static_files/icons/
 # Deploy'un yazdığı sürüm (v178 abc1234); core/version.py okur
 .version
 .version.tmp
