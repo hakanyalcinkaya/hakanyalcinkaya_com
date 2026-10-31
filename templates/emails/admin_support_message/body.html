@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}{% if is_new %}Yeni destek talebi.{% else %}Destek talebinde yeni mesaj.{% endif %}{% endblock %}
+{% block preheader %}{{ sender_name }} · {{ subject }}{% endblock %}
+{% block eyebrow %}Yönetici · Destek{% endblock %}
+{% block heading %}{% if is_new %}Yeni destek talebi.{% else %}Yeni mesaj.{% endif %}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;"><strong>{{ sender_name }}</strong> ({{ sender_email }}{% if not is_member %}, hesabı yok{% endif %}) · <strong>{{ subject }}</strong></p>
+<p style="margin: 0 0 14px;">{{ message_text|linebreaksbr }}</p>
+{% include "emails/modules/button.html" with url=studio_url label="Stüdyo'da yanıtla" %}
+{% endblock %}
+{% block footer %}Yönetici bildirimi. Yanıtı Stüdyo'dan yaz; bu e-postayı yanıtlamak kullanıcıya ulaşmaz.{% endblock %}

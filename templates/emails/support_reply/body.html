@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}Destek talebine yanıt var.{% endblock %}
+{% block preheader %}{{ subject }}{% endblock %}
+{% block eyebrow %}Destek · {{ subject }}{% endblock %}
+{% block heading %}Yeni mesajın var.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ subject }}</strong> konulu destek talebine yanıt verildi. Mesajı okumak ve yanıtlamak için hesabındaki Destek sayfasına git.</p>
+{% include "emails/modules/button.html" with url=ticket_url label="Mesajı görüntüle" %}
+{% endblock %}
+{% block footer %}Bu e-postayı yanıtlama; yanıtın panelden gönderilir. {{ site_name }} · {{ email }}{% endblock %}

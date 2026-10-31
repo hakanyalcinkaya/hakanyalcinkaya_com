@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block title %}{{ subject }}{% endblock %}
+{% block preheader %}{{ reply_text|truncatechars:90 }}{% endblock %}
+{% block eyebrow %}Destek · {{ subject }}{% endblock %}
+{% block heading %}Mesajına yanıt.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">{{ reply_text|linebreaksbr }}</p>
+<p style="margin: 0 0 14px;">Yanıt yazmak için bu e-postayı yanıtlaman yeterli.</p>
+{% if original_text %}<p style="margin: 18px 0 0; padding: 10px 14px; border-left: 3px solid #3a3a3a; color: #9B9B9B; font-size: 14px;"><strong style="color: #D8D8D8;">Mesajın:</strong><br>{{ original_text|linebreaksbr }}</p>{% endif %}
+{% endblock %}
+{% block footer %}Bu e-posta {{ email }} adresinden yazdığın destek mesajına yanıt olarak gönderildi.{% endblock %}

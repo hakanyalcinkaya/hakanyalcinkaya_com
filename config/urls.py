@@ -43,6 +43,8 @@ urlpatterns += [
     path("studio/", include("studio.urls")),
     # E-posta açılma/tıklama takibi
     path("e/", include("mailing.urls")),
+    # page.urls'deki <slug>/ her adresi yakalar; destek ondan önce.
+    path("support/", include("support.urls")),
     path("", include("page.urls")),
 ]
 

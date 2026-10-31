@@ -6,7 +6,7 @@
 {% block spotlight %}{% endblock %}
 {% block navbar %}
 <nav class="navbar sticky-top bg-body border-bottom" aria-label="Stüdyo menüsü">
-  {% studio_section as section %}{% busy_upload_total as busy_total %}{% pending_review_total as pending_reviews %}
+  {% studio_section as section %}{% busy_upload_total as busy_total %}{% pending_review_total as pending_reviews %}{% awaiting_support_total as awaiting_support %}
   <div class="container d-flex flex-wrap align-items-center column-gap-3 row-gap-2">
     {# [hy] her sayfada olduğu gibi ana sayfaya, "Stüdyo" stüdyonun başına döner. #}
     <div class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6 me-auto">
@@ -36,6 +36,7 @@
       </div>
       <a href="{% url 'studio:students' %}" class="studio-nav-link{% if section == 'students' %} active{% endif %}"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Öğrenciler</a>
       <a href="{% url 'studio:reviews' %}" class="studio-nav-link{% if section == 'reviews' %} active{% endif %}"><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Yorumlar{% if pending_reviews %} <span class="badge text-bg-warning">{{ pending_reviews }}</span>{% endif %}</a>
+      <a href="{% url 'studio:support_list' %}" class="studio-nav-link{% if section == 'support' %} active{% endif %}"><i class="bi bi-life-preserver me-1" aria-hidden="true"></i>Destek{% if awaiting_support %} <span class="badge text-bg-warning">{{ awaiting_support }}</span>{% endif %}</a>
       <div class="dropdown" data-dropdown>
         <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'mail' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-mail-menu"><i class="bi bi-envelope me-1" aria-hidden="true"></i>E-posta<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
         <ul id="studio-mail-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">

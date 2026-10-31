@@ -1,0 +1,8 @@
+{% extends "emails/base.txt" %}
+{% block content %}{% if is_new %}Yeni destek talebi{% else %}Destek talebinde yeni mesaj{% endif %}
+{{ sender_name }} ({{ sender_email }}{% if not is_member %}, hesabı yok{% endif %}) · {{ subject }}
+
+{{ message_text }}
+
+Stüdyo'da yanıtla: {{ studio_url }}{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

@@ -925,6 +925,25 @@
     media.addEventListener("loadedmetadata", bindTracks);
   }
 
+  // Kalan karakter sayacı: maxlength'li metin alanının altında "N karakter kaldı" (data-char-count; ör. destek mesajı).
+  function charCounter(field) {
+    var note = field.parentNode.querySelector("[data-char-left]");
+    if (!note) {
+      note = document.createElement("div");
+      note.className = "form-text text-end";
+      note.setAttribute("data-char-left", "");
+      note.setAttribute("aria-live", "polite");
+      field.insertAdjacentElement("afterend", note);
+    }
+    var left = Number(field.getAttribute("maxlength")) - field.value.length;
+    note.textContent = left + " karakter kaldı";
+    note.classList.toggle("text-danger", left <= 50);
+  }
+  document.querySelectorAll("textarea[data-char-count][maxlength]").forEach(charCounter);
+  document.addEventListener("input", function (event) {
+    if (event.target.matches && event.target.matches("textarea[data-char-count][maxlength]")) charCounter(event.target);
+  });
+
   // Yorum kartına tıklanınca (ya da kart odaktayken Enter/Boşluk) "Tüm yorumlar" penceresi açılır; kurs bağlantısı kursa gider.
   var focusReview = "";
   function openReviews(card) {

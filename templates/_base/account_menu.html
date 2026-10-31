@@ -1,8 +1,8 @@
 {# Masaüstünde hesap menüsü; mobilde hesap öğeleri tek menüde (mobile_account.html). #}
 <div class="dropdown d-none d-lg-block" data-dropdown>
   <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="hesap-menusu" aria-label="Hesap menüsü">
-    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>
-    <span class="d-none d-xl-inline">Hesabım</span>
+    <span class="position-relative d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}{% if support_unread %}<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>{% endif %}</span>
+    <span class="d-none d-xl-inline">Hesabım</span>{% if support_unread %}<span class="visually-hidden">, yeni destek mesajın var</span>{% endif %}
     {% if app_version and app_version.label %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace" title="Sürüm {{ app_version.label }} · commit {{ app_version.commit }}">{{ app_version.label }}</span>{% endif %}<i class="bi bi-chevron-down small d-none d-sm-inline" aria-hidden="true"></i>
   </button>
   <ul id="hesap-menusu" class="dropdown-menu dropdown-menu-end shadow py-2" data-dropdown-menu data-bs-popper="static" style="width:280px">
@@ -10,6 +10,7 @@
     <li><hr class="dropdown-divider"></li>
     <li><a href="{{ library_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-collection-play text-body-tertiary" aria-hidden="true"></i>Kurslarım</a></li>
     <li><a href="{% url 'page:course_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-grid text-body-tertiary" aria-hidden="true"></i>Tüm Kurslar</a></li>
+    <li><a href="{{ support_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-life-preserver text-body-tertiary" aria-hidden="true"></i><span class="flex-grow-1">Destek</span>{% if support_unread %}<span class="badge text-bg-danger">{{ support_unread }} yeni</span>{% endif %}</a></li>
     <li><a href="{{ settings_url }}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-gear text-body-tertiary" aria-hidden="true"></i>Ayarlar</a></li>
     {% if request.user.is_superuser %}
     <li><a href="{% url 'studio:course_list' %}" class="dropdown-item d-flex align-items-center gap-2 py-2"><i class="bi bi-camera-reels text-body-tertiary" aria-hidden="true"></i>Stüdyo</a></li>

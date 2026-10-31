@@ -1,0 +1,6 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+"{{ subject }}" konulu destek talebine yanıt verildi. Mesajı okumak ve yanıtlamak için:
+{{ ticket_url }}{% endblock %}
+{% block footer %}Bu e-postayı yanıtlama; yanıtın panelden gönderilir.{% endblock %}

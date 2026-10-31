@@ -45,7 +45,7 @@ def _email(label, group, description, variables, recipient="user"):
     return {"label": label, "group": group, "description": description, "variables": variables, "recipient": recipient}
 
 
-# Sitenin gönderebileceği e-postalar. "recipient": user (öğrenci), subscriber (bülten), admin (yönetici).
+# Sitenin gönderebileceği e-postalar. "recipient": user (öğrenci), subscriber (bülten), guest (hesabı olmayan), admin (yönetici).
 EMAILS = {
     # Hesap
     "welcome": _email(
@@ -149,7 +149,44 @@ EMAILS = {
         },
         recipient="subscriber",
     ),
+    # Destek
+    "support_reply": _email(
+        "Destek yanıtı (üye)",
+        "Destek",
+        "Yönetici yanıt verince hesabı olan kullanıcıya; yanıt panelde okunur ve yanıtlanır (no-reply'dan).",
+        {**COMMON_VARIABLES, "subject": "Talebin konusu", "reply_text": "Yanıt metni", "ticket_url": "Panelde konuşma"},
+    ),
+    "support_reply_guest": _email(
+        "Destek yanıtı (hesabı olmayan)",
+        "Destek",
+        "Hesabı olmayan kullanıcıya yanıtın kendisi; destek adresinden gider, yanıtlanınca oraya döner.",
+        {
+            "greeting_name": "Selamlamada ad",
+            "full_name": "Formdaki ad soyad",
+            "email": "Formdaki e-posta",
+            "site_url": "Sitenin adresi",
+            "subject": "Talebin konusu",
+            "reply_text": "Yanıt metni",
+            "original_text": "Kullanıcının son mesajı (alıntı)",
+        },
+        recipient="guest",
+    ),
     # Yönetici
+    "admin_support_message": _email(
+        "Yeni destek mesajı (yönetici)",
+        "Yönetici",
+        "Yeni talep açılınca ya da kullanıcı panelden yanıt yazınca.",
+        {
+            "subject": "Talebin konusu",
+            "sender_name": "Yazanın adı",
+            "sender_email": "Yazanın e-postası",
+            "is_member": "Talep bir hesaba bağlıysa True",
+            "is_new": "Yeni talepse True",
+            "message_text": "Mesaj",
+            "studio_url": "Stüdyo → Destek'te konuşma",
+        },
+        recipient="admin",
+    ),
     "admin_new_order": _email(
         "Yeni satış (yönetici)",
         "Yönetici",
@@ -204,9 +241,12 @@ def _with_query(url, **params):
     return f"{url}{'&' if '?' in url else '?'}{urlencode(params)}"
 
 
-def send_email(key, to, context, user=None, batch=None):
+def send_email(key, to, context, user=None, batch=None, from_email=None, reply_to=None):
     """E-postayı gönderir ve kaydeder (mailing.EmailLog): içerik gizli bağlantılar maskelenerek saklanır; HTML'e açılma
-    görseli ve tıklama yönlendirmeleri eklenir. Bülten e-postalarına tek tıkla abonelikten çıkma başlıkları konur."""
+    görseli ve tıklama yönlendirmeleri eklenir. Bülten e-postalarına tek tıkla abonelikten çıkma başlıkları konur.
+
+    from_email / reply_to: varsayılan gönderen (no-reply) yerine başka adres; ör. hesabı olmayana destek yanıtı admin@'den
+    gider ve yanıtlanınca oraya döner."""
     from mailing.models import EmailLog
     from mailing.tracking import add_tracking, mask, sensitive_values
 
@@ -220,7 +260,7 @@ def send_email(key, to, context, user=None, batch=None):
         context = {**context, "unsubscribe_url": unsubscribe_url}
     subject, text, html = render_email(key, context)
     secrets = sensitive_values(context)
-    message = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL, [to])
+    message = EmailMultiAlternatives(subject, text, from_email or settings.DEFAULT_FROM_EMAIL, [to], reply_to=reply_to)
     message.attach_alternative(add_tracking(html, log.token, skip=[unsubscribe_url], secrets=secrets), "text/html")
     if unsubscribe_url:
         message.extra_headers["List-Unsubscribe"] = f"<{unsubscribe_url}>"
@@ -328,6 +368,25 @@ def sample_context(key):
             "cta_url": f"{site}/courses/",
             "unsubscribe_url": f"{site}/newsletter/unsubscribe/?ornek",
             "manage_url": f"{site}/newsletter/manage/?ornek",
+        },
+        "support_reply": {
+            "subject": "Videolar açılmıyor",
+            "reply_text": "Merhaba, tarayıcı önbelleğini temizleyip tekrar dener misin? Sorun sürerse buradan yaz.",
+            "ticket_url": f"{site}/support/ornek/",
+        },
+        "support_reply_guest": {
+            "subject": "Fatura talebi",
+            "reply_text": "Merhaba, faturan e-posta adresine gönderildi. Başka bir şey olursa bu e-postayı yanıtlayabilirsin.",
+            "original_text": "Geçen ay aldığım kurs için fatura alabilir miyim?",
+        },
+        "admin_support_message": {
+            "subject": "Videolar açılmıyor",
+            "sender_name": "Ayşe Yılmaz",
+            "sender_email": "ayse@example.com",
+            "is_member": True,
+            "is_new": True,
+            "message_text": "React kursunda 3. bölümdeki videolar açılmıyor.",
+            "studio_url": f"{site}/studio/support/ornek/",
         },
         "admin_new_order": {"admin_url": f"{site}/admin/order/order/"},
         "admin_review_pending": {

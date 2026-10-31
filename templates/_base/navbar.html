@@ -16,7 +16,7 @@
       {% elif show_explore %}
       <a href="{% url 'page:course_list' %}" class="btn btn-primary d-none d-sm-inline-flex align-items-center gap-2 text-nowrap">Kursları Keşfet <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
       {% endif %}
-      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
+      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="position-relative d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}{% if support_unread %}<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>{% endif %}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
     </div>
 
     <div id="mobil-menu" class="collapse navbar-collapse hy-nav-center">

@@ -1,0 +1,29 @@
+{% extends "_base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ ticket.subject }} — Destek{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:48rem">
+  <a href="{% url 'support:support' %}" class="small link-secondary text-decoration-none"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Destek</a>
+  <header class="d-flex flex-wrap align-items-center gap-2 mt-2">
+    <h1 class="h3 fw-semibold mb-0 flex-grow-1">{{ ticket.subject }}</h1>
+    <span class="badge {{ ticket.status_badge }} fw-medium">{{ ticket.get_status_display }}</span>
+  </header>
+
+  <ol class="list-unstyled d-grid gap-3 mt-4">
+    {% for message in thread %}
+    {% include "support/partials/_message.html" %}
+    {% endfor %}
+  </ol>
+
+  <section class="card mt-4" aria-labelledby="yanit-baslik">
+    <div class="card-body p-4">
+      <h2 id="yanit-baslik" class="h6 fw-semibold">Yanıt yaz</h2>
+      {% if ticket.is_closed %}<p class="small text-body-secondary">Bu konuşma kapandı; yanıt yazarsan yeniden açılır.</p>{% endif %}
+      {% crispy form %}
+    </div>
+  </section>
+</div>
+{% endblock %}

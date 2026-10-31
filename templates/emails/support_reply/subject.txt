@@ -1,0 +1,1 @@
+Destek talebine yanıt var: {{ subject }}

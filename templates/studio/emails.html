@@ -21,7 +21,7 @@
     <div class="d-flex flex-wrap align-items-center gap-2">
       <span class="fw-medium">{{ email.label }}</span>
       <code class="small text-body-tertiary">{{ email.key }}</code>
-      {% if email.recipient == "admin" %}<span class="badge border text-body-secondary fw-normal">Yöneticiye</span>{% elif email.recipient == "subscriber" %}<span class="badge border text-body-secondary fw-normal">Aboneye</span>{% endif %}
+      {% if email.recipient == "admin" %}<span class="badge border text-body-secondary fw-normal">Yöneticiye</span>{% elif email.recipient == "subscriber" %}<span class="badge border text-body-secondary fw-normal">Aboneye</span>{% elif email.recipient == "guest" %}<span class="badge border text-body-secondary fw-normal">Hesabı olmayana</span>{% endif %}
     </div>
     <div class="small text-body-secondary">{{ email.description }}</div>
   </a>

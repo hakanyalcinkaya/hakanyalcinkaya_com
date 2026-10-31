@@ -1,0 +1,36 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Destek{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Destek</h1>
+    <p class="text-body-secondary mb-0">Kullanıcıların mesajları. Yanıt yazınca hesabı olana panel bağlantısı, hesabı olmayana yanıtın kendisi e-postayla gider; o e-postayı yanıtlarsa destek adresine düşer.</p>
+  </div>
+</div>
+<nav class="btn-group btn-group-sm flex-wrap mb-3" aria-label="Duruma göre">
+  {% for item in filters %}
+  <a href="?status={{ item.key }}" class="btn btn-outline-secondary{% if item.checked %} active{% endif %}"{% if item.checked %} aria-current="true"{% endif %}>{{ item.label }} <span class="text-body-tertiary">{{ item.count }}</span></a>
+  {% endfor %}
+</nav>
+{% if page.object_list %}
+<div class="list-group">
+  {% for ticket in page %}
+  <a href="{{ ticket.get_studio_url }}" class="list-group-item list-group-item-action py-3">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="fw-semibold text-truncate flex-grow-1">{{ ticket.subject }}</span>
+      <span class="badge {{ ticket.status_badge }} fw-medium">{{ ticket.get_status_display }}</span>
+    </div>
+    <div class="small text-body-secondary mt-1">{{ ticket.name }} · {{ ticket.email }}{% if ticket.is_guest %} · <span class="text-body-tertiary">hesabı yok</span>{% endif %} · {{ ticket.message_count }} mesaj · <time datetime="{{ ticket.last_message_at|date:'c' }}">{{ ticket.last_message_at|date:"j F Y, H:i" }}</time></div>
+  </a>
+  {% endfor %}
+</div>
+{% if page.has_other_pages %}
+<nav class="d-flex justify-content-between mt-3" aria-label="Sayfalar">
+  {% if page.has_previous %}<a class="btn btn-outline-secondary btn-sm" href="?status={% for item in filters %}{% if item.checked %}{{ item.key }}{% endif %}{% endfor %}&page={{ page.previous_page_number }}">Önceki</a>{% else %}<span></span>{% endif %}
+  {% if page.has_next %}<a class="btn btn-outline-secondary btn-sm" href="?status={% for item in filters %}{% if item.checked %}{{ item.key }}{% endif %}{% endfor %}&page={{ page.next_page_number }}">Sonraki</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="border rounded p-4 text-center text-body-secondary"><i class="bi bi-inbox fs-3 d-block text-body-tertiary mb-2" aria-hidden="true"></i>Bu durumda mesaj yok.</div>
+{% endif %}
+{% endblock %}

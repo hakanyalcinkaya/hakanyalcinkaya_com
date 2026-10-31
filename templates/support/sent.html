@@ -1,0 +1,17 @@
+{% extends "_base/base.html" %}
+
+{% block title %}Mesajın alındı — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card mx-auto text-center" style="max-width:36rem">
+    <div class="card-body p-4 p-sm-5">
+      <i class="bi bi-envelope-check fs-1 text-success" aria-hidden="true"></i>
+      <h1 class="h4 fw-semibold mt-3">Mesajın alındı</h1>
+      <p class="text-body-secondary mb-4">Yanıtı yazdığın e-posta adresine göndereceğiz. Gelen kutunda göremezsen istenmeyen (spam) klasörüne de bak.</p>
+      <a href="{% url 'page:index' %}" class="btn btn-primary">Ana sayfaya dön</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

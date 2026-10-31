@@ -27,6 +27,9 @@ SITE_URL = env("SITE_URL", default="http://local.hakanyalcinkaya.com:8001")  # n
 # Yerel çerezler canlı siteden (hakanyalcinkaya.com) ya da eski kurulumlardan kalan aynı adlı çerezlerle çakışmasın:
 # tarayıcı iki "sessionid" gönderirse Django eskisini okur ve giriş yapılmamış görünür.
 SESSION_COOKIE_NAME = "hy_dev_sessionid"
+# Turnstile: yerelde Cloudflare'in her zaman geçen test anahtarları (gerçek anahtar .env'den verilirse o kullanılır).
+TURNSTILE_SITE_KEY = env("TURNSTILE_SITE_KEY", default="1x00000000000000000000AA")  # noqa: F405
+TURNSTILE_SECRET_KEY = env("TURNSTILE_SECRET_KEY", default="1x0000000000000000000000000000000AA")  # noqa: F405
 CSRF_COOKIE_NAME = "hy_dev_csrftoken"
 if EMAIL_TRACKING_URL:  # noqa: F405
     ALLOWED_HOSTS.append(urlparse(EMAIL_TRACKING_URL).hostname)  # noqa: F405

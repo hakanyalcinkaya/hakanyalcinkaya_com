@@ -1,0 +1,35 @@
+{% extends "studio/base.html" %}
+{% load crispy_forms_tags %}
+{% block studio_title %}{{ ticket.subject }} · Destek{% endblock %}
+{% block studio_content %}
+<div style="max-width:52rem">
+  <a href="{% url 'studio:support_list' %}" class="small link-secondary text-decoration-none"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Destek</a>
+  <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+    <h1 class="h4 mb-0 flex-grow-1">{{ ticket.subject }}</h1>
+    <span class="badge {{ ticket.status_badge }} fw-medium">{{ ticket.get_status_display }}</span>
+    <form method="post" action="{% url 'studio:support_status' ticket.id %}">
+      {% csrf_token %}
+      {% if ticket.is_closed %}
+      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Yeniden aç</button>
+      {% else %}
+      <input type="hidden" name="closed" value="1">
+      <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Kapat</button>
+      {% endif %}
+    </form>
+  </div>
+  <p class="small text-body-secondary mt-2 mb-0">
+    {{ ticket.name }} · <a href="mailto:{{ ticket.email }}">{{ ticket.email }}</a>
+    {% if ticket.user %} · <a href="{% url 'studio:student_detail' ticket.user.pk %}">Üye</a>{% else %} · hesabı yok: yanıt e-postayla gider, kullanıcının yanıtı destek adresine düşer{% endif %}
+  </p>
+
+  <ol class="list-unstyled d-grid gap-3 mt-4">
+    {% for message in thread %}
+    {% include "support/partials/_message.html" %}
+    {% endfor %}
+  </ol>
+
+  <section class="card mt-4" aria-label="Yanıt">
+    <div class="card-body p-4">{% crispy form %}</div>
+  </section>
+</div>
+{% endblock %}

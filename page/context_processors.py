@@ -57,6 +57,9 @@ def site(request):
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
         "library_url": reverse("page:library"),
+        "support_url": reverse("support:support"),
+        # Destek: üyenin okumadığı yanıtı olan talepler (hesap menüsündeki "yeni mesaj" rozeti); yalnız şablonda kullanılırsa sayılır.
+        "support_unread": SimpleLazyObject(lambda: _unread_support(user)),
         # Stüdyo "Ayarlar"ı (ör. not alma açık mı); yalnız şablonda kullanılırsa okunur.
         "site_settings": SimpleLazyObject(SiteSettings.load),
         # Superuser'a menüde sürüm (v + commit sayısı): yerel ile sunucunun aynı commit'te olup olmadığı görülür.
@@ -66,3 +69,9 @@ def site(request):
             lambda: Subscriber.state_for(user, request.session.get(NEWSLETTER_SESSION_KEY, "")) or {}
         ),
     }
+
+
+def _unread_support(user):
+    from support.models import Ticket
+
+    return Ticket.objects.for_user(user).unread().count() if user.is_authenticated else 0

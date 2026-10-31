@@ -1,6 +1,6 @@
 from django.urls import path
 
-from studio import views, views_catalog, views_sales
+from studio import views, views_catalog, views_sales, views_support
 
 app_name = "studio"
 
@@ -83,6 +83,9 @@ urlpatterns = [
     path("catalog/<slug:kind>/sort/", views_catalog.catalog_sort, name="catalog_sort"),
     path("catalog/<slug:kind>/<uuid:item_id>/", views_catalog.catalog_edit, name="catalog_edit"),
     path("catalog/<slug:kind>/<uuid:item_id>/delete/", views_catalog.catalog_delete, name="catalog_delete"),
+    path("support/", views_support.support_list, name="support_list"),
+    path("support/<uuid:ticket_id>/", views_support.support_detail, name="support_detail"),
+    path("support/<uuid:ticket_id>/status/", views_support.support_status, name="support_status"),
     path("orders/", views_sales.orders, name="orders"),
     path("orders/new/", views_sales.order_create, name="order_create"),
     path("orders/<uuid:order_id>/", views_sales.order_detail, name="order_detail"),

@@ -1,0 +1,10 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{{ reply_text }}
+
+Yanıt yazmak için bu e-postayı yanıtlaman yeterli.{% if original_text %}
+
+> Mesajın:
+> {{ original_text }}{% endif %}{% endblock %}
+{% block footer %}Bu e-posta {{ email }} adresinden yazdığın destek mesajına yanıt olarak gönderildi.{% endblock %}

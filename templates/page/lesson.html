@@ -35,7 +35,7 @@
       {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
       {% include "_base/account_menu.html" %}
       {% endif %}
-      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
+      <button type="button" class="btn btn-outline-secondary d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% if nav_member %}<span class="position-relative d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis fw-semibold small hy-initials" aria-hidden="true">{{ account_user.initials }}{% if support_unread %}<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>{% endif %}</span>{% endif %}<i class="bi bi-list" data-menu-icon aria-hidden="true"></i></button>
     </div>
   </div>
   {# Mobil menü: geniş ekranda üst çubukta görünen bağlantılar ve düğmeler. #}

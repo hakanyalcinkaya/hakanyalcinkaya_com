@@ -20,6 +20,14 @@ def pending_review_total():
 
 
 @register.simple_tag
+def awaiting_support_total():
+    """Stüdyo menüsündeki "Destek" rozeti: yanıt bekleyen talepler."""
+    from support.models import Ticket
+
+    return Ticket.objects.awaiting().count()
+
+
+@register.simple_tag
 def video_accept():
     """Dosya seçicinin kabul ettiği video uzantıları (sunucudaki doğrulamayla aynı liste)."""
     from course.models import VIDEO_EXTENSIONS
@@ -68,6 +76,7 @@ NAV_SECTIONS = (
     ("sales", ("order", "cart")),
     ("students", ("student", "enrollment")),
     ("reviews", ("review",)),
+    ("support", ("support",)),
     ("mail", ("email", "newsletter", "subscriber")),
     ("queue", ("queue", "upload_")),
     ("settings", ("settings",)),
