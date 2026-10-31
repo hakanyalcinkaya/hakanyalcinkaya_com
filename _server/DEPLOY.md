@@ -215,7 +215,7 @@ root'un yazdığı dosyalar (venv, `.git`, `static_files`, `.version`) sonraki d
 ```bash
 sudo -u deploy -H bash
 cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj
-bash _server/deploy.sh                         # elle deploy (yeni commit yoksa yalnız .version'ı yazar)
+bash _server/deploy.sh                         # elle deploy (yeni commit yoksa .version yazılır, eksik ikon dosyaları üretilir)
 /var/Env/hakanyalcinkaya_312/bin/python manage.py shell
 ```
 
