@@ -439,7 +439,7 @@ def _detail(course, card):
     return detail
 
 
-def course_page(course, enrolled=False, staff=False):
+def course_page(course, enrolled=False, staff=False, user=None):
     sections, flat = curriculum(course, staff)
     for item in flat:
         item["locked"] = not enrolled and not item["preview"]
@@ -455,7 +455,8 @@ def course_page(course, enrolled=False, staff=False):
         "section_count": len(sections),
         "first_preview": previews[0] if previews else None,
         "enrolled": enrolled,
-        "others": [item for item in catalog_cards() if item["slug"] != course.slug],
+        # Diğer kurslar kullanıcıya göre: sahip olunan kursta fiyat yerine "Eğitimlerinde" görünür.
+        "others": [item for item in catalog_cards(user) if item["slug"] != course.slug],
     }
 
 

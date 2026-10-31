@@ -144,7 +144,7 @@ def course_detail(request, slug):
     if course is not None:
         site_rating = Review.objects.filter(course=course, source=ReviewSource.USER).rating_summary()
         enrolled = _enrolled(request, slug)
-        page = content.course_page(course, enrolled=enrolled, staff=request.user.is_staff)
+        page = content.course_page(course, enrolled=enrolled, staff=request.user.is_staff, user=request.user)
         # Personel dersleri izleyebilir (enrolled) ama satın alma düğmeleri yalnız gerçek kurs kaydına göre gizlenir.
         enrollment = Enrollment.objects.for_user(request.user).filter(course=course).select_related("last_lesson").first()
         page["course"]["owned"] = enrollment is not None

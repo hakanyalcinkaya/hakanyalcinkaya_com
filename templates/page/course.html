@@ -209,7 +209,7 @@
             <span class="d-block fw-semibold text-body">{{ item.short }}</span>
             <span class="d-block small text-body-tertiary">{{ item.meta_line }}</span>
           </span>
-          <span class="fw-semibold text-body d-none d-sm-inline">{{ item.price }}</span>
+          {% if item.owned %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium d-none d-sm-inline"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Eğitimlerinde</span>{% else %}<span class="fw-semibold text-body d-none d-sm-inline">{{ item.price }}</span>{% endif %}
         </a>
       </div>
       {% endfor %}
