@@ -54,7 +54,7 @@
               {% if course.owned %}
               <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Eğitimlerinde</span>
               <div class="d-flex flex-wrap gap-2 flex-grow-1 flex-sm-grow-0">
-                {% if course.continue_url %}<a href="{{ course.continue_url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1"><i class="bi bi-play-fill me-1" aria-hidden="true"></i>{% if course.continue_started %}Kaldığın dersten devam et{% else %}İlk derse başla{% endif %}</a>{% endif %}
+                {% if course.continue_url %}<a href="{{ course.continue_url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1"><i class="bi bi-play-fill me-1" aria-hidden="true"></i>{% if course.continue_started %}Kaldığın dersten devam et{% else %}Devam et{% endif %}</a>{% endif %}
                 <a href="{{ course.url }}" class="btn {% if course.continue_url %}btn-outline-secondary{% else %}btn-primary{% endif %} btn-lg fs-6 flex-grow-1"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Eğitime git</a>
               </div>
               {% else %}
