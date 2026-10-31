@@ -521,12 +521,14 @@ def _next_url(request, fallback):
 
 
 def anonymous_required(view):
-    """Giriş yapmış kullanıcı giriş, kayıt ve şifremi unuttum sayfalarını açarsa ana sayfaya gider."""
+    """Giriş yapmış kullanıcı giriş, kayıt ve şifremi unuttum sayfalarını açarsa (ör. eski bir sekmedeki bağlantıdan)
+    gitmek istediği yere (?next=), yoksa Kurslarım'a gider; zaten giriş yaptığı bildirilir."""
 
     @wraps(view)
     def wrapper(request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect("page:index")
+            messages.info(request, f"Zaten {request.user.display_name} olarak giriş yaptın.")
+            return redirect(_next_url(request, reverse("page:library")))
         return view(request, *args, **kwargs)
 
     return wrapper
