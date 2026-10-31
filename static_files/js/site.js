@@ -744,8 +744,8 @@
         media.addEventListener("ended", exitFullscreen);
         if (nextUrl && frame) autoAdvance(media, frame, nextUrl, nextTitle);
       } else if (nextUrl && preferences.autoplayNext) {
-        // Kursu alan üye: tercih açıksa (Video oynatma ayarı) video bitince beklemeden sıradaki derse geçilir.
-        media.addEventListener("ended", function () { window.location.href = nextUrl; });
+        // Kursu alan üye: tercih açıksa (Video oynatma ayarı) video bitince ders tamamlanır ve beklemeden sıradaki derse geçilir.
+        media.addEventListener("ended", function () { completeAndGo(nextUrl); });
       }
       applyPreferences(media, preferences);
       if (preferencesUrl) watchPreferences(media, preferences, preferencesUrl);
@@ -1005,6 +1005,35 @@
     });
     ["pause", "ended", "emptied"].forEach(function (name) { media.addEventListener(name, stop); });
   }
+
+  // Önceki / Sonraki ile dersten çıkınca ders tamamlandı olarak işaretlenir (kursu alan üye). Ders zaten tamamlandıysa ya
+  // da kullanıcı bu sayfada düğmeyle elle seçim yaptıysa dokunulmaz. İstek bitince (ya da hata olsa da) geçilir.
+  function completeAndGo(url) {
+    var button = document.getElementById("lesson-complete");
+    if (!button || button.getAttribute("data-completed") === "true" || button.hasAttribute("data-manual")) {
+      window.location.href = url;
+      return;
+    }
+    var data = new FormData();
+    data.append("done", "1");
+    data.append("auto", "1");
+    fetch(button.getAttribute("hx-post"), {
+      method: "POST",
+      body: data,
+      headers: { "X-CSRFToken": csrfToken(), "HX-Request": "true" },
+      credentials: "same-origin",
+      keepalive: true,
+    }).catch(function () {}).then(function () {
+      window.location.href = url;
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest("a[data-complete-on-leave]");
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    completeAndGo(link.href);
+  });
 
   // Bildirimler: Django mesajları sağ üstte kendiliğinden kapanan toast olarak gösterilir (SweetAlert2).
   var toastIcons = { success: "success", info: "info", warning: "warning", error: "error", debug: "info" };

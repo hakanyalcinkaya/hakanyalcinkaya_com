@@ -112,7 +112,7 @@
         {# Oynatıcının hemen altında: önceki / tamamlandı / favori / sonraki. #}
         <div class="hy-lesson-nav d-flex flex-wrap align-items-center gap-2">
           {% if prev %}
-          <a href="{{ prev.url }}{% if preview %}?play=1{% endif %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %}</a>
+          <a href="{{ prev.url }}{% if preview %}?play=1{% endif %}" class="btn btn-outline-secondary"{% if favorite %} data-complete-on-leave{% endif %}><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %}</a>
           {% else %}
           <button type="button" class="btn btn-outline-secondary" disabled><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Önceki</button>
           {% endif %}
@@ -123,7 +123,7 @@
           {% endif %}
           {% if favorite %}{% include "page/partials/favorite_button.html" with lesson_id=favorite.lesson_id is_favorite=favorite.is_favorite %}{% endif %}
           {% if next %}
-          <a href="{{ next.url }}{% if preview %}?play=1{% endif %}" class="btn btn-primary ms-sm-auto">Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="{{ next.url }}{% if preview %}?play=1{% endif %}" class="btn btn-primary ms-sm-auto"{% if favorite %} data-complete-on-leave{% endif %}>Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% elif preview %}
           <a href="{{ course.buy_url }}" class="btn btn-primary ms-sm-auto">Tamamına eriş<span class="d-none d-sm-inline"> · {{ course.price }}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% else %}
