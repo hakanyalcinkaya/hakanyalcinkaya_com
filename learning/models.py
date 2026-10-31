@@ -283,6 +283,7 @@ class PlayerPreference(BaseModel):
         _("altyazı dili"), max_length=10, choices=SubtitleLanguage, default=SubtitleLanguage.TR
     )
     fullscreen_on_play = models.BooleanField(_("oynatınca tam ekran"), default=False)
+    autoplay_next = models.BooleanField(_("bitince sonraki derse geç"), default=True)
 
     class Meta:
         verbose_name = _("oynatıcı tercihi")
@@ -306,4 +307,5 @@ class PlayerPreference(BaseModel):
             "subtitles": self.subtitles_enabled,
             "subtitleLanguage": self.subtitle_language,
             "fullscreen": self.fullscreen_on_play,
+            "autoplayNext": self.autoplay_next,
         }

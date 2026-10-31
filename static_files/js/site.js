@@ -724,6 +724,7 @@
     var preferencesUrl = holder.getAttribute("data-preferences-url");
     var nextUrl = holder.getAttribute("data-next-url");
     var nextTitle = holder.getAttribute("data-next-title");
+    var preview = holder.hasAttribute("data-preview");
     var frame = holder.closest(".ratio");
     mountPlayer(holder, {
       playerSrc: holder.getAttribute("data-player-src"),
@@ -737,11 +738,23 @@
     }).then(function (media) {
       if (!media) return;
       watchCompletion(media);
-      if (nextUrl && frame) autoAdvance(media, frame, nextUrl, nextTitle);
+      if (preview) {
+        // Önizleme bitince tam ekrandan çıkılır; sıradaki önizleme geri sayımla açılır.
+        media.addEventListener("ended", exitFullscreen);
+        if (nextUrl && frame) autoAdvance(media, frame, nextUrl, nextTitle);
+      } else if (nextUrl && preferences.autoplayNext) {
+        // Kursu alan üye: tercih açıksa (Video oynatma ayarı) video bitince beklemeden sıradaki derse geçilir.
+        media.addEventListener("ended", function () { window.location.href = nextUrl; });
+      }
       applyPreferences(media, preferences);
       if (preferencesUrl) watchPreferences(media, preferences, preferencesUrl);
     }).catch(playerFailed);
   });
+
+  function exitFullscreen() {
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
 
   // Önizleme bitince (kursu almamış ziyaretçi) birkaç saniyelik geri sayımla sıradaki önizleme dersi açılır ve
   // kendiliğinden başlar; "İptal" ile durdurulur, "Şimdi izle" ile beklemeden geçilir. Video yeniden oynatılırsa kapanır.
