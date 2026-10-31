@@ -911,6 +911,31 @@
     media.addEventListener("loadedmetadata", bindTracks);
   }
 
+  // Yorum kartına tıklanınca (ya da kart odaktayken Enter/Boşluk) "Tüm yorumlar" penceresi açılır; kurs bağlantısı kursa gider.
+  var focusReview = "";
+  function openReviews(card) {
+    var all = card.closest("[data-reviews]").querySelector("[data-reviews-all]");
+    if (!all) return;
+    focusReview = card.getAttribute("data-review-id") || "";
+    all.click();
+  }
+  document.querySelectorAll("[data-reviews] figure[data-review-id]").forEach(function (card) {
+    if (!card.closest("[data-reviews]").querySelector("[data-reviews-all]")) return;
+    card.classList.add("hy-review-open");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("title", "Tüm yorumları gör");
+  });
+  document.addEventListener("click", function (event) {
+    var card = event.target.closest(".hy-review-open");
+    if (card && !event.target.closest("a, button")) openReviews(card);
+  });
+  document.addEventListener("keydown", function (event) {
+    if ((event.key === "Enter" || event.key === " ") && event.target.classList && event.target.classList.contains("hy-review-open")) {
+      event.preventDefault();
+      openReviews(event.target);
+    }
+  });
+
   // Ortak pencere (ör. "Tüm yorumlar"): içerik yüklenince açılır; ✕, Esc ya da dışarı tıklama kapatır.
   var siteDialog = document.getElementById("site-dialog");
   if (siteDialog) {
@@ -918,6 +943,14 @@
       if (event.detail.target.id !== "site-dialog-body" || siteDialog.open) return;
       document.documentElement.classList.add("hy-dialog-open");
       siteDialog.showModal();
+      // Yorum kartından açıldıysa o yorum ortaya kaydırılır ve kısa süre vurgulanır.
+      var picked = focusReview && document.getElementById("yorum-" + focusReview);
+      focusReview = "";
+      if (picked) {
+        picked.scrollIntoView({ block: "center" });
+        picked.classList.add("hy-review-picked");
+        window.setTimeout(function () { picked.classList.remove("hy-review-picked"); }, 1800);
+      }
     });
     siteDialog.addEventListener("click", function (event) {
       if (event.target === siteDialog || event.target.closest("[data-dialog-close]")) siteDialog.close();

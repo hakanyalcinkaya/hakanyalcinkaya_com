@@ -18,7 +18,7 @@
 {% endif %}
 <div class="overflow-y-auto px-3 px-md-4 py-2 hy-site-dialog-scroll">
   {% for review in reviews %}
-  <article class="py-3{% if not forloop.last %} border-bottom{% endif %}{% if link_course %} position-relative hy-review-link{% endif %}">
+  <article{% if review.id %} id="yorum-{{ review.id }}"{% endif %} class="py-3{% if not forloop.last %} border-bottom{% endif %}{% if link_course %} position-relative hy-review-link{% endif %}">
     <div class="d-flex flex-wrap align-items-center gap-2 small">
       <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis hy-avatar" aria-hidden="true">{{ review.initial }}</span>
       <span class="fw-semibold">{{ review.name }}</span>

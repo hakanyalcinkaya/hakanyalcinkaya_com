@@ -4,7 +4,7 @@
     <p class="small text-body-tertiary mb-0">{% if rating.count %}{{ rating.average|floatformat:1 }} ortalama puan · {{ rating.count }} değerlendirme · {% endif %}Toplam {{ review_total }} yorum</p>
   </div>
   <div class="d-flex align-items-center gap-2">
-    {% if reviews_url %}<button type="button" class="btn btn-outline-secondary btn-sm me-1" hx-get="{{ reviews_url }}" hx-target="#site-dialog-body"><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Tüm yorumlar</button>{% endif %}
+    {% if reviews_url %}<button type="button" class="btn btn-outline-secondary btn-sm me-1" hx-get="{{ reviews_url }}" hx-target="#site-dialog-body" data-reviews-all><i class="bi bi-chat-square-quote me-1" aria-hidden="true"></i>Tüm yorumlar</button>{% endif %}
     <span class="small text-body-tertiary me-1" data-review-pos aria-live="polite"></span>
     <button type="button" class="btn btn-outline-secondary btn-sm" data-review-prev disabled aria-label="Önceki yorumlar"><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
     <button type="button" class="btn btn-outline-secondary btn-sm" data-review-next disabled aria-label="Sonraki yorumlar"><i class="bi bi-arrow-right" aria-hidden="true"></i></button>

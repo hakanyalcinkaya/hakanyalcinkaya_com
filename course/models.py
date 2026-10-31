@@ -1529,6 +1529,7 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
     def card(self):
         """Sitedeki yorum kartının verisi (onaylı sürüm)."""
         return dict(
+            id=self.pk,
             name=self.display_name,
             initial=self.initial,
             text=self.approved_text,
