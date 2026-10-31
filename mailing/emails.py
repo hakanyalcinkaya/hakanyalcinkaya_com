@@ -232,7 +232,15 @@ def render_email(key, context):
     if key not in EMAILS:
         raise KeyError(f"Tanımsız e-posta: {key}")
     names = template_names(key)
-    context = {"site_name": "Hakan Yalçınkaya", "email_key": key, **DEFAULTS.get(key, {}), **context}
+    # site_url her e-postada olmalı: düzen (emails/base.html) onu filtre argümanı olarak kullanır ({{ x|default:site_url }}),
+    # filtre argümanı eksik değişkende sessiz kalmaz, VariableDoesNotExist verir.
+    context = {
+        "site_name": "Hakan Yalçınkaya",
+        "site_url": settings.SITE_URL.rstrip("/"),
+        "email_key": key,
+        **DEFAULTS.get(key, {}),
+        **context,
+    }
     subject = " ".join(render_to_string(names["subject.txt"], context).split())
     return subject, render_to_string(names["body.txt"], context).strip() + "\n", render_to_string(names["body.html"], context)
 
