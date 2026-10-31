@@ -1,0 +1,14 @@
+{# Son 12 ayın satışları; ay seçimi istatistiklerle aynı (?month=). #}
+{% url 'studio:orders' as orders_url %}
+<section class="border rounded p-3 p-lg-4 mt-4" aria-labelledby="order-trend-title">
+  <h2 id="order-trend-title" class="h6 mb-3">Son 12 ay</h2>
+  <div class="d-grid gap-2">
+    {% for row in trend %}
+    <a href="{{ orders_url }}?month={{ row.key }}" class="row g-2 align-items-center small text-decoration-none link-body-emphasis{% if row.is_current %} fw-semibold{% endif %}"{% if row.is_current %} aria-current="true"{% endif %}>
+      <span class="col-4 col-md-2">{{ row.label }}</span>
+      <span class="col"><span class="studio-bar d-block" role="img" aria-label="{{ row.count }} sipariş"><span style="width: {{ row.percent }}%"></span></span></span>
+      <span class="col-4 col-md-3 text-end text-body-secondary">{{ row.count }}{% for amount in row.amounts %} · {% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% endfor %}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
