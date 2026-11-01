@@ -92,7 +92,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 
 ## Önkoşullar
 
-- SendGrid'de gönderici alan adı doğrulaması (SPF/DKIM); yoksa hatırlatmalar spam'e düşer.
+- ~~SendGrid alan adı doğrulaması~~ Yapıldı (1 Kasım 2026). Kalan: gerçek gönderimle deneme (bülten test adresi, Gmail'de spam klasörü ve "doğrulandı" başlıkları).
 - Ticari ileti onayı ve İYS kaydı (teklif mailleri için).
 - Trafik planı: YouTube, Udemy öğrencileri, bülten, sosyal medya; bağlantılarda UTM.
 
@@ -168,7 +168,7 @@ Kodla çakışan noktalar:
 
 Kapsam ve sıra (öneri):
 
-- Aşama 0: premium ön satış sayfası, iyzico, SendGrid doğrulaması, onay kutusu/İYS, işlem mailleri.
+- Aşama 0: iyzico (ilk), premium ön satış sayfası, onay kutusu/İYS, işlem mailleri. (SendGrid doğrulaması yapıldı.)
 - Aşama 1: ücretsiz kayıt, günlük kilit, kaynak ayrımı (owned, mark_paid, bundle), grafik akış motoru (düğüm/kenar/durum), ilk akış seti JSON ile, `run_flows`, kontrol grubu, Stüdyo'da liste + önizleme + metin özeti + huni ve rapor.
 - Aşama 2 (veri gelirse): React Flow kanvası, görsel simülasyon, bonus ders yönetimi, sertifika.
 - Paralel: 5–10 eğitmenle Uzilla görüşmesi; ücretsiz program yalnız öğrenci tarafını ölçer.
