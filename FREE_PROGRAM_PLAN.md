@@ -18,7 +18,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - İlk gün: Stüdyo'da ders başına "ilk gün açık" işareti. İşaretli derslerin hepsi kayıttan hemen sonra açılır.
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
 - Açılma: **günlük tavan.** Her gün en fazla N ders açılır; N kurs başına ayarlanır, varsayılan 1. O günün derslerini bitirmek ek ders açmaz. Takvime göre biriken günler izlenebilir. Ücretli "tümünü aç" tavanı kaldırır; "hızlandırma" ödülü o gün +X ders açar. Program durdurma ve devam kuralları akışlarda (ör. 30 gün izlemeyenin programı durur, mail gider; devam yolu akışta seçilir).
-- **Freemium sınırı (kurs başına, isteğe bağlı).** Kursun ücretsiz kısmı sınırlanabilir: ör. 200 dersin ilk 100'ü ya da belirli bir bölüme kadar. Sınırdan sonrası günlük tavandan bağımsız olarak kilitli; devam için satın alma gerekir. Sınır yoksa kursun tamamı günlük tavanla ücretsiz. Öneri: Stüdyo'da bölüm (section) düzeyinde "ücretsiz kısmın sonu" işareti; ders sayısıyla sınır bölüm ortasında keser. Alternatif: kurs ayarında "ücretsiz ders sayısı".
+- **Freemium sınırı (kurs başına, isteğe bağlı).** Kursun ücretsiz kısmı sınırlanabilir: ör. 200 dersin ilk 100'ü ya da belirli bir bölüme kadar. Sınırdan sonrası günlük tavandan bağımsız olarak kilitli; devam için satın alma gerekir. Sınır yoksa kursun tamamı günlük tavanla ücretsiz. Sınır Stüdyo'da bölüm (section) düzeyinde "ücretsiz kısmın sonu" işaretiyle konur (karar); işaretli bölüm dahil öncesi ücretsiz, sonrası kilitli. Kursta en fazla bir bölüm işaretli olur.
 - Ücretli teklifler: aynı kursun tamamı (freemium sınırını ve günlük tavanı kaldırır), diğer mevcut kurslar, yeni premium kurs.
 - Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
 - Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
@@ -146,6 +146,5 @@ Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akı
 
 ## Açık sorular
 
-- Freemium sınırı bölüm işaretiyle mi, ders sayısıyla mı?
 - Kurs başına: freemium sınırı var mı ve nerede, günlük tavan (varsayılan 1), gerçek fiyat, bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
 - İlk akış setinin gün ve yüzde değerleri (taslak yukarıda, birlikte gözden geçirilecek).
