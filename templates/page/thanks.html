@@ -1,23 +1,23 @@
 {% extends "_base/base.html" %}
-{% load static %}
+{% load static core_tags %}
 
+{# Ödenmiş siparişin özeti (/thanks/<sipariş no>/); yalnız siparişin sahibi ya da siparişi bu tarayıcıda veren görür. #}
 {% block title %}Kaydın tamamlandı — Hakan Yalçınkaya{% endblock %}
 {% block head %}<meta name="robots" content="noindex">{% endblock %}
 
 {% block content %}
 <div class="container py-4 py-lg-5">
   {% include "page/partials/steps.html" %}
-  {% if order %}
   <div class="row justify-content-center">
     <div class="col-lg-8 col-xl-7">
       <div class="text-center">
         <span class="d-inline-flex align-items-center justify-content-center rounded bg-success-subtle text-success-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-check-lg fs-2"></i></span>
         <h1 class="display-6 fw-semibold mt-3">Kaydın tamamlandı</h1>
         <p class="lead text-body-secondary mb-1">{{ headline }}</p>
-        <p class="small text-body-tertiary mb-0">Sipariş özetin <b class="text-body-secondary">{{ order.email }}</b> adresine gönderilecek.</p>
+        <p class="small text-body-tertiary mb-0">Sipariş <b class="text-body-secondary">{{ order.email }}</b> adresine kayıtlı.</p>
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
-          <a href="{{ start_url }}" class="btn btn-primary btn-lg fs-6 px-4">Kursa başla <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
-          <a href="{{ library_url }}" class="btn btn-outline-secondary btn-lg fs-6 px-4">Kurslarım</a>
+          {% if start_url %}<a href="{{ start_url }}" class="btn btn-primary btn-lg fs-6 px-4">Kursa başla <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endif %}
+          <a href="{{ library_url }}" class="btn {% if start_url %}btn-outline-secondary{% else %}btn-primary{% endif %} btn-lg fs-6 px-4">Kurslarım</a>
         </div>
       </div>
 
@@ -25,23 +25,24 @@
         <div class="card-body p-4">
           <div class="d-flex flex-wrap justify-content-between gap-2">
             <h2 id="siparis-baslik" class="h6 fw-semibold mb-0">Sipariş özeti</h2>
-            {% if order.number %}<span class="small text-body-tertiary">Sipariş no <span class="font-monospace">{{ order.number }}</span></span>{% endif %}
+            <span class="small text-body-tertiary">{{ order.paid_at|date:"j F Y" }} · Sipariş no <span class="font-monospace">{{ order.number }}</span></span>
           </div>
           <ul class="list-unstyled d-grid gap-3 mt-3 mb-0">
-            {% for item in summary.items %}
+            {% for row in items %}
             <li class="d-flex gap-3 align-items-center">
-              <img src="{% static item.image %}" alt="" width="192" height="108" class="rounded-1 object-fit-cover flex-shrink-0" style="width:72px;height:41px">
-              <span class="flex-grow-1 small fw-medium min-w-0">{{ item.title }}</span>
-              <span class="small fw-semibold">{{ item.price }}</span>
+              {% if row.image %}<img src="{% static row.image %}" alt="" width="192" height="108" class="rounded-1 object-fit-cover flex-shrink-0" style="width:72px;height:41px">{% endif %}
+              <span class="flex-grow-1 small fw-medium min-w-0">{% if row.url %}<a href="{{ row.url }}" class="link-body-emphasis text-decoration-none">{{ row.item.title }}</a>{% else %}{{ row.item.title }}{% endif %}</span>
+              <span class="small fw-semibold">{% if order.currency == "TRY" %}{{ row.item.paid_price|money }}{% else %}{{ row.item.paid_price }} {{ order.currency }}{% endif %}</span>
             </li>
             {% endfor %}
           </ul>
           <hr>
-          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam</span><span>{{ summary.subtotal }}</span></div>
-          {% if summary.coupon %}
-          <div class="d-flex justify-content-between small text-success mt-1"><span>İndirim ({{ summary.coupon }})</span><span>−{{ summary.discount }}</span></div>
+          <div class="d-flex justify-content-between small text-body-secondary"><span>Ara toplam</span><span>{% if order.currency == "TRY" %}{{ order.subtotal|money }}{% else %}{{ order.subtotal }} {{ order.currency }}{% endif %}</span></div>
+          {% if order.discount_total %}
+          <div class="d-flex justify-content-between small text-success mt-1"><span>İndirim{% if order.discount_code %} ({{ order.discount_code }}){% endif %}</span><span>−{% if order.currency == "TRY" %}{{ order.discount_total|money }}{% else %}{{ order.discount_total }} {{ order.currency }}{% endif %}</span></div>
           {% endif %}
-          <div class="d-flex justify-content-between fw-semibold mt-2"><span>Ödenen</span><span>{{ summary.total }}</span></div>
+          <div class="d-flex justify-content-between fw-semibold mt-2"><span>Ödenen</span><span>{% if order.currency == "TRY" %}{{ order.total|money }}{% else %}{{ order.total }} {{ order.currency }}{% endif %}</span></div>
+          <div class="small text-body-tertiary mt-1">{{ order.payment_method_label }}</div>
         </div>
       </section>
 
@@ -55,16 +56,5 @@
       </section>
     </div>
   </div>
-  {% else %}
-  <div class="text-center border rounded p-5">
-    <i class="bi bi-receipt fs-1 text-body-tertiary" aria-hidden="true"></i>
-    <h1 class="h5 fw-semibold mt-3">Görüntülenecek sipariş yok</h1>
-    <p class="text-body-secondary mb-4">Tamamlanmış bir sipariş bulunamadı. Kurslarına Kurslarım sayfasından ulaşabilirsin.</p>
-    <div class="d-flex flex-wrap justify-content-center gap-2">
-      <a href="{% url 'page:course_list' %}" class="btn btn-primary">Kursları incele</a>
-      <a href="{{ library_url }}" class="btn btn-outline-secondary">Kurslarım</a>
-    </div>
-  </div>
-  {% endif %}
 </div>
 {% endblock %}

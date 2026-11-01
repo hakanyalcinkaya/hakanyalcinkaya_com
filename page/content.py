@@ -287,9 +287,30 @@ def checkout_buyer(request, email):
 
 
 def create_card_order(request, email):
-    """Kartla ödeme için bekleyen sipariş (sepetin o anki fiyatları); ödeme sağlayıcısı onaylayınca Order.mark_paid."""
+    """Kartla ödeme için bekleyen sipariş (sepetin o anki fiyatları); ödeme sağlayıcısı onaylayınca Order.mark_paid.
+    Numarası oturuma yazılır: misafir de ödemeden sonra teşekkür sayfasını görür."""
     cart = current_cart(request)
-    return Order.create_from_cart(cart, email, checkout_buyer(request, email), provider="card")
+    order = Order.create_from_cart(cart, email, checkout_buyer(request, email), provider="card")
+    request.session[catalog.ORDERS_SESSION_KEY] = [*request.session.get(catalog.ORDERS_SESSION_KEY, []), order.number][-20:]
+    return order
+
+
+def order_thanks(order, user):
+    """Teşekkür sayfası: siparişteki ürünler (kurs görseli ve adresiyle) ve ilk kursa başlama adresi."""
+    cards = {card["slug"]: card for card in catalog_cards(user)}
+    items = []
+    for item in order.items.select_related("course", "bundle"):
+        card = cards.get(item.course.slug) if item.course_id else None
+        items.append(dict(item=item, image=card["image"] if card else "", url=card["url"] if card else ""))
+    first = next((row["item"].course for row in items if row["item"].course_id), None)
+    enrollment = Enrollment.objects.for_user(user).filter(course=first).first() if first else None
+    lesson = enrollment.continue_lesson() if enrollment else None
+    if len(items) == 1:
+        single = items[0]["item"]
+        headline = f"{single.title} {'kursuna' if single.course_id else 'paketine'} erişimin açıldı."
+    else:
+        headline = f"{len(items)} ürüne erişimin açıldı."
+    return dict(items=items, start_url=lesson.get_absolute_url() if lesson else "", headline=headline)
 
 
 def cart_add(request, slug):

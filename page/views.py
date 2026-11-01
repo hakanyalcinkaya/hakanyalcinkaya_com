@@ -25,10 +25,11 @@ from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
 from newsletter.models import Subscriber
+from order.models import Order
 from page import content
 from page.catalog import (
     NEWSLETTER_SESSION_KEY,
-    ORDER_SESSION_KEY,
+    ORDERS_SESSION_KEY,
     RESET_SESSION_KEY,
     SELLER_ADDRESS,
     SELLER_TAX,
@@ -37,12 +38,9 @@ from page.catalog import (
     catalog_stats,
     course_by_slug,
     course_page,
-    courses_by_slugs,
-    curriculum,
     filter_courses,
     find_lesson,
     legal_page,
-    order_summary,
     owns_course,
     purchase_steps,
     reviews,
@@ -557,23 +555,12 @@ def checkout(request):
     )
 
 
-def thanks(request):
-    order = request.session.get(ORDER_SESSION_KEY)
-    items = courses_by_slugs(order["slugs"]) if order else []
-    context = {"steps": purchase_steps(2), "order": None}
-    if items:
-        course = items[0]
-        _sections, flat = curriculum(course["slug"])
-        context.update(
-            order=order,
-            summary=order_summary(items, order["coupon"]),
-            course=course,
-            start_url=flat[0]["url"] if flat else course["url"],
-            headline=f"{course['short']} kursuna erişimin açıldı."
-            if len(items) == 1
-            else f"{len(items)} kursa erişimin açıldı.",
-        )
-    return render(request, "page/thanks.html", context)
+def thanks(request, number):
+    """Satın almadan sonra ödenmiş siparişin özeti. Yalnız siparişin sahibi ya da siparişi bu tarayıcıda veren görür;
+    iyzico dönüşü ödemeyi doğruladıktan sonra buraya yönlendirir (Order.get_thanks_url)."""
+    orders = Order.objects.paid().visible_to(request.user, request.session.get(ORDERS_SESSION_KEY, []))
+    order = get_object_or_404(orders, number=number)
+    return render(request, "page/thanks.html", dict(order=order, steps=purchase_steps(2), **content.order_thanks(order, request.user)))
 
 
 def _library_reviews(request):

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -44,6 +45,13 @@ class OrderQuerySet(models.QuerySet):
     def unfinished(self):
         """Ödeme adımına gelip tamamlanmayanlar (bekleyen ya da başarısız)."""
         return self.filter(status__in=(OrderStatus.PENDING, OrderStatus.FAILED))
+
+    def visible_to(self, user, numbers=()):
+        """Teşekkür sayfası: siparişin sahibi ya da siparişi bu tarayıcıda veren (oturumdaki sipariş numaraları)."""
+        condition = Q(number__in=list(numbers))
+        if user.is_authenticated:
+            condition |= Q(user=user)
+        return self.filter(condition)
 
 
 def new_order_number():
@@ -99,6 +107,9 @@ class Order(BaseModel):
             while Order.objects.filter(number=self.number).exists():
                 self.number = new_order_number()
         super().save(*args, **kwargs)
+
+    def get_thanks_url(self):
+        return reverse("page:thanks", kwargs={"number": self.number})
 
     @property
     def is_paid(self):

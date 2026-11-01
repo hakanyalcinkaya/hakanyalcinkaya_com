@@ -10,7 +10,9 @@ urlpatterns = [
     path("courses/", views.course_list, name="course_list"),
     path("cart/", views.cart, name="cart"),
     path("checkout/", views.checkout, name="checkout"),
-    path("thanks/", views.thanks, name="thanks"),
+    # Numarasız eski teşekkür adresi: siparişler Kurslarım'da.
+    path("thanks/", RedirectView.as_view(pattern_name="page:library")),
+    path("thanks/<slug:number>/", views.thanks, name="thanks"),
     path("my-courses/", views.library, name="library"),
     # Eski Kurslarım adresleri (Podia'daki /p/products/library/ ve kısa süre kullanılan /library/): kalıcı yönlenir,
     # sorgu parametreleri korunur.

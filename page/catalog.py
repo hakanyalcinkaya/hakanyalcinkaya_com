@@ -21,6 +21,8 @@ DEFAULT_CART_SLUG = "sifirdan-projelerle-front-end-ve-react-18-x-ogren"
 CART_SESSION_KEY = "cart"
 COUPON_SESSION_KEY = "coupon"
 ORDER_SESSION_KEY = "last_order"
+# Bu tarayıcıda verilen siparişlerin numaraları: misafir de kendi teşekkür sayfasını görebilir (Order.objects.visible_to).
+ORDERS_SESSION_KEY = "orders"
 NEWSLETTER_SESSION_KEY = "newsletter_email"
 # [ÖRNEK] Sipariş modeli yokken satın alınan kurslar oturumda tutulur.
 PURCHASED_SESSION_KEY = "purchased"
