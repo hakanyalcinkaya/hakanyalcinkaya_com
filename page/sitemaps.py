@@ -13,6 +13,7 @@ class StaticSitemap(Sitemap):
         return [
             "page:index",
             "page:course_list",
+            "page:all_reviews",
             "page:about",
             "page:privacy",
             "page:terms",
@@ -40,4 +41,16 @@ class CourseSitemap(Sitemap):
         return course.updated_at
 
 
-sitemaps = {"static": StaticSitemap, "courses": CourseSitemap}
+class CourseReviewsSitemap(Sitemap):
+    """Yayındaki kursların yorum sayfaları (/courses/<slug>/reviews/)."""
+
+    priority = 0.5
+
+    def items(self):
+        return Course.objects.published().order_by("sort_order", "pk")
+
+    def location(self, course):
+        return reverse("page:course_reviews", kwargs={"slug": course.slug})
+
+
+sitemaps = {"static": StaticSitemap, "courses": CourseSitemap, "course_reviews": CourseReviewsSitemap}

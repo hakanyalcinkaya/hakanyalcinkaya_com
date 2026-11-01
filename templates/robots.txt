@@ -7,10 +7,8 @@ Disallow: /thanks/
 Disallow: /account/
 Disallow: /my-courses/
 Disallow: /newsletter/
-Disallow: /reviews/
 Disallow: /lessons/
 Disallow: /courses/*/review/
-Disallow: /courses/*/reviews/
 Disallow: /*/buy/
 
 Sitemap: {{ sitemap_url }}
