@@ -13,13 +13,13 @@
     <div class="col-lg-7 d-grid gap-3 align-content-start">
       <section class="card" aria-labelledby="hesap-baslik">
         <div class="card-body p-4">
-          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>{% if checkout_form %}İletişim bilgileri{% else %}Hesap{% endif %}</h2>
-          {% if checkout_form %}
+          <h2 id="hesap-baslik" class="h6 fw-semibold mb-2"><span class="text-body-tertiary me-1">1.</span>{% if request.user.is_authenticated %}Hesap{% else %}İletişim bilgileri{% endif %}</h2>
+          {% if request.user.is_authenticated %}
+          <p class="small text-body-secondary">Kurslar <b class="text-body">{{ request.user.email }}</b> hesabına açılacak.</p>
+          {% crispy checkout_form %}
+          {% else %}
           {% crispy checkout_form %}
           <p class="small text-body-tertiary mb-0">Ödemeden sonra adını soracağız; kurslarına bu adresle giriş yapacaksın. Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>
-          {% else %}
-          <form method="post" id="odeme-formu">{% csrf_token %}</form>
-          <p class="small text-body-secondary mb-0">Kurslar <b class="text-body">{{ request.user.email }}</b> hesabına açılacak.</p>
           {% endif %}
         </div>
       </section>
@@ -60,7 +60,7 @@
           <hr>
           {% include "page/partials/order_totals.html" %}
           <button type="submit" form="odeme-formu" class="btn btn-primary btn-lg fs-6 w-100 mt-3"{% if not card_payment_open %} disabled{% endif %}><i class="bi bi-lock me-2" aria-hidden="true"></i>{% if card_payment_open %}Öde {{ summary.total }}{% else %}Kartla ödeme yakında{% endif %}</button>
-          <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ distance_sales_url }}">Mesafeli Satış Sözleşmesi</a>'ni, <a href="{{ delivery_url }}">Teslimat ve İade Şartları</a>'nı, <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun. Kurslar anında erişime açıldığından satın alma sonrasında iptal ve iade yapılmaz.</p>
+          <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
         </div>
       </div>
       <a href="{{ cart_url }}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Sepete dön</a>

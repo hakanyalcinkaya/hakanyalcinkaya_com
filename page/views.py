@@ -463,8 +463,8 @@ def checkout(request):
     coupon_form, done = _coupon(request, cart, items, action, "page:checkout")
     if done:
         return done
-    form = None if member else CheckoutForm(request.POST if action == "pay" else None)
-    if action == "pay" and (form is None or form.is_valid()):
+    form = CheckoutForm(request.POST if action == "pay" else None, member=member)
+    if action == "pay" and form.is_valid():
         if not CARD_PAYMENT_OPEN:
             messages.info(request, "Kartla online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
             return redirect("page:checkout")

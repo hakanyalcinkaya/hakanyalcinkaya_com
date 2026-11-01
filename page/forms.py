@@ -438,15 +438,32 @@ class PasswordChangeForm(CurrentPasswordMixin, StyledForm):
 
 
 class CheckoutForm(StyledForm):
-    email = email_field()
+    """Ödeme adımı: misafir e-postasını yazar (üyeninki hesabından gelir); herkes Mesafeli Satış Sözleşmesi'ni onaylar."""
 
-    def __init__(self, *args, **kwargs):
+    email = email_field()
+    agreement = forms.BooleanField(
+        error_messages={"required": "Ödemeye geçmek için sözleşmeyi onaylamalısın."},
+    )
+
+    def __init__(self, *args, member=False, **kwargs):
         super().__init__(*args, **kwargs)
-        # Adres doğrulanmaz ve kayıtlı olup olmadığı söylenmez; kayıtlıysa satın alma o hesaba bağlanır.
-        self.fields["email"].help_text = "Kurslar bu e-posta adresine tanımlanır; ödeme bilgilendirmesi de buraya gelir."
+        if member:
+            del self.fields["email"]
+        else:
+            # Adres doğrulanmaz ve kayıtlı olup olmadığı söylenmez; kayıtlıysa satın alma o hesaba bağlanır.
+            self.fields["email"].help_text = "Kurslar bu e-posta adresine tanımlanır; ödeme bilgilendirmesi de buraya gelir."
+        # Kurslar anında teslim edilen dijital içerik: cayma hakkı yok (Mesafeli Sözleşmeler Yönetmeliği 15/1-ğ),
+        # bunun ödemeden önce açıkça onaylanması gerekir.
+        self.fields["agreement"].label = format_html(
+            '<a href="{}" target="_blank">Mesafeli Satış Sözleşmesi</a>’ni ve <a href="{}" target="_blank">Teslimat ve İade '
+            "Şartları</a>’nı okudum, onaylıyorum. Kurslar ödemeden hemen sonra erişime açıldığı için cayma hakkım "
+            "olmadığını ve satın alma sonrasında iptal ve iade yapılmayacağını biliyorum.",
+            reverse("page:distance_sales"),
+            reverse("page:delivery"),
+        )
         # "Öde" düğmesi sipariş özetinde durur ve form="odeme-formu" ile bu forma bağlanır.
         self.helper.form_id = "odeme-formu"
-        self.helper.layout = Layout(Hidden("action", "pay"), "email")
+        self.helper.layout = Layout(Hidden("action", "pay"), *([] if member else ["email"]), "agreement")
 
 
 class CouponForm(StyledForm):
