@@ -37,7 +37,7 @@
             </label>
           </div>
           {% if not card_payment_open %}
-          <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Kartla online ödeme çok yakında açılıyor. Sepetindeki kurslar hesabında bekliyor.</p>
+          <p class="small text-body-secondary mt-3 mb-0"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Kartla online ödeme çok yakında açılıyor. {% if request.user.is_authenticated %}Sepetindeki kurslar hesabında bekliyor.{% else %}Sepetindeki kurslar bu tarayıcıda seni bekliyor.{% endif %}</p>
           {% endif %}
         </div>
       </section>
