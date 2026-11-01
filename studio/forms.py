@@ -119,7 +119,9 @@ class LessonBulkForm(forms.Form):
 class SiteSettingsForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
-        fields = ("video_platform", "sync_video_titles", "lesson_notes_enabled")
+        # Ders notları henüz bağlı değil (TODO.md "Video notu"): anahtar bitene kadar stüdyoda gösterilmez, ayar kapalı kalır.
+        # Bağlanınca "lesson_notes_enabled" alanı ve templates/studio/settings.html'deki "Öğrenci araçları" bölümü geri eklenir.
+        fields = ("video_platform", "sync_video_titles")
         widgets = {"video_platform": forms.RadioSelect}
 
     def clean_video_platform(self):

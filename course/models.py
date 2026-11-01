@@ -1495,6 +1495,10 @@ class Review(BaseModel, BaseStatus, BaseSortOrder):
         self.needs_review = True
         self.source = ReviewSource.USER
         self.save()
+        # Yöneticiye bildirim, kayıt kesinleşince (işlem geri alınırsa gitmez).
+        from course.tasks import notify_review_pending
+
+        transaction.on_commit(partial(notify_review_pending.delay, str(self.pk)))
 
     def approve(self):
         """Son hali onaylanır ve sitede görünür."""

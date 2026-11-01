@@ -6,7 +6,7 @@
       <div class="small text-body-tertiary text-truncate">{{ course.short }}</div>
       <div class="fw-semibold lh-sm"><span class="visually-hidden">Fiyat: </span>{{ course.price }}{% include "components/list_price.html" %}</div>
     </div>
-    <a href="{{ course.buy_url }}" class="btn btn-primary text-nowrap">Hemen Kaydol <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+    <a href="{{ course.buy_url }}" class="btn btn-primary text-nowrap"><span class="d-none d-sm-inline">Kursu Hemen </span>Satın Al <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
   </div>
 </div>
 {% endif %}

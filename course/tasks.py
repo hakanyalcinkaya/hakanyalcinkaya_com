@@ -2,6 +2,7 @@
 çıkar; iki kez çalışması zarar vermez. Her iş, videonun kaydında yazan platformla yapılır (bkz. `course.video_service`)."""
 
 import logging
+import smtplib
 
 from celery import shared_task
 
@@ -148,3 +149,28 @@ def delete_remote_caption(video_id, language, platform=VideoPlatform.BUNNY):
         video_service.get(platform).delete_caption(video_id, language)
     except VideoServiceError as error:
         logger.warning("Altyazı silinemedi (%s, %s): %s", video_id, language, error)
+
+
+@shared_task(autoretry_for=(smtplib.SMTPException, OSError), retry_backoff=True, max_retries=3)
+def notify_review_pending(review_id):
+    """Öğrenci yorum yazdı ya da değiştirdi (Review.submit): yöneticiye onay bekleyen yorum bildirimi."""
+    from django.conf import settings
+    from django.urls import reverse
+
+    from course.models import Review
+    from mailing.emails import send_email
+    from order.emails import absolute
+
+    review = Review.objects.select_related("course", "user").filter(pk=review_id, needs_review=True).first()
+    if review is None:
+        return
+    context = {
+        "course_title": review.course.title,
+        "course_url": absolute(review.course.get_absolute_url()),
+        "reviewer_name": review.display_name,
+        "rating": review.rating,
+        "review_text": review.text,
+        "is_edit": review.approved_at is not None,
+        "studio_url": absolute(reverse("studio:reviews")),
+    }
+    send_email("admin_review_pending", settings.SUPPORT_EMAIL, context)

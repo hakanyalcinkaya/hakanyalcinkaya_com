@@ -259,6 +259,7 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     if page.get("locked") and page.get("previews"):
         # Kursu almamış ziyaretçi kilitli derse gelirse sıradaki (yoksa ilk) önizleme dersine yönlenir; video başlar.
         target = next((item for item in page["previews"] if item["n"] > page["current"]["n"]), page["previews"][0])
+        messages.info(request, f"“{page['current']['title']}” dersi kursu satın alınca açılır; şimdilik ücretsiz önizlemeyi izleyebilirsin.")
         return redirect(f"{target['url']}?play=1")
     lesson = page["current"].get("object")
     # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
@@ -433,7 +434,7 @@ def remove_from_cart(request, slug):
 
 
 def buy(request, slug):
-    """"Hemen Kaydol": online ödeme açılana kadar kursu sepete ekler (sahip olunan kurs eklenmez)."""
+    """"Kursu Hemen Satın Al": online ödeme açılana kadar kursu sepete ekler (sahip olunan kurs eklenmez)."""
     card = content.card_by_slug(slug, request.user)
     if card is None:
         raise Http404
@@ -692,7 +693,7 @@ def logout(request):
 SETTINGS_FORMS = {
     "profile": (ProfileForm, "Profil bilgilerin kaydedildi."),
     "email": (EmailChangeForm, "E-posta adresin güncellendi."),
-    "password": (PasswordChangeForm, "Şifren değiştirildi."),
+    "password": (PasswordChangeForm, "Şifren değiştirildi. Diğer cihazlardaki oturumların kapatıldı."),
     "player": (PlayerPreferenceForm, "Video oynatma tercihlerin kaydedildi."),
     "appearance": (AppearanceForm, "Görünüm tercihlerin kaydedildi."),
 }

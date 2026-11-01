@@ -8,7 +8,7 @@
 <meta name="description" content="{% block description %}Gerçek projelerle Python, Django, React ve modern web teknolojilerini öğren. Hakan Yalçınkaya'nın yazılım ve üretkenlik odaklı kursları.{% endblock %}">
 {# Paylaşım önizlemesi (Open Graph / X). Başlık ve açıklama blokları şablonda iki kez kullanılamadığı için sayfalar #}
 {# og_title / og_description'ı ayrıca verir; vermeyen sayfada sitenin genel metni görünür. #}
-<link rel="canonical" href="{{ canonical_url }}">
+{% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Hakan Yalçınkaya">
 <meta property="og:locale" content="tr_TR">

@@ -145,18 +145,19 @@ DATABASES = {
     }
 }
 
+# Kurallar Django'nunkiler; hata metinleri sitenin diliyle (account/password_validation.py).
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "account.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "account.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": "account.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": "account.password_validation.NumericPasswordValidator",
     },
 ]
 # Şifre sıfırlama/belirleme bağlantısı 1 saat geçerli (Django varsayılanı 3 gün): Şifremi unuttum ve satın alma onayındaki

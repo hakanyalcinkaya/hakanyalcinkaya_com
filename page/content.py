@@ -379,8 +379,9 @@ def _library_row(enrollment, card, flat, done):
         state_label, state_cls, cta = "Devam ediyor", "bg-primary-subtle text-primary-emphasis", "Devam et"
     else:
         state_label, state_cls, cta = "Başlanmadı", "bg-body-tertiary text-body-secondary", "Başla"
-    lesson = enrollment.continue_lesson() if total else None
-    current = next((item for item in flat if lesson and item["object"].pk == lesson.pk), None)
+    # Tamamlanan kurs "Kursu tekrar izle" ile baştan açılır; diğerlerinde kaldığı ders.
+    lesson = None if finished or not total else enrollment.continue_lesson()
+    current = flat[0] if finished else next((item for item in flat if lesson and item["object"].pk == lesson.pk), None)
     return {
         **card,
         "done": done,
@@ -419,9 +420,11 @@ def library_page(user, status):
     }
     status = status if status in groups else ""
     url = reverse("page:library")
+    # Filtreler yalnız içinde kurs olunca görünür (ör. "Tamamlanan" ilk kurs bitince); "Tümü" her zaman.
     filters = [
         dict(label=label, count=len(groups[key]), checked=key == status, url=f"{url}?status={key}" if key else url)
         for key, label in LIBRARY_FILTERS
+        if not key or groups[key] or key == status
     ]
     shown = groups[status]
     owned_ids = {row["course_id"] for row in owned}
