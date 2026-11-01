@@ -146,7 +146,7 @@ Karar bekleyenler:
 
 Eksik önkoşullar:
 
-- Kartla ödeme yerelde kapalı (`page/views.py` `CARD_PAYMENT_OPEN = False`); prod durumu teyit edilmeli. 5499 ₺'de kart + taksit olmadan dönüşüm ölçülmez.
+- Kartla ödeme prod'da da kapalı (1 Kasım 2026, teyit edildi); satış yalnız havale/EFT. 5499 ₺'de kart + taksit olmadan dönüşüm ölçülmez. **İlk iş: iyzico (TODO 3), sandbox → canlı, taksit açık.** Ücretsiz program iyzico'dan önce açılmaz.
 - İşlem mailleri (hoş geldin, satın alma onayı) bağlı değil.
 - Ücretsiz kayıt formunda işaretsiz ticari ileti onay kutusu + İYS.
 - Ücretsiz hizmet için kısa kullanım şartları; gizlilik politikasına UTM ve akış kayıtları; hesap silme planına `FlowRun` ve UTM.
