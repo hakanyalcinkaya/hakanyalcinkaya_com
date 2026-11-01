@@ -44,6 +44,9 @@ def site(request):
         "privacy_url": reverse("page:privacy"),
         "terms_url": reverse("page:terms"),
         "cookies_url": reverse("page:cookies"),
+        "delivery_url": reverse("page:delivery"),
+        "distance_sales_url": reverse("page:distance_sales"),
+        "about_url": reverse("page:about"),
         # Google Analytics: izin modunda bant gösterilir, etiket yalnız izinle yüklenir (site.js); değilse etiket doğrudan
         # yüklenir. Yöneticinin (staff) ziyaretleri ölçülmez: ona bant da etiket de hiç gelmez.
         "google_analytics_id": "" if user.is_staff else settings.GOOGLE_ANALYTICS_ID,

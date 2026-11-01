@@ -692,12 +692,12 @@ def _continue_slugs(slug):
 
 
 # [PLACEHOLDER: hukuki metin] Başlıklar yer tutucudur; yayından önce hukuki incelemeden geçmeli.
-LEGAL_UPDATED = "28 Ekim 2026"
+LEGAL_UPDATED = "1 Kasım 2026"
 
 _PRIVACY = (
     (
         "Veri sorumlusu",
-        "Bu politika, hakanyalcinkaya.dev üzerinden sunulan kurslar kapsamında işlenen kişisel verilerin nasıl toplandığını ve kullanıldığını açıklar. Veri sorumlusu Hakan Yalçınkaya’dır.",
+        "Bu politika, hakanyalcinkaya.com üzerinden sunulan kurslar kapsamında işlenen kişisel verilerin nasıl toplandığını ve kullanıldığını açıklar. Veri sorumlusu Hakan Yalçınkaya’dır.",
     ),
     (
         "Topladığımız veriler",
@@ -732,7 +732,7 @@ _PRIVACY = (
 _TERMS = (
     (
         "Kapsam",
-        "Bu şartlar, hakanyalcinkaya.dev üzerindeki kurslara erişimini ve siteyi kullanımını düzenler. Siteyi kullanarak bu şartları kabul etmiş olursun.",
+        "Bu şartlar, hakanyalcinkaya.com üzerindeki kurslara erişimini ve siteyi kullanımını düzenler. Siteyi kullanarak bu şartları kabul etmiş olursun.",
     ),
     (
         "Hesap",
@@ -744,7 +744,7 @@ _TERMS = (
     ),
     (
         "İade",
-        "İade koşulları ve süresi burada açıklanacak. [PLACEHOLDER: iade politikası]",
+        "Kurslar satın alındığı anda erişime açılan dijital içeriktir; bu nedenle satın alma sonrasında iptal ve iade yapılmaz. Ayrıntılar Teslimat ve İade Şartları’nda ve Mesafeli Satış Sözleşmesi’ndedir.",
     ),
     (
         "Fikri mülkiyet",
@@ -792,6 +792,80 @@ _COOKIES = (
     ),
 )
 
+
+# Satıcı bilgileri Mesafeli Satış Sözleşmesi'nde ve Teslimat ve İade Şartları'nda geçer.
+SELLER_CONTACT = (
+    "Satıcı: Hakan Yalçınkaya. Adres: [PLACEHOLDER: açık adres]. Vergi dairesi / no: [PLACEHOLDER: vergi dairesi ve "
+    f"numarası]. Telefon: [PLACEHOLDER: telefon]. E-posta: {settings.SUPPORT_EMAIL}. Web: hakanyalcinkaya.com."
+)
+
+_DELIVERY = (
+    (
+        "Teslimat şekli",
+        "Sitede satılan tüm ürünler online video kurslardır; fiziksel ürün gönderimi ve kargo yoktur. Teslimat, kursun hesabına tanımlanmasıyla elektronik ortamda yapılır.",
+    ),
+    (
+        "Teslimat süresi",
+        "Ödemen onaylandığı anda kurs, satın alırken kullandığın e-posta adresine bağlı hesabındaki Kurslarım sayfasına eklenir ve hemen izlenebilir. Satın almanın onayı ve erişim bağlantısı aynı e-posta adresine gönderilir.",
+    ),
+    (
+        "Erişim süresi",
+        "Satın aldığın kursa, hesabın açık olduğu sürece süresiz erişebilirsin. Kursa sonradan eklenen dersler ve güncellemeler de ek ücret olmadan erişimine açılır.",
+    ),
+    (
+        "Teslimat sorunları",
+        f"Ödemen onaylandığı hâlde kurs hesabında görünmüyorsa Destek sayfasından ya da {settings.SUPPORT_EMAIL} adresinden bize ulaş; erişim en kısa sürede sağlanır.",
+    ),
+    (
+        "İptal ve iade",
+        "Kurs videoları satın alma sonrasında anında erişime açılır ve indirilebilir. Bu nedenle, Mesafeli Sözleşmeler Yönetmeliği’nin 15. maddesinin (ğ) bendi uyarınca (elektronik ortamda anında ifa edilen hizmetler ve tüketiciye anında teslim edilen gayrimaddi mallar) cayma hakkı bulunmaz; satın alma sonrasında sipariş iptal edilemez ve ücret iadesi yapılmaz. Satın almadan önce kurs sayfasındaki içerik listesini ve ücretsiz önizleme derslerini inceleyebilirsin.",
+    ),
+    (
+        "Hatalı veya mükerrer ödeme",
+        "Aynı kurs için birden fazla kez ödeme alınması ya da teknik bir hata nedeniyle kursa hiç erişim sağlanamaması durumunda, inceleme sonrasında hatalı tahsil edilen tutar ödemenin yapıldığı karta iade edilir. İadenin kartına yansıma süresi bankana bağlıdır.",
+    ),
+    ("Satıcı bilgileri", SELLER_CONTACT),
+)
+
+_DISTANCE_SALES = (
+    (
+        "Taraflar",
+        f"{SELLER_CONTACT} Alıcı: hakanyalcinkaya.com üzerinden sipariş veren ve sipariş sırasında e-posta adresini bildiren kişidir; alıcının iletişim bilgileri sipariş kaydında yer alır.",
+    ),
+    (
+        "Sözleşmenin konusu",
+        "Bu sözleşme, alıcının satıcıya ait hakanyalcinkaya.com sitesinden elektronik ortamda satın aldığı online video kursların satışı ve teslimi ile ilgili olarak, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri uyarınca tarafların hak ve yükümlülüklerini düzenler.",
+    ),
+    (
+        "Ürün ve ödeme bilgileri",
+        "Satın alınan kursların adı, adedi ve vergiler dâhil toplam satış bedeli, ödeme adımındaki sipariş özetinde ve siparişin ardından gönderilen onay e-postasında yer alır. Ödeme kredi kartı ya da banka kartı ile, iyzico ödeme altyapısı üzerinden tek seferde alınır; kart bilgileri satıcıya iletilmez.",
+    ),
+    (
+        "Ön bilgilendirme",
+        "Alıcı; satıcının bilgilerini, ürünün temel niteliklerini, satış bedelini, ödeme ve teslimat şeklini ve cayma hakkının bulunmadığını sipariş öncesinde okuduğunu, bu bilgilerin elektronik ortamda kendisine verildiğini ve siparişi bu bilgiler doğrultusunda verdiğini kabul eder.",
+    ),
+    (
+        "Teslimat",
+        "Teslimat elektronik ortamda yapılır: ödeme onaylandığı anda kurs, alıcının e-posta adresine bağlı hesabındaki Kurslarım sayfasına eklenir. Fiziksel teslimat ve kargo yoktur; teslimat için ek ücret alınmaz.",
+    ),
+    (
+        "Cayma hakkı",
+        "Satın alınan kurslar elektronik ortamda anında ifa edilen hizmet ve anında teslim edilen gayrimaddi mal niteliğindedir; videolar teslimle birlikte izlenebilir ve indirilebilir. Mesafeli Sözleşmeler Yönetmeliği’nin 15. maddesinin (ğ) bendi uyarınca bu sözleşmede cayma hakkı kullanılamaz. Alıcı, siparişi onaylayarak ifaya hemen başlanmasını kabul ettiğini ve bu nedenle cayma hakkını kaybedeceğini bildiğini beyan eder.",
+    ),
+    (
+        "Tarafların yükümlülükleri",
+        "Satıcı, ödemesi onaylanan kursa erişimi sağlamakla yükümlüdür. Alıcı, hesap bilgilerini gizli tutmakla ve kurs içeriğini yalnız kişisel öğrenimi için kullanmakla yükümlüdür; içerik kopyalanamaz, paylaşılamaz ve yeniden satılamaz.",
+    ),
+    (
+        "Uyuşmazlıkların çözümü",
+        "Bu sözleşmeden doğan uyuşmazlıklarda, Ticaret Bakanlığı’nca her yıl ilan edilen parasal sınırlar içinde alıcının yerleşim yerindeki veya işlemin yapıldığı yerdeki Tüketici Hakem Heyetleri, bu sınırları aşan durumlarda Tüketici Mahkemeleri yetkilidir.",
+    ),
+    (
+        "Yürürlük",
+        "Alıcı, ödeme adımında siparişi onayladığında bu sözleşmenin tüm koşullarını kabul etmiş sayılır. Sözleşme, siparişin onaylanmasıyla yürürlüğe girer ve bir kopyası sipariş onay e-postasıyla alıcıya iletilir.",
+    ),
+)
+
 COOKIE_COLUMNS = ("Ad", "Tür", "Amaç", "Süre")
 
 # Analitik izin bandı kapalıyken (GOOGLE_ANALYTICS_CONSENT=False) Google Analytics her ziyaretçide yüklenir; metinler
@@ -836,6 +910,20 @@ LEGAL_DOCUMENTS = (
         "Çerez Politikası",
         "Sitede hangi çerezlerin ve tarayıcı kayıtlarının neden kullanıldığını açıklar.",
         _COOKIES,
+    ),
+    (
+        "delivery",
+        "page:delivery",
+        "Teslimat ve İade Şartları",
+        "Satın aldığın kursun sana nasıl teslim edildiğini ve iptal ile iade koşullarını açıklar.",
+        _DELIVERY,
+    ),
+    (
+        "distance_sales",
+        "page:distance_sales",
+        "Mesafeli Satış Sözleşmesi",
+        "Site üzerinden yapılan kurs satışlarında satıcı ile alıcı arasında geçerli sözleşme.",
+        _DISTANCE_SALES,
     ),
 )
 

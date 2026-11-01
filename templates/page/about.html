@@ -1,0 +1,32 @@
+{% extends "_base/base.html" %}
+
+{% block title %}Hakkımda — Hakan Yalçınkaya{% endblock %}
+{% block description %}1996'dan bu yana BT ve yazılım alanında çalışan Hakan Yalçınkaya'nın yazılım ve üretkenlik odaklı kursları hakkında.{% endblock %}
+{% block og_title %}Hakkımda — Hakan Yalçınkaya{% endblock %}
+
+{% block content %}
+<div class="container pt-5">
+  <header class="pb-4 border-bottom">
+    <h1 class="display-6 fw-semibold mb-1">Hakkımda</h1>
+    <p class="text-body-secondary mb-0">Kursların arkasındaki kişi ve bana nasıl ulaşabileceğin.</p>
+  </header>
+</div>
+
+{% include "components/about.html" %}
+
+<section aria-labelledby="iletisim-baslik" class="pb-5">
+  <div class="container">
+    <div class="border rounded-3 p-4" style="max-width:62ch">
+      <h2 id="iletisim-baslik" class="h5 fw-semibold mb-3">İletişim</h2>
+      <dl class="row small mb-0">
+        <dt class="col-sm-4 fw-medium text-body-secondary">E-posta</dt>
+        <dd class="col-sm-8"><a href="mailto:{{ support_email }}">{{ support_email }}</a></dd>
+        <dt class="col-sm-4 fw-medium text-body-secondary">Destek</dt>
+        <dd class="col-sm-8"><a href="{{ support_url }}">Destek talebi oluştur</a></dd>
+        <dt class="col-sm-4 fw-medium text-body-secondary">Adres</dt>
+        <dd class="col-sm-8 mb-0">[PLACEHOLDER: açık adres]</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+{% endblock %}

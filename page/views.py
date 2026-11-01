@@ -2,6 +2,7 @@ import json
 from functools import wraps
 from urllib.parse import urlencode, urlparse
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -758,6 +759,18 @@ def terms(request):
 
 def cookies(request):
     return render(request, "page/legal.html", legal_page("cookies"))
+
+
+def delivery(request):
+    return render(request, "page/legal.html", legal_page("delivery"))
+
+
+def distance_sales(request):
+    return render(request, "page/legal.html", legal_page("distance_sales"))
+
+
+def about(request):
+    return render(request, "page/about.html", {"support_email": settings.SUPPORT_EMAIL})
 
 
 def robots_txt(request):
