@@ -725,7 +725,7 @@ _PRIVACY = (
     ),
     (
         "İletişim",
-        "Bu politika hakkındaki soruların için iletişim adresine yazabilirsin. [PLACEHOLDER: iletişim e-postası]",
+        f"Bu politika hakkındaki soruların için {settings.SUPPORT_EMAIL} adresine yazabilirsin.",
     ),
 )
 
@@ -788,15 +788,17 @@ _COOKIES = (
     ),
     (
         "İletişim",
-        "Çerezlerle ilgili soruların için iletişim adresine yazabilirsin. [PLACEHOLDER: iletişim e-postası]",
+        f"Çerezlerle ilgili soruların için {settings.SUPPORT_EMAIL} adresine yazabilirsin.",
     ),
 )
 
 
-# Satıcı bilgileri Mesafeli Satış Sözleşmesi'nde ve Teslimat ve İade Şartları'nda geçer.
+# Satıcı bilgileri Mesafeli Satış Sözleşmesi'nde, Teslimat ve İade Şartları'nda ve Hakkımda sayfasında geçer.
+SELLER_ADDRESS = "Cevizli Mah. Zuhal Cad. A Blok No: 46 İç Kapı No: 50, Maltepe / İstanbul"
+SELLER_TAX = "Kartal V.D. 9320122128"
 SELLER_CONTACT = (
-    "Satıcı: Hakan Yalçınkaya. Adres: [PLACEHOLDER: açık adres]. Vergi dairesi / no: [PLACEHOLDER: vergi dairesi ve "
-    f"numarası]. Telefon: [PLACEHOLDER: telefon]. E-posta: {settings.SUPPORT_EMAIL}. Web: hakanyalcinkaya.com."
+    f"Satıcı: Hakan Yalçınkaya. Adres: {SELLER_ADDRESS}. Vergi dairesi / no: {SELLER_TAX}. "
+    f"E-posta: {settings.SUPPORT_EMAIL}. Web: hakanyalcinkaya.com."
 )
 
 _DELIVERY = (

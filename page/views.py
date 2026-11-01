@@ -29,6 +29,8 @@ from page.catalog import (
     NEWSLETTER_SESSION_KEY,
     ORDER_SESSION_KEY,
     RESET_SESSION_KEY,
+    SELLER_ADDRESS,
+    SELLER_TAX,
     TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
     catalog_stats,
@@ -770,7 +772,11 @@ def distance_sales(request):
 
 
 def about(request):
-    return render(request, "page/about.html", {"support_email": settings.SUPPORT_EMAIL})
+    return render(
+        request,
+        "page/about.html",
+        {"support_email": settings.SUPPORT_EMAIL, "seller_address": SELLER_ADDRESS, "seller_tax": SELLER_TAX},
+    )
 
 
 def robots_txt(request):
