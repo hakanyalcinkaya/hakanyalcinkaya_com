@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 
+from account.tokens import ResetOrInviteTokenGenerator
 from cart.request_cart import current_cart
 from core import ratelimit
 from core.turnstile import client_ip
@@ -664,6 +665,8 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
     template_name = "page/account/password_reset_confirm.html"
     form_class = NewPasswordForm
+    # Şifremi unuttum (1 saat) ve Podia daveti (3 gün) bağlantıları aynı sayfaya gelir.
+    token_generator = ResetOrInviteTokenGenerator()
     post_reset_login = True
     success_url = reverse_lazy("page:library")
 

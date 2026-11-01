@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from account.tokens import invite_token_generator
 from core.money import format_money
 
 
@@ -61,10 +62,10 @@ def order_items_context(orders):
     }
 
 
-def password_url(user):
-    """Tek kullanımlık şifre belirleme/sıfırlama bağlantısı (Django'nun şifre sıfırlama belirteci)."""
+def password_url(user, invite=False):
+    """Tek kullanımlık şifre belirleme/sıfırlama bağlantısı: Django'nun belirteci (1 saat) ya da davette 3 günlük belirteç."""
     uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
+    token = (invite_token_generator if invite else default_token_generator).make_token(user)
     return absolute(reverse("page:password_reset_confirm", kwargs={"uidb64": uid, "token": token}))
 
 
@@ -73,7 +74,7 @@ def account_migrated_context(user):
     from order.podia import PROVIDER
 
     orders = user.orders.filter(payment_provider=PROVIDER).order_by("paid_at")
-    return {**recipient_context(user), **order_items_context(orders), "set_password_url": password_url(user)}
+    return {**recipient_context(user), **order_items_context(orders), "set_password_url": password_url(user, invite=True)}
 
 
 def purchase_confirmation_context(order):
