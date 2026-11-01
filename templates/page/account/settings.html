@@ -42,7 +42,12 @@
       <section id="password" class="card" aria-labelledby="sifre-baslik">
         <div class="card-body p-4">
           <h2 id="sifre-baslik" class="h5 fw-semibold">Şifre</h2>
-          <p class="small text-body-secondary">Şifreni hatırlamıyorsan <a href="{% url 'page:password_reset' %}">sıfırlama bağlantısı iste</a>.</p>
+          <form method="post" action="{% url 'page:account_settings' %}#password" class="d-flex flex-wrap align-items-center gap-2 small text-body-secondary mb-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reset_link">
+            <span>Mevcut şifreni hatırlamıyorsan:</span>
+            <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-send me-1" aria-hidden="true"></i>Sıfırlama bağlantısını e-postama gönder</button>
+          </form>
           {% crispy password_form %}
         </div>
       </section>

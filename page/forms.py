@@ -206,6 +206,13 @@ class PasswordResetForm(TurnstileMixin, StyledFormMixin, auth_forms.PasswordRese
     def send_link(self, request):
         self.save(request=request, use_https=request.is_secure())
 
+    @classmethod
+    def send_to(cls, request, email):
+        """Giriş yapmış kullanıcının kendi adresine bağlantı (hesap ayarları): adres hesaptan gelir, bot doğrulaması gerekmez."""
+        form = cls()
+        form.cleaned_data = {"email": email}
+        form.send_link(request)
+
     def get_users(self, email):
         """Django şifresi olmayan hesaplara bağlantı göndermez; Podia'dan aktarılan hesapların şifresi yok,
         "Şifremi unuttum" onlar için de çalışmalı. Etkin ve e-postası eşleşen her hesap."""

@@ -69,6 +69,8 @@ from page.forms import (
 # Bülten aboneliği sınırı: IP başına saatte, e-posta başına günde (başkasının kutusuna onay e-postası yağdırılmasın).
 NEWSLETTER_IP_LIMIT = (5, 60 * 60)
 NEWSLETTER_EMAIL_LIMIT = (3, 24 * 60 * 60)
+# Hesap ayarlarından kendi adresine şifre sıfırlama bağlantısı: kullanıcı başına saatte 3.
+SETTINGS_RESET_LINK_LIMIT = (3, 60 * 60)
 
 
 def _newsletter(request):
@@ -701,6 +703,15 @@ def account_settings(request):
     user = request.user
     forms = {key: form_class(user=user) for key, (form_class, _message) in SETTINGS_FORMS.items()}
     action = request.POST.get("action")
+    url = reverse("page:account_settings")
+    if request.method == "POST" and action == "reset_link":
+        # Şifresini unutan ama oturumu açık kullanıcı: "Şifremi unuttum" sayfası yalnız girişsize açık olduğu için bağlantı buradan.
+        if ratelimit.allow("settings-reset-link", user.pk, *SETTINGS_RESET_LINK_LIMIT):
+            PasswordResetForm.send_to(request, user.email)
+            messages.success(request, f"Şifre sıfırlama bağlantısı {user.email} adresine gönderildi; {_reset_valid_for()} geçerli.")
+        else:
+            messages.info(request, "Kısa süre önce bağlantı gönderildi; gelen kutunu ve istenmeyen e-postaları kontrol et.")
+        return redirect(f"{url}#password")
     if request.method == "POST" and action in SETTINGS_FORMS:
         form_class, message = SETTINGS_FORMS[action]
         form = form_class(request.POST, user=user)
@@ -712,7 +723,6 @@ def account_settings(request):
             return redirect(f"{reverse('page:account_settings')}#{action}")
         forms[action] = form
     # Her form kendi bölümüne gönderilir: hata varsa tarayıcı sayfayı o bölümde açar (hata ekranın dışında kalmaz).
-    url = reverse("page:account_settings")
     for key, form in forms.items():
         form.helper.form_action = f"{url}#{key}"
     return render(
