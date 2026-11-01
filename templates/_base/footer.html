@@ -42,14 +42,14 @@
           <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ distance_sales_url }}">Mesafeli Satış Sözleşmesi</a></li>
           <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ privacy_url }}">Gizlilik Politikası</a></li>
         </ul>
+        <ul class="list-unstyled d-flex flex-wrap align-items-center gap-2 mt-4 mb-0" aria-label="Ödeme yöntemleri">
+          <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/iyzico-ile-ode.svg' %}" alt="iyzico ile Öde" width="84" height="18" loading="lazy"></li>
+          <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/visa.svg' %}" alt="Visa" width="48" height="18" loading="lazy"></li>
+          <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/mastercard.svg' %}" alt="Mastercard" width="30" height="18" loading="lazy"></li>
+        </ul>
       </div>
     </div>
-    <ul class="list-unstyled d-flex flex-wrap align-items-center gap-2 mt-5 mb-0" aria-label="Ödeme yöntemleri">
-      <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/iyzico-ile-ode.svg' %}" alt="iyzico ile Öde" width="84" height="18" loading="lazy"></li>
-      <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/visa.svg' %}" alt="Visa" width="48" height="18" loading="lazy"></li>
-      <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/mastercard.svg' %}" alt="Mastercard" width="30" height="18" loading="lazy"></li>
-    </ul>
-    <div class="d-flex flex-wrap justify-content-between gap-3 border-top mt-4 pt-4 small text-body-tertiary">
+    <div class="d-flex flex-wrap justify-content-between gap-3 border-top mt-5 pt-4 small text-body-tertiary">
       <span>© {{ year }} Hakan Yalçınkaya. Tüm hakları saklıdır.</span>
       <div class="d-flex flex-wrap gap-3">
         <a class="text-body-tertiary text-decoration-none link-hover" href="{{ privacy_url }}">Gizlilik Politikası</a>
