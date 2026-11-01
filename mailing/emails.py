@@ -76,8 +76,13 @@ EMAILS = {
     "purchase_confirmation": _email(
         "Teşekkürler, satın alma onayı",
         "Satın alma",
-        "Ödemesi onaylanan sipariş (iyzico): satın alınan eğitimler, tutarlar ve Kurslarım bağlantısı.",
-        {**COMMON_VARIABLES, **ITEM_VARIABLES},
+        "Ödemesi onaylanan sipariş (iyzico, stüdyoda havale onayı): satın alınan eğitimler, tutarlar, Kurslarım ve sözleşme bağlantısı.",
+        {
+            **COMMON_VARIABLES,
+            **ITEM_VARIABLES,
+            "agreement_url": "Mesafeli Satış Sözleşmesi sayfası",
+            "thanks_url": "Siparişin teşekkür sayfası (sipariş özeti)",
+        },
     ),
     "payment_failed": _email(
         "Ödeme başarısız",
@@ -357,6 +362,10 @@ def sample_context(key):
             "currency": "EUR",
             "coupon": "KENDINIGELISTIRMEYEDEVAM",
             "set_password_url": f"{site}/account/password-reset/ornek/belirtec/",
+        },
+        "purchase_confirmation": {
+            "agreement_url": f"{site}/distance-sales-agreement/",
+            "thanks_url": f"{site}/thanks/HY-260314-A1B2C3/",
         },
         "password_reset": {"reset_url": f"{site}/account/password-reset/ornek/belirtec/"},
         "password_changed": {"changed_at": when, "reset_page_url": f"{site}/account/password-reset/"},

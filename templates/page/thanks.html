@@ -14,7 +14,7 @@
         <span class="d-inline-flex align-items-center justify-content-center rounded bg-success-subtle text-success-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-check-lg fs-2"></i></span>
         <h1 class="display-6 fw-semibold mt-3">Kaydın tamamlandı</h1>
         <p class="lead text-body-secondary mb-1">{{ headline }}</p>
-        <p class="small text-body-tertiary mb-0">Sipariş <b class="text-body-secondary">{{ order.email }}</b> adresine kayıtlı.</p>
+        <p class="small text-body-tertiary mb-0">{% if order.user_id %}Sipariş özetin <b class="text-body-secondary">{{ order.email }}</b> adresine gönderildi.{% else %}Sipariş <b class="text-body-secondary">{{ order.email }}</b> adresine kayıtlı.{% endif %}</p>
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
           {% if start_url %}<a href="{{ start_url }}" class="btn btn-primary btn-lg fs-6 px-4">Kursa başla <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>{% endif %}
           <a href="{{ library_url }}" class="btn {% if start_url %}btn-outline-secondary{% else %}btn-primary{% endif %} btn-lg fs-6 px-4">Kurslarım</a>

@@ -77,7 +77,13 @@ def account_migrated_context(user):
 
 
 def purchase_confirmation_context(order):
-    return {**recipient_context(order.user), **order_items_context([order])}
+    return {
+        **recipient_context(order.user),
+        **order_items_context([order]),
+        # Mesafeli Satış Sözleşmesi "bir kopyası onay e-postasıyla iletilir" der: e-postada bağlantısı yer alır.
+        "agreement_url": absolute(reverse("page:distance_sales")),
+        "thanks_url": absolute(order.get_thanks_url()),
+    }
 
 
 def password_reset_context(user, reset_url=None):

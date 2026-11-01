@@ -1,4 +1,5 @@
 import secrets
+from functools import partial
 
 from django.conf import settings
 from django.core.validators import MinValueValidator
@@ -163,8 +164,10 @@ class Order(BaseModel):
         return order
 
     def mark_paid(self, provider="", reference=""):
-        """Ödemeyi onaylar: kurs kayıtlarını açar, kod kullanımını sayar, sepeti kapatır."""
+        """Ödemeyi onaylar: kurs kayıtlarını açar, kod kullanımını sayar, sepeti kapatır; işlem kaydedilince alıcıya satın
+        alma onayı e-postası gider (iyzico, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz)."""
         from learning.models import Enrollment, EnrollmentSource
+        from order.tasks import send_purchase_confirmation
 
         if self.is_paid:
             return
@@ -191,6 +194,7 @@ class Order(BaseModel):
                 self.discount.register_use()
             if self.cart_id:
                 self.cart.mark_converted()
+            transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
 
     def mark_failed(self, reference=""):
         self.status = OrderStatus.FAILED

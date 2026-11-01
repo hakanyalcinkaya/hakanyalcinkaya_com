@@ -8,5 +8,5 @@
 <p style="margin: 0 0 14px;">Ödemen alındı ve eğitim{% if items|length > 1 %}ler{% endif %} hesabına tanımlandı. Hemen başlayabilirsin.</p>
 {% include "emails/modules/items.html" with show_prices=True %}
 {% include "emails/modules/button.html" with url=library_url label="Eğitime başla" %}
-<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Sipariş bilgilerin için bu e-postayı saklayabilirsin. Sorun olursa bu e-postayı yanıtlaman yeterli.</p>
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Sipariş bilgilerin için bu e-postayı saklayabilirsin{% if thanks_url %} ya da <a href="{{ thanks_url }}" style="color: #9B9B9B;">sipariş özetine</a> bakabilirsin{% endif %}. Satın alma <a href="{{ agreement_url }}" style="color: #9B9B9B;">Mesafeli Satış Sözleşmesi</a>'ne tabidir. Sorun olursa bu e-postayı yanıtlaman yeterli.</p>
 {% endblock %}
