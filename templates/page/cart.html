@@ -91,7 +91,7 @@
           </span>
           <form method="post" action="{{ course.cart_url }}" class="flex-shrink-0">
             {% csrf_token %}
-            <button type="submit" class="btn btn-outline-secondary btn-sm" aria-label="{{ course.cart_label }}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Ekle</button>
+            <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1 text-nowrap" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i>Ekle</button>
           </form>
         </div>
       </div>
