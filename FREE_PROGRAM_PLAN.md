@@ -45,7 +45,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 
 - Durdurulan program (ör. F7) kişi dönünce kaldığı dersten devam eder.
 - Devamda kurallar baştan işler: sayaçlar ve seri sıfırlanır, akışlar yeni bir "dönem" için yeniden çalışabilir. Örnek: "3 gün üst üste maildeki bağlantıya tıklayıp derse gidene bonus" kuralı sıfırdan sayar.
-- Varsayım (onaylanacak): daha önce verilen ödül (açılan bonus ders, gönderilen kod) geri alınmaz; aynı ödül akışı yeni dönemde yeniden çalışabilir.
+- Daha önce verilen ödül (açılan bonus ders, gönderilen kod) geri alınmaz; aynı ödül akışı yeni dönemde yeniden çalışabilir. Aynı bonus zaten açıksa yalnız mail gider (onaylandı).
 
 ### Mail
 
@@ -65,7 +65,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - `learning.EnrollmentSource`'a `FREE` (ücretsiz kayıt). Erişim kontrolü (`page/views.py` `_enrolled`, `Enrollment.objects.has_access`) kayda bakıyor; ücretsiz kayıtta ek olarak ders kilidi gerekir.
 - `Course`: ücretsiz program açık/kapalı, günlük tavan (varsayılan 1). `Section`: "ücretsiz kısmın sonu" işareti (freemium sınırı). `Lesson`: "ilk gün açık", bonus ders işareti.
 - Kilit kontrolü iki katman: freemium sınırı (satın alma gerekir) ve günlük tavan (bekleme gerekir). Kilitli ders sayfası ikisini ayrı anlatır: "yarın açılıyor" / "devamı için kursu aç".
-- İlerleme yüzdesi ücretsiz kullanıcıda ücretsiz kısma göre mi, kursun tamamına göre mi hesaplanacak? F3/F4 eşikleri için ücretsiz kısma göre (sınır varsa).
+- İlerleme, sınırlı kursta ücretsiz kullanıcıya iki değerle gösterilir: çubukta ücretsiz kısma göre yüzde, yanında "kursun %X'i" notu. Akış eşikleri (F3/F4) ücretsiz kısma göre. Satın alınca yüzde kursun tamamına göre hesaplanır. `Enrollment.with_progress()` iki payda ile genişletilir (karar).
 - Model metotları: `Course.enroll_free(user)`, `Enrollment.program_day()`, `Enrollment.unlocked_lessons()`, `Enrollment.is_on_schedule()`, `Lesson.is_unlocked_for(enrollment)`. Kilitli ders: "yarın açılıyor" sayfası ve ücretli teklif.
 - Program durumu kayıtta: durduruldu mu, ne zaman, hızlandırma ile açılan ek gün sayısı, bonus erişimleri.
 - Kayıt akışı: kurs sayfasında POST `course/<slug>/enroll/`; misafir kayıt sayfasına (`?next`), kayıttan sonra kurs kaydı açılır ve ilk güne gider.
