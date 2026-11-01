@@ -14,8 +14,7 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 ## 2. İçerik temizliği (yayından önce)
 - [ ] Örnek veriyi kaldır: kurs sayfası tanıtım metnini aynı slug'lı örnek kurstan birleştiriyor (`page/content.py` `course_card` ve kurs detayı, `catalog.course_by_slug`); sepette oturumdaki örnek kurs yolu (`page/catalog.py` `cart_add`, `page/content.py` sepet) ve yayında kurs yokken gösterilen örnek kurslar. Gerçek kursların madde listeleri (CourseHighlight) dolu.
 - [ ] Ödeme logoları geçici (`static_files/img/payment/`, kendi çizimimiz): iyzico panelinden resmi logo bandını (iyzico ile Öde + Visa + MasterCard) indirip footer'da onunla değiştir (`templates/_base/footer.html`).
-- [ ] Teşekkürler sayfası (`thanks.html`) hâlâ oturumdaki örnek siparişi gösteriyor (`catalog.place_order` hiçbir yerden çağrılmıyor); iyzico bağlanınca gerçek `Order`'dan (sipariş no `order.number`) beslenmeli.
-- [ ] Kurs fiyatları yer tutucu (₺100 / ₺100 / ₺99,79): gerçek fiyatlar girilmeli.
+- [ ] Teşekkürler sayfası (`page/views.py` `thanks`) oturumdaki `last_order`'dan besleniyor, `catalog.place_order` hiçbir yerden çağrılmadığı için şu an hep "Görüntülenecek sipariş yok" diyor; iyzico bağlanınca gerçek `Order`'dan (sipariş no `order.number`) beslenmeli.
 - [ ] Django ve Python kurslarının erişim notu "platformdan izlemeye başlayabilirsin" diyor; sadeleştir (Stüdyo → Kurs bilgileri → Erişim notu).
 - [ ] Ders adlarındaki yazım hataları ("Kulllanımı", "Klasorlerin", ...).
 - [ ] Sayfa sayfa son kontrol (masaüstü, 375 px mobil, açık/koyu tema). Yapıldı: ana sayfa, kurs listesi, kurs sayfası. Kalan: önizleme dersi, kursun tüm yorumları, `/reviews/`, üst menü/alt bilgi/tema paneli, 404, sepete ekle/çıkar, sepet, hemen al, ödeme, teşekkürler, giriş, kayıt, şifre sıfırlama akışı (geçerli ve süresi dolmuş bağlantı), hesap ayarları, çıkış, Kurslarım, ders sayfası, oynatıcı tercihleri, yorum yazma, kursu olmayan üyenin ders sayfası.
