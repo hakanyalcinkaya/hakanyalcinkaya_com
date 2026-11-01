@@ -19,7 +19,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
 - Açılma: **günlük tavan.** Her gün en fazla N ders açılır; N kurs başına ayarlanır, varsayılan 1. O günün derslerini bitirmek ek ders açmaz. Takvime göre biriken günler izlenebilir. Ücretli "tümünü aç" tavanı kaldırır; "hızlandırma" ödülü o gün +X ders açar. Program durdurma ve devam kuralları akışlarda (ör. 30 gün izlemeyenin programı durur, mail gider; devam yolu akışta seçilir).
 - **Freemium sınırı (kurs başına, isteğe bağlı).** Kursun ücretsiz kısmı sınırlanabilir: ör. 200 dersin ilk 100'ü ya da belirli bir bölüme kadar. Sınırdan sonrası günlük tavandan bağımsız olarak kilitli; devam için satın alma gerekir. Sınır yoksa kursun tamamı günlük tavanla ücretsiz. Sınır Stüdyo'da bölüm (section) düzeyinde "ücretsiz kısmın sonu" işaretiyle konur (karar); işaretli bölüm dahil öncesi ücretsiz, sonrası kilitli. Kursta en fazla bir bölüm işaretli olur.
-- **Sırasız kurs / yarının dersini seçme (kurs başına, isteğe bağlı).** Her dersin bağımsız konu anlattığı kurslarda (ör. AI Tools) kursa "öğrenci sıradaki dersi seçer" seçeneği açılır. Günün dersi bitince "yarın hangi içeriği izlemek istersin?" sorulur; seçenekler henüz açılmamış dersler (freemium sınırı varsa ücretsiz kısımdakiler). Günlük tavan aynen geçerli: tavan N ise N ders seçilir. Seçim ders sonu ekranında ve günlük mailde (düğmelerle) yapılabilir. Seçim yapılmazsa müfredat sırasındaki ders açılır (varsayım). Ertesi günün maili seçilen dersin özetiyle gider. Sıralı kurslarda bu seçenek kapalı, müfredat sırası işler.
+- **Sırasız kurs / yarının dersini seçme (kurs başına, isteğe bağlı).** Her dersin bağımsız konu anlattığı kurslarda (ör. AI Tools) kursa "öğrenci sıradaki dersi seçer" seçeneği açılır. Günün dersi bitince "yarın hangi içeriği izlemek istersin?" sorulur; seçenekler henüz açılmamış dersler (freemium sınırı varsa ücretsiz kısımdakiler). Günlük tavan aynen geçerli: tavan N ise N ders seçilir. Seçim ders sonu ekranında ve günlük mailde (düğmelerle) yapılabilir. Seçim yapılmazsa müfredat sırasındaki açılmamış ilk ders açılır (karar). Ertesi günün maili seçilen dersin özetiyle gider. Sıralı kurslarda bu seçenek kapalı, müfredat sırası işler.
 - Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
 - Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
 
@@ -165,7 +165,6 @@ Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akı
 
 ## Açık sorular
 
-- Seçimli kursta seçim yapılmazsa ne açılsın: müfredat sırası (varsayım), rastgele, ya da en çok seçilen ders?
 - Seçimli kursta "ilk gün açık" işareti aynı şekilde mi işler, yoksa ilk gün de seçim mi sorulur?
 
 - Kurs başına: freemium sınırı var mı ve nerede, günlük tavan (varsayılan 1), gerçek fiyat, bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
