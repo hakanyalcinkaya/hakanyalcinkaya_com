@@ -111,7 +111,12 @@
     if (window.innerWidth >= 992) setMenu(false);
   });
 
-  if ("IntersectionObserver" in window) {
+  // Bölüm vurgusu yalnız menü bağlantılarının bölümlerine (#yorumlar gibi) işaret ettiği sayfada (ana sayfa); diğer sayfalarda
+  // aynı kimlikli bölüm olsa da bağlantı ana sayfaya gider, vurgu sunucuda verilir (context_processors NAV_PAGES).
+  var navOnPage = Array.prototype.some.call(document.querySelectorAll("[data-nav]"), function (link) {
+    return link.hash && link.pathname === window.location.pathname;
+  });
+  if (navOnPage && "IntersectionObserver" in window) {
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;

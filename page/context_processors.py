@@ -14,6 +14,15 @@ from page.catalog import (
     NEWSLETTER_SESSION_KEY,
 )
 
+# Menü bölümüne ait sayfalar (url adı -> NAV kimliği).
+NAV_PAGES = {
+    "course_list": "egitimler",
+    "course_detail": "egitimler",
+    "course_reviews": "egitimler",
+    "all_reviews": "yorumlar",
+    "about": "hakkimda",
+}
+
 
 def site(request):
     index_url = reverse("page:index")
@@ -21,6 +30,9 @@ def site(request):
     user = request.user
     cards = content.catalog_cards(user)
     cart_count = len(content.cart_cards(request, cards))
+    # Ana sayfa dışındaki sayfada menüde bulunulan bölüm sunucuda işaretlenir; ana sayfada kaydırdıkça site.js işaretler.
+    url_name = request.resolver_match.url_name if request.resolver_match else ""
+    current_nav = NAV_PAGES.get(url_name, "")
     nav_items = []
     for item_id, label in NAV:
         # Giriş yapan üyeye tanıtım bölümleri (Öğrenci Yorumları, Hakkımda) gösterilmez; yalnız Kurslar.
@@ -30,7 +42,7 @@ def site(request):
             href = course_list_url
         else:
             href = f"{index_url}#{item_id}"
-        nav_items.append({"id": item_id, "href": href, "label": label})
+        nav_items.append({"id": item_id, "href": href, "label": label, "active": item_id == current_nav})
     return {
         # Sorgu parametresiz asıl adres: filtre, utm ve e-posta takibi parametreli adresler aynı sayfaya bağlanır.
         "canonical_url": absolute_url(request.path),

@@ -103,6 +103,9 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-cursor-glow.is-on{opacity:1}
 [data-reviews]::before{content:"";position:absolute;inset:10% 0 0;z-index:-1;pointer-events:none;background:radial-gradient(40% 55% at 18% 60%,rgba(var(--bs-primary-rgb),.22),transparent 70%),radial-gradient(35% 50% at 82% 40%,rgba(var(--bs-primary-rgb),.14),transparent 70%)}
 [data-theme-root]>.dropdown-menu{top:100%;right:0;left:auto}
+/* Mobil üst menü: logo, ad ve düğmeler tek satırda kalır (logonun sağ boşluğu 375 px'te satırı kırıyordu); çok dar ekranda ad gizlenir. */
+.hy-nav>.navbar-brand{margin-right:0}
+@media (max-width:359.98px){.hy-brand-name{display:none}}
 
 @media (min-width:992px){
   .navbar>.container.hy-nav{

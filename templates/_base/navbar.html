@@ -2,7 +2,7 @@
   <div class="container hy-nav">
     <a href="{% url 'page:index' %}#top" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6" aria-label="{% if nav_member %}Ana Sayfa{% else %}Hakan Yalçınkaya — Ana Sayfa{% endif %}">
       <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
-      {% if not nav_member %}Hakan Yalçınkaya{% endif %}
+      {% if not nav_member %}<span class="hy-brand-name">Hakan Yalçınkaya</span>{% endif %}
     </a>
 
     <div class="hy-nav-tools d-flex align-items-center gap-2 order-lg-last">
@@ -23,7 +23,7 @@
       {# Site bağlantıları: masaüstünde ortada; mobilde yalnız misafire (üyede menü mobile_account.html). #}
       <ul class="navbar-nav gap-lg-3 pt-3 pt-lg-0{% if nav_member %} d-none d-lg-flex{% endif %}">
         {% for item in nav_items %}
-        <li class="nav-item"><a href="{{ item.href }}" data-nav="{{ item.id }}" class="nav-link d-flex justify-content-between align-items-center">{{ item.label }}<i class="bi bi-chevron-right small d-lg-none text-body-tertiary" data-nav-chevron aria-hidden="true"></i></a></li>
+        <li class="nav-item"><a href="{{ item.href }}" data-nav="{{ item.id }}" class="nav-link d-flex justify-content-between align-items-center{% if item.active %} active{% endif %}"{% if item.active %} aria-current="page"{% endif %}>{{ item.label }}<i class="bi bi-chevron-right small d-lg-none {% if item.active %}text-primary-emphasis{% else %}text-body-tertiary{% endif %}" data-nav-chevron aria-hidden="true"></i></a></li>
         {% endfor %}
       </ul>
       {% if not nav_member %}
