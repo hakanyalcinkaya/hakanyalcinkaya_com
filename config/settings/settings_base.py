@@ -158,6 +158,9 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+# Şifre sıfırlama/belirleme bağlantısı 1 saat geçerli (Django varsayılanı 3 gün). Şifremi unuttum, Podia daveti ve satın
+# alma onayındaki "Şifreni belirle" bağlantısı aynı süreyi kullanır; süresi dolan "Şifremi unuttum"dan yenisini ister.
+PASSWORD_RESET_TIMEOUT = 60 * 60
 
 LANGUAGE_CODE = "tr"
 

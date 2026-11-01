@@ -142,7 +142,7 @@ Komutun kuralları:
 
 ## 11. Sonrası
 
-- **Şifre belirlemeyenler**: Şifre bağlantısı 3 gün geçerlidir (Django varsayılanı). Bağlantıyı kaybeden ya da süresi geçen kişi giriş sayfasındaki "Şifremi unuttum" ile yeni
+- **Şifre belirlemeyenler**: Şifre bağlantısı 1 saat geçerlidir (`PASSWORD_RESET_TIMEOUT`). Bağlantıyı kaybeden ya da süresi geçen kişi giriş sayfasındaki "Şifremi unuttum" ile yeni
   bağlantı alabilir (şifresi olmayan aktarılmış hesaplar için de çalışır).
 - **Yeni Podia satışları**: Yeni dosyayla 3–5. adımları tekrarla, sonra `send_podia_invites` yalnız henüz davet
   almamış kişilere gönderir.
