@@ -28,14 +28,29 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Akış = tetikleyici + eşik + aksiyon. Örnekler: 3 gün izlemedi → hatırlatma; %20 tamamladı → bonus ders; %50 tamamladı → indirim kodu; 30 gün giriş yok → programı durdur ve mail at; 7 gün üst üste zamanında → hızlandırma.
 - İki ayrı akış kitlesi: kursu satın alanlar, satın almadan izleyenler.
 - Akış kursa göre hazırlanır; başka kursa kopyalanıp uyarlanır (kısa kursta bonus ve indirim daha erken güne çekilebilir).
-- Ödüller: kişiye bağlı tek kullanımlık süreli indirim kodu, bonus ders (kursta normalde gizli, o kişiye açılır), programı hızlandırma (sonraki günler beklemeden açılır), sertifika.
+- Ödüller: kişiye bağlı tek kullanımlık süreli indirim kodu, bonus ders, programı hızlandırma (o gün ek ders açılır), sertifika.
+- Bonus ders: kurs içinde "bonus" işaretli gizli ders ya da kursa eklenen ayrı bonus bölümü. Akış, açılacak dersi kursun bonus derslerinden seçer. Bonus dersler müfredat sayısına ve ilerleme yüzdesine girmez.
+- Tetikleyiciler izleme ve ilerlemeyle sınırlı değil; mail etkileşimi de tetikleyici olabilir: ör. "3 gün üst üste maildeki bağlantıya tıklayıp derse gitti" (`EmailLog` tıklaması + aynı gün ders ziyareti).
+- Satın alanlar için ayrı kural ve akış yapısı; günlük tavan ve freemium sınırı uygulanmaz. Onlara özel gizli/ek bonus dersler olabilir.
 - Kontrol grubu akış başına ayarlanır (%; 0 = kapalı). Koşula uyanların bu kadarına aksiyon uygulanmaz, yalnız kaydedilir; akışın gerçek etkisi iki grubun farkıyla ölçülür.
 - Geriye dönük çalışma: akışlar o anki duruma bakar, yeni akış eski kayıtlara da uygulanabilir. Aktifleştirmeden önce önizleme ("şu an 142 kişiye uyuyor" ve örnek liste); eskilere uygulanıp uygulanmayacağı her seferinde seçilir. Toplu gönderim saatlik sınırla yayılır.
 - Aynı akış aynı kayda bir kez çalışır. İzlememe gibi tekrarlayan koşullarda kişi araya izleme girdiyse yeniden çalışabilir, en fazla tekrar sayısıyla. İlerleme eşiklerinde istenirse üst sınır (ör. yalnız %20–%40 arası).
 
+### Gün ve saat
+
+- "Gün" kullanıcının yerel takvim günüdür. Saat dilimi tarayıcıdan alınır (kayıtta ve her girişte güncellenir); bilinmiyorsa Europe/Istanbul.
+- Gönderim saati akışta belirlenir (ör. 09:00 yerel). Saatlik görev, o saatte olan saat dilimlerindeki kişilere gönderir.
+
+### Program durdurma ve devam
+
+- Durdurulan program (ör. F7) kişi dönünce kaldığı dersten devam eder.
+- Devamda kurallar baştan işler: sayaçlar ve seri sıfırlanır, akışlar yeni bir "dönem" için yeniden çalışabilir. Örnek: "3 gün üst üste maildeki bağlantıya tıklayıp derse gidene bonus" kuralı sıfırdan sayar.
+- Varsayım (onaylanacak): daha önce verilen ödül (açılan bonus ders, gönderilen kod) geri alınmaz; aynı ödül akışı yeni dönemde yeniden çalışabilir.
+
 ### Mail
 
-- Program mailleri (yeni gün açıldı, hatırlatma, program durduruldu): kişi başı günde en fazla 1; çakışırsa önceliği yüksek olan gider, diğeri ertesi güne kalır.
+- Günlük program maili: o gün açılan derslerin özetiyle (ders adı ve açıklaması) gider. Hatırlatma ve "program durduruldu" da program maili sayılır.
+- Program mailleri: kişi başı günde en fazla 1; çakışırsa önceliği yüksek olan gider, diğeri ertesi güne kalır.
 - Ödül ve teklif mailleri (bonus, indirim, sertifika, kurs önerisi) ayrı gider; kişi başı günde en fazla 1.
 - Kişi iki türü hesap ayarlarında ayrı ayrı kapatır. Teklif mailleri ticari ileti sayılır: onay ve İYS gerekir; hukukçuyla teyit edilmeli.
 
@@ -111,8 +126,8 @@ Karar bekleyenler:
 - ~~Kilit modeli~~ Karar: günlük tavan, kurs başına, varsayılan 1 (yukarıda).
 - **Ücretli ürün.** Sitede şu an satılan ürün yok (100 ₺ fiyat yalnız test için). Freemium sınırı olan kurslarda "kursun kalanını aç" gerçek bir teklif; sınırsız kurslarda yalnız premium kalır. Kurs başına gerçek fiyat belirlenmeli. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
 - **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
-- **Günlük "yeni gün açıldı" maili** gönderilsin mi? Öneri: yalnız izlemeyene hatırlatma ya da haftalık özet; her gün mail yorgunluk yaratır.
-- Ücretsiz kayıtlı kullanıcı yorum yazabilsin mi? (Şu an `has_access` izin verir.) En azından yorumda kaynak saklanmalı.
+- ~~Günlük mail~~ Karar: her gün, o günün ders özetiyle gider. Risk: uzun programda (300+ gün) yorgunluk; abonelikten çıkma oranı izlenir, gerekirse akışla seyreltilir.
+- ~~Yorum~~ Karar: ücretsiz kayıtlı yorum yazabilir; yorumda kayıt kaynağı saklanır, Stüdyo'da filtrelenir.
 
 Eksik önkoşullar:
 
@@ -131,7 +146,8 @@ Kodla çakışan noktalar:
 - Paket fiyat düşümü (TODO 3) ücretsiz kaydı da düşer; kaynak ayrımı.
 - Bonus dersler müfredat toplamından ve ilerleme yüzdesinden hariç tutulmalı.
 - "30 gün giriş yapmadı": `last_login` oturum boyunca güncellenmez; `last_watched_at` ya da son istek zamanı.
-- "Gün" tanımı: Europe/Istanbul takvim günü, mail saati (ör. 09:00) belirlenmeli.
+- Kullanıcıda saat dilimi alanı (tarayıcıdan, kayıt ve girişte güncellenir; `makemigrations account`).
+- Günlük mail için derste özet/açıklama metni olmalı; boşsa yalnız ders adı.
 - Site içi olay kaydı (`Event`: kullanıcı, olay, zaman) yok; "teklife tıklama" hunisi için gerekir.
 - Kontrol grubu %10 küçük kitlede anlamsız; birkaç yüz kayıt birikmeden okunmaz.
 
