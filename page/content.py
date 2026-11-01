@@ -12,7 +12,7 @@ from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.db.models import Prefetch
 from django.templatetags.static import static
 from django.urls import reverse
@@ -279,11 +279,20 @@ def cart_cards(request, cards=None):
 
 
 def checkout_buyer(request, email):
-    """Siparişin bağlanacağı hesap: giriş yapan üye; misafirde bu e-postayla kayıtlı hesap (doğrulama yok), yoksa None.
-    Hesabı olmayan alıcının adı soyadı ödemeden sonra sorulur ve hesabı o adımda açılır."""
+    """Siparişin bağlanacağı hesap: giriş yapan üye; misafirde bu e-postayla kayıtlı hesap (doğrulama yok), yoksa "Kartla
+    öde"ye basınca şifresiz açılan yeni hesap. Ödeme tamamlanmasa da hesap kalır; şifre belirleme bağlantısı satın alma
+    onayı e-postasıyla gider, adı soyadı ödemeden sonra sorulur. Misafir bu hesapla oturum açmış sayılmaz."""
     if request.user.is_authenticated:
         return request.user
-    return User.objects.with_email(email).first()
+    user = User.objects.with_email(email).first()
+    if user is None:
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(email=email, password=None)
+        except IntegrityError:
+            # Aynı e-postayla eşzamanlı ikinci istek: önce açılan hesap kullanılır.
+            user = User.objects.with_email(email).first()
+    return user
 
 
 def create_card_order(request, email):

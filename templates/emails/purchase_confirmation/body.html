@@ -7,6 +7,11 @@
 <p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
 <p style="margin: 0 0 14px;">Ödemen alındı ve eğitim{% if items|length > 1 %}ler{% endif %} hesabına tanımlandı. Hemen başlayabilirsin.</p>
 {% include "emails/modules/items.html" with show_prices=True %}
+{% if set_password_url %}
+<p style="margin: 0 0 14px;">Hesabın bu e-posta adresiyle açıldı. Kurslarına girmek için önce bir şifre belirle; bağlantı süreli ve tek kullanımlıktır.</p>
+{% include "emails/modules/button.html" with url=set_password_url label="Şifreni belirle" %}
+{% else %}
 {% include "emails/modules/button.html" with url=library_url label="Eğitime başla" %}
+{% endif %}
 <p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Sipariş bilgilerin için bu e-postayı saklayabilirsin{% if thanks_url %} ya da <a href="{{ thanks_url }}" style="color: #9B9B9B;">sipariş özetine</a> bakabilirsin{% endif %}. Satın alma <a href="{{ agreement_url }}" style="color: #9B9B9B;">Mesafeli Satış Sözleşmesi</a>'ne tabidir. Sorun olursa bu e-postayı yanıtlaman yeterli.</p>
 {% endblock %}

@@ -19,7 +19,7 @@
           {% crispy checkout_form %}
           {% else %}
           {% crispy checkout_form %}
-          <p class="small text-body-tertiary mb-0">Ödemeden sonra adını soracağız; kurslarına bu adresle giriş yapacaksın. Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>
+          <p class="small text-body-tertiary mb-0">Kartla öde'ye basınca hesabın bu e-postayla açılır; ödemeden sonra adını soracağız, şifre belirleme bağlantısı da e-postana gelir. Zaten hesabın var mı? <a href="{{ login_url }}?next={{ request.path|urlencode }}">Giriş yap</a></p>
           {% endif %}
         </div>
       </section>

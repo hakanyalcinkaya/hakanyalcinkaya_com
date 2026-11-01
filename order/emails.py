@@ -83,6 +83,8 @@ def purchase_confirmation_context(order):
         # Mesafeli Satış Sözleşmesi "bir kopyası onay e-postasıyla iletilir" der: e-postada bağlantısı yer alır.
         "agreement_url": absolute(reverse("page:distance_sales")),
         "thanks_url": absolute(order.get_thanks_url()),
+        # Ödemede (misafirken) açılan şifresiz hesap: şifre belirleme bağlantısı.
+        "set_password_url": "" if order.user.has_usable_password() else password_url(order.user),
     }
 
 

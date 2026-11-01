@@ -12,7 +12,7 @@ from order.emails import purchase_confirmation_context
 @shared_task(autoretry_for=(smtplib.SMTPException, OSError), retry_backoff=True, max_retries=3)
 def send_purchase_confirmation(order_id):
     """Ödemesi onaylanan sipariş: alıcıya satın alma onayı (Order.mark_paid sonrası). Yanıtlanınca destek adresine döner.
-    Hesabı olmayan alıcının siparişi gönderilmez: hesabı açılınca (misafir siparişi akışı) gönderilmeli."""
+    Siparişler hesaba bağlıdır (misafirin hesabı "Kartla öde"de açılır); hesapsız eski kayıt olursa gönderilmez."""
     from order.models import Order
 
     order = Order.objects.paid().select_related("user").filter(pk=order_id).first()

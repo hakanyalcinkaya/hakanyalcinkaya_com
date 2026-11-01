@@ -4,8 +4,10 @@
 Ödemen alındı ve eğitim{% if items|length > 1 %}ler{% endif %} hesabına tanımlandı. Sipariş no: {{ order_number }}{% if purchased_at %} · {{ purchased_at|date:"j F Y" }}{% endif %}
 
 {% include "emails/_items.txt" with show_prices=True %}
-Eğitime başla: {{ library_url }}
-{% if thanks_url %}Sipariş özeti: {{ thanks_url }}
+{% if set_password_url %}Hesabın bu e-posta adresiyle açıldı. Kurslarına girmek için önce şifreni belirle (bağlantı süreli ve tek kullanımlık):
+{{ set_password_url }}
+{% else %}Eğitime başla: {{ library_url }}
+{% endif %}{% if thanks_url %}Sipariş özeti: {{ thanks_url }}
 {% endif %}Mesafeli Satış Sözleşmesi: {{ agreement_url }}
 
 Sorun olursa bu e-postayı yanıtlaman yeterli.{% endblock %}

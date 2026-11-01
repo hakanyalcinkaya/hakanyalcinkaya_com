@@ -82,6 +82,7 @@ EMAILS = {
             **ITEM_VARIABLES,
             "agreement_url": "Mesafeli Satış Sözleşmesi sayfası",
             "thanks_url": "Siparişin teşekkür sayfası (sipariş özeti)",
+            "set_password_url": "Şifre belirleme bağlantısı; yalnız ödemede açılan şifresiz hesapta (yoksa boş)",
         },
     ),
     "payment_failed": _email(
@@ -366,6 +367,7 @@ def sample_context(key):
         "purchase_confirmation": {
             "agreement_url": f"{site}/distance-sales-agreement/",
             "thanks_url": f"{site}/thanks/HY-260314-A1B2C3/",
+            "set_password_url": f"{site}/account/password-reset/ornek/belirtec/",
         },
         "password_reset": {"reset_url": f"{site}/account/password-reset/ornek/belirtec/"},
         "password_changed": {"changed_at": when, "reset_page_url": f"{site}/account/password-reset/"},
