@@ -640,12 +640,22 @@ def password_reset(request):
     return render(request, "page/account/password_reset.html", {"form": form})
 
 
+def _reset_valid_for():
+    """Şifre sıfırlama bağlantısının geçerlilik süresi (PASSWORD_RESET_TIMEOUT): "3 gün", "12 saat" ya da "30 dakika"."""
+    seconds = settings.PASSWORD_RESET_TIMEOUT
+    if seconds % 86400 == 0:
+        return f"{seconds // 86400} gün"
+    if seconds % 3600 == 0:
+        return f"{seconds // 3600} saat"
+    return f"{max(seconds // 60, 1)} dakika"
+
+
 @anonymous_required
 def password_reset_sent(request):
     return render(
         request,
         "page/account/password_reset_sent.html",
-        {"email": request.session.get(RESET_SESSION_KEY, "")},
+        {"email": request.session.get(RESET_SESSION_KEY, ""), "reset_valid_for": _reset_valid_for()},
     )
 
 
