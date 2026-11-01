@@ -13,7 +13,6 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 
 ## 2. İçerik temizliği (yayından önce)
 - [ ] Örnek veriyi kaldır: kurs sayfası tanıtım metnini aynı slug'lı örnek kurstan birleştiriyor (`page/content.py` `course_card` ve kurs detayı, `catalog.course_by_slug`); sepette oturumdaki örnek kurs yolu (`page/catalog.py` `cart_add`, `page/content.py` sepet) ve yayında kurs yokken gösterilen örnek kurslar. Gerçek kursların madde listeleri (CourseHighlight) dolu.
-- [ ] Visa ve Mastercard logoları geçici (`static_files/img/payment/visa.svg`, `mastercard.svg`, kendi çizimimiz); resmi dosyalarla değiştir. iyzico ile Öde logosu resmi paketten.
 - [ ] Teşekkürler sayfası (`page/views.py` `thanks`) oturumdaki `last_order`'dan besleniyor, `catalog.place_order` hiçbir yerden çağrılmadığı için şu an hep "Görüntülenecek sipariş yok" diyor; iyzico bağlanınca gerçek `Order`'dan (sipariş no `order.number`) beslenmeli.
 - [ ] Django ve Python kurslarının erişim notu "platformdan izlemeye başlayabilirsin" diyor; sadeleştir (Stüdyo → Kurs bilgileri → Erişim notu).
 - [ ] Ders adlarındaki yazım hataları ("Kulllanımı", "Klasorlerin", ...).
