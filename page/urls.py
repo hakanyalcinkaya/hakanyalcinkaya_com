@@ -24,8 +24,8 @@ urlpatterns = [
     ),
     path("lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
     path("lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
-    path("courses/<slug:slug>/review/", views.course_review, name="course_review"),
-    path("courses/<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
+    # Kursun yorumları önceden /courses/<slug>/reviews/ adresindeydi: kurs adresinin altına kalıcı yönlenir.
+    path("courses/<slug:slug>/reviews/", RedirectView.as_view(pattern_name="page:course_reviews", permanent=True)),
     path("reviews/", views.all_reviews, name="all_reviews"),
     path("account/login/", views.login, name="login"),
     path("account/signup/", views.signup, name="signup"),
@@ -51,6 +51,8 @@ urlpatterns = [
     path("<slug:slug>/add-to-cart/", views.add_to_cart, name="add_to_cart"),
     path("<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
     path("<slug:slug>/buy/", views.buy, name="buy"),
+    path("<slug:slug>/review/", views.course_review, name="course_review"),
+    path("<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
     path("<slug:slug>/", views.course_detail, name="course_detail"),
     path("<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/", views.lesson, name="lesson"),
 ]
