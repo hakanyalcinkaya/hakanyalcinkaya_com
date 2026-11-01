@@ -1,7 +1,7 @@
 {% extends "_base/base.html" %}
 {% load static %}
 
-{% block title %}Ders — {{ course.title }}{% endblock %}
+{% block title %}{{ current.title }} — {{ course.short }}{% endblock %}
 {% block description %}{{ current.title }}{% endblock %}
 {% block head %}
 <meta name="robots" content="noindex">
@@ -154,7 +154,7 @@
 
         {% if preview %}
         <section class="mt-4 pt-2" aria-labelledby="onizleme-baslik">
-          <div class="d-flex align-items-baseline justify-content-between gap-2">
+          <div class="d-flex flex-column flex-sm-row align-items-sm-baseline justify-content-between gap-1 gap-sm-2">
             <h2 id="onizleme-baslik" class="h6 fw-semibold mb-0">Ücretsiz önizleme dersleri</h2>
             <span class="small text-body-tertiary">{{ preview_count }} ders · satın almadan izle</span>
           </div>
