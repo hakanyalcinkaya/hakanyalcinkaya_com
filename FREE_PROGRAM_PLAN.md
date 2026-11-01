@@ -137,14 +137,16 @@ Günler kurs uzunluğuna göre ölçeklenir: `G` = kursun program uzunluğu (gü
 Karar bekleyenler:
 
 - ~~Kilit modeli~~ Karar: günlük tavan, kurs başına, varsayılan 1 (yukarıda).
-- **Ücretli ürün.** Sitede şu an satılan ürün yok (100 ₺ fiyat yalnız test için). Freemium sınırı olan kurslarda "kursun kalanını aç" gerçek bir teklif; sınırsız kurslarda yalnız premium kalır. Kurs başına gerçek fiyat belirlenmeli. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
+- **Ücretli ürün.** Site yayında (1 Kasım 2026), her kurs 5499 ₺. Bu fiyatta kursun tamamını günlük tavanla ücretsiz vermek gerçek gelir kaybıdır; **freemium sınırı 5499 ₺'lik kurslarda zorunlu** olmalı (öneri: ücretsiz kısım kursun %10–20'si, ilk projeye kadar). "Kalanını aç" 5499 ₺'lik gerçek teklif. Sınırsız ücretsiz program yalnız ayrı bir "tanıtım" kursu ya da premium öncesi kampanya için düşünülmeli.
+- **5499 ₺ dönüşüm matematiği.** Ücretsizden yüksek fiyata geçiş oranı düşük olur (%1–3 beklenmeli). 1000 ücretsiz kayıt → 10–30 satış → 55–165 bin ₺. Kaldıraçlar: iyzico taksit (6–12 ay), süreli indirim kodu (F9), memnuniyet garantisi (mesafeli satışta cayma hakkı zaten yok; ayrıca "14 gün iade" vaadi düşünülebilir), paket fiyatı, canlı destek/mentorluk eklentisi.
+- **Çapa.** Ücretsiz kısmın kalitesi 5499 ₺'yi haklı çıkarmalı; ilk gün açık dersler en güçlü içerik olmalı. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
 - **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
 - ~~Günlük mail~~ Karar: her gün, o günün ders özetiyle gider. Risk: uzun programda (300+ gün) yorgunluk; abonelikten çıkma oranı izlenir, gerekirse akışla seyreltilir.
 - ~~Yorum~~ Karar: ücretsiz kayıtlı yorum yazabilir; yorumda kayıt kaynağı saklanır, Stüdyo'da filtrelenir.
 
 Eksik önkoşullar:
 
-- Kartla ödeme kapalı (`page/views.py` `CARD_PAYMENT_OPEN = False`); iyzico bağlanmadan dönüşüm ölçülmez.
+- Kartla ödeme yerelde kapalı (`page/views.py` `CARD_PAYMENT_OPEN = False`); prod durumu teyit edilmeli. 5499 ₺'de kart + taksit olmadan dönüşüm ölçülmez.
 - İşlem mailleri (hoş geldin, satın alma onayı) bağlı değil.
 - Ücretsiz kayıt formunda işaretsiz ticari ileti onay kutusu + İYS.
 - Ücretsiz hizmet için kısa kullanım şartları; gizlilik politikasına UTM ve akış kayıtları; hesap silme planına `FlowRun` ve UTM.
