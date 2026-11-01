@@ -59,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "core.middleware.HtmxLoginRedirectMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -161,6 +162,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Şifre sıfırlama/belirleme bağlantısı 1 saat geçerli (Django varsayılanı 3 gün): Şifremi unuttum ve satın alma onayındaki
 # "Şifreni belirle". Podia davetinin bağlantısı 3 gün (account.tokens.INVITE_TIMEOUT).
 PASSWORD_RESET_TIMEOUT = 60 * 60
+# Form güvenlik belirteci geçersizse (eski sekme vb.) Türkçe sayfa (templates/403_csrf.html).
+CSRF_FAILURE_VIEW = "page.views.csrf_failure"
 
 LANGUAGE_CODE = "tr"
 

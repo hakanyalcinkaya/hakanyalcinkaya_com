@@ -214,9 +214,17 @@ class FavoriteQuerySet(models.QuerySet):
         return self.filter(user=user)
 
     def for_library(self):
-        """Kurslarım sayfası: kurs kurs, müfredat sırasıyla."""
-        return self.select_related("lesson__section__course").order_by(
-            "lesson__section__course__title", "lesson__section__sort_order", "lesson__sort_order", "id"
+        """Kurslarım sayfası: kurs kurs, müfredat sırasıyla. Yalnız yayındaki dersler ve kullanıcının sahip olduğu kurslar;
+        taslağa alınan ya da erişimi kalmayan dersin favorisi listelenmez (bağlantısı 404 verirdi)."""
+        return (
+            self.filter(
+                lesson__status=Status.PUBLISHED,
+                lesson__section__status=Status.PUBLISHED,
+                lesson__section__course__status=Status.PUBLISHED,
+                lesson__section__course__enrollments__user=models.F("user"),
+            )
+            .select_related("lesson__section__course")
+            .order_by("lesson__section__course__title", "lesson__section__sort_order", "lesson__sort_order", "id")
         )
 
 

@@ -1,0 +1,21 @@
+{% extends "_base/base.html" %}
+
+{# Form güvenlik belirteci geçersiz (CSRF): çoğunlukla sayfa uzun süre açık kaldı ya da başka sekmede giriş/çıkış yapıldı. page.views.csrf_failure çizer. #}
+{% block title %}Sayfanın süresi doldu — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center py-lg-5">
+    <div class="col-lg-8 col-xl-7 text-center">
+      <p class="font-monospace text-primary-emphasis mb-2">[403] =&gt; süresi doldu</p>
+      <h1 class="display-6 fw-semibold">Sayfanın süresi doldu</h1>
+      <p class="lead text-body-secondary">Sayfa uzun süre açık kaldığı ya da başka bir sekmede giriş/çıkış yapıldığı için işlem tamamlanamadı. Sayfayı yenileyip tekrar dene.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+        <a href="{{ back_url }}" class="btn btn-primary btn-lg fs-6"><i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>Sayfaya dön ve yenile</a>
+        <a href="{% url 'page:index' %}" class="btn btn-outline-secondary btn-lg fs-6">Ana sayfa</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

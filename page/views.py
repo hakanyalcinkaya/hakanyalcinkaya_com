@@ -264,9 +264,13 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     review_course = None
     if lesson is not None and not page["preview"] and request.user.is_authenticated:
         favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
-        # Kursu satın alıp değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
-        if Enrollment.objects.has_access(request.user, course) and not Review.objects.filter(course=course, user=request.user).exists():
-            review_course = course
+        enrollment = Enrollment.objects.for_user(request.user).filter(course=course).first()
+        if enrollment is not None:
+            # Kaldığı ders: Kurslarım'daki "Kaldığın dersten devam et", son izleme tarihi ve stüdyodaki izleme bilgisi.
+            enrollment.record_visit(lesson)
+            # Kursu satın alıp değerlendirmemişse ders sayfasında sorulur; değerlendirdiyse burada bir daha sorulmaz.
+            if not Review.objects.filter(course=course, user=request.user).exists():
+                review_course = course
     # Önizleme ziyaretçisine kursun yorumları, kurs sayfasındaki gibi kaydırmalı ve "Tüm yorumlar" ile (örnek kursta örnekler).
     review_context = {}
     if page["preview"]:
@@ -707,6 +711,10 @@ def account_settings(request):
             messages.success(request, message)
             return redirect(f"{reverse('page:account_settings')}#{action}")
         forms[action] = form
+    # Her form kendi bölümüne gönderilir: hata varsa tarayıcı sayfayı o bölümde açar (hata ekranın dışında kalmaz).
+    url = reverse("page:account_settings")
+    for key, form in forms.items():
+        form.helper.form_action = f"{url}#{key}"
     return render(
         request,
         "page/account/settings.html",
@@ -723,12 +731,13 @@ def account_settings(request):
 @login_required
 @require_POST
 def player_preferences(request):
-    """Oynatıcıda hız, kalite ya da altyazı değişince arka planda çağrılır; yalnız gönderilen tercihler kaydedilir."""
-    form = PlayerPreferenceAutoForm(request.POST, user=request.user)
-    if not form.is_valid():
+    """Oynatıcıda hız, kalite ya da altyazı değişince arka planda çağrılır; yalnız gönderilen tercihler kaydedilir.
+    Geçersiz alan atlanır (skipped), geçerli olanlar yine kaydedilir."""
+    form, skipped = PlayerPreferenceAutoForm.valid_fields(request.POST, user=request.user)
+    if form.errors:
         return JsonResponse(dict(ok=False, errors=form.errors.get_json_data()), status=400)
     form.save()
-    return JsonResponse(dict(ok=True, preferences=form.instance.player_options()))
+    return JsonResponse(dict(ok=True, preferences=form.instance.player_options(), skipped=skipped))
 
 
 def newsletter_confirmed(request):
@@ -822,6 +831,14 @@ def newsletter_confirm(request):
         "page/newsletter_confirm.html",
         {"email": request.session.get(NEWSLETTER_SESSION_KEY, "")},
     )
+
+
+def csrf_failure(request, reason=""):
+    """Form güvenlik belirteci geçersiz (CSRF_FAILURE_VIEW): Django'nun İngilizce sayfası yerine site düzeninde Türkçe
+    açıklama; "Sayfaya dön" geldiği sayfaya (aynı siteden geldiyse) gider."""
+    referer = request.META.get("HTTP_REFERER", "")
+    allowed = url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}, require_https=request.is_secure())
+    return render(request, "403_csrf.html", {"back_url": referer if referer and allowed else reverse("page:index")}, status=403)
 
 
 def _legal(request, key):

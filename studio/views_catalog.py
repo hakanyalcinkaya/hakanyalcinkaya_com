@@ -9,7 +9,7 @@ import json
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, ProtectedError, Q
+from django.db.models import Count, F, ProtectedError, Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -135,7 +135,7 @@ def _stats_list(request, course, tab):
         bucket = ""
     if query:
         rows = rows.filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
-    page = _page(request, rows.order_by("-progress", "-last_watched_at", "id"))
+    page = _page(request, rows.order_by("-progress", F("last_watched_at").desc(nulls_last=True), "id"))
     return dict(context, page=page, bucket=bucket, buckets=course_stats.PROGRESS_BUCKETS)
 
 

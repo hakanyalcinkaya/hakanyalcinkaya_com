@@ -6,7 +6,7 @@ Listeler filtreyi GET parametresinde tutar; HTMX isteğinde liste, kaydırınca 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -231,7 +231,7 @@ def student_detail(request, user_id):
     enrollments = Enrollment.objects.filter(user=member).with_progress().select_related("course", "last_lesson", "order")
     context = dict(
         member=member,
-        enrollments=enrollments.order_by("-last_watched_at", "-created_at", "id"),
+        enrollments=enrollments.order_by(F("last_watched_at").desc(nulls_last=True), "-created_at", "id"),
         orders=member.orders.prefetch_related("items").order_by("-created_at", "id"),
         cart_items=CartItem.objects.filter(cart__user=member, cart__status=CartStatus.ACTIVE).select_related("course", "bundle"),
         subscriber=Subscriber.objects.by_email(member.email),

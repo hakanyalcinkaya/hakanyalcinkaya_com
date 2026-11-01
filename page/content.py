@@ -404,7 +404,8 @@ def library_page(user, status):
         Enrollment.objects.filter(user=user, course__status=Status.PUBLISHED)
         .select_related("course__category", "last_lesson__section")
         .prefetch_related("course__technologies")
-        .order_by("-last_watched_at", "-created_at", "id")
+        # Son izlenen önce; hiç izlenmeyen (boş) sona: PostgreSQL azalan sırada boşları başa koyar.
+        .order_by(models.F("last_watched_at").desc(nulls_last=True), "-created_at", "id")
     )
     owned = []
     for enrollment in enrollments:

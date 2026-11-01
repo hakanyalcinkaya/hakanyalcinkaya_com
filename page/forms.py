@@ -4,6 +4,7 @@ from crispy_forms.layout import HTML, Column, Hidden, Layout, Row
 from django import forms
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth import forms as auth_forms
+from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -41,6 +42,9 @@ class StyledForm(StyledFormMixin, forms.Form):
     pass
 
 
+EMAIL_MAX_LENGTH = 254
+
+
 def legal_dialog_link(url_name, text):
     """Yasal metin bağlantısı: sayfadan çıkmadan ortak pencerede açılır (aynı adresin HTMX yanıtı); JS yoksa sayfaya gider."""
     url = reverse(url_name)
@@ -48,16 +52,22 @@ def legal_dialog_link(url_name, text):
 
 
 def email_field(label="E-posta"):
-    return forms.EmailField(
+    # Veritabanındaki e-posta alanı 254 karakter; daha uzunu kaydederken hata (500) veriyordu. Tarayıcının maxlength'i
+    # kaldırılır ki yapıştırılan uzun adres kesilmeden gelsin ve kullanıcı sınırı hata mesajıyla görsün.
+    field = forms.EmailField(
         label=label,
+        max_length=EMAIL_MAX_LENGTH,
         error_messages={
             "required": "E-posta adresi gerekli.",
             "invalid": "Geçerli bir e-posta adresi gir.",
+            "max_length": f"E-posta adresi en fazla {EMAIL_MAX_LENGTH} karakter olabilir.",
         },
         widget=forms.EmailInput(
             attrs={"autocomplete": "email", "inputmode": "email", "placeholder": "ornek@eposta.com"}
         ),
     )
+    field.widget.attrs.pop("maxlength", None)
+    return field
 
 
 def password_field(label, autocomplete, min_length=None):
@@ -305,8 +315,15 @@ class ReviewForm(forms.Form):
     def save(self, course, user, review=None):
         from course.models import Review
 
+        rating, text = self.cleaned_data["rating"], self.cleaned_data["text"]
         review = review or Review(course=course, user=user)
-        review.submit(self.cleaned_data["rating"], self.cleaned_data["text"])
+        try:
+            with transaction.atomic():
+                review.submit(rating, text)
+        except IntegrityError:
+            # Çift gönderim (aynı anda iki istek): ilk istekte açılan yorum güncellenir, kısıt hatası (500) çıkmaz.
+            review = Review.objects.get(course=course, user=user)
+            review.submit(rating, text)
         return review
 
 
@@ -361,6 +378,18 @@ class PlayerPreferenceAutoForm(forms.ModelForm):
         merged = {name: getattr(instance, name) for name in self.FIELDS}
         merged.update({name: data[name] for name in self.FIELDS if name in data})
         super().__init__(merged, instance=instance, **kwargs)
+
+    @classmethod
+    def valid_fields(cls, data, *, user):
+        """Oynatıcı değişiklikleri biriktirip tek istekte yollar: geçersiz alan (ör. listede olmayan 1440p kalitesi) atılır,
+        diğerleri yine kaydedilir. (geçerli form, atılan alanların hataları) döner."""
+        form = cls(data, user=user)
+        if form.is_valid():
+            return form, {}
+        skipped = form.errors.get_json_data()
+        form = cls({name: value for name, value in data.items() if name not in skipped}, user=user)
+        form.is_valid()
+        return form, skipped
 
 
 class CurrentPasswordMixin:
