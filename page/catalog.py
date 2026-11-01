@@ -691,7 +691,6 @@ def _continue_slugs(slug):
     return lesson["section_slug"], lesson["lesson_slug"]
 
 
-# [PLACEHOLDER: hukuki metin] Başlıklar yer tutucudur; yayından önce hukuki incelemeden geçmeli.
 LEGAL_UPDATED = "1 Kasım 2026"
 
 _PRIVACY = (

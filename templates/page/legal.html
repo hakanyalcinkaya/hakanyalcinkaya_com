@@ -30,7 +30,6 @@
     </nav>
 
     <article class="col-lg-8 col-xl-7">
-      <p class="small font-monospace text-body-tertiary">[PLACEHOLDER: hukuki metin — yayından önce hukuki inceleme gerekli]</p>
       {% for section in sections %}
       <section id="{{ section.id }}" class="{% if not forloop.first %}pt-4{% endif %}" aria-labelledby="{{ section.id }}-baslik">
         <h2 id="{{ section.id }}-baslik" class="h5 fw-semibold">{{ forloop.counter }}. {{ section.title }}</h2>

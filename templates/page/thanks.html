@@ -14,7 +14,7 @@
         <span class="d-inline-flex align-items-center justify-content-center rounded bg-success-subtle text-success-emphasis hy-icon-tile" aria-hidden="true"><i class="bi bi-check-lg fs-2"></i></span>
         <h1 class="display-6 fw-semibold mt-3">Kaydın tamamlandı</h1>
         <p class="lead text-body-secondary mb-1">{{ headline }}</p>
-        <p class="small text-body-tertiary mb-0">Sipariş özetin <b class="text-body-secondary">{{ order.email }}</b> adresine gönderilecek. <span class="font-monospace">[PLACEHOLDER: e-posta bildirimi]</span></p>
+        <p class="small text-body-tertiary mb-0">Sipariş özetin <b class="text-body-secondary">{{ order.email }}</b> adresine gönderilecek.</p>
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
           <a href="{{ start_url }}" class="btn btn-primary btn-lg fs-6 px-4">Kursa başla <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           <a href="{{ library_url }}" class="btn btn-outline-secondary btn-lg fs-6 px-4">Kurslarım</a>
@@ -25,7 +25,7 @@
         <div class="card-body p-4">
           <div class="d-flex flex-wrap justify-content-between gap-2">
             <h2 id="siparis-baslik" class="h6 fw-semibold mb-0">Sipariş özeti</h2>
-            <span class="small text-body-tertiary">Sipariş no <span class="font-monospace">[PLACEHOLDER]</span></span>
+            {% if order.number %}<span class="small text-body-tertiary">Sipariş no <span class="font-monospace">{{ order.number }}</span></span>{% endif %}
           </div>
           <ul class="list-unstyled d-grid gap-3 mt-3 mb-0">
             {% for item in summary.items %}
