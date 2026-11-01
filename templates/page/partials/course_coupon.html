@@ -1,0 +1,9 @@
+{# Satın alma kartında indirim kodu: bağlantı tıklanınca kod alanı HTMX ile gelir (page:course_coupon); hata da burada gösterilir. #}
+{% load crispy_forms_tags %}
+<div class="mt-3" data-course-coupon>
+  {% if coupon_form %}
+  {% crispy coupon_form %}
+  {% else %}
+  <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" hx-get="{% url 'page:course_coupon' slug=course.slug %}" hx-target="closest [data-course-coupon]" hx-swap="outerHTML"><i class="bi bi-tag me-1" aria-hidden="true"></i>İndirim kodun var mı?</button>
+  {% endif %}
+</div>

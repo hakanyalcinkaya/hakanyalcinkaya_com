@@ -16,6 +16,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django_htmx.http import HttpResponseClientRedirect
 
 from cart.request_cart import current_cart
 from core import ratelimit
@@ -440,6 +441,32 @@ def buy(request, slug):
         messages.info(request, error.messages[0])
         return redirect("page:cart")
     return redirect(f"{reverse('page:cart')}?{urlencode({'added': slug})}")
+
+
+def course_coupon(request, slug):
+    """Kurs sayfasında indirim kodu (satın alma kartı): GET kod alanını getirir; geçerli kodda kurs sepete eklenir,
+    kod sepete uygulanır ve sepete gidilir. Geçersiz kodda hata kartın içinde gösterilir."""
+    course = content.visible_course(slug, request.user)
+    if course is None:
+        raise Http404
+    if not request.htmx and request.method != "POST":
+        return redirect(course.get_absolute_url())
+    form = CouponForm(request.POST if request.method == "POST" else None, user=request.user, course=course)
+    if request.method == "POST" and form.is_valid():
+        discount = form.cleaned_data["code"]
+        try:
+            content.cart_add(request, slug)
+        except ValidationError as error:
+            messages.info(request, error.messages[0])
+        else:
+            current_cart(request).apply_discount(discount, request.user)
+            messages.success(request, f"{discount.code} indirim kodu uygulandı.")
+        url = reverse("page:cart")
+        return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
+    if not request.htmx:
+        messages.error(request, form.errors["code"][0])
+        return redirect(course.get_absolute_url())
+    return render(request, "page/partials/course_coupon.html", dict(course=course, coupon_form=form))
 
 
 def _coupon(request, cart, items, action, next_url):

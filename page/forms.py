@@ -476,14 +476,21 @@ class CouponForm(StyledForm):
         widget=forms.TextInput(attrs={"autocomplete": "off", "placeholder": "Kodunu gir"}),
     )
 
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, user=None, course=None, **kwargs):
         super().__init__(*args, prefix="coupon", **kwargs)
         self.user = user
+        # course: kurs sayfasındaki kutu; kod o kursta geçerli olmalı, form kendi adresine HTMX ile gönderilir.
+        self.course = course
         self.fields["code"].widget.attrs["class"] = ""
         self.helper.layout = Layout(
             Hidden("action", "coupon"),
             FieldWithButtons("code", StrictButton("Uygula", type="submit", css_class="btn-outline-secondary")),
         )
+        if course is not None:
+            url = reverse("page:course_coupon", kwargs={"slug": course.slug})
+            self.helper.form_action = url
+            self.fields["code"].widget.attrs["autofocus"] = True
+            self.helper.attrs.update({"hx-post": url, "hx-target": "closest [data-course-coupon]", "hx-swap": "outerHTML"})
 
     def clean_code(self):
         if not self.cleaned_data["code"].strip():
@@ -492,4 +499,6 @@ class CouponForm(StyledForm):
         if discount is None:
             raise forms.ValidationError("Bu indirim kodu geçerli değil.")
         discount.validate_for(self.user)
+        if self.course is not None and not discount.applies_to(self.course):
+            raise forms.ValidationError("Bu indirim kodu bu kursta geçerli değil.")
         return discount
