@@ -72,7 +72,17 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Model metotları: `Course.enroll_free(user)`, `Enrollment.program_day()`, `Enrollment.unlocked_lessons()`, `Enrollment.is_on_schedule()`, `Lesson.is_unlocked_for(enrollment)`. Kilitli ders: "yarın açılıyor" sayfası ve ücretli teklif.
 - Program durumu kayıtta: durduruldu mu, ne zaman, hızlandırma ile açılan ek gün sayısı, bonus erişimleri.
 - Kayıt akışı: kurs sayfasında POST `course/<slug>/enroll/`; misafir kayıt sayfasına (`?next`), kayıttan sonra kurs kaydı açılır ve ilk güne gider.
-- Yeni app (`automation`): `Flow` (kurs, kitle, tetikleyici, eşik, aksiyon, mail metni, ödül ayarı, kontrol grubu %, öncelik, tekrar sınırı, durum, kopyala), `FlowRun` (akış, kayıt, zaman, kontrol grubunda mı, mail, indirim kodu).
+- Yeni app (`automation`). **Akış motoru baştan grafik, kanvas sonra** (karar; tek kullanıcı, Stüdyo).
+  - `Flow`: ad, kurs, kitle (ücretsiz / satın alan), durum (taslak / aktif / duraklatıldı), sürüm, kontrol grubu %, öncelik, "eskilere uygula". Kopyalanabilir.
+  - `FlowNode`: tür + ayarlar (JSON). Türler: **tetikleyici** (kayıt oldu, izlemedi X gün, ilerleme ≥ %, sınıra ulaştı, seçim yapmadı, bitirdi, kayıttan X gün, mail tıkladı), **koşul/dal** (satın aldı mı, tıkladı mı, ilerleme, seri), **bekle** (X gün / belirli saate kadar), **aksiyon** (mail, bonus ders, indirim kodu, hızlandır, durdur, sertifika), **bitir**.
+  - `FlowEdge`: kaynak düğüm → hedef düğüm, dal etiketi (evet/hayır).
+  - `FlowState`: kayıt başına akış durumu: hangi düğümde, bekleme bitişi, dönem, kontrol grubunda mı, başlangıç ve bitiş. Aynı akış aynı kayıtta aynı dönemde bir kez.
+  - `FlowAction` (eski adıyla FlowRun): yapılan her aksiyonun kaydı (mail `EmailLog`, indirim kodu, açılan ders).
+  - Çalıştırıcı (`run_flows`, saatlik): tetikleyici düğümler koşula uyan kayıtlar için `FlowState` açar; bekleyen durumları ilerletir; dal düğümlerini değerlendirir; aksiyonları günlük mail sınırlarına ve saat dilimine göre uygular. Akış sürümü değişince devam eden durumlar eski sürümde biter (karar: basit yol).
+  - Doğrulama: kopuk dal, döngü, boş çıkış, tetikleyicisiz akış kaydedilmez.
+  - Aşama 1'de akışlar kodda/JSON ile tanımlanır; Stüdyo listeler, önizler (kaç kişi uyuyor), grafikten otomatik metin özeti üretir ("kayıt → 3 gün izlemezse mail → tıklamazsa 3 gün sonra kod"), raporlar.
+  - Simülasyon: örnek kayıt + sahte zamanla motoru yürüt, izlenen yolu listele. Aşama 1'de metin çıktısı, Aşama 2'de kanvasta boyanır.
+  - Aşama 2: React Flow kanvası yalnız görünüm/düzenleme katmanı; `frontend/` esbuild ile paketlenir, motor değişmez.
 - Koşullar `EnrollmentQuerySet` metotları: `inactive_for(days)`, `progress_at_least(percent)` (`with_progress()` üzerinden), `enrolled_before(days)`, `without_purchase()`, `not_logged_in_for(days)`.
 - Kişiye bağlı indirim kodu: `discount.Discount`'a `user` alanı; `max_uses=1`, `valid_until`, kurs hedefi.
 - Çalıştırıcı: `run_flows` yönetim komutu + saatlik görev. Projede Celery beat ayarı yok: `django-celery-beat` ya da sunucuda cron.
@@ -157,11 +167,11 @@ Kodla çakışan noktalar:
 Kapsam ve sıra (öneri):
 
 - Aşama 0: premium ön satış sayfası, iyzico, SendGrid doğrulaması, onay kutusu/İYS, işlem mailleri.
-- Aşama 1: ücretsiz kayıt, günlük kilit, kaynak ayrımı (owned, mark_paid, bundle), kodda sabit ilk akış seti, `run_flows`, `FlowRun`, basit kontrol grubu, Stüdyo'da huni ve akış sayıları.
-- Aşama 2 (veri gelirse): Stüdyo akış kurucu, kopyalama, önizleme, bonus ders yönetimi, sertifika.
+- Aşama 1: ücretsiz kayıt, günlük kilit, kaynak ayrımı (owned, mark_paid, bundle), grafik akış motoru (düğüm/kenar/durum), ilk akış seti JSON ile, `run_flows`, kontrol grubu, Stüdyo'da liste + önizleme + metin özeti + huni ve rapor.
+- Aşama 2 (veri gelirse): React Flow kanvası, görsel simülasyon, bonus ders yönetimi, sertifika.
 - Paralel: 5–10 eğitmenle Uzilla görüşmesi; ücretsiz program yalnız öğrenci tarafını ölçer.
 
-Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akış kurucu gerekirse Customer.io (EU veri merkezi) referans; KVKK yurt dışı aktarım yükümlülüğü var. Açık kaynak alternatif: Dittofeed, Mautic. SendGrid otomasyonları davranış tetikleyicisi için yetersiz.
+Araç kararı: kendi kod (`mailing` altyapısı hazır); dış araç yok. Motor baştan grafik, kanvas Aşama 2 (kaba maliyet: form tabanlı 1x, grafik motor ~2x, kanvasla birlikte 3–4x). Customer.io (EU veri merkezi) yalnız kavram referansı; KVKK yurt dışı aktarım yükümlülüğü var. Açık kaynak alternatif: Dittofeed, Mautic. SendGrid otomasyonları davranış tetikleyicisi için yetersiz.
 
 ## Açık sorular
 
