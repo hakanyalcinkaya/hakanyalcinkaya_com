@@ -1,0 +1,19 @@
+{# Yasal metnin bölümleri: tam sayfa (page/legal.html) ve pencere (page/partials/legal_dialog.html). #}
+{% for section in sections %}
+<section id="{{ section.id }}" class="{% if not forloop.first %}pt-4{% endif %}" aria-labelledby="{{ section.id }}-baslik">
+  <h2 id="{{ section.id }}-baslik" class="h5 fw-semibold">{{ forloop.counter }}. {{ section.title }}</h2>
+  <p class="text-body-secondary mb-0" style="max-width:68ch">{{ section.text }}</p>
+  {% if section.rows %}
+  <div class="table-responsive border rounded mt-3">
+    <table class="table table-sm small align-middle mb-0">
+      <thead><tr>{% for column in section.columns %}<th scope="col" class="fw-semibold text-body-secondary bg-body-tertiary px-3 py-2">{{ column }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for name, kind, purpose, duration in section.rows %}
+        <tr><td class="font-monospace px-3 py-2">{{ name }}</td><td class="px-3 py-2">{{ kind }}</td><td class="px-3 py-2">{{ purpose }}</td><td class="px-3 py-2 text-nowrap">{{ duration }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endfor %}

@@ -824,24 +824,30 @@ def newsletter_confirm(request):
     )
 
 
+def _legal(request, key):
+    """Yasal metin: tam sayfa; HTMX isteğinde ortak pencerenin içeriği (ör. kayıt formundaki şart bağlantıları)."""
+    template = "page/partials/legal_dialog.html" if request.htmx else "page/legal.html"
+    return render(request, template, legal_page(key))
+
+
 def privacy(request):
-    return render(request, "page/legal.html", legal_page("privacy"))
+    return _legal(request, "privacy")
 
 
 def terms(request):
-    return render(request, "page/legal.html", legal_page("terms"))
+    return _legal(request, "terms")
 
 
 def cookies(request):
-    return render(request, "page/legal.html", legal_page("cookies"))
+    return _legal(request, "cookies")
 
 
 def delivery(request):
-    return render(request, "page/legal.html", legal_page("delivery"))
+    return _legal(request, "delivery")
 
 
 def distance_sales(request):
-    return render(request, "page/legal.html", legal_page("distance_sales"))
+    return _legal(request, "distance_sales")
 
 
 def about(request):

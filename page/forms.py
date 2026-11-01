@@ -141,7 +141,9 @@ class SignupForm(TurnstileMixin, StyledFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["password"].help_text = "En az 8 karakter."
         self.fields["terms"].label = format_html(
-            '<a href="{}">Kullanım Şartları</a>’nı ve <a href="{}">Gizlilik Politikası</a>’nı okudum, kabul ediyorum.',
+            # Bağlantılar sayfadan çıkmadan ortak pencerede açılır (aynı adresin HTMX yanıtı); JS yoksa sayfaya gider.
+            '<a href="{0}" hx-get="{0}" hx-target="#site-dialog-body" hx-push-url="false">Kullanım Şartları</a>’nı ve '
+            '<a href="{1}" hx-get="{1}" hx-target="#site-dialog-body" hx-push-url="false">Gizlilik Politikası</a>’nı okudum, kabul ediyorum.',
             reverse("page:terms"),
             reverse("page:privacy"),
         )
