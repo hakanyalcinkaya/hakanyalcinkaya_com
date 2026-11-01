@@ -17,7 +17,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Program kapatılınca ücretsiz kayıtlı kişi o güne kadar açılan içeriği korur, yeni içerik açılmaz. Yeni ücretsiz kayıt alınmaz.
 - İlk gün: Stüdyo'da ders başına "ilk gün açık" işareti. İşaretli derslerin hepsi kayıttan hemen sonra açılır.
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
-- Açılma: takvime göre (kayıttan sonraki her gün bir paket) ve önceki paketi bitiren beklemeden sonrakini açabilir. Bu davranışlar akış kurallarıyla yönetilir (ör. 30 gün giriş yapmayanın programı durur, mail gider). Durdurulan programın nasıl devam edeceğini (giriş yapınca, maildeki düğmeyle, satın almayla) akış belirler.
+- Açılma: **günlük tavan.** Her gün en fazla N ders açılır; N kurs başına ayarlanır, varsayılan 1. O günün derslerini bitirmek ek ders açmaz. Takvime göre biriken günler izlenebilir. Ücretli "tümünü aç" tavanı kaldırır; "hızlandırma" ödülü o gün +X ders açar. Program durdurma ve devam kuralları akışlarda (ör. 30 gün izlemeyenin programı durur, mail gider; devam yolu akışta seçilir).
 - Ücretli teklifler: aynı kursun tamamı (beklemeden açma), diğer mevcut kurslar, yeni premium kurs.
 - Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
 - Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
@@ -103,8 +103,8 @@ Günler kurs uzunluğuna göre ölçeklenir: `G` = kursun program uzunluğu (gü
 
 Karar bekleyenler:
 
-- **Kilit modeli çelişkisi.** "Takvime göre aç" + "bitiren beklemeden açar" birlikte kilidi fiilen kaldırır; "aynı kursun tamamını satın al" ve "hızlandırma" ödülü anlamsızlaşır. Seçenekler: (a) günlük tavan: her gün en fazla N ders açılır, bitirmek ek açmaz; ücretli "tümünü aç" tavanı kaldırır, hızlandırma o gün +X ders; (b) tavan yok: aynı kursu satma teklifi plandan çıkar, ücretli ürün yalnız diğer kurslar + premium.
-- **Ücretli ürün.** Üç kurs birden ücretsiz olunca satılacak şey kalmıyor. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
+- ~~Kilit modeli~~ Karar: günlük tavan, kurs başına, varsayılan 1 (yukarıda).
+- **Ücretli ürün.** Sitede şu an satılan ürün yok (100 ₺ fiyat yalnız test için). Üç kurs ücretsiz olunca "tümünü aç" dışında teklif kalmıyor. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
 - **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
 - **Günlük "yeni gün açıldı" maili** gönderilsin mi? Öneri: yalnız izlemeyene hatırlatma ya da haftalık özet; her gün mail yorgunluk yaratır.
 - Ücretsiz kayıtlı kullanıcı yorum yazabilsin mi? (Şu an `has_access` izin verir.) En azından yorumda kaynak saklanmalı.
@@ -141,6 +141,5 @@ Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akı
 
 ## Açık sorular
 
-- Kilit modeli: (a) günlük tavan mı, (b) tavan yok + aynı kurs teklifi çıkar mı?
-- Kurs başına program uzunluğu, günlük ders sayısı ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
+- Kurs başına günlük tavan (varsayılan 1), bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
 - İlk akış setinin gün ve yüzde değerleri (taslak yukarıda, birlikte gözden geçirilecek).
