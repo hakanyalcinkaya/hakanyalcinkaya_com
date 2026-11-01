@@ -34,6 +34,7 @@ from page.catalog import (
     TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
     catalog_stats,
+    course_by_slug,
     course_page,
     courses_by_slugs,
     curriculum,
@@ -282,6 +283,36 @@ def lesson(request, course_slug, section_slug, lesson_slug):
             "player_preferences_json": json.dumps(PlayerPreference.for_user(request.user).player_options()),
         },
     )
+
+
+def _root_course_known(slug):
+    """Eski kök adresteki slug bir kursa mı ait (veritabanı ya da örnek veri)."""
+    return Course.objects.filter(slug=slug).exists() or course_by_slug(slug) is not None
+
+
+def _with_query(request, url):
+    query = request.META.get("QUERY_STRING", "")
+    return f"{url}?{query}" if query else url
+
+
+def root_course(request, slug, target="page:course_detail"):
+    """Eski kök kurs adresi (/<kurs>/, /<kurs>/reviews/, /<kurs>/buy/): /courses/ altındaki adrese kalıcı yönlenir.
+    Eski platformun (Podia) kurs slug'ı doğrudan sitedeki kursa gider (örnek veride aynı slug olsa da); kurs yoksa 404."""
+    if not Course.objects.filter(slug=slug).exists():
+        moved = content.moved_course(slug, request.user)
+        if moved is not None:
+            slug = moved.slug
+        elif course_by_slug(slug) is None:
+            raise Http404
+    return redirect(_with_query(request, reverse(target, kwargs={"slug": slug})), permanent=True)
+
+
+def root_lesson(request, course_slug, section_slug, lesson_slug):
+    """Eski kök ders adresi (/<kurs>/<bölüm>/<ders>/): /courses/ altındaki adrese kalıcı yönlenir; kurs yoksa 404."""
+    if not _root_course_known(course_slug) and content.moved_course(course_slug, request.user) is None:
+        raise Http404
+    url = reverse("page:lesson", kwargs=dict(course_slug=course_slug, section_slug=section_slug, lesson_slug=lesson_slug))
+    return redirect(_with_query(request, url), permanent=True)
 
 
 def legacy_lesson(request, course_slug, section_slug, lesson_slug):

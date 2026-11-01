@@ -24,8 +24,6 @@ urlpatterns = [
     ),
     path("lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
     path("lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
-    # Kursun yorumları önceden /courses/<slug>/reviews/ adresindeydi: kurs adresinin altına kalıcı yönlenir.
-    path("courses/<slug:slug>/reviews/", RedirectView.as_view(pattern_name="page:course_reviews", permanent=True)),
     path("reviews/", views.all_reviews, name="all_reviews"),
     path("account/login/", views.login, name="login"),
     path("account/signup/", views.signup, name="signup"),
@@ -48,11 +46,17 @@ urlpatterns = [
     path("delivery-and-returns/", views.delivery, name="delivery"),
     path("distance-sales-agreement/", views.distance_sales, name="distance_sales"),
     path("about/", views.about, name="about"),
-    path("<slug:slug>/add-to-cart/", views.add_to_cart, name="add_to_cart"),
-    path("<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
-    path("<slug:slug>/buy/", views.buy, name="buy"),
-    path("<slug:slug>/review/", views.course_review, name="course_review"),
-    path("<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
-    path("<slug:slug>/", views.course_detail, name="course_detail"),
-    path("<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/", views.lesson, name="lesson"),
+    path("courses/<slug:slug>/add-to-cart/", views.add_to_cart, name="add_to_cart"),
+    path("courses/<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
+    path("courses/<slug:slug>/buy/", views.buy, name="buy"),
+    path("courses/<slug:slug>/review/", views.course_review, name="course_review"),
+    path("courses/<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
+    path("courses/<slug:slug>/", views.course_detail, name="course_detail"),
+    path("courses/<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/", views.lesson, name="lesson"),
+    # Kurs adresleri Kasım 2026'ya kadar sitenin kökündeydi (/<kurs>/...): eski adresler /courses/ altına kalıcı yönlenir.
+    # En sonda durur; kökteki diğer sayfalarla çakışmaz.
+    path("<slug:slug>/", views.root_course, name="root_course"),
+    path("<slug:slug>/reviews/", views.root_course, {"target": "page:course_reviews"}),
+    path("<slug:slug>/buy/", views.root_course, {"target": "page:buy"}),
+    path("<slug:course_slug>/<slug:section_slug>/<slug:lesson_slug>/", views.root_lesson, name="root_lesson"),
 ]
