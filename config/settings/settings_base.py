@@ -179,6 +179,8 @@ EMAIL_REDIRECT_TO = env("EMAIL_REDIRECT_TO", default="")
 # Stüdyo'daki "Test gönder" düğmelerinin adresi (her e-posta şablonu ve bülten). Yönlendirmeden bağımsızdır; yayında da
 # kalır. Tanımsızsa EMAIL_REDIRECT_TO kullanılır.
 EMAIL_TEST_TO = env("EMAIL_TEST_TO", default=EMAIL_REDIRECT_TO)
+# Message-ID alan adı ve SMTP EHLO adı. Boşsa Django sunucunun hostname'ini kullanır (FQDN değilse spam puanı düşer).
+EMAIL_HOSTNAME = env("EMAIL_HOSTNAME", default="hakanyalcinkaya.com")
 MAILERS = {
     "default": (
         {
