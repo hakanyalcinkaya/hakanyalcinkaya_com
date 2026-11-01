@@ -41,6 +41,12 @@ class StyledForm(StyledFormMixin, forms.Form):
     pass
 
 
+def legal_dialog_link(url_name, text):
+    """Yasal metin bağlantısı: sayfadan çıkmadan ortak pencerede açılır (aynı adresin HTMX yanıtı); JS yoksa sayfaya gider."""
+    url = reverse(url_name)
+    return format_html('<a href="{0}" hx-get="{0}" hx-target="#site-dialog-body" hx-push-url="false">{1}</a>', url, text)
+
+
 def email_field(label="E-posta"):
     return forms.EmailField(
         label=label,
@@ -141,11 +147,9 @@ class SignupForm(TurnstileMixin, StyledFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["password"].help_text = "En az 8 karakter."
         self.fields["terms"].label = format_html(
-            # Bağlantılar sayfadan çıkmadan ortak pencerede açılır (aynı adresin HTMX yanıtı); JS yoksa sayfaya gider.
-            '<a href="{0}" hx-get="{0}" hx-target="#site-dialog-body" hx-push-url="false">Kullanım Şartları</a>’nı ve '
-            '<a href="{1}" hx-get="{1}" hx-target="#site-dialog-body" hx-push-url="false">Gizlilik Politikası</a>’nı okudum, kabul ediyorum.',
-            reverse("page:terms"),
-            reverse("page:privacy"),
+            "{}’nı ve {}’nı okudum, kabul ediyorum.",
+            legal_dialog_link("page:terms", "Kullanım Şartları"),
+            legal_dialog_link("page:privacy", "Gizlilik Politikası"),
         )
         self.helper.layout = Layout(
             Row(Column("first_name", css_class="col-sm-6"), Column("last_name", css_class="col-sm-6")),
@@ -457,11 +461,10 @@ class CheckoutForm(StyledForm):
         # Kurslar anında teslim edilen dijital içerik: cayma hakkı yok (Mesafeli Sözleşmeler Yönetmeliği 15/1-ğ),
         # bunun ödemeden önce açıkça onaylanması gerekir.
         self.fields["agreement"].label = format_html(
-            '<a href="{}" target="_blank">Mesafeli Satış Sözleşmesi</a>’ni ve <a href="{}" target="_blank">Teslimat ve İade '
-            "Şartları</a>’nı okudum, onaylıyorum. Kurslar ödemeden hemen sonra erişime açıldığı için cayma hakkım "
+            "{}’ni ve {}’nı okudum, onaylıyorum. Kurslar ödemeden hemen sonra erişime açıldığı için cayma hakkım "
             "olmadığını ve satın alma sonrasında iptal ve iade yapılmayacağını biliyorum.",
-            reverse("page:distance_sales"),
-            reverse("page:delivery"),
+            legal_dialog_link("page:distance_sales", "Mesafeli Satış Sözleşmesi"),
+            legal_dialog_link("page:delivery", "Teslimat ve İade Şartları"),
         )
         # "Öde" düğmesi sipariş özetinde durur ve form="odeme-formu" ile bu forma bağlanır.
         self.helper.form_id = "odeme-formu"

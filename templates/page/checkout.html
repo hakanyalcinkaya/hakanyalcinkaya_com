@@ -60,7 +60,7 @@
           <hr>
           {% include "page/partials/order_totals.html" %}
           <button type="submit" form="odeme-formu" class="btn btn-primary btn-lg fs-6 w-100 mt-3"{% if not card_payment_open %} disabled{% endif %}><i class="bi bi-lock me-2" aria-hidden="true"></i>{% if card_payment_open %}Öde {{ summary.total }}{% else %}Kartla ödeme yakında{% endif %}</button>
-          <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ terms_url }}">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
+          <p class="small text-body-tertiary mt-3 mb-0">Ödeme yaparak <a href="{{ terms_url }}" hx-get="{{ terms_url }}" hx-target="#site-dialog-body" hx-push-url="false">Kullanım Şartları</a>'nı ve <a href="{{ privacy_url }}" hx-get="{{ privacy_url }}" hx-target="#site-dialog-body" hx-push-url="false">Gizlilik Politikası</a>'nı kabul etmiş olursun.</p>
         </div>
       </div>
       <a href="{{ cart_url }}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Sepete dön</a>
