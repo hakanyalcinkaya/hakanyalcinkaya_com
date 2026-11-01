@@ -18,7 +18,8 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - İlk gün: Stüdyo'da ders başına "ilk gün açık" işareti. İşaretli derslerin hepsi kayıttan hemen sonra açılır.
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
 - Açılma: **günlük tavan.** Her gün en fazla N ders açılır; N kurs başına ayarlanır, varsayılan 1. O günün derslerini bitirmek ek ders açmaz. Takvime göre biriken günler izlenebilir. Ücretli "tümünü aç" tavanı kaldırır; "hızlandırma" ödülü o gün +X ders açar. Program durdurma ve devam kuralları akışlarda (ör. 30 gün izlemeyenin programı durur, mail gider; devam yolu akışta seçilir).
-- Ücretli teklifler: aynı kursun tamamı (beklemeden açma), diğer mevcut kurslar, yeni premium kurs.
+- **Freemium sınırı (kurs başına, isteğe bağlı).** Kursun ücretsiz kısmı sınırlanabilir: ör. 200 dersin ilk 100'ü ya da belirli bir bölüme kadar. Sınırdan sonrası günlük tavandan bağımsız olarak kilitli; devam için satın alma gerekir. Sınır yoksa kursun tamamı günlük tavanla ücretsiz. Öneri: Stüdyo'da bölüm (section) düzeyinde "ücretsiz kısmın sonu" işareti; ders sayısıyla sınır bölüm ortasında keser. Alternatif: kurs ayarında "ücretsiz ders sayısı".
+- Ücretli teklifler: aynı kursun tamamı (freemium sınırını ve günlük tavanı kaldırır), diğer mevcut kurslar, yeni premium kurs.
 - Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
 - Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
 
@@ -47,7 +48,9 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 ## Teknik taslak (mevcut koda göre)
 
 - `learning.EnrollmentSource`'a `FREE` (ücretsiz kayıt). Erişim kontrolü (`page/views.py` `_enrolled`, `Enrollment.objects.has_access`) kayda bakıyor; ücretsiz kayıtta ek olarak ders kilidi gerekir.
-- `Course`: ücretsiz program açık/kapalı, günlük ders sayısı. `Lesson`: "ilk gün açık", bonus ders işareti.
+- `Course`: ücretsiz program açık/kapalı, günlük tavan (varsayılan 1). `Section`: "ücretsiz kısmın sonu" işareti (freemium sınırı). `Lesson`: "ilk gün açık", bonus ders işareti.
+- Kilit kontrolü iki katman: freemium sınırı (satın alma gerekir) ve günlük tavan (bekleme gerekir). Kilitli ders sayfası ikisini ayrı anlatır: "yarın açılıyor" / "devamı için kursu aç".
+- İlerleme yüzdesi ücretsiz kullanıcıda ücretsiz kısma göre mi, kursun tamamına göre mi hesaplanacak? F3/F4 eşikleri için ücretsiz kısma göre (sınır varsa).
 - Model metotları: `Course.enroll_free(user)`, `Enrollment.program_day()`, `Enrollment.unlocked_lessons()`, `Enrollment.is_on_schedule()`, `Lesson.is_unlocked_for(enrollment)`. Kilitli ders: "yarın açılıyor" sayfası ve ücretli teklif.
 - Program durumu kayıtta: durduruldu mu, ne zaman, hızlandırma ile açılan ek gün sayısı, bonus erişimleri.
 - Kayıt akışı: kurs sayfasında POST `course/<slug>/enroll/`; misafir kayıt sayfasına (`?next`), kayıttan sonra kurs kaydı açılır ve ilk güne gider.
@@ -85,7 +88,9 @@ Günler kurs uzunluğuna göre ölçeklenir: `G` = kursun program uzunluğu (gü
 | F5 | 7 gün üst üste günün paketini aynı gün bitirdi | Hızlandırma: o gün +1 paket | ödül | 0 |
 | F6 | Kayıttan `G/2` gün geçti, satın almadı, ilerleme < %25 | Premium kurs tanıtımı / ön satış | teklif | %10 |
 | F7 | 30 gün izlemedi | Programı durdur + "devam etmek için giriş yap" maili; giriş yapınca kaldığı yerden devam | program | 0 |
-| F8 | Kursu bitirdi | Tebrik + sertifika (ücretsiz türü) + diğer kurs teklifi | ödül | 0 |
+| F8 | Ücretsiz kısmı bitirdi (sınır varsa) | Tebrik + sertifika (ücretsiz türü) + diğer kurs teklifi | ödül | 0 |
+| F9 | Freemium sınırına ulaştı | "Devamı için kursu aç" teklifi + 3 gün sonra indirim kodu | teklif | %10 |
+| F10 | Sınıra ulaştıktan 14 gün sonra satın almadı | Son hatırlatma, kodun bitiş tarihi | teklif | %10 |
 
 ### Satın alanlar
 
@@ -97,14 +102,14 @@ Günler kurs uzunluğuna göre ölçeklenir: `G` = kursun program uzunluğu (gü
 | P4 | Kursu bitirdi | Tebrik + sertifika (ücretli türü) + yorum isteği | ödül | 0 |
 | P5 | Bitirdikten 7 gün sonra | Diğer kurs / premium için indirim kodu | teklif | %10 |
 
-Öncelik (aynı gün çakışırsa): F7 > F1 > F2; teklif maillerinde F4 > F6.
+Öncelik (aynı gün çakışırsa): F7 > F1 > F2; teklif maillerinde F9 > F4 > F10 > F6.
 
 ## İnceleme bulguları (1 Kasım 2026)
 
 Karar bekleyenler:
 
 - ~~Kilit modeli~~ Karar: günlük tavan, kurs başına, varsayılan 1 (yukarıda).
-- **Ücretli ürün.** Sitede şu an satılan ürün yok (100 ₺ fiyat yalnız test için). Üç kurs ücretsiz olunca "tümünü aç" dışında teklif kalmıyor. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
+- **Ücretli ürün.** Sitede şu an satılan ürün yok (100 ₺ fiyat yalnız test için). Freemium sınırı olan kurslarda "kursun kalanını aç" gerçek bir teklif; sınırsız kurslarda yalnız premium kalır. Kurs başına gerçek fiyat belirlenmeli. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
 - **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
 - **Günlük "yeni gün açıldı" maili** gönderilsin mi? Öneri: yalnız izlemeyene hatırlatma ya da haftalık özet; her gün mail yorgunluk yaratır.
 - Ücretsiz kayıtlı kullanıcı yorum yazabilsin mi? (Şu an `has_access` izin verir.) En azından yorumda kaynak saklanmalı.
@@ -141,5 +146,6 @@ Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akı
 
 ## Açık sorular
 
-- Kurs başına günlük tavan (varsayılan 1), bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
+- Freemium sınırı bölüm işaretiyle mi, ders sayısıyla mı?
+- Kurs başına: freemium sınırı var mı ve nerede, günlük tavan (varsayılan 1), gerçek fiyat, bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
 - İlk akış setinin gün ve yüzde değerleri (taslak yukarıda, birlikte gözden geçirilecek).
