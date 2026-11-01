@@ -469,9 +469,10 @@ class CheckoutForm(StyledForm):
 class CouponForm(StyledForm):
     """Ödeme adımında indirim kodu (discount.Discount); geçerlilik, tarih ve kullanım sınırları kodda denetlenir."""
 
+    # Zorunlu değil: alan isteğe bağlı görünür (yıldız yok); boş gönderim clean_code'da reddedilir.
     code = forms.CharField(
         label="İndirim kodu",
-        error_messages={"required": "Bir indirim kodu gir."},
+        required=False,
         widget=forms.TextInput(attrs={"autocomplete": "off", "placeholder": "Kodunu gir"}),
     )
 
@@ -485,6 +486,8 @@ class CouponForm(StyledForm):
         )
 
     def clean_code(self):
+        if not self.cleaned_data["code"].strip():
+            raise forms.ValidationError("Bir indirim kodu gir.")
         discount = Discount.objects.by_code(self.cleaned_data["code"])
         if discount is None:
             raise forms.ValidationError("Bu indirim kodu geçerli değil.")

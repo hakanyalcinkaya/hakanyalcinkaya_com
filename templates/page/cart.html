@@ -20,7 +20,7 @@
     <span><b>{{ removed_course.title }}</b> sepetten çıkarıldı.</span>
     <form method="post" action="{{ removed_course.cart_url }}" class="ms-auto">
       {% csrf_token %}
-      <button type="submit" class="btn btn-link btn-sm p-0">Geri al</button>
+      <button type="submit" class="btn btn-link btn-sm p-0 text-nowrap">Geri al</button>
     </form>
   </div>
   {% endif %}
@@ -91,7 +91,7 @@
           </span>
           <form method="post" action="{{ course.cart_url }}" class="flex-shrink-0">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1 text-nowrap" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i>Sepete Ekle</button>
+            <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1 text-nowrap" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></button>
           </form>
         </div>
       </div>
