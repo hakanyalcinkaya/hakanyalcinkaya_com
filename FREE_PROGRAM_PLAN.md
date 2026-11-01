@@ -19,7 +19,8 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
 - Açılma: takvime göre (kayıttan sonraki her gün bir paket) ve önceki paketi bitiren beklemeden sonrakini açabilir. Bu davranışlar akış kurallarıyla yönetilir (ör. 30 gün giriş yapmayanın programı durur, mail gider). Durdurulan programın nasıl devam edeceğini (giriş yapınca, maildeki düğmeyle, satın almayla) akış belirler.
 - Ücretli teklifler: aynı kursun tamamı (beklemeden açma), diğer mevcut kurslar, yeni premium kurs.
-- Varsayım (onaylanacak): ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer.
+- Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
+- Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
 
 ### Akışlar
 
@@ -34,7 +35,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 ### Mail
 
 - Program mailleri (yeni gün açıldı, hatırlatma, program durduruldu): kişi başı günde en fazla 1; çakışırsa önceliği yüksek olan gider, diğeri ertesi güne kalır.
-- Ödül ve teklif mailleri (bonus, indirim, sertifika, kurs önerisi) ayrı gider, kendi günlük sınırı olur.
+- Ödül ve teklif mailleri (bonus, indirim, sertifika, kurs önerisi) ayrı gider; kişi başı günde en fazla 1.
 - Kişi iki türü hesap ayarlarında ayrı ayrı kapatır. Teklif mailleri ticari ileti sayılır: onay ve İYS gerekir; hukukçuyla teyit edilmeli.
 
 ### Ölçüm
@@ -69,9 +70,77 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Sertifika: genel sisteme eklenecek; ücretli alanlar ve ücretsiz izleyenler için iki tür. Taslak: ad, kurs, tarih, benzersiz numara içeren PDF ve numarayla herkese açık doğrulama sayfası.
 - 171 eski (Podia) müşterinin tam erişimi var; bilgilendirme maili ayrı iş.
 
+## İlk akış seti (taslak)
+
+Günler kurs uzunluğuna göre ölçeklenir: `G` = kursun program uzunluğu (gün). Kurs başına kopyalanıp uyarlanır. "İzlemedi" = o kursta `last_watched_at` (hiç izlemediyse kayıt tarihi) üzerinden. Kontrol grubu yalnız mail/ödül akışlarında; durdurma akışlarında yok.
+
+### Satın almadan izleyenler
+
+| # | Tetikleyici | Aksiyon | Tür | Kontrol |
+|---|---|---|---|---|
+| F1 | Kayıt oldu, 24 saat içinde ilk dersi açmadı | "İlk dersin seni bekliyor" | program | %10 |
+| F2 | 3 gün izlemedi (en fazla 3 kez, arada izleme olursa yeniden) | Hatırlatma, kaldığı ders bağlantısı | program | %10 |
+| F3 | İlerleme ≥ %25 | Bonus ders açılır + mail | ödül | %10 |
+| F4 | İlerleme ≥ %50 | Kişiye bağlı indirim kodu (7 gün geçerli): tümünü aç / diğer kurs / premium | teklif | %10 |
+| F5 | 7 gün üst üste günün paketini aynı gün bitirdi | Hızlandırma: o gün +1 paket | ödül | 0 |
+| F6 | Kayıttan `G/2` gün geçti, satın almadı, ilerleme < %25 | Premium kurs tanıtımı / ön satış | teklif | %10 |
+| F7 | 30 gün izlemedi | Programı durdur + "devam etmek için giriş yap" maili; giriş yapınca kaldığı yerden devam | program | 0 |
+| F8 | Kursu bitirdi | Tebrik + sertifika (ücretsiz türü) + diğer kurs teklifi | ödül | 0 |
+
+### Satın alanlar
+
+| # | Tetikleyici | Aksiyon | Tür | Kontrol |
+|---|---|---|---|---|
+| P1 | Satın aldı, 3 gün içinde hiç izlemedi | "Kursuna başla" | program | 0 |
+| P2 | 7 gün izlemedi (en fazla 3 kez) | Hatırlatma | program | %10 |
+| P3 | İlerleme ≥ %50 | Bonus ders | ödül | 0 |
+| P4 | Kursu bitirdi | Tebrik + sertifika (ücretli türü) + yorum isteği | ödül | 0 |
+| P5 | Bitirdikten 7 gün sonra | Diğer kurs / premium için indirim kodu | teklif | %10 |
+
+Öncelik (aynı gün çakışırsa): F7 > F1 > F2; teklif maillerinde F4 > F6.
+
+## İnceleme bulguları (1 Kasım 2026)
+
+Karar bekleyenler:
+
+- **Kilit modeli çelişkisi.** "Takvime göre aç" + "bitiren beklemeden açar" birlikte kilidi fiilen kaldırır; "aynı kursun tamamını satın al" ve "hızlandırma" ödülü anlamsızlaşır. Seçenekler: (a) günlük tavan: her gün en fazla N ders açılır, bitirmek ek açmaz; ücretli "tümünü aç" tavanı kaldırır, hızlandırma o gün +X ders; (b) tavan yok: aynı kursu satma teklifi plandan çıkar, ücretli ürün yalnız diğer kurslar + premium.
+- **Ücretli ürün.** Üç kurs birden ücretsiz olunca satılacak şey kalmıyor. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
+- **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
+- **Günlük "yeni gün açıldı" maili** gönderilsin mi? Öneri: yalnız izlemeyene hatırlatma ya da haftalık özet; her gün mail yorgunluk yaratır.
+- Ücretsiz kayıtlı kullanıcı yorum yazabilsin mi? (Şu an `has_access` izin verir.) En azından yorumda kaynak saklanmalı.
+
+Eksik önkoşullar:
+
+- Kartla ödeme kapalı (`page/views.py` `CARD_PAYMENT_OPEN = False`); iyzico bağlanmadan dönüşüm ölçülmez.
+- İşlem mailleri (hoş geldin, satın alma onayı) bağlı değil.
+- Ücretsiz kayıt formunda işaretsiz ticari ileti onay kutusu + İYS.
+- Ücretsiz hizmet için kısa kullanım şartları; gizlilik politikasına UTM ve akış kayıtları; hesap silme planına `FlowRun` ve UTM.
+- Kurs schema `offers` fiyatı ücretsiz olunca güncellenmeli.
+
+Kodla çakışan noktalar:
+
+- `page/content.py` `owned_course_ids`: her kayıt "sahip" sayılır; ücretsiz kayıtlı "Eğitimlerinde" görür, satın alamaz. Kaynak ayrımı gerekir.
+- `order/models.py` `mark_paid`: `get_or_create` ücretsiz kaydı `free` bırakır, siparişi bağlamaz; mevcut kayıt yükseltilmeli.
+- Ders kilidi tek noktada değil: ders sayfası, `autoplay_next`, `continue_lesson`, Önceki/Sonraki ile tamamlandı işareti, müfredat listesi.
+- `LessonProgress.completed_at` Önceki/Sonraki ile işaretlenir; ilerleme tetikleyicileri tıklayarak kazanılabilir. İzleme konumu (`record_position`) ya da süre şartı gerekir.
+- Paket fiyat düşümü (TODO 3) ücretsiz kaydı da düşer; kaynak ayrımı.
+- Bonus dersler müfredat toplamından ve ilerleme yüzdesinden hariç tutulmalı.
+- "30 gün giriş yapmadı": `last_login` oturum boyunca güncellenmez; `last_watched_at` ya da son istek zamanı.
+- "Gün" tanımı: Europe/Istanbul takvim günü, mail saati (ör. 09:00) belirlenmeli.
+- Site içi olay kaydı (`Event`: kullanıcı, olay, zaman) yok; "teklife tıklama" hunisi için gerekir.
+- Kontrol grubu %10 küçük kitlede anlamsız; birkaç yüz kayıt birikmeden okunmaz.
+
+Kapsam ve sıra (öneri):
+
+- Aşama 0: premium ön satış sayfası, iyzico, SendGrid doğrulaması, onay kutusu/İYS, işlem mailleri.
+- Aşama 1: ücretsiz kayıt, günlük kilit, kaynak ayrımı (owned, mark_paid, bundle), kodda sabit ilk akış seti, `run_flows`, `FlowRun`, basit kontrol grubu, Stüdyo'da huni ve akış sayıları.
+- Aşama 2 (veri gelirse): Stüdyo akış kurucu, kopyalama, önizleme, bonus ders yönetimi, sertifika.
+- Paralel: 5–10 eğitmenle Uzilla görüşmesi; ücretsiz program yalnız öğrenci tarafını ölçer.
+
+Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akış kurucu gerekirse Customer.io (EU veri merkezi) referans; KVKK yurt dışı aktarım yükümlülüğü var. Açık kaynak alternatif: Dittofeed, Mautic. SendGrid otomasyonları davranış tetikleyicisi için yetersiz.
+
 ## Açık sorular
 
-- Satın alma sonrası akış geçişi varsayımının onayı.
-- Ödül ve teklif maillerinin günlük sınırı (öneri: 1).
-- Kurs başına günlük ders sayıları ve hangi derslerin ilk gün açık olacağı.
-- İlk akış seti: her kurs için satın alanlar ve satın almayanlar akışlarının tetikleyici/gün listesi.
+- Kilit modeli: (a) günlük tavan mı, (b) tavan yok + aynı kurs teklifi çıkar mı?
+- Kurs başına program uzunluğu, günlük ders sayısı ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
+- İlk akış setinin gün ve yüzde değerleri (taslak yukarıda, birlikte gözden geçirilecek).
