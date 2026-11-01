@@ -19,7 +19,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Sonraki günler: her gün sabit sayıda ders açılır; sayı kurs başına ayarlanır.
 - Açılma: **günlük tavan.** Her gün en fazla N ders açılır; N kurs başına ayarlanır, varsayılan 1. O günün derslerini bitirmek ek ders açmaz. Takvime göre biriken günler izlenebilir. Ücretli "tümünü aç" tavanı kaldırır; "hızlandırma" ödülü o gün +X ders açar. Program durdurma ve devam kuralları akışlarda (ör. 30 gün izlemeyenin programı durur, mail gider; devam yolu akışta seçilir).
 - **Freemium sınırı (kurs başına, isteğe bağlı).** Kursun ücretsiz kısmı sınırlanabilir: ör. 200 dersin ilk 100'ü ya da belirli bir bölüme kadar. Sınırdan sonrası günlük tavandan bağımsız olarak kilitli; devam için satın alma gerekir. Sınır yoksa kursun tamamı günlük tavanla ücretsiz. Sınır Stüdyo'da bölüm (section) düzeyinde "ücretsiz kısmın sonu" işaretiyle konur (karar); işaretli bölüm dahil öncesi ücretsiz, sonrası kilitli. Kursta en fazla bir bölüm işaretli olur.
-- Ücretli teklifler: aynı kursun tamamı (freemium sınırını ve günlük tavanı kaldırır), diğer mevcut kurslar, yeni premium kurs.
+- **Sırasız kurs / yarının dersini seçme (kurs başına, isteğe bağlı).** Her dersin bağımsız konu anlattığı kurslarda (ör. AI Tools) kursa "öğrenci sıradaki dersi seçer" seçeneği açılır. Günün dersi bitince "yarın hangi içeriği izlemek istersin?" sorulur; seçenekler henüz açılmamış dersler (freemium sınırı varsa ücretsiz kısımdakiler). Günlük tavan aynen geçerli: tavan N ise N ders seçilir. Seçim ders sonu ekranında ve günlük mailde (düğmelerle) yapılabilir. Seçim yapılmazsa müfredat sırasındaki ders açılır (varsayım). Ertesi günün maili seçilen dersin özetiyle gider. Sıralı kurslarda bu seçenek kapalı, müfredat sırası işler.
 - Ücretsiz izleyen kursu satın alınca tüm içerik açılır, "satın almayanlar" akışından çıkıp "satın alanlar" akışına geçer (onaylandı). Mevcut kurs kaydı `purchase`'a yükseltilir, yeni kayıt açılmaz.
 - Program uzunluğu ve günlük ders sayısı kursa göre belirlenir; "30 gün" yalnız örnek, akış ve stratejiye göre değişir.
 
@@ -30,6 +30,7 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 - Akış kursa göre hazırlanır; başka kursa kopyalanıp uyarlanır (kısa kursta bonus ve indirim daha erken güne çekilebilir).
 - Ödüller: kişiye bağlı tek kullanımlık süreli indirim kodu, bonus ders, programı hızlandırma (o gün ek ders açılır), sertifika.
 - Bonus ders: kurs içinde "bonus" işaretli gizli ders ya da kursa eklenen ayrı bonus bölümü. Akış, açılacak dersi kursun bonus derslerinden seçer. Bonus dersler müfredat sayısına ve ilerleme yüzdesine girmez.
+- Sırasız kurslarda ek tetikleyiciler: "yarının dersini seçmedi" (hatırlatma), "üst üste X gün seçim yaptı" (ödül).
 - Tetikleyiciler izleme ve ilerlemeyle sınırlı değil; mail etkileşimi de tetikleyici olabilir: ör. "3 gün üst üste maildeki bağlantıya tıklayıp derse gitti" (`EmailLog` tıklaması + aynı gün ders ziyareti).
 - Satın alanlar için ayrı kural ve akış yapısı; günlük tavan ve freemium sınırı uygulanmaz. Onlara özel gizli/ek bonus dersler olabilir.
 - Kontrol grubu akış başına ayarlanır (%; 0 = kapalı). Koşula uyanların bu kadarına aksiyon uygulanmaz, yalnız kaydedilir; akışın gerçek etkisi iki grubun farkıyla ölçülür.
@@ -64,6 +65,8 @@ Uzilla'dan önce hakanyalcinkaya.com'da denenecek model: kurslara ücretsiz kay�
 
 - `learning.EnrollmentSource`'a `FREE` (ücretsiz kayıt). Erişim kontrolü (`page/views.py` `_enrolled`, `Enrollment.objects.has_access`) kayda bakıyor; ücretsiz kayıtta ek olarak ders kilidi gerekir.
 - `Course`: ücretsiz program açık/kapalı, günlük tavan (varsayılan 1). `Section`: "ücretsiz kısmın sonu" işareti (freemium sınırı). `Lesson`: "ilk gün açık", bonus ders işareti.
+- `Course`: "öğrenci sıradaki dersi seçer" seçeneği. Kayıtta açılan dersler ders listesi olarak tutulur (sıralı kursta "ilk K ders" yetmez; seçimli kursta açılan dersler dağınık). Önerilen yapı: `UnlockedLesson` (kayıt, ders, açılma günü, kaynak: takvim / seçim / hızlandırma / bonus) ve kayıtta "yarın için seçilen dersler".
+- "Kaldığı yerden devam" ve `continue_lesson` seçimli kursta açılmış ama izlenmemiş derse gider; sırası yoksa en son açılan.
 - Kilit kontrolü iki katman: freemium sınırı (satın alma gerekir) ve günlük tavan (bekleme gerekir). Kilitli ders sayfası ikisini ayrı anlatır: "yarın açılıyor" / "devamı için kursu aç".
 - İlerleme, sınırlı kursta ücretsiz kullanıcıya iki değerle gösterilir: çubukta ücretsiz kısma göre yüzde, yanında "kursun %X'i" notu. Akış eşikleri (F3/F4) ücretsiz kısma göre. Satın alınca yüzde kursun tamamına göre hesaplanır. `Enrollment.with_progress()` iki payda ile genişletilir (karar).
 - Model metotları: `Course.enroll_free(user)`, `Enrollment.program_day()`, `Enrollment.unlocked_lessons()`, `Enrollment.is_on_schedule()`, `Lesson.is_unlocked_for(enrollment)`. Kilitli ders: "yarın açılıyor" sayfası ve ücretli teklif.
@@ -161,6 +164,9 @@ Kapsam ve sıra (öneri):
 Araç kararı: Aşama 1 kendi kodla (`mailing` altyapısı hazır). Görsel akış kurucu gerekirse Customer.io (EU veri merkezi) referans; KVKK yurt dışı aktarım yükümlülüğü var. Açık kaynak alternatif: Dittofeed, Mautic. SendGrid otomasyonları davranış tetikleyicisi için yetersiz.
 
 ## Açık sorular
+
+- Seçimli kursta seçim yapılmazsa ne açılsın: müfredat sırası (varsayım), rastgele, ya da en çok seçilen ders?
+- Seçimli kursta "ilk gün açık" işareti aynı şekilde mi işler, yoksa ilk gün de seçim mi sorulur?
 
 - Kurs başına: freemium sınırı var mı ve nerede, günlük tavan (varsayılan 1), gerçek fiyat, bundan çıkan program uzunluğu ve ilk gün açık dersler (kursa göre, birlikte belirlenecek).
 - İlk akış setinin gün ve yüzde değerleri (taslak yukarıda, birlikte gözden geçirilecek).
