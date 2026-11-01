@@ -524,6 +524,8 @@ def library(request):
             **content.library_page(request.user, status),
             "favorites": Favorite.objects.for_user(request.user).for_library(),
             "review_items": _library_reviews(request),
+            # Alabileceğin kurslar: sepette olanda "Sepete Ekle" yerine sepete bağlantı.
+            "cart_slugs": {card["slug"] for card in content.cart_cards(request)},
         },
     )
 

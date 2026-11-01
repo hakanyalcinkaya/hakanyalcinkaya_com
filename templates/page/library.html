@@ -190,14 +190,21 @@
     <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
       {% for course in others %}
       <div class="col">
-        <a href="{{ course.url }}" class="card h-100 flex-row align-items-center gap-3 p-3 text-decoration-none hover-lift">
-          <img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:128px;height:72px">
+        <div class="card h-100 flex-row align-items-center gap-3 p-3">
+          <a href="{{ course.url }}" class="flex-shrink-0" tabindex="-1" aria-hidden="true"><img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover" style="width:128px;height:72px"></a>
           <span class="flex-grow-1 min-w-0">
-            <span class="d-block fw-semibold text-body">{{ course.short }}</span>
-            <span class="d-block small text-body-tertiary">{{ course.meta_line }}</span>
+            <a href="{{ course.url }}" class="d-block fw-semibold link-body-emphasis text-decoration-none">{{ course.short }}</a>
+            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {{ course.price }}</span>
           </span>
-          <span class="fw-semibold text-body d-none d-sm-inline">{{ course.price }}</span>
-        </a>
+          {% if course.slug in cart_slugs %}
+          <a href="{{ cart_url }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 text-nowrap flex-shrink-0"><i class="bi bi-bag-check" aria-hidden="true"></i>Sepette</a>
+          {% else %}
+          <form method="post" action="{{ course.cart_url }}" class="flex-shrink-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1 text-nowrap" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i>Sepete Ekle</button>
+          </form>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
