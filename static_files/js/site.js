@@ -738,9 +738,10 @@
       poster: holder.getAttribute("data-poster"),
       tracks: tracks,
       quality: preferences.quality,
-      // Önizleme listesinden ya da önceki dersin sonundan gelindiyse (?play=1) video kendiliğinden başlar; kursu alan üyede
-      // "ders açılınca oynat" tercihi açıksa her ders açılışında.
-      autoplay: new URLSearchParams(window.location.search).has("play") || (!preview && Boolean(preferences.autoplay)),
+      // Önizleme listesinden ya da önceki dersin sonundan gelindiyse (?play=1) video kendiliğinden başlar. Giriş yapmamış
+      // ziyaretçide önizleme her açılışta başlar (tercih adresi yalnız üyede var); kursu alan üyede "ders açılınca oynat"
+      // tercihi açıksa her ders açılışında.
+      autoplay: new URLSearchParams(window.location.search).has("play") || (preview && !preferencesUrl) || (!preview && Boolean(preferences.autoplay)),
     }).then(function (media) {
       if (!media) return;
       watchCompletion(media);
