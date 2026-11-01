@@ -1,0 +1,16 @@
+{# Yorum listesi: "Tüm yorumlar" penceresi ve tam sayfası. link_course: yoruma tıklayınca o yorumun kursuna gidilir; show_course: kurs adı etiket olarak yazılır. #}
+{% load core_tags %}
+{% for review in reviews %}
+<article{% if review.id %} id="yorum-{{ review.id }}"{% endif %} class="py-3{% if not forloop.last %} border-bottom{% endif %}{% if link_course %} position-relative hy-review-link{% endif %}">
+  <div class="d-flex flex-wrap align-items-center gap-2 small">
+    <span class="d-inline-flex align-items-center justify-content-center rounded-1 bg-primary-subtle text-primary-emphasis hy-avatar" aria-hidden="true">{{ review.initial }}</span>
+    <span class="fw-semibold">{{ review.name }}</span>
+    {% if review.rating %}{% include "page/partials/stars.html" with rating=review.rating %}{% endif %}
+    {% if review.date %}<time class="text-body-tertiary" datetime="{{ review.date|date:'c' }}" title="{{ review.date|date:'j F Y' }}">{{ review.date|ago }}</time>{% endif %}
+    {% if link_course %}<a href="{{ review.course_url }}" class="badge rounded-1 border text-body-secondary fw-medium ms-auto text-decoration-none stretched-link" title="Kurs sayfasına git">{{ review.course }} <i class="bi bi-arrow-right" aria-hidden="true"></i></a>{% elif show_course %}<span class="badge rounded-1 border text-body-secondary fw-medium ms-auto">{{ review.course }}</span>{% endif %}
+  </div>
+  <p class="mt-2 mb-0 text-pre-line">{{ review.text }}</p>
+</article>
+{% empty %}
+<p class="text-body-secondary py-4 mb-0">Henüz yorum yok.</p>
+{% endfor %}

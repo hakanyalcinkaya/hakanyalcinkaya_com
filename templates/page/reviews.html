@@ -1,0 +1,63 @@
+{% extends "_base/base.html" %}
+
+{# "Tüm yorumlar" tam sayfası (adres doğrudan açılınca); pencerede page/partials/reviews_dialog.html. course: kursun yorumları, yanda satın alma kartı. #}
+{% block title %}{% if course %}{{ course.short }} yorumları{% else %}Öğrenci yorumları{% endif %} — Hakan Yalçınkaya{% endblock %}
+{% block description %}{% if course %}{{ course.title }} kursu hakkında öğrenci yorumları ve değerlendirmeleri.{% else %}Hakan Yalçınkaya'nın kursları hakkında öğrenci yorumları ve değerlendirmeleri.{% endif %}{% endblock %}
+{% block og_title %}{% if course %}{{ course.short }} yorumları{% else %}Öğrenci yorumları{% endif %} — Hakan Yalçınkaya{% endblock %}
+{% block og_image %}{% if course %}{% include "page/partials/og_course_image.html" %}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block head %}{% if course %}{% include "page/partials/video_referrer.html" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      <nav aria-label="Sayfa konumu">
+        <ol class="breadcrumb small mb-4">
+          <li class="breadcrumb-item"><a href="{% url 'page:index' %}" class="link-secondary text-decoration-none">Ana Sayfa</a></li>
+          {% if course %}
+          <li class="breadcrumb-item"><a href="{% url 'page:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a></li>
+          <li class="breadcrumb-item"><a href="{{ course.url }}" class="link-secondary text-decoration-none">{{ course.short }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Yorumlar</li>
+          {% else %}
+          <li class="breadcrumb-item active" aria-current="page">Öğrenci yorumları</li>
+          {% endif %}
+        </ol>
+      </nav>
+
+      <header>
+        <h1 class="display-6 fw-semibold mb-1">Öğrenci yorumları</h1>
+        {% if course %}<p class="lead text-body-secondary mb-0"><a href="{{ course.url }}" class="link-body-emphasis">{{ course.title }}</a></p>{% endif %}
+        <p class="small text-body-secondary mt-3 mb-0">{% if rating.count %}{% include "page/partials/stars.html" with rating=rating.stars %} <b class="text-body">{{ rating.average|floatformat:1 }}</b> · {{ rating.count }} değerlendirme · {% endif %}{{ reviews|length }} yorum</p>
+      </header>
+
+      {% if course %}
+      <div class="d-lg-none mt-4" data-buy-card>
+        {% include "page/partials/purchase_card.html" %}
+      </div>
+      {% endif %}
+
+      {% if course_filter %}
+      <nav class="d-flex flex-wrap gap-2 mt-4" aria-label="Kursa göre">
+        <a href="{% url 'page:all_reviews' %}" class="btn btn-sm btn-secondary" aria-current="page">Tümü <span class="opacity-75">{{ total }}</span></a>
+        {% for item in course_filter %}
+        <a href="{% url 'page:course_reviews' slug=item.course__slug %}" class="btn btn-sm btn-outline-secondary">{{ item.course__short_title }} <span class="opacity-75">{{ item.count }}</span></a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+
+      <div class="border-top mt-4">
+        {% include "page/partials/review_items.html" %}
+      </div>
+    </div>
+
+    {% if course %}
+    <aside class="col-lg-4 d-none d-lg-block" aria-label="Satın alma">
+      <div class="sticky-top top-lg-nav">
+        {% include "page/partials/purchase_card.html" %}
+      </div>
+    </aside>
+    {% endif %}
+  </div>
+</div>
+{% if course %}{% include "page/partials/buy_bar.html" %}{% endif %}
+{% endblock %}

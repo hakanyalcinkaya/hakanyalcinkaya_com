@@ -148,6 +148,17 @@ def _enrolled(request, slug):
     return owns_course(request.user, request.session, slug)
 
 
+def _course_page(request, course):
+    """Veritabanındaki kursun sayfa verisi (kurs sayfası ve kursun yorum sayfasındaki satın alma kartı)."""
+    page = content.course_page(course, enrolled=_enrolled(request, course.slug), staff=request.user.is_staff, user=request.user)
+    # Personel dersleri izleyebilir (enrolled) ama satın alma düğmeleri yalnız gerçek kurs kaydına göre gizlenir.
+    enrollment = Enrollment.objects.for_user(request.user).filter(course=course).select_related("last_lesson").first()
+    page["course"]["owned"] = enrollment is not None
+    resume = enrollment.continue_lesson() if enrollment else None
+    page["first_lesson_url"] = resume.get_absolute_url() if resume else (page["lessons"][0]["url"] if page["lessons"] else "")
+    return page
+
+
 def course_detail(request, slug):
     # Veritabanındaki kurs (müfredat, tanıtım videosu) önce gelir; yoksa örnek veri gösterilir.
     course = content.visible_course(slug, request.user)
@@ -158,13 +169,7 @@ def course_detail(request, slug):
     site_rating = None
     if course is not None:
         site_rating = Review.objects.filter(course=course, source=ReviewSource.USER).rating_summary()
-        enrolled = _enrolled(request, slug)
-        page = content.course_page(course, enrolled=enrolled, staff=request.user.is_staff, user=request.user)
-        # Personel dersleri izleyebilir (enrolled) ama satın alma düğmeleri yalnız gerçek kurs kaydına göre gizlenir.
-        enrollment = Enrollment.objects.for_user(request.user).filter(course=course).select_related("last_lesson").first()
-        page["course"]["owned"] = enrollment is not None
-        resume = enrollment.continue_lesson() if enrollment else None
-        page["first_lesson_url"] = resume.get_absolute_url() if resume else (page["lessons"][0]["url"] if page["lessons"] else "")
+        page = _course_page(request, course)
         review_context = content.course_reviews(course)
         page["course"]["rating"] = review_context["rating"]
         # Kursu satın alan üye kendi puanını ve yorumunu burada verir ya da düzenler (personel erişimi yetmez).
@@ -192,10 +197,13 @@ def course_detail(request, slug):
 
 
 def all_reviews(request):
-    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır. ?course=<slug> o kursa daraltır."""
+    """Tüm onaylı yorumlar (pencerede, en yeni önce); ana sayfa ve kurs listesinden açılır. ?course=<slug> o kursa daraltır.
+    Doğrudan açılınca tam sayfa; kurs seçiliyse kursun yorum sayfasına gider."""
     courses = Review.objects.course_counts()
     selected = request.GET.get("course", "")
     course = Course.objects.filter(slug=selected).first() if selected else None
+    if not request.htmx and course is not None:
+        return redirect("page:course_reviews", slug=course.slug)
     items = Review.objects.all_for(course).order_by("-approved_written_at", "id")[:ALL_REVIEWS_LIMIT]
     context = dict(
         reviews=[item.card() for item in items],
@@ -207,11 +215,13 @@ def all_reviews(request):
         course=course,
         rating=Review.objects.filter(course=course).rating_summary() if course else None,
     )
+    if not request.htmx:
+        return render(request, "page/reviews.html", context)
     return render(request, "page/partials/reviews_dialog.html", context)
 
 
 def course_reviews(request, slug):
-    """Kursun tüm onaylı yorumları (pencerede)."""
+    """Kursun tüm onaylı yorumları: pencerede; doğrudan açılınca yanda satın alma kartıyla tam sayfa."""
     course = content.visible_course(slug, request.user)
     if course is None:
         raise Http404
@@ -219,6 +229,9 @@ def course_reviews(request, slug):
     context = dict(
         reviews=[item.card() for item in items], course=course, rating=Review.objects.filter(course=course).rating_summary()
     )
+    if not request.htmx:
+        # Tam sayfada `course` kurs kartıdır (satın alma kartı ve mobil çubuk için).
+        return render(request, "page/reviews.html", {**context, **_course_page(request, course)})
     return render(request, "page/partials/reviews_dialog.html", context)
 
 
