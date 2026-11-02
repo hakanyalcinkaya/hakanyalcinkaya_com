@@ -20,7 +20,7 @@ from studio.periods import month_bounds, month_label
 TREND_MONTHS = 12
 
 
-def _by_currency(orders):
+def by_currency(orders):
     """[{currency, total, count, average, discount}], TL önce."""
     rows = orders.order_by().values("currency").annotate(total=Sum("total"), count=Count("pk"), discount=Sum("discount_total"))
     result = [dict(row, average=(row["total"] / row["count"]).quantize(Decimal("0.01")) if row["count"] else 0) for row in rows]
@@ -46,8 +46,8 @@ def summary(period):
     orders = paid_in(start, end)
     year, month = (period["year"] - 1, 12) if period["month"] == 1 else (period["year"], period["month"] - 1)
     previous_orders = paid_in(*month_bounds(year, month))
-    revenue = _by_currency(orders)
-    previous_revenue = {row["currency"]: row for row in _by_currency(previous_orders)}
+    revenue = by_currency(orders)
+    previous_revenue = {row["currency"]: row for row in by_currency(previous_orders)}
     for row in revenue:
         row["change"] = _change(row["total"], (previous_revenue.get(row["currency"]) or {}).get("total"))
     count, previous_count = orders.count(), previous_orders.count()
@@ -68,7 +68,7 @@ def summary(period):
         returning_buyers=len(returning),
         with_code=orders.exclude(discount_code="").count(),
         items=OrderItem.objects.filter(order__in=orders).count(),
-        pending=_by_currency(pending),
+        pending=by_currency(pending),
         pending_count=pending.count(),
         created_unpaid=created.filter(status=OrderStatus.PENDING).count(),
         failed=created.filter(status=OrderStatus.FAILED).count(),

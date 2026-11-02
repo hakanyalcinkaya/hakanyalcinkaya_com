@@ -16,6 +16,7 @@
     </div>
     <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 small">
       <a href="{% url 'studio:course_list' %}" class="studio-nav-link{% if section == 'courses' %} active{% endif %}"{% if section == 'courses' %} aria-current="page"{% endif %}><i class="bi bi-collection-play me-1" aria-hidden="true"></i>Kurslar</a>
+      <a href="{% url 'studio:stats' %}" class="studio-nav-link{% if section == 'stats' %} active{% endif %}"{% if section == 'stats' %} aria-current="page"{% endif %}><i class="bi bi-graph-up me-1" aria-hidden="true"></i>İstatistikler</a>
       <div class="dropdown" data-dropdown>
         <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'catalog' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-catalog-menu"><i class="bi bi-boxes me-1" aria-hidden="true"></i>Katalog<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
         <ul id="studio-catalog-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">

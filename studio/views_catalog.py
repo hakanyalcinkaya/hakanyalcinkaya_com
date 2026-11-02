@@ -21,7 +21,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import InstructorProfile
 from course.models import Bundle, Category, Course, Technology
 from discount.models import Discount
-from studio import course_stats
+from studio import course_stats, overview_stats
 from studio.forms import (
     BundleForm,
     CategoryForm,
@@ -162,6 +162,21 @@ def course_stats_view(request, course_id):
         return render(request, "studio/partials/_course_stats_list.html", context)
     context["stats"] = course_stats.summary(course)
     return render(request, "studio/course_stats.html", context)
+
+
+@superuser_required
+def stats_overview(request):
+    """Genel istatistikler: sitenin geneli, tüm kurslar tek tabloda, en çok izlenen ve bırakılan dersler, son 12 ay."""
+    courses = overview_stats.courses()
+    context = dict(
+        stats=overview_stats.summary(),
+        courses=courses,
+        top_watched=overview_stats.top_watched({course.pk: course.enrollment_total for course in courses}),
+        top_left=overview_stats.top_left(),
+        trend=overview_stats.trend(),
+        left_after_days=course_stats.LEFT_AFTER_DAYS,
+    )
+    return render(request, "studio/stats.html", context)
 
 
 # Katalog: aynı liste/form/silme akışı; satırlar türe özel partial ile çizilir.

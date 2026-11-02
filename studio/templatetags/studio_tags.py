@@ -71,6 +71,7 @@ def next_rows_url(context, page):
 
 
 NAV_SECTIONS = (
+    ("stats", ("stats",)),
     ("courses", ("course_", "section_", "lesson_", "extra_content", "subtitle_")),
     ("catalog", ("catalog_",)),
     ("sales", ("order", "cart")),

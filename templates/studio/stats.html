@@ -1,0 +1,162 @@
+{% extends "studio/base.html" %}
+{% load core_tags %}
+{% block studio_title %}İstatistikler{% endblock %}
+{% block studio_content %}
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">İstatistikler</h1>
+    <p class="text-body-secondary mb-0">Tüm kurslar tek yerde. Ayrıntı için kurs adına, aylık satış ve sepet hunisi için siparişler ve sepetler sayfasına bak.</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'studio:orders' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-receipt me-1" aria-hidden="true"></i>Siparişler</a>
+    <a href="{% url 'studio:carts' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-cart me-1" aria-hidden="true"></i>Sepetler</a>
+    <a href="{% url 'studio:students' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Öğrenciler</a>
+  </div>
+</div>
+
+<div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+  <div class="col"><a href="{% url 'studio:students' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+    <div class="small text-body-secondary">Öğrenci</div>
+    <div class="fs-3 fw-semibold">{{ stats.student_total }}</div>
+    <div class="small text-body-tertiary">{{ stats.enrollments.total }} kurs kaydı · son {{ stats.active_days }} günde {{ stats.new_enrollments }} yeni</div>
+  </a></div>
+  <div class="col"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">Son {{ stats.active_days }} günde ders açan</div>
+    <div class="fs-3 fw-semibold">{{ stats.active_students }}</div>
+    <div class="small text-body-tertiary">{{ stats.enrollments.started }} kayıtta izleme başladı · ort. %{{ stats.average_progress }} · {{ stats.enrollments.finished }} bitirdi</div>
+  </div></div>
+  <div class="col"><div class="border rounded p-3 h-100">
+    <div class="small text-body-secondary">Toplam satış</div>
+    {% for row in stats.revenue %}
+    <div class="{% if forloop.first %}fs-3{% else %}fs-6{% endif %} fw-semibold">{% include "studio/partials/_amount.html" with amount=row.total currency=row.currency %}</div>
+    {% empty %}
+    <div class="fs-3 fw-semibold">—</div>
+    {% endfor %}
+    <div class="small text-body-tertiary">{{ stats.order_total }} sipariş · {{ stats.buyer_total }} alıcı</div>
+  </div></div>
+  <div class="col"><a href="{% url 'studio:orders' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+    <div class="small text-body-secondary">{{ stats.period.label }}</div>
+    {% for row in stats.month.revenue %}
+    <div class="{% if forloop.first %}fs-3{% else %}fs-6{% endif %} fw-semibold">{% include "studio/partials/_amount.html" with amount=row.total currency=row.currency %}</div>
+    {% empty %}
+    <div class="fs-3 fw-semibold">—</div>
+    {% endfor %}
+    <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.month.count_change %}{{ stats.month.count }} sipariş · {{ stats.month.new_buyers }} yeni alıcı{% if stats.month.pending_count %} · {{ stats.month.pending_count }} ödeme bekliyor{% endif %}</div>
+  </a></div>
+  <div class="col"><a href="{% url 'studio:carts' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+    <div class="small text-body-secondary">Şu an sepette bekleyen</div>
+    <div class="fs-3 fw-semibold">{{ stats.waiting.total }}</div>
+    <div class="small text-body-tertiary">{{ stats.waiting.item_total }} ürün · {{ stats.waiting.amount|money }}{% if stats.waiting.idle %} · {{ stats.waiting.idle }} sepet {{ stats.waiting.idle_days }}+ gündür değişmedi{% endif %}</div>
+  </a></div>
+</div>
+
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="stats-courses-title">
+  <h2 id="stats-courses-title" class="h6 mb-1">Kurslar</h2>
+  <p class="small text-body-secondary">İzleme oranı yayındaki derslerden tamamlananların payı. Aktif: son {{ stats.active_days }} günde ders açan. Satış ve gelir kursun tek başına satıldığı siparişlerden; paketle satılanlar ayrı. Sepette: kursu sepete ekleyip almayan üye ve misafirler.</p>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="text-nowrap"><tr class="text-body-secondary">
+        <th scope="col" class="fw-medium" style="min-width: 14rem">Kurs</th>
+        <th scope="col" class="fw-medium text-end">Kayıt</th>
+        <th scope="col" class="fw-medium text-end">Başlayan</th>
+        <th scope="col" class="fw-medium" style="min-width: 9rem">Ort. izleme</th>
+        <th scope="col" class="fw-medium text-end">Bitiren</th>
+        <th scope="col" class="fw-medium text-end">Aktif</th>
+        <th scope="col" class="fw-medium text-end">Satın alan</th>
+        <th scope="col" class="fw-medium text-end">Satış · gelir</th>
+        <th scope="col" class="fw-medium text-end">Paketle</th>
+        <th scope="col" class="fw-medium text-end">Sepette</th>
+      </tr></thead>
+      <tbody>
+        {% for course in courses %}
+        {% url 'studio:course_stats' course.id as course_stats_url %}
+        <tr>
+          <td><a href="{{ course_stats_url }}" class="fw-medium link-body-emphasis">{{ course.title }}</a>{% if not course.is_published %} <span class="badge text-bg-light border fw-normal">{{ course.get_status_display }}</span>{% endif %}</td>
+          <td class="text-end"><a href="{{ course_stats_url }}?tab=students" class="link-body-emphasis">{{ course.enrollment_total }}</a></td>
+          <td class="text-end">{{ course.started_total }}</td>
+          <td><div class="d-flex align-items-center gap-2"><span class="studio-bar flex-grow-1" role="img" aria-label="%{{ course.average_progress }}"><span style="width: {{ course.average_progress }}%"></span></span><span class="text-nowrap">%{{ course.average_progress }}</span></div></td>
+          <td class="text-end text-nowrap">{{ course.finished_total }}{% if course.finished_total %} <span class="text-body-tertiary">(%{{ course.finished_percent }})</span>{% endif %}</td>
+          <td class="text-end">{{ course.active_total }}</td>
+          <td class="text-end"><a href="{{ course_stats_url }}?tab=buyers" class="link-body-emphasis">{{ course.buyer_total }}</a></td>
+          <td class="text-end text-nowrap">{% for row in course.revenue %}{{ row.count }} · {% include "studio/partials/_amount.html" with amount=row.total currency=row.order__currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}</td>
+          <td class="text-end">{{ course.bundle_sale_total }}</td>
+          <td class="text-end">{% if course.cart_total %}<a href="{{ course_stats_url }}?tab=in-cart" class="link-body-emphasis">{{ course.cart_total }}</a>{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10" class="text-body-secondary text-center py-4">Henüz kurs yok.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="row g-4 mb-4">
+  <section class="col-lg-6" aria-labelledby="stats-watched-title">
+    <div class="border rounded p-3 h-100">
+      <h2 id="stats-watched-title" class="h6 mb-1">En çok izlenen dersler</h2>
+      <p class="small text-body-secondary">Dersi oynatan ya da tamamlayan kayıtlı öğrenci; oran kursa kayıtlılara göre.</p>
+      {% if top_watched %}
+      <ol class="list-unstyled small mb-0 d-grid gap-2">
+        {% for row in top_watched %}
+        <li>
+          <a href="{% url 'studio:course_stats' row.lesson.section.course_id %}?tab=lessons" class="d-block text-decoration-none link-body-emphasis">
+            <span class="d-flex gap-2"><span class="fw-medium">{{ row.lesson.title }}</span><span class="ms-auto text-nowrap text-body-secondary">{{ row.viewers }} · %{{ row.percent }}</span></span>
+            <span class="d-block text-body-tertiary">{{ row.lesson.section.course.title }} · {{ row.lesson.section.title }}{% if row.completed %} · {{ row.completed }} tamamladı{% endif %}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="small text-body-secondary mb-0">Henüz izlenen ders yok.</p>
+      {% endif %}
+    </div>
+  </section>
+  <section class="col-lg-6" aria-labelledby="stats-left-title">
+    <div class="border rounded p-3 h-100">
+      <h2 id="stats-left-title" class="h6 mb-1">En çok bırakılan dersler</h2>
+      <p class="small text-body-secondary">Son açtığı ders bu olup {{ left_after_days }} gündür ders açmayan ve kursu bitirmeyen öğrenci.</p>
+      {% if top_left %}
+      <ol class="list-unstyled small mb-0 d-grid gap-2">
+        {% for row in top_left %}
+        <li>
+          <a href="{% url 'studio:course_stats' row.lesson.section.course_id %}?tab=students&left={{ row.lesson.pk }}" class="d-block text-decoration-none link-body-emphasis">
+            <span class="d-flex gap-2"><span class="fw-medium">{{ row.lesson.title }}</span><span class="ms-auto text-nowrap text-body-secondary">{{ row.count }} kişi</span></span>
+            <span class="d-block text-body-tertiary">{{ row.lesson.section.course.title }} · {{ row.lesson.section.title }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+      {% else %}
+      <p class="small text-body-secondary mb-0">Bırakan öğrenci yok.</p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+<section class="border rounded p-3 p-lg-4" aria-labelledby="stats-trend-title">
+  <h2 id="stats-trend-title" class="h6 mb-1">Son 12 ay</h2>
+  <p class="small text-body-secondary">Satış ödeme tarihine göre. Yeni kayıt: açılan kurs erişimi (satın alma, paket, hediye, elle). Açılan ders: kayıtlı öğrencilerin ilk kez açtığı dersler.</p>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="text-nowrap"><tr class="text-body-secondary">
+        <th scope="col" class="fw-medium">Ay</th>
+        <th scope="col" class="fw-medium" style="min-width: 10rem">Satış</th>
+        <th scope="col" class="fw-medium text-end">Gelir</th>
+        <th scope="col" class="fw-medium text-end">Yeni kayıt</th>
+        <th scope="col" class="fw-medium text-end">Açılan ders</th>
+      </tr></thead>
+      <tbody>
+        {% for row in trend %}
+        <tr{% if row.is_current %} class="fw-semibold" aria-current="true"{% endif %}>
+          <td class="text-nowrap"><a href="{% url 'studio:orders' %}?month={{ row.key }}" class="link-body-emphasis">{{ row.label }}</a></td>
+          <td><div class="d-flex align-items-center gap-2"><span class="studio-bar flex-grow-1" role="img" aria-label="{{ row.count }} sipariş"><span style="width: {{ row.percent }}%"></span></span><span class="text-nowrap">{{ row.count }}</span></div></td>
+          <td class="text-end text-nowrap">{% for amount in row.amounts %}{% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}</td>
+          <td class="text-end">{{ row.enrollments }}</td>
+          <td class="text-end">{{ row.opened }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -48,6 +48,7 @@ urlpatterns = [
     path("extra-content/preview/", views.extra_content_preview, name="extra_content_preview"),
     path("subtitles/<uuid:subtitle_id>/retry/", views.subtitle_retry, name="subtitle_retry"),
     path("subtitles/<uuid:subtitle_id>/delete/", views.subtitle_delete, name="subtitle_delete"),
+    path("stats/", views_catalog.stats_overview, name="stats"),
     path("settings/", views.site_settings, name="settings"),
     path("emails/", views.emails, name="emails"),
     path("subscribers/", views.subscribers, name="subscribers"),
