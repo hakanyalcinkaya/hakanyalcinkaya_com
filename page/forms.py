@@ -399,6 +399,12 @@ class PlayerPreferenceAutoForm(forms.ModelForm):
         return form, skipped
 
 
+class LessonPositionForm(forms.Form):
+    """Oynatıcının yazdığı kaldığı saniye (en çok 24 saat)."""
+
+    seconds = forms.IntegerField(min_value=0, max_value=24 * 60 * 60)
+
+
 class CurrentPasswordMixin:
     """Hesap değişikliklerinden önce mevcut şifreyi doğrular."""
 

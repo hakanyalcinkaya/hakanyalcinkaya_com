@@ -1,0 +1,27 @@
+{# Ders bazında izleme: lessons = course_stats.lessons(course). İzleyen oranı kursa kayıtlı öğrencilere göredir. #}
+{% load core_tags %}
+<p class="small text-body-secondary">İzleyen: dersi oynatan ya da tamamlayan kayıtlı öğrenci (oran kayıtlılara göre). Ortalama kaldığı yer: oynatıcının son yazdığı saniyelerin ortalaması. Bıraktı: son açtığı ders bu olup {{ left_after_days }} gündür ders açmayan ve kursu bitirmeyen öğrenci.</p>
+<div class="table-responsive">
+  <table class="table table-sm align-middle small mb-0">
+    <thead class="text-nowrap"><tr><th scope="col" class="text-end">#</th><th scope="col" style="min-width: 14rem">Ders</th><th scope="col" style="min-width: 10rem">İzleyen</th><th scope="col" class="text-end">Tamamlayan</th><th scope="col" class="text-end">Ortalama kaldığı yer</th><th scope="col" class="text-end">Bıraktı</th></tr></thead>
+    <tbody>
+      {% for lesson in lessons %}
+      <tr>
+        <td class="text-end text-body-tertiary">{{ lesson.number }}</td>
+        <td>
+          <div class="fw-medium">{{ lesson.title }}</div>
+          <div class="text-body-tertiary">{{ lesson.section.title }}{% if lesson.duration_seconds %} · {{ lesson.duration_seconds|lesson_clock }}{% endif %}</div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center gap-2"><span class="studio-bar flex-grow-1" role="img" aria-label="%{{ lesson.viewer_percent }}"><span style="width: {{ lesson.viewer_percent }}%"></span></span><span class="text-nowrap">{{ lesson.viewer_total }} · %{{ lesson.viewer_percent }}</span></div>
+        </td>
+        <td class="text-end">{{ lesson.completed_total }}</td>
+        <td class="text-end text-nowrap">{% if lesson.average_position %}{{ lesson.average_position|lesson_clock }}{% if lesson.average_percent is not None %} <span class="text-body-tertiary">(%{{ lesson.average_percent }})</span>{% endif %}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+        <td class="text-end">{% if lesson.left_total %}<a href="{{ list_url }}?tab=students&left={{ lesson.pk }}" hx-get="{{ list_url }}?tab=students&left={{ lesson.pk }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true">{{ lesson.left_total }}</a>{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-body-secondary text-center py-4">Yayında ders yok.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

@@ -13,7 +13,7 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 - [ ] Cloudflare'de `hakanyalcinkaya.com` ve `www` kayıtları "DNS only" (gri bulut) olmalı: proxy açıkken yükleme 100 MB / 100 sn ile sınırlı, stüdyoda büyük video yüklenemez. Sonra 100 MB'tan büyük bir videoyla dene.
 - [ ] Bunny CDN token koruması: panelde (Stream → kütüphane → Security) "Token Authentication" açılınca imzalı adresi gerçek CDN'de doğrula, sonra `.env`'de `BUNNY_CDN_TOKEN_AUTH=True` (kod hazır, `course/bunny.py` `_signed`). İkisi birlikte yapılmalı; yoksa videolar oynamaz.
 - [ ] Bunny panelinde izinli alan adları: `hakanyalcinkaya.com` (canlı) ve `local.hakanyalcinkaya.com` (geliştirme); Vimeo izinli alan adları ayarda (`VIMEO_EMBED_DOMAINS`, varsayılanda hâlâ `hakanyalcinkaya.dev` var).
-- [ ] Gerçek videoda deneme: 5 sn sonra tamamlandı, oynatıcı tercihleri (hız/kalite/altyazı otomatik kayıt, tam ekran; iPhone Safari'de tam ekran desteklenmeyebilir).
+- [ ] Gerçek videoda deneme (Bunny ve Vimeo): 5 sn sonra tamamlandı, kaldığı saniyeden devam (yerelde yalnız HLS test videosuyla denendi), oynatıcı tercihleri (hız/kalite/altyazı otomatik kayıt, tam ekran; iPhone Safari'de tam ekran desteklenmeyebilir).
 
 ## 2. İçerik temizliği (yayından önce)
 - [ ] Örnek veriyi kaldır: kurs sayfası tanıtım metnini aynı slug'lı örnek kurstan birleştiriyor (`page/content.py` `course_card` ve kurs detayı, `catalog.course_by_slug`); sepette oturumdaki örnek kurs yolu (`page/catalog.py` `cart_add`, `page/content.py` sepet) ve yayında kurs yokken gösterilen örnek kurslar. Gerçek kursların madde listeleri (CourseHighlight) dolu.
@@ -45,7 +45,6 @@ Sonraya bırakılan işler, yayın önceliğine göre. Tamamlananı listeden ç�
 - [ ] Kullanıcı paketteki bir kursa zaten sahipse paket fiyatından o kurs için ödediği tutarı düş (hediye/manuel ise 0 düşülür, fiyat 0'ın altına inmez).
 
 ## 4. Öğrenci araçları
-- [ ] Kaldığı saniyeden devam: `LessonProgress.record_position()` hazır ama hiçbir yerden çağrılmıyor. Oynatıcı her 5 saniyede bir yazmalı, ders kaldığı saniyeden açılmalı.
 - [ ] Video notu: oynatıcıda "Not ekle" düğmesi; not videonun o anki saniyesine kaydedilir. İlerleme çubuğunda notların yerinde işaret (mark), işarete tıklanınca o saniyeye gidilir. `learning.Note` modeline saniye alanı (`position_seconds`) eklenecek. Derslerde not alma şu an kapalı (Stüdyo → Ayarlar); açılmadan önce bağlanmalı.
 - [ ] Udemy eğitmen yanıtları (karar bekliyor): ayrı gösterilecekse `Review.reply` alanı, `import_reviews`'un yanıtı `udemy-*-yorumlar.md` dosyalarından bu alana yazması, sitede ve stüdyoda gösterim. `makemigrations course` gerekir.
 - [ ] Kullanıcıya yorumu onaylandığında / gizlendiğinde bilgi (isteğe bağlı).

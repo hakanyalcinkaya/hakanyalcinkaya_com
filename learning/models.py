@@ -129,8 +129,12 @@ class Enrollment(BaseModel):
         self.save(update_fields=["last_lesson", "last_watched_at", "updated_at"])
 
 
+# Kaldığı yer dersin son bu kadar saniyesindeyse ders bir dahaki açılışta baştan başlar.
+RESUME_END_MARGIN = 10
+
+
 class LessonProgress(BaseModel):
-    """Ders ilerlemesi. Oynatıcı izlenen saniyeyi düzenli aralıklarla yazar (TODO.md: her 5 sn)."""
+    """Ders ilerlemesi. Oynatıcı oynatma sürerken 5 sn'de bir, durdurunca ve sayfadan çıkarken kaldığı saniyeyi yazar."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lesson_progress", verbose_name=_("kullanıcı"))
     lesson = models.ForeignKey("course.Lesson", on_delete=models.CASCADE, related_name="progress", verbose_name=_("ders"))
@@ -176,8 +180,30 @@ class LessonProgress(BaseModel):
         )
 
     def record_position(self, seconds):
-        self.position_seconds = max(int(seconds), 0)
+        """Kaldığı saniye; süresi bilinen derste dersin sonunu aşmaz."""
+        seconds = max(int(seconds), 0)
+        if self.lesson.duration_seconds:
+            seconds = min(seconds, self.lesson.duration_seconds)
+        self.position_seconds = seconds
         self.save(update_fields=["position_seconds", "updated_at"])
+
+    @classmethod
+    def save_position(cls, user, lesson, seconds):
+        """Oynatıcının düzenli aralıklarla yazdığı kaldığı saniye; kaydı döner."""
+        progress = cls.objects.get_or_create(user=user, lesson=lesson)[0]
+        progress.lesson = lesson
+        progress.record_position(seconds)
+        return progress
+
+    @classmethod
+    def resume_seconds(cls, user, lesson):
+        """Dersin açılacağı saniye: kaldığı yer. Hiç izlemediyse ya da dersin son saniyelerine geldiyse 0 (baştan)."""
+        if not user.is_authenticated:
+            return 0
+        position = cls.objects.filter(user=user, lesson=lesson).values_list("position_seconds", flat=True).first() or 0
+        if lesson.duration_seconds and position >= lesson.duration_seconds - RESUME_END_MARGIN:
+            return 0
+        return position
 
 
 class Note(BaseModel):

@@ -730,6 +730,7 @@
     var nextUrl = holder.getAttribute("data-next-url");
     var nextTitle = holder.getAttribute("data-next-title");
     var preview = holder.hasAttribute("data-preview");
+    var positionUrl = holder.getAttribute("data-position-url");
     var frame = holder.closest(".ratio");
     mountPlayer(holder, {
       playerSrc: holder.getAttribute("data-player-src"),
@@ -745,6 +746,7 @@
     }).then(function (media) {
       if (!media) return;
       watchCompletion(media);
+      if (positionUrl) watchPosition(media, positionUrl, Number(holder.getAttribute("data-start")) || 0);
       if (preview) {
         // Önizleme bitince tam ekrandan çıkılır; sıradaki önizleme geri sayımla açılır.
         media.addEventListener("ended", exitFullscreen);
@@ -1029,6 +1031,41 @@
       }, AUTO_COMPLETE_MS);
     });
     ["pause", "ended", "emptied"].forEach(function (name) { media.addEventListener(name, stop); });
+  }
+
+  // Kaldığı yer (kursu alan üye): ders kaydedilen saniyeden başlar. Oynatma sürerken 5 sn'de bir, durdurunca, bitince ve
+  // sayfadan çıkarken izlenen saniye yazılır; istek sayfa kapansa da gider (keepalive). Değişmeyen saniye yeniden yazılmaz.
+  var POSITION_SAVE_MS = 5000;
+  function watchPosition(media, url, start) {
+    var saved = start;
+    var lastSave = 0;
+    function save() {
+      var seconds = Math.floor(media.currentTime || 0);
+      if (seconds === saved || (seconds === 0 && !lastSave)) return;
+      saved = seconds;
+      lastSave = Date.now();
+      var data = new FormData();
+      data.append("seconds", String(seconds));
+      fetch(url, { method: "POST", body: data, headers: { "X-CSRFToken": csrfToken() }, credentials: "same-origin", keepalive: true }).catch(function () {});
+    }
+    if (start > 0) {
+      var resume = function () {
+        if (media.currentTime < 1) media.currentTime = start;
+      };
+      if (media.readyState >= 1) resume();
+      else media.addEventListener("loadedmetadata", resume, { once: true });
+    }
+    media.addEventListener("playing", function () {
+      if (!lastSave) lastSave = Date.now();
+    });
+    media.addEventListener("timeupdate", function () {
+      if (!media.paused && lastSave && Date.now() - lastSave >= POSITION_SAVE_MS) save();
+    });
+    ["pause", "ended"].forEach(function (name) { media.addEventListener(name, save); });
+    window.addEventListener("pagehide", save);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") save();
+    });
   }
 
   // Önceki / Sonraki ile dersten çıkınca ders tamamlandı olarak işaretlenir (kursu alan üye). Ders zaten tamamlandıysa ya

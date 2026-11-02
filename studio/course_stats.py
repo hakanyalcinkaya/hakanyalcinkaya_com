@@ -1,15 +1,24 @@
-"""Stüdyo kurs istatistikleri: kayıtlar, izleme oranı dağılımı, satın alanlar ve sepette bırakanlar.
+"""Stüdyo kurs istatistikleri: kayıtlar, izleme oranı dağılımı, ders bazında izleme, satın alanlar ve sepette bırakanlar.
 
 İzleme oranı yayındaki derslere göredir (Enrollment.objects.with_progress). Gelir yalnız kursun doğrudan satıldığı
 kalemlerden ve para birimine göre toplanır; paketle satışlarda kursa düşen pay bilinmediği için ayrı sayılır.
 """
 
+from collections import Counter
+from datetime import timedelta
+
+from django.core.exceptions import ValidationError
 from django.db.models import Avg, Count, Q, Sum
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cart.models import CartItem
+from course.models import Lesson
 from learning.models import Enrollment, EnrollmentSource
 from order.models import Order, OrderItem, OrderStatus
+
+# Son açtığı ders bu olup bu kadar gündür hiç ders açmayan, kursu bitirmemiş öğrenci o derste "bıraktı" sayılır.
+LEFT_AFTER_DAYS = 14
 
 # (anahtar, etiket, en az %, en çok %)
 PROGRESS_BUCKETS = (
@@ -32,6 +41,54 @@ def bucket_filter(key):
 
 def enrollments(course):
     return Enrollment.objects.filter(course=course).with_progress()
+
+
+def left_filter(lesson=None):
+    """Bıraktı (with_progress satırlarında): son açtığı ders (verilirse bu ders), LEFT_AFTER_DAYS gündür ders açmadı,
+    kursu bitirmedi."""
+    condition = Q(last_lesson__isnull=False, last_watched_at__lt=timezone.now() - timedelta(days=LEFT_AFTER_DAYS), progress__lt=100)
+    if lesson is not None:
+        condition &= Q(last_lesson=lesson)
+    return condition
+
+
+def course_lesson(course, lesson_id):
+    """GET'ten gelen ders kimliği bu kursun dersiyse ders, değilse None."""
+    if not lesson_id:
+        return None
+    try:
+        return Lesson.objects.filter(section__course=course, pk=lesson_id).first()
+    except ValidationError:
+        return None
+
+
+def lessons(course):
+    """Yayındaki dersler kurs sırasıyla; her derste izleyen, bitiren, ortalama kaldığı yer ve o derste bırakan sayısı.
+    Yalnız kursa kayıtlı öğrenciler sayılır (personelin denemeleri sayılmaz). Kaldığı yer oynatıcının son yazdığı saniyedir."""
+    students = Enrollment.objects.filter(course=course).values("user")
+    mine = Q(progress__user__in=students)
+    rows = list(
+        course.published_lessons()
+        .select_related("section")
+        .order_by("section__sort_order", "sort_order", "id")
+        .annotate(
+            viewer_total=Count("progress", filter=mine & (Q(progress__position_seconds__gt=0) | Q(progress__completed_at__isnull=False))),
+            completed_total=Count("progress", filter=mine & Q(progress__completed_at__isnull=False)),
+            average_position=Avg("progress__position_seconds", filter=mine & Q(progress__position_seconds__gt=0)),
+        )
+    )
+    left = Counter(enrollments(course).filter(left_filter()).values_list("last_lesson", flat=True))
+    total = Enrollment.objects.filter(course=course).count()
+    for number, lesson in enumerate(rows, 1):
+        lesson.number = number
+        lesson.left_total = left[lesson.pk]
+        lesson.viewer_percent = round(lesson.viewer_total * 100 / total) if total else 0
+        lesson.average_percent = (
+            min(round(lesson.average_position * 100 / lesson.duration_seconds), 100)
+            if lesson.average_position and lesson.duration_seconds
+            else None
+        )
+    return rows
 
 
 def buyer_orders(course):

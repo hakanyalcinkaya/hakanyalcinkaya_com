@@ -30,6 +30,8 @@
     {% endfor %}
   </div>
   {% endif %}
+  {% elif tab == "lessons" %}
+  {% include "studio/partials/stats/_lessons.html" %}
   {% else %}
   <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[name=q]" hx-sync="this:replace">
     <input type="hidden" name="tab" value="{{ tab }}">
@@ -38,6 +40,10 @@
       {% for key, label, low, high in buckets %}<option value="{{ key }}"{% if key == bucket %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Ad ya da e-posta" aria-label="Ad ya da e-posta ara">
+    {% if left_lesson %}
+    <input type="hidden" name="left" value="{{ left_lesson.pk }}">
+    <a href="{{ list_url }}?tab={{ tab }}" class="badge rounded-pill text-bg-secondary text-decoration-none fw-normal" hx-get="{{ list_url }}?tab={{ tab }}" hx-target="#course-stats-list" hx-swap="outerHTML" hx-push-url="true" title="Ders filtresini kaldır">“{{ left_lesson.title }}” dersinde bırakanlar <i class="bi bi-x" aria-hidden="true"></i></a>
+    {% endif %}
     <span class="small text-body-tertiary">{{ page.paginator.count }} öğrenci</span>
   </form>
   <div class="list-group">{% include "studio/partials/stats/_students_rows.html" %}</div>

@@ -10,7 +10,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -52,6 +52,7 @@ from page.forms import (
     CheckoutForm,
     CouponForm,
     EmailChangeForm,
+    LessonPositionForm,
     LoginForm,
     NewsletterForm,
     NewsletterManageForm,
@@ -265,9 +266,12 @@ def lesson(request, course_slug, section_slug, lesson_slug):
     lesson = page["current"].get("object")
     # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
     favorite = None
+    position = None
     review_course = None
     if lesson is not None and not page["preview"] and request.user.is_authenticated:
         favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
+        # Kaldığı yer: oynatıcı oradan başlar ve izlerken yazar.
+        position = dict(lesson_id=lesson.pk, start=LessonProgress.resume_seconds(request.user, lesson))
         enrollment = Enrollment.objects.for_user(request.user).filter(course=course).first()
         if enrollment is not None:
             # Kaldığı ders: Kurslarım'daki "Kaldığın dersten devam et", son izleme tarihi ve stüdyodaki izleme bilgisi.
@@ -286,6 +290,7 @@ def lesson(request, course_slug, section_slug, lesson_slug):
             **page,
             **review_context,
             "favorite": favorite,
+            "position": position,
             "review_course": review_course,
             # Oynatıcı tercihleri (hız, kalite, altyazı, tam ekran); ziyaretçiye varsayılanlar.
             "player_preferences_json": json.dumps(PlayerPreference.for_user(request.user).player_options()),
@@ -398,6 +403,18 @@ def lesson_complete(request, lesson_id):
         progress=content.progress_summary(lesson.section.course, request.user, request.user.is_staff),
     )
     return render(request, "page/partials/complete_response.html", context)
+
+
+@login_required
+@require_POST
+def lesson_position(request, lesson_id):
+    """Oynatıcı kaldığı saniyeyi arka planda yazar (kursa erişimi olan üye); ders bir dahaki açılışta oradan başlar."""
+    lesson = _member_lesson(request, lesson_id)
+    form = LessonPositionForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse(dict(ok=False, errors=form.errors.get_json_data()), status=400)
+    LessonProgress.save_position(request.user, lesson, form.cleaned_data["seconds"])
+    return HttpResponse(status=204)
 
 
 @login_required

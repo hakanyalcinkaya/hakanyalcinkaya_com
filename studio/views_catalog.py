@@ -97,6 +97,7 @@ def course_edit(request, course_id):
 
 STATS_TABS = {
     "students": gettext_lazy("Öğrenciler"),
+    "lessons": gettext_lazy("Dersler"),
     "buyers": gettext_lazy("Satın alanlar"),
     "in-cart": gettext_lazy("Sepette bırakanlar"),
 }
@@ -126,6 +127,8 @@ def _stats_list(request, course, tab):
             rows = rows.filter(cart__user__email__icontains=query)
         unfinished = course_stats.unfinished_orders(course).select_related("user").order_by("-created_at", "id")[:STATS_PAGE_SIZE]
         return dict(context, page=_page(request, rows.order_by("-created_at", "id")), unfinished=unfinished)
+    if tab == "lessons":
+        return dict(context, lessons=course_stats.lessons(course), left_after_days=course_stats.LEFT_AFTER_DAYS)
     bucket = request.GET.get("progress", "")
     rows = course_stats.enrollments(course).select_related("user", "last_lesson", "order")
     condition = course_stats.bucket_filter(bucket)
@@ -133,15 +136,19 @@ def _stats_list(request, course, tab):
         rows = rows.filter(condition)
     else:
         bucket = ""
+    # Ders sekmesinden gelindiyse yalnız o derste bırakanlar.
+    left_lesson = course_stats.course_lesson(course, request.GET.get("left"))
+    if left_lesson is not None:
+        rows = rows.filter(course_stats.left_filter(left_lesson))
     if query:
         rows = rows.filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
     page = _page(request, rows.order_by("-progress", F("last_watched_at").desc(nulls_last=True), "id"))
-    return dict(context, page=page, bucket=bucket, buckets=course_stats.PROGRESS_BUCKETS)
+    return dict(context, page=page, bucket=bucket, buckets=course_stats.PROGRESS_BUCKETS, left_lesson=left_lesson)
 
 
 @superuser_required
 def course_stats_view(request, course_id):
-    """Kurs istatistikleri: kayıt ve izleme oranı özeti; sekmelerde öğrenciler, satın alanlar, sepette bırakanlar.
+    """Kurs istatistikleri: kayıt ve izleme oranı özeti; sekmelerde öğrenciler, dersler, satın alanlar, sepette bırakanlar.
     Sekme, oran, filtre ve arama GET parametresinde; HTMX isteğinde yalnız liste, kaydırınca yalnız yeni satırlar döner."""
     course = get_object_or_404(Course, pk=course_id)
     tab = request.GET.get("tab", "students")

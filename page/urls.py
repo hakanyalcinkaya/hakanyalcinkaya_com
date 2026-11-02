@@ -27,6 +27,7 @@ urlpatterns = [
     ),
     path("lessons/<uuid:lesson_id>/favorite/", views.lesson_favorite, name="lesson_favorite"),
     path("lessons/<uuid:lesson_id>/complete/", views.lesson_complete, name="lesson_complete"),
+    path("lessons/<uuid:lesson_id>/position/", views.lesson_position, name="lesson_position"),
     path("reviews/", views.all_reviews, name="all_reviews"),
     path("account/login/", views.login, name="login"),
     path("account/signup/", views.signup, name="signup"),
