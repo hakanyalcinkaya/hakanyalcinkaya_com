@@ -27,6 +27,13 @@ from studio import cart_stats, course_stats, order_stats, periods
 # Bu kadar gün içinde ders açan öğrenci "aktif" sayılır.
 ACTIVE_DAYS = 30
 TOP_LESSONS = 10
+# Son 12 ayda yeni kayıtların kaynağa göre sütunları: (anahtar, etiket, kayıt kaynakları).
+ENROLLMENT_GROUPS = (
+    ("purchase", _("Satın alma"), (EnrollmentSource.PURCHASE, EnrollmentSource.BUNDLE)),
+    ("gift", _("Hediye"), (EnrollmentSource.GIFT,)),
+    ("manual", _("Elle"), (EnrollmentSource.MANUAL,)),
+    ("imported", _("Aktarım"), (EnrollmentSource.IMPORTED,)),
+)
 
 
 def _percent(part, whole):
@@ -194,20 +201,28 @@ def top_left():
 
 
 def trend():
-    """Son 12 ayın satış adedi ve geliri (order_stats.trend), yeni kurs kaydı ve ilk kez açılan ders sayısı."""
+    """Son 12 ayın satış adedi ve geliri (order_stats.trend), kaynağa göre yeni kurs kaydı (ENROLLMENT_GROUPS sırasıyla
+    row["enrollments"]) ve ilk kez açılan ders sayısı."""
     rows = order_stats.trend(periods.month_period())
     year, month = (int(part) for part in rows[0]["key"].split("-"))
     start = periods.month_bounds(year, month)[0]
     zone = timezone.get_current_timezone()
 
-    def by_month(queryset):
-        counts = queryset.filter(created_at__gte=start).annotate(month=TruncMonth("created_at", tzinfo=zone)).order_by().values("month").annotate(n=Count("pk"))
-        return {(timezone.localtime(row["month"], zone) if timezone.is_aware(row["month"]) else row["month"]).strftime("%Y-%m"): row["n"] for row in counts}
+    def by_month(queryset, *fields):
+        """{(ay, *alanlar): sayı}; ay "YYYY-AA"."""
+        counts = queryset.filter(created_at__gte=start).annotate(month=TruncMonth("created_at", tzinfo=zone)).order_by().values("month", *fields).annotate(n=Count("pk"))
+        result = {}
+        for row in counts:
+            month = timezone.localtime(row["month"], zone) if timezone.is_aware(row["month"]) else row["month"]
+            result[(month.strftime("%Y-%m"), *(row[field] for field in fields))] = row["n"]
+        return result
 
     enrolled = Enrollment.objects.filter(user=OuterRef("user"), course=OuterRef("lesson__section__course"))
-    enrollments = by_month(Enrollment.objects.all())
+    enrollments = by_month(Enrollment.objects.all(), "source")
     opened = by_month(LessonProgress.objects.filter(Exists(enrolled)))
     for row in rows:
-        row["enrollments"] = enrollments.get(row["key"], 0)
-        row["opened"] = opened.get(row["key"], 0)
+        row["enrollments"] = [
+            dict(key=key, count=sum(enrollments.get((row["key"], source), 0) for source in sources)) for key, _label, sources in ENROLLMENT_GROUPS
+        ]
+        row["opened"] = opened.get((row["key"],), 0)
     return rows

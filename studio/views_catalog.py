@@ -176,6 +176,7 @@ def stats_overview(request):
         top_watched=overview_stats.top_watched({course.pk: course.enrollment_total for course in courses}),
         top_left=overview_stats.top_left(),
         trend=overview_stats.trend(),
+        enrollment_groups=overview_stats.ENROLLMENT_GROUPS,
         left_after_days=course_stats.LEFT_AFTER_DAYS,
     )
     return render(request, "studio/stats.html", context)

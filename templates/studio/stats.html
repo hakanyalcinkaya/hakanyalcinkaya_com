@@ -168,23 +168,28 @@
 
 <section class="border rounded p-3 p-lg-4" aria-labelledby="stats-trend-title">
   <h2 id="stats-trend-title" class="h6 mb-1">Son 12 ay</h2>
-  <p class="small text-body-secondary">Satış ödeme tarihine göre. Yeni kayıt: açılan kurs erişimi (satın alma, paket, hediye, elle). Açılan ders: kayıtlı öğrencilerin ilk kez açtığı dersler.</p>
+  <p class="small text-body-secondary">Satış ödeme tarihine göre. Yeni kayıtlar açılan kurs erişimleridir, kaynağa göre: satın alma (tek kurs ya da paket), hediye, elle (öğrenciye yöneticinin açtığı) ve eski platformdan aktarım (aktarıldığı tarihte). Açılan ders: kayıtlı öğrencilerin ilk kez açtığı dersler.</p>
   <div class="table-responsive">
     <table class="table table-sm align-middle small mb-0">
-      <thead class="text-nowrap"><tr class="text-body-secondary">
-        <th scope="col" class="fw-medium">Ay</th>
-        <th scope="col" class="fw-medium" style="min-width: 10rem">Satış</th>
-        <th scope="col" class="fw-medium text-end">Gelir</th>
-        <th scope="col" class="fw-medium text-end">Yeni kayıt</th>
-        <th scope="col" class="fw-medium text-end">Açılan ders</th>
-      </tr></thead>
+      <thead class="text-nowrap">
+        <tr class="text-body-secondary">
+          <th scope="col" rowspan="2" class="fw-medium align-bottom">Ay</th>
+          <th scope="col" rowspan="2" class="fw-medium align-bottom" style="min-width: 10rem">Satış</th>
+          <th scope="col" rowspan="2" class="fw-medium align-bottom text-end">Gelir</th>
+          <th scope="colgroup" colspan="{{ enrollment_groups|length }}" class="fw-medium text-center border-bottom">Yeni kayıt</th>
+          <th scope="col" rowspan="2" class="fw-medium align-bottom text-end">Açılan ders</th>
+        </tr>
+        <tr class="text-body-secondary">
+          {% for key, label, sources in enrollment_groups %}<th scope="col" class="fw-medium text-end">{{ label }}</th>{% endfor %}
+        </tr>
+      </thead>
       <tbody>
         {% for row in trend reversed %}
         <tr{% if row.is_current %} class="fw-semibold" aria-current="true"{% endif %}>
           <td class="text-nowrap"><a href="{% url 'studio:orders' %}?month={{ row.key }}" class="link-body-emphasis">{{ row.label }}</a></td>
           <td><div class="d-flex align-items-center gap-2"><span class="studio-bar flex-grow-1" role="img" aria-label="{{ row.count }} sipariş"><span style="width: {{ row.percent }}%"></span></span><span class="text-nowrap">{{ row.count }}</span></div></td>
           <td class="text-end text-nowrap">{% for amount in row.amounts %}{% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}</td>
-          <td class="text-end">{{ row.enrollments }}</td>
+          {% for group in row.enrollments %}<td class="text-end">{% if group.count %}{{ group.count }}{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>{% endfor %}
           <td class="text-end">{{ row.opened }}</td>
         </tr>
         {% endfor %}
