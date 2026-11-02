@@ -8,5 +8,16 @@ import '@videojs/html/video/skin';
 import '@videojs/html/media/hlsjs-video';
 import '@videojs/html/media/vimeo-video';
 
+// Oynatmaya basılınca kapak görseli Video.js'teki sürenin (0,25 sn) yarısında kaybolur. Görünüm shadow DOM içinde
+// olduğu için kural sitenin CSS'inden değil, görünümün kendi stil sayfasının sonuna eklenerek verilir; "hareketi
+// azalt" tercihinde Video.js'in anında geçişi korunur.
+const POSTER_FADE = '@media (prefers-reduced-motion: no-preference) { .media-skin .media-poster { transition-duration: .125s; } }';
+const VideoSkin = customElements.get('video-skin');
+if (typeof VideoSkin.styles === 'string') {
+  VideoSkin.styles += POSTER_FADE;
+} else {
+  VideoSkin.styles.insertRule(POSTER_FADE, VideoSkin.styles.cssRules.length);
+}
+
 export { preferQuality } from './quality.js';
 export { enableVimeoQuality } from './vimeo-quality.js';
