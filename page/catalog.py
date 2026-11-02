@@ -23,6 +23,8 @@ COUPON_SESSION_KEY = "coupon"
 ORDER_SESSION_KEY = "last_order"
 # Bu tarayıcıda verilen siparişlerin numaraları: misafir de kendi teşekkür sayfasını görebilir (Order.objects.visible_to).
 ORDERS_SESSION_KEY = "orders"
+# Kartla ödemede PayTR iframe token'ları, sipariş numarasına göre (son birkaç sipariş).
+PAYMENT_SESSION_KEY = "paytr_tokens"
 NEWSLETTER_SESSION_KEY = "newsletter_email"
 # [ÖRNEK] Sipariş modeli yokken satın alınan kurslar oturumda tutulur.
 PURCHASED_SESSION_KEY = "purchased"

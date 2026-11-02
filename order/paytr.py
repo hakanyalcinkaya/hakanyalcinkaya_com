@@ -28,6 +28,8 @@ REQUIRED_SETTINGS = ("PAYTR_MERCHANT_ID", "PAYTR_MERCHANT_KEY", "PAYTR_MERCHANT_
 NAME_LENGTH = 60
 ADDRESS_LENGTH = 400
 PHONE_LENGTH = 20
+# Adres zorunlu; kurslar dijital teslim edildiği için sabit metin gider.
+DIGITAL_ADDRESS = "Dijital ürün (online kurs)"
 
 logger = logging.getLogger(__name__)
 

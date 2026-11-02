@@ -1,0 +1,56 @@
+{% extends "_base/base.html" %}
+{% load core_tags %}
+
+{# Kartla ödeme (/checkout/pay/<sipariş no>/): PayTR'nin ödeme formu ya da dönüşten sonra onay beklenirken durum. #}
+{% block title %}Kartla ödeme — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">
+{# PayTR dönüşü iframe içinde açılırsa sayfa üst pencereye taşınır. #}
+<script>if (window.top !== window.self) window.top.location.href = window.location.href;</script>{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+  {% include "page/partials/steps.html" %}
+  <h1 class="h2 fw-semibold mb-4">Kartla ödeme</h1>
+
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-7">
+      <section class="card" aria-label="Ödeme formu">
+        <div class="card-body p-2 p-sm-3">
+          {% include "page/partials/payment_status.html" %}
+        </div>
+      </section>
+      <p class="small text-body-tertiary mt-3 mb-0"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i>Kart bilgilerini PayTR'nin güvenli formuna giriyorsun; kart bilgilerin bu sitede saklanmaz.</p>
+    </div>
+
+    <aside class="col-lg-5" aria-labelledby="ozet-baslik">
+      <div class="card shadow sticky-lg-top top-lg-nav">
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap justify-content-between gap-2">
+            <h2 id="ozet-baslik" class="h6 fw-semibold mb-0">Sipariş özeti</h2>
+            <span class="small text-body-tertiary">Sipariş no <span class="font-monospace">{{ order.number }}</span></span>
+          </div>
+          <ul class="list-unstyled d-grid gap-2 mt-3 mb-0">
+            {% for item in order.items.all %}
+            <li class="d-flex gap-3 justify-content-between small"><span class="fw-medium min-w-0">{{ item.title }}</span><span class="fw-semibold">{{ item.paid_price|money }}</span></li>
+            {% endfor %}
+          </ul>
+          <hr>
+          {% if order.discount_total %}
+          <div class="d-flex justify-content-between small text-success-emphasis mb-2"><span>İndirim{% if order.discount_code %} ({{ order.discount_code }}){% endif %}</span><span>−{{ order.discount_total|money }}</span></div>
+          {% endif %}
+          <div class="d-flex justify-content-between align-items-baseline"><span class="fw-semibold">Toplam <span class="small fw-normal text-body-tertiary">(KDV dahil)</span></span><span class="fs-3 fw-semibold">{{ order.total|money }}</span></div>
+          <p class="small text-body-tertiary mt-3 mb-0">Kurslar <b class="text-body-secondary">{{ order.email }}</b> hesabına açılacak.</p>
+        </div>
+      </div>
+      {% if not waiting %}<a href="{% url 'page:checkout' %}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Ödeme adımına dön</a>{% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if iframe_url %}
+<script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
+<script>iFrameResize({}, "#paytriframe");</script>
+{% endif %}
+{% endblock %}

@@ -26,6 +26,7 @@ from core.money import format_try
 from core.models import Status, VideoPlatform
 from core.site_url import absolute_url
 from core.templatetags.core_tags import share_image
+from core.turnstile import client_ip
 from course import video_service
 from course.models import (
     Course,
@@ -38,6 +39,7 @@ from course.models import (
     rating_summary,
 )
 from learning.models import Enrollment, LessonProgress
+from order import paytr
 from order.models import Order
 from page import catalog
 
@@ -303,6 +305,25 @@ def create_card_order(request, email):
     order = Order.create_from_cart(cart, email, checkout_buyer(request, email), provider="card")
     request.session[catalog.ORDERS_SESSION_KEY] = [*request.session.get(catalog.ORDERS_SESSION_KEY, []), order.number][-20:]
     return order
+
+
+def start_card_payment(request, order, name, phone):
+    """PayTR ödeme formunun token'ı; oturuma yazılır, ödeme sayfası (Order.get_payment_url) iframe'i bununla açar.
+    PayTR müşteriyi ödeme sayfasına ?result=ok ya da ?result=fail ile döndürür. PayTR reddederse PaytrError."""
+    payment_url = request.build_absolute_uri(order.get_payment_url())
+    token = paytr.create_token(
+        order,
+        client_ip(request),
+        name,
+        phone,
+        paytr.DIGITAL_ADDRESS,
+        ok_url=f"{payment_url}?result=ok",
+        fail_url=f"{payment_url}?result=fail",
+    )
+    tokens = dict(list(request.session.get(catalog.PAYMENT_SESSION_KEY, {}).items())[-4:])
+    tokens[order.number] = token
+    request.session[catalog.PAYMENT_SESSION_KEY] = tokens
+    return token
 
 
 def order_thanks(order, user):

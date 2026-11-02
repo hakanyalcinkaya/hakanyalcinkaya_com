@@ -10,6 +10,7 @@ urlpatterns = [
     path("courses/", views.course_list, name="course_list"),
     path("cart/", views.cart, name="cart"),
     path("checkout/", views.checkout, name="checkout"),
+    path("checkout/pay/<slug:number>/", views.payment, name="payment"),
     # Numarasız eski teşekkür adresi: siparişler Kurslarım'da.
     path("thanks/", RedirectView.as_view(pattern_name="page:library")),
     path("thanks/<slug:number>/", views.thanks, name="thanks"),

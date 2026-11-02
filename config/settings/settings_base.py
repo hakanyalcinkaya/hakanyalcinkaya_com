@@ -229,3 +229,6 @@ PAYTR_MERCHANT_SALT = env("PAYTR_MERCHANT_SALT", default="")
 PAYTR_TEST_MODE = env.bool("PAYTR_TEST_MODE", default=True)
 # Taksit: 1 yalnız tek çekim; 2-12 ödeme formunda gösterilecek en fazla taksit sayısı.
 PAYTR_MAX_INSTALLMENT = env.int("PAYTR_MAX_INSTALLMENT", default=1)
+# Ödeme sayfasında kartla ödeme: boş kapalı ("Yakında"), "staff" yalnız yöneticilere (prod'da test modunda denemek
+# için), "all" herkese açık.
+CARD_PAYMENT_OPEN = env("CARD_PAYMENT_OPEN", default="")

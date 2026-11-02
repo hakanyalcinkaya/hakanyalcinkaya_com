@@ -14,6 +14,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
@@ -26,11 +27,13 @@ from course.models import Course, Lesson, Review, ReviewSource
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
 from newsletter.models import Subscriber
+from order import paytr
 from order.models import Order
 from page import content
 from page.catalog import (
     NEWSLETTER_SESSION_KEY,
     ORDERS_SESSION_KEY,
+    PAYMENT_SESSION_KEY,
     RESET_SESSION_KEY,
     SELLER_ADDRESS,
     SELLER_TAX,
@@ -539,8 +542,11 @@ def cart(request):
     )
 
 
-# Kartla ödeme (iyzico) bağlanınca açılır; kapalıyken sipariş oluşturulmaz, sepet bekler.
-CARD_PAYMENT_OPEN = False
+def card_payment_open(request):
+    """Kartla ödeme (PayTR) açık mı: settings.CARD_PAYMENT_OPEN "all" herkese, "staff" yalnız yöneticilere. Kapalıyken
+    sipariş oluşturulmaz, sepet bekler."""
+    mode = settings.CARD_PAYMENT_OPEN
+    return paytr.is_configured() and (mode == "all" or (mode == "staff" and request.user.is_staff))
 
 
 def checkout(request):
@@ -558,22 +564,33 @@ def checkout(request):
     coupon_form, done = _coupon(request, cart, items, action, "page:checkout")
     if done:
         return done
-    form = CheckoutForm(request.POST if action == "pay" else None, member=member)
+    payment_open = card_payment_open(request)
+    initial = {"name": request.user.get_full_name()} if member else None
+    form = CheckoutForm(request.POST if action == "pay" else None, member=member, initial=initial)
     if action == "pay" and form.is_valid():
-        if not CARD_PAYMENT_OPEN:
+        if not payment_open:
             messages.info(request, "Kartla online ödeme çok yakında açılıyor; sepetindeki kurslar seni bekliyor.")
             return redirect("page:checkout")
         email = request.user.email if member else form.cleaned_data["email"]
-        content.create_card_order(request, email)
-        # iyzico bağlanınca: ödeme sayfasına yönlendirme burada.
-        return redirect("page:cart")
+        order = content.create_card_order(request, email)
+        if not order.total:
+            # %100 indirim kodu: ödenecek tutar yok, kartsız tamamlanır.
+            order.mark_paid()
+            return redirect(order.get_thanks_url())
+        try:
+            content.start_card_payment(request, order, form.cleaned_data["name"], form.cleaned_data["phone"])
+        except paytr.PaytrError:
+            order.mark_failed()
+            messages.error(request, "Ödeme sayfası şu an açılamadı; biraz sonra tekrar dene. Sorun sürerse bize yaz.")
+            return redirect("page:checkout")
+        return redirect(order.get_payment_url())
     return render(
         request,
         "page/checkout.html",
         {
             "summary": content.order_summary(items, cart),
             "steps": purchase_steps(1),
-            "card_payment_open": CARD_PAYMENT_OPEN,
+            "card_payment_open": payment_open,
             "checkout_form": form,
             # İndirim kodu yalnız veritabanındaki kursların sepetine uygulanır.
             "coupon_form": coupon_form,
@@ -581,9 +598,33 @@ def checkout(request):
     )
 
 
+@xframe_options_sameorigin
+def payment(request, number):
+    """Kartla ödeme: PayTR'nin ödeme formu (iframe). PayTR müşteriyi ?result=ok ya da ?result=fail ile buraya döndürür
+    (dönüş iframe içinde açılırsa sayfa üst pencereye taşınır). Dönüş ödemenin kanıtı değildir: sipariş yalnız PayTR
+    bildirimiyle ödenir; o gelene kadar sayfa birkaç saniyede bir durumu sorar (HTMX), ödenince teşekkür sayfasına geçer."""
+    orders = Order.objects.by_card().visible_to(request.user, request.session.get(ORDERS_SESSION_KEY, []))
+    order = get_object_or_404(orders, number=number)
+    go = HttpResponseClientRedirect if request.htmx else redirect
+    if order.is_paid:
+        return go(order.get_thanks_url())
+    result = request.GET.get("result")
+    token = request.session.get(PAYMENT_SESSION_KEY, {}).get(order.number)
+    if order.is_failed or result == "fail":
+        messages.error(request, "Ödeme tamamlanamadı, kartından para çekilmedi. Bilgilerini kontrol edip tekrar deneyebilirsin.")
+        return go(reverse("page:checkout"))
+    if result != "ok" and not token:
+        messages.info(request, "Ödeme oturumunun süresi doldu; kartla ödemeyi yeniden başlat.")
+        return go(reverse("page:checkout"))
+    context = dict(order=order, waiting=result == "ok", iframe_url="" if result == "ok" else paytr.iframe_url(token))
+    if request.htmx:
+        return render(request, "page/partials/payment_status.html", context)
+    return render(request, "page/payment.html", dict(context, steps=purchase_steps(1)))
+
+
 def thanks(request, number):
     """Satın almadan sonra ödenmiş siparişin özeti. Yalnız siparişin sahibi ya da siparişi bu tarayıcıda veren görür;
-    iyzico dönüşü ödemeyi doğruladıktan sonra buraya yönlendirir (Order.get_thanks_url)."""
+    kartla ödeme sayfası PayTR onayı gelince buraya geçer (Order.get_thanks_url)."""
     orders = Order.objects.paid().visible_to(request.user, request.session.get(ORDERS_SESSION_KEY, []))
     order = get_object_or_404(orders, number=number)
     return render(request, "page/thanks.html", dict(order=order, steps=purchase_steps(2), **content.order_thanks(order, request.user)))

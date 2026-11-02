@@ -1,0 +1,12 @@
+{# Ödeme sayfasının içeriği: PayTR formu ya da dönüşten sonra onay beklenirken iki saniyede bir yenilenen durum. #}
+{% if waiting %}
+<div id="odeme-durumu" class="text-center px-3 py-5" hx-get="{{ request.path }}?result=ok" hx-trigger="every 2s" hx-swap="outerHTML" role="status">
+  <div class="spinner-border text-primary" aria-hidden="true"></div>
+  <p class="fw-semibold mt-3 mb-1">Ödemen onaylanıyor…</p>
+  <p class="small text-body-secondary mb-0">Birkaç saniye sürebilir; sayfayı kapatma. Onay gelince kursların açılır ve sipariş özeti <b class="text-body">{{ order.email }}</b> adresine gelir.</p>
+</div>
+{% else %}
+<div id="odeme-durumu">
+  <iframe src="{{ iframe_url }}" id="paytriframe" title="PayTR güvenli ödeme formu" frameborder="0" scrolling="no" class="w-100 d-block" style="min-height:560px"></iframe>
+</div>
+{% endif %}

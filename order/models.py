@@ -32,6 +32,7 @@ PAYMENT_METHODS = {
 }
 ADMIN_PAYMENT_METHODS = ("bank_transfer", "card", "manual", "gift")
 GIFT = "gift"
+CARD = "card"
 # Hediye siparişin tutarları 0'dır (satış istatistiklerinde gelir 0). Sonradan hediyeye yalnız stüdyoda elle açılan
 # siparişler çevrilebilir (sitedeki kart ödemeleri ve aktarılan siparişler değil).
 GIFTABLE_PROVIDERS = ("bank_transfer", "manual")
@@ -58,6 +59,10 @@ class OrderQuerySet(models.QuerySet):
     def containing(self, course):
         """Kursu doğrudan ya da içindeki bir paketle içeren siparişler."""
         return self.filter(Q(items__course=course) | Q(items__bundle__courses=course)).distinct()
+
+    def by_card(self):
+        """Sitede kartla verilen siparişler (PayTR)."""
+        return self.filter(payment_provider=CARD)
 
     def unfinished(self):
         """Ödeme adımına gelip tamamlanmayanlar (bekleyen ya da başarısız)."""
@@ -128,9 +133,16 @@ class Order(BaseModel):
     def get_thanks_url(self):
         return reverse("page:thanks", kwargs={"number": self.number})
 
+    def get_payment_url(self):
+        return reverse("page:payment", kwargs={"number": self.number})
+
     @property
     def is_paid(self):
         return self.status == OrderStatus.PAID
+
+    @property
+    def is_failed(self):
+        return self.status == OrderStatus.FAILED
 
     @property
     def is_gift(self):
@@ -193,7 +205,7 @@ class Order(BaseModel):
 
     def mark_paid(self, provider="", reference=""):
         """Ödemeyi onaylar: kurs kayıtlarını açar, kod kullanımını sayar, sepeti kapatır; işlem kaydedilince alıcıya satın
-        alma onayı e-postası gider (iyzico, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
+        alma onayı e-postası gider (PayTR bildirimi, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
         kayıtların kaynağı "Hediye"dir ve onay e-postası gitmez."""
         from learning.models import Enrollment, EnrollmentSource
         from order.tasks import send_purchase_confirmation

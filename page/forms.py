@@ -12,6 +12,7 @@ from account.models import User
 from core.turnstile import TurnstileMixin
 from discount.models import Discount
 from learning.models import PlayerPreference
+from order.paytr import NAME_LENGTH as PAYTR_NAME_LENGTH
 
 INPUT_CLASS = "form-control-lg fs-6"
 LABEL_CLASS = "small fw-medium text-body-secondary"
@@ -486,12 +487,32 @@ class PasswordChangeForm(CurrentPasswordMixin, StyledForm):
 
 
 class CheckoutForm(StyledForm):
-    """Ödeme adımı: misafir e-postasını yazar (üyeninki hesabından gelir); herkes Mesafeli Satış Sözleşmesi'ni onaylar."""
+    """Ödeme adımı: misafir e-postasını yazar (üyeninki hesabından gelir); herkes Mesafeli Satış Sözleşmesi'ni onaylar.
+    Ad soyad ve telefon ödeme sağlayıcısına (PayTR) gider, siparişte saklanmaz."""
 
     email = email_field()
+    name = name_field(placeholder="Ad Soyad", noun="adını soyadını")
+    phone = forms.CharField(
+        label="Cep telefonu",
+        error_messages={"required": "Cep telefonu gerekli."},
+        widget=forms.TextInput(
+            attrs={"type": "tel", "autocomplete": "tel", "inputmode": "tel", "placeholder": "05xx xxx xx xx"}
+        ),
+    )
     agreement = forms.BooleanField(
         error_messages={"required": "Ödemeye geçmek için sözleşmeyi onaylamalısın."},
     )
+
+    def clean_name(self):
+        return " ".join(self.cleaned_data["name"].split())[:PAYTR_NAME_LENGTH]
+
+    def clean_phone(self):
+        # Rakamlar ve baştaki + kalır; boşluk, tire ve parantez atılır.
+        phone = self.cleaned_data["phone"].strip()
+        digits = "".join(char for char in phone if char.isdigit())
+        if not 10 <= len(digits) <= 15:
+            raise forms.ValidationError("Geçerli bir cep telefonu numarası gir.")
+        return f"+{digits}" if phone.startswith("+") else digits
 
     def __init__(self, *args, member=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -510,7 +531,13 @@ class CheckoutForm(StyledForm):
         )
         # "Öde" düğmesi sipariş özetinde durur ve form="odeme-formu" ile bu forma bağlanır.
         self.helper.form_id = "odeme-formu"
-        self.helper.layout = Layout(Hidden("action", "pay"), *([] if member else ["email"]), "agreement")
+        self.fields["phone"].help_text = "Ödeme sağlayıcısı ister; başka amaçla kullanılmaz."
+        self.helper.layout = Layout(
+            Hidden("action", "pay"),
+            *([] if member else ["email"]),
+            Row(Column("name", css_class="col-sm-6"), Column("phone", css_class="col-sm-6")),
+            "agreement",
+        )
 
 
 class CouponForm(StyledForm):
