@@ -5,7 +5,10 @@
 {# Bu üye giriş yapınca ya da şifresini belirleyince buraya gelir (User.get_start_url). #}
 {# Video page/catalog.py'deki WELCOME_VIDEO_ID'den; boşken video bölümü gösterilmez. #}
 {% block title %}{% translate "Hoş geldin" %} — Hakan Yalçınkaya{% endblock %}
-{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block head %}
+<meta name="robots" content="noindex">
+{% if video %}{% include "page/partials/video_referrer.html" %}{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
