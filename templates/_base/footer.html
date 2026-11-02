@@ -43,7 +43,8 @@
           <li><a class="text-body-secondary text-decoration-none link-hover" href="{{ privacy_url }}">Gizlilik Politikası</a></li>
         </ul>
         <ul class="list-unstyled d-flex flex-wrap align-items-center gap-2 mt-4 mb-0" aria-label="Ödeme yöntemleri">
-          <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/iyzico-ile-ode.svg' %}" alt="iyzico ile Öde" width="122" height="18" loading="lazy"></li>
+          {# PayTR'nin resmî logosu gelene kadar yazıyla. #}
+          <li class="bg-white border rounded-2 px-2 py-1 d-flex align-items-center text-dark fw-semibold" style="font-size:.75rem;line-height:18px"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i>PayTR ile güvenli ödeme</li>
           <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/visa.svg' %}" alt="Visa" width="48" height="18" loading="lazy"></li>
           <li class="bg-white border rounded-2 px-2 py-1 d-flex"><img src="{% static 'img/payment/mastercard.svg' %}" alt="Mastercard" width="30" height="18" loading="lazy"></li>
         </ul>

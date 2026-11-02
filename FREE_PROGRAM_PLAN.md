@@ -138,7 +138,7 @@ Karar bekleyenler:
 
 - ~~Kilit modeli~~ Karar: günlük tavan, kurs başına, varsayılan 1 (yukarıda).
 - **Ücretli ürün.** Site yayında (1 Kasım 2026), her kurs 5499 ₺. Bu fiyatta kursun tamamını günlük tavanla ücretsiz vermek gerçek gelir kaybıdır; **freemium sınırı 5499 ₺'lik kurslarda zorunlu** olmalı (öneri: ücretsiz kısım kursun %10–20'si, ilk projeye kadar). "Kalanını aç" 5499 ₺'lik gerçek teklif. Sınırsız ücretsiz program yalnız ayrı bir "tanıtım" kursu ya da premium öncesi kampanya için düşünülmeli.
-- **5499 ₺ dönüşüm matematiği.** Ücretsizden yüksek fiyata geçiş oranı düşük olur (%1–3 beklenmeli). 1000 ücretsiz kayıt → 10–30 satış → 55–165 bin ₺. Kaldıraçlar: iyzico taksit (6–12 ay), süreli indirim kodu (F9), memnuniyet garantisi (mesafeli satışta cayma hakkı zaten yok; ayrıca "14 gün iade" vaadi düşünülebilir), paket fiyatı, canlı destek/mentorluk eklentisi.
+- **5499 ₺ dönüşüm matematiği.** Ücretsizden yüksek fiyata geçiş oranı düşük olur (%1–3 beklenmeli). 1000 ücretsiz kayıt → 10–30 satış → 55–165 bin ₺. Kaldıraçlar: PayTR taksit (6–12 ay), süreli indirim kodu (F9), memnuniyet garantisi (mesafeli satışta cayma hakkı zaten yok; ayrıca "14 gün iade" vaadi düşünülebilir), paket fiyatı, canlı destek/mentorluk eklentisi.
 - **Çapa.** Ücretsiz kısmın kalitesi 5499 ₺'yi haklı çıkarmalı; ilk gün açık dersler en güçlü içerik olmalı. Premium kurs (ör. AI ajanlarıyla kod yazmak) ön satış sayfası testten önce hazır olmalı; bu aynı zamanda premium talebini kodsuz ölçer.
 - **Karar noktası.** Test süresiz; yine de 90. günde yazılı eşiklerle değerlendirme tarihi.
 - ~~Günlük mail~~ Karar: her gün, o günün ders özetiyle gider. Risk: uzun programda (300+ gün) yorgunluk; abonelikten çıkma oranı izlenir, gerekirse akışla seyreltilir.
@@ -146,7 +146,7 @@ Karar bekleyenler:
 
 Eksik önkoşullar:
 
-- Kartla ödeme prod'da da kapalı (1 Kasım 2026, teyit edildi); satış yalnız havale/EFT. 5499 ₺'de kart + taksit olmadan dönüşüm ölçülmez. **İlk iş: iyzico (TODO 3), sandbox → canlı, taksit açık.** Ücretsiz program iyzico'dan önce açılmaz.
+- Kartla ödeme PayTR ile bağlandı (2 Kasım 2026, prod'da test modunda denendi; müşterilere henüz kapalı, satış havale/EFT). 5499 ₺'de kart + taksit olmadan dönüşüm ölçülmez. **İlk iş: PayTR canlıya geçiş (TODO 3), taksit açık.** Ücretsiz program kartla ödeme açılmadan açılmaz.
 - İşlem mailleri (hoş geldin, satın alma onayı) bağlı değil.
 - Ücretsiz kayıt formunda işaretsiz ticari ileti onay kutusu + İYS.
 - Ücretsiz hizmet için kısa kullanım şartları; gizlilik politikasına UTM ve akış kayıtları; hesap silme planına `FlowRun` ve UTM.
@@ -168,7 +168,7 @@ Kodla çakışan noktalar:
 
 Kapsam ve sıra (öneri):
 
-- Aşama 0: iyzico (ilk), premium ön satış sayfası, onay kutusu/İYS, işlem mailleri. (SendGrid doğrulaması yapıldı.)
+- Aşama 0: PayTR canlıya geçiş (ilk), premium ön satış sayfası, onay kutusu/İYS, işlem mailleri. (SendGrid doğrulaması yapıldı.)
 - Aşama 1: ücretsiz kayıt, günlük kilit, kaynak ayrımı (owned, mark_paid, bundle), grafik akış motoru (düğüm/kenar/durum), ilk akış seti JSON ile, `run_flows`, kontrol grubu, Stüdyo'da liste + önizleme + metin özeti + huni ve rapor.
 - Aşama 2 (veri gelirse): React Flow kanvası, görsel simülasyon, bonus ders yönetimi, sertifika.
 - Paralel: 5–10 eğitmenle Uzilla görüşmesi; ücretsiz program yalnız öğrenci tarafını ölçer.
