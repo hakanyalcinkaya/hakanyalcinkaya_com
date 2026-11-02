@@ -37,9 +37,9 @@ LIST_PAGE_SIZE = 1000
 UPLOAD_SIGNATURE_SECONDS = 6 * 60 * 60
 # Oynatma linkleri bu süre geçerli (CDN token koruması açıksa).
 PLAYBACK_URL_SECONDS = 6 * 60 * 60
-# Panelde seçili kapak görselinin adı bu süre önbellekte tutulur; okunamazsa kısa süre ilk kapakla devam edilir.
-THUMBNAIL_CACHE_SECONDS = 10 * 60
-THUMBNAIL_RETRY_SECONDS = 60
+# Panelde seçili kapak görselinin adı bu süre önbellekte tutulur (kapak değişince sitede en geç bu sürede görünür);
+# okunamazsa aynı süre ilk kapakla devam edilir.
+THUMBNAIL_CACHE_SECONDS = 60
 THUMBNAIL_TIMEOUT = 5
 SRT_TIMESTAMP = re.compile(r"(\d{2}:\d{2}:\d{2}),(\d{3})")
 
@@ -387,7 +387,7 @@ def selected_thumbnail_url(video_id):
             cache.set(cache_key, name, THUMBNAIL_CACHE_SECONDS)
         except VideoServiceError:
             name = "thumbnail.jpg"
-            cache.set(cache_key, name, THUMBNAIL_RETRY_SECONDS)
+            cache.set(cache_key, name, THUMBNAIL_CACHE_SECONDS)
     return _signed(f"/{video_id}/{name}", video_id)
 
 
