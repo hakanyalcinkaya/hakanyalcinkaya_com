@@ -2,6 +2,7 @@
 
 import html
 import re
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from django.conf import settings
 from django.core import signing
@@ -38,6 +39,19 @@ def open_pixel_url(token):
 def click_url(token, url, secret=False):
     payload = {"u": url, "s": 1} if secret else url
     return _site(reverse("mailing:click", kwargs={"token": token})) + "?u=" + signing.dumps(payload, salt=CLICK_SALT, compress=True)
+
+
+def with_utm(url, params):
+    """Sitenin kendi adresine (www dahil) UTM parametreleri ekler; adreste zaten utm_* varsa ya da dış adresse
+    (YouTube, LinkedIn vb.) olduğu gibi döner."""
+    parts = urlsplit(url)
+    site_host = urlsplit(settings.SITE_URL).hostname or ""
+    if (parts.hostname or "").removeprefix("www.") != site_host.removeprefix("www."):
+        return url
+    query = parse_qsl(parts.query, keep_blank_values=True)
+    if any(name.startswith("utm_") for name, _value in query):
+        return url
+    return urlunsplit(parts._replace(query=urlencode([*query, *params.items()])))
 
 
 def unsign_click(value):

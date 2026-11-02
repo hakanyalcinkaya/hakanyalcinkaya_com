@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 
 from mailing.models import EmailLog
-from mailing.tracking import unsign_click
+from mailing.tracking import unsign_click, with_utm
 
 # 1x1 saydam GIF
 PIXEL = base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")
@@ -25,12 +25,15 @@ def email_open(request, token):
 
 @never_cache
 def email_click(request, token):
-    """Tıklama yönlendirmesi: hedef adres imzalıdır, imzasız adrese yönlendirilmez."""
+    """Tıklama yönlendirmesi: hedef adres imzalıdır, imzasız adrese yönlendirilmez. Sitenin kendi sayfalarına Google
+    Analytics için UTM parametreleri eklenir (gizli bağlantılar hariç: şifre sayfası belirteci adresten hemen siler)."""
     url, secret = unsign_click(request.GET.get("u", ""))
     if not url:
         return HttpResponseNotFound()
-    log = EmailLog.objects.filter(token=token).first()
+    log = EmailLog.objects.select_related("batch").filter(token=token).first()
     if log is not None:
         # Şifre/onay bağlantısı gibi gizli adresler kaydedilmez; yalnız tıklandığı bilinir.
         log.record_click("" if secret else url, _user_agent(request))
+        if not secret:
+            url = with_utm(url, log.utm_params)
     return HttpResponseRedirect(url)

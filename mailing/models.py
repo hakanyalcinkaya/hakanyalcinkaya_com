@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel
+from core.text import slugify_tr
 
 
 class EmailStatus(models.TextChoices):
@@ -163,6 +164,16 @@ class EmailLog(BaseModel):
 
     def __str__(self):
         return f"{self.template} → {self.to_email}"
+
+    @property
+    def utm_params(self):
+        """Google Analytics kampanya parametreleri: toplu gönderim (bülten) newsletter / konusu, tekil e-posta
+        transactional / şablon adı (ör. account_migrated)."""
+        if self.batch_id:
+            source, campaign = "newsletter", slugify_tr(self.batch.subject)[:60] or self.template
+        else:
+            source, campaign = "transactional", self.template
+        return {"utm_source": source, "utm_medium": "email", "utm_campaign": campaign}
 
     def _record(self, kind, url="", user_agent=""):
         EmailEvent.objects.create(log=self, kind=kind, url=url[:500], user_agent=user_agent[:300])
