@@ -1,1 +1,1 @@
-Teşekkürler! {{ product_title }}{% if items|length > 1 %} ve {{ items|length|add:"-1" }} kurs daha{% endif %} hesabında
+Kurs{% if items|length > 1 %}ların{% else %}un{% endif %} hazır! {{ product_title }}{% if items|length > 1 %} ve {{ items|length|add:"-1" }} kurs daha{% endif %} hesabında

@@ -1,8 +1,8 @@
 {% extends "emails/base.html" %}
-{% block title %}Teşekkürler!{% endblock %}
+{% block title %}Kurs{% if items|length > 1 %}ların{% else %}un{% endif %} hazır!{% endblock %}
 {% block preheader %}Kursların hesabına tanımlandı; hemen başlayabilirsin.{% endblock %}
 {% block eyebrow %}Sipariş {{ order_number }}{% if purchased_at %} · {{ purchased_at|date:"j F Y" }}{% endif %}{% endblock %}
-{% block heading %}Teşekkürler!{% endblock %}
+{% block heading %}Kurs{% if items|length > 1 %}ların{% else %}un{% endif %} hazır!{% endblock %}
 {% block content %}
 <p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
 <p style="margin: 0 0 14px;">Ödemen alındı ve kurs{% if items|length > 1 %}lar{% endif %} hesabına tanımlandı. Hemen başlayabilirsin.</p>

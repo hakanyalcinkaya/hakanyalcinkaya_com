@@ -1,7 +1,7 @@
 {% extends "emails/base.txt" %}
 {% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
 
-{{ course_title }} için yaptığın değerlendirme onaylandı ve kurs sayfasında yayında. Teşekkürler!
+{{ course_title }} için yaptığın değerlendirme onaylandı ve kurs sayfasında yayında. Fikrin diğer öğrencilere ışık tutacak ;)
 {% if rating %}Puan: {{ rating }}/5{% endif %}{% if review_text %}
 “{{ review_text }}”{% endif %}
 
