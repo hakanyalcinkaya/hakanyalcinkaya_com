@@ -28,9 +28,7 @@
       <div class="{% if video %}col-lg-5{% else %}col-12{% endif %} d-flex flex-column">
         <div class="card-body p-4 p-lg-5">
           <h1 id="hosgeldin-baslik" class="h2 fw-semibold mb-2">{% blocktranslate with name=request.user.first_name|default:request.user.display_name %}Hoş geldin, {{ name }}{% endblocktranslate %}</h1>
-          <p class="text-body-secondary mb-0">{% translate "Yeni platforma hoş geldin. Yeni kurslar ve yeni platform hakkında biraz sohbet edelim. Videoyu izlediysen kurslardan en iyi şekilde yararlanman için birkaç ipucu aşağıda seni bekliyor ;)" %}</p>
-          {% if video %}<p class="text-body-secondary mt-3 mb-0">{% translate "Başlamadan önce bu kısa videoyu izle: platformu nasıl kullanacağını ve kursları nasıl takip etmeni önerdiğimi anlatıyorum." %}</p>{% endif %}
-        </div>
+          <p class="text-body-secondary mb-0">{% translate "Yeni platforma hoş geldin. Yeni kurslar ve yeni platform hakkında biraz sohbet edelim. Videoyu izlediysen kurslardan en iyi şekilde yararlanman için birkaç ipucu aşağıda seni bekliyor ;)" %}</p>        </div>
         <div class="card-footer bg-transparent px-4 px-lg-5 py-3 mt-auto">
           <a href="{{ library_url }}" class="btn btn-primary btn-lg fs-6">{% translate "Kurslarım" %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
         </div>
