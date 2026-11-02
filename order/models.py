@@ -28,8 +28,13 @@ PAYMENT_METHODS = {
     "bank_transfer": _("Havale / EFT"),
     "manual": _("Elle (yönetici)"),
     "podia": _("Podia (eski platform)"),
+    "gift": _("Hediye"),
 }
-ADMIN_PAYMENT_METHODS = ("bank_transfer", "card", "manual")
+ADMIN_PAYMENT_METHODS = ("bank_transfer", "card", "manual", "gift")
+GIFT = "gift"
+# Hediye siparişin tutarları 0'dır (satış istatistiklerinde gelir 0). Sonradan hediyeye yalnız stüdyoda elle açılan
+# siparişler çevrilebilir (sitedeki kart ödemeleri ve aktarılan siparişler değil).
+GIFTABLE_PROVIDERS = ("bank_transfer", "manual")
 
 # Stüdyoda elle yapılabilen durum değişiklikleri; "ödendi"ye geçiş mark_paid ile olur.
 STATUS_TRANSITIONS = {
@@ -128,6 +133,14 @@ class Order(BaseModel):
         return self.status == OrderStatus.PAID
 
     @property
+    def is_gift(self):
+        return self.payment_provider == GIFT
+
+    @property
+    def can_make_gift(self):
+        return self.payment_provider in GIFTABLE_PROVIDERS and self.status in (OrderStatus.PENDING, OrderStatus.FAILED, OrderStatus.PAID)
+
+    @property
     def next_statuses(self):
         return STATUS_TRANSITIONS.get(self.status, ())
 
@@ -180,7 +193,8 @@ class Order(BaseModel):
 
     def mark_paid(self, provider="", reference=""):
         """Ödemeyi onaylar: kurs kayıtlarını açar, kod kullanımını sayar, sepeti kapatır; işlem kaydedilince alıcıya satın
-        alma onayı e-postası gider (iyzico, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz)."""
+        alma onayı e-postası gider (iyzico, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
+        kayıtların kaynağı "Hediye"dir ve onay e-postası gitmez."""
         from learning.models import Enrollment, EnrollmentSource
         from order.tasks import send_purchase_confirmation
 
@@ -199,17 +213,44 @@ class Order(BaseModel):
                             Enrollment.objects.get_or_create(
                                 user=self.user,
                                 course=course,
-                                defaults={"source": EnrollmentSource.BUNDLE, "order": self, "bundle": item.bundle},
+                                defaults={
+                                    "source": EnrollmentSource.GIFT if self.is_gift else EnrollmentSource.BUNDLE,
+                                    "order": self,
+                                    "bundle": item.bundle,
+                                },
                             )
                     else:
                         Enrollment.objects.get_or_create(
-                            user=self.user, course=item.course, defaults={"source": EnrollmentSource.PURCHASE, "order": self}
+                            user=self.user,
+                            course=item.course,
+                            defaults={"source": EnrollmentSource.GIFT if self.is_gift else EnrollmentSource.PURCHASE, "order": self},
                         )
             if self.discount_id:
                 self.discount.register_use()
             if self.cart_id:
                 self.cart.mark_converted()
-            transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
+            if not self.is_gift:
+                transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
+
+    def make_gift(self):
+        """Elle açılan siparişi hediye yapar: tutarlar 0'a iner (satış istatistiklerinde gelir 0), indirim kodu düşer
+        (ödenmişse kullanımı geri alınır). Ödenmemişse ödendi olur ve kurs erişimleri açılır; ödenmişse açtığı kurs
+        kayıtlarının kaynağı "Hediye" olur. Satın alma onayı e-postası gitmez."""
+        from learning.models import Enrollment, EnrollmentSource
+
+        with transaction.atomic():
+            if self.is_paid and self.discount_id:
+                self.discount.release_use()
+            self.payment_provider = GIFT
+            self.subtotal = self.discount_total = self.total = 0
+            self.discount = None
+            self.discount_code = ""
+            self.save(update_fields=["payment_provider", "subtotal", "discount_total", "total", "discount", "discount_code", "updated_at"])
+            self.items.update(unit_price=0, paid_price=0)
+            if self.is_paid:
+                Enrollment.objects.filter(order=self).update(source=EnrollmentSource.GIFT)
+            else:
+                self.mark_paid()
 
     def set_status(self, status, revoke_access=True, notify=False):
         """Yöneticinin durum değişikliği; geçersiz geçişte ValueError. "Ödendi"ye mark_paid ile geçer. Ödenmiş sipariş iade
@@ -251,7 +292,7 @@ class Order(BaseModel):
 
     @property
     def can_resend_confirmation(self):
-        return self.is_paid and bool(self.user_id)
+        return self.is_paid and bool(self.user_id) and not self.is_gift
 
 
 class OrderItem(BaseModel):

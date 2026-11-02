@@ -36,7 +36,7 @@ from course.models import (
 from discount.forms import DiscountTargetsMixin
 from discount.models import Discount
 from newsletter.models import AudienceKind, Issue
-from order.models import ADMIN_PAYMENT_METHODS, NOTICE_STATUSES, PAYMENT_METHODS, Order, OrderStatus
+from order.models import ADMIN_PAYMENT_METHODS, GIFT, NOTICE_STATUSES, PAYMENT_METHODS, Order, OrderStatus
 from support.models import Ticket, TicketStatus
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
@@ -1111,14 +1111,17 @@ class StudentFilterForm(forms.Form):
 
 class ManualOrderForm(forms.Form):
     """Yöneticinin açtığı sipariş (ör. havale/EFT): üye, kurslar/paketler, ödeme yolu ve isteğe bağlı indirim kodu.
-    Tutarlar bugünkü fiyatlardan hesaplanır; "ödendi" seçilirse kurs erişimi hemen açılır, değilse sipariş bekler."""
+    Tutarlar bugünkü fiyatlardan hesaplanır; "ödendi" seçilirse kurs erişimi hemen açılır, değilse sipariş bekler.
+    Ödeme yolu "Hediye" ise tutar 0 olur, kod uygulanmaz ve erişim hemen açılır (Order.make_gift)."""
 
     email = forms.EmailField(label=_("Üye e-postası"), help_text=_("Kurslar bu hesaba açılır; üye önce siteye kayıt olmalı."))
     courses = forms.ModelMultipleChoiceField(label=_("Kurslar"), queryset=Course.objects.none(), required=False, widget=forms.CheckboxSelectMultiple)
     bundles = forms.ModelMultipleChoiceField(label=_("Paketler"), queryset=Bundle.objects.none(), required=False, widget=forms.CheckboxSelectMultiple)
     payment_provider = forms.ChoiceField(label=_("Ödeme yolu"), widget=forms.RadioSelect)
-    discount_code = forms.CharField(label=_("İndirim kodu"), max_length=40, required=False)
-    mark_paid = forms.BooleanField(label=_("Ödeme alındı; erişimi şimdi aç"), required=False)
+    discount_code = forms.CharField(label=_("İndirim kodu"), max_length=40, required=False, help_text=_("Hediyede uygulanmaz."))
+    mark_paid = forms.BooleanField(
+        label=_("Ödeme alındı; erişimi şimdi aç"), required=False, help_text=_("Hediyede erişim her zaman hemen açılır.")
+    )
     cart = forms.ModelChoiceField(queryset=Cart.objects.none(), required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
@@ -1163,11 +1166,19 @@ class ManualOrderForm(forms.Form):
     def save(self):
         data = self.cleaned_data
         items = [CartItem(course=course) for course in data["courses"]] + [CartItem(bundle=bundle) for bundle in data["bundles"]]
+        gift = data["payment_provider"] == GIFT
         with transaction.atomic():
             order = Order.create_for_items(
-                items, self.user.email, self.user, discount=data["discount_code"], provider=data["payment_provider"], cart=data["cart"]
+                items,
+                self.user.email,
+                self.user,
+                discount=None if gift else data["discount_code"],
+                provider=data["payment_provider"],
+                cart=data["cart"],
             )
-            if data["mark_paid"]:
+            if gift:
+                order.make_gift()
+            elif data["mark_paid"]:
                 order.mark_paid(provider=data["payment_provider"])
         return order
 

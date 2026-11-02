@@ -8,11 +8,16 @@
     <h1 class="h3 mb-1 font-monospace">{{ order.number }}</h1>
     <div class="d-flex flex-wrap align-items-center gap-2 small text-body-secondary">{% include "studio/partials/_order_status.html" %}{{ order.created_at|date:"d.m.Y H:i" }} oluşturuldu{% if order.paid_at %} · {{ order.paid_at|date:"d.m.Y H:i" }} ödendi{% endif %}</div>
   </div>
-  {% if not order.is_paid %}
-  <button type="button" class="btn btn-primary btn-sm" hx-post="{% url 'studio:order_mark_paid' order.id %}" hx-confirm="Sipariş ödendi olarak işaretlensin mi? Kurs erişimleri açılır ve indirim kodu kullanımı sayılır."><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Ödendi olarak işaretle</button>
-  {% elif order.can_resend_confirmation %}
-  <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:order_resend_confirmation' order.id %}" hx-confirm="Satın alma onayı e-postası {{ order.email }} adresine yeniden gönderilsin mi?"><i class="bi bi-envelope me-1" aria-hidden="true"></i>Onay e-postasını yeniden gönder</button>
-  {% endif %}
+  <div class="d-flex flex-wrap gap-2">
+    {% if order.can_make_gift %}
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:order_make_gift' order.id %}" hx-confirm="Sipariş hediye olarak işaretlensin mi? Tutarı 0'a iner (satış istatistiklerinde gelir 0), indirim kodu düşer{% if not order.is_paid %}, kurs erişimleri açılır{% endif %}. Onay e-postası gitmez."><i class="bi bi-gift me-1" aria-hidden="true"></i>Hediye olarak işaretle</button>
+    {% endif %}
+    {% if not order.is_paid %}
+    <button type="button" class="btn btn-primary btn-sm" hx-post="{% url 'studio:order_mark_paid' order.id %}" hx-confirm="Sipariş ödendi olarak işaretlensin mi? Kurs erişimleri açılır ve indirim kodu kullanımı sayılır."><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Ödendi olarak işaretle</button>
+    {% elif order.can_resend_confirmation %}
+    <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:order_resend_confirmation' order.id %}" hx-confirm="Satın alma onayı e-postası {{ order.email }} adresine yeniden gönderilsin mi?"><i class="bi bi-envelope me-1" aria-hidden="true"></i>Onay e-postasını yeniden gönder</button>
+    {% endif %}
+  </div>
 </div>
 <div class="row g-4">
   <div class="col-lg-7">

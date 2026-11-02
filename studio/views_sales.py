@@ -138,6 +138,20 @@ def order_mark_paid(request, order_id):
 
 @superuser_required
 @require_POST
+def order_make_gift(request, order_id):
+    """Elle açılan siparişi hediye yapar (Order.make_gift): tutar 0 olur, ödenmemişse kurs erişimleri açılır."""
+    order = _order(order_id)
+    if order.can_make_gift:
+        order.make_gift()
+        messages.success(request, _("Sipariş hediye olarak işaretlendi; tutarı 0 sayılır, kurs erişimleri açık."))
+    else:
+        messages.info(request, _("Bu sipariş hediyeye çevrilemez; yalnız elle açılan havale/EFT ve elle siparişler çevrilir."))
+    url = reverse("studio:order_detail", args=[order.pk])
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
+
+
+@superuser_required
+@require_POST
 def order_status(request, order_id):
     """Durumu değiştirir (Order.set_status): ödendi → erişimler açılır; ödenmiş sipariş iade/iptal → kod kullanımı geri
     alınır, işaretliyse erişimler kaldırılır."""
