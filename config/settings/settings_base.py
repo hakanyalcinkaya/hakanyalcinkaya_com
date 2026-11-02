@@ -221,3 +221,11 @@ SUPPORT_FROM_EMAIL = env("SUPPORT_FROM_EMAIL", default=f"Hakan Yalçınkaya <{SU
 # Cloudflare Turnstile (giriş yapmamış kullanıcının destek formunda bot koruması). Anahtar yoksa doğrulama kapalıdır.
 TURNSTILE_SITE_KEY = env("TURNSTILE_SITE_KEY", default="")
 TURNSTILE_SECRET_KEY = env("TURNSTILE_SECRET_KEY", default="")
+# PayTR iFrame API (kartla ödeme, order/paytr.py). Mağaza bilgileri PayTR panelinde (Destek & Kurulum › Entegrasyon
+# Bilgileri); tanımlı değilse kartla ödeme yapılamaz. Test modunda karttan para çekilmez (PayTR'nin test kartlarıyla).
+PAYTR_MERCHANT_ID = env("PAYTR_MERCHANT_ID", default="")
+PAYTR_MERCHANT_KEY = env("PAYTR_MERCHANT_KEY", default="")
+PAYTR_MERCHANT_SALT = env("PAYTR_MERCHANT_SALT", default="")
+PAYTR_TEST_MODE = env.bool("PAYTR_TEST_MODE", default=True)
+# Taksit: 1 yalnız tek çekim; 2-12 ödeme formunda gösterilecek en fazla taksit sayısı.
+PAYTR_MAX_INSTALLMENT = env.int("PAYTR_MAX_INSTALLMENT", default=1)
