@@ -1,4 +1,5 @@
 import json
+import logging
 from functools import wraps
 from urllib.parse import urlencode, urlparse
 
@@ -10,7 +11,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -69,6 +70,8 @@ from page.forms import (
     ProfileForm,
     SignupForm,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # Bülten aboneliği sınırı: IP başına saatte, e-posta başına günde (başkasının kutusuna onay e-postası yağdırılmasın).
@@ -620,6 +623,37 @@ def payment(request, number):
     if request.htmx:
         return render(request, "page/partials/payment_status.html", context)
     return render(request, "page/payment.html", dict(context, steps=purchase_steps(1)))
+
+
+@csrf_exempt
+@require_POST
+def paytr_notification(request):
+    """PayTR Bildirim URL'si (panelde: Destek & Kurulum › Ayarlar › Bildirim URL Ayarları). Ödeme sonucunu PayTR sunucusu
+    POST eder; yetkiyi imza verir (CSRF anahtarı taşıyamaz). Sipariş yalnız burada ödenir. PayTR yanıt olarak yalnız
+    düz "OK" bekler, almazsa aynı bildirimi yeniden gönderir; işlenemeyen bildirim de (bulunamayan sipariş, tutar farkı)
+    günlüğe yazılıp OK ile kapatılır, tekrar gelmesi bir şey değiştirmez."""
+    try:
+        notification = paytr.parse_notification(request.POST)
+    except paytr.PaytrError:
+        logger.warning("PayTR bildirimi reddedildi: imza geçersiz (%s)", request.POST.get("merchant_oid", ""))
+        return HttpResponseBadRequest("PAYTR notification failed: bad hash")
+    order = Order.objects.by_card().with_merchant_oid(notification.merchant_oid).first()
+    if order is None:
+        logger.error("PayTR bildirimi: sipariş bulunamadı (%s)", notification.merchant_oid)
+    elif notification.is_test and not settings.PAYTR_TEST_MODE:
+        logger.warning("PayTR bildirimi: canlı modda test ödemesi işlenmedi (%s)", order.number)
+    else:
+        result = order.apply_card_result(notification.is_success, notification.total_amount, notification.merchant_oid)
+        log = logger.info if result in ("paid", "failed") else logger.error
+        log(
+            "PayTR bildirimi %s: %s (tahsil %s TL, sipariş %s TL) %s",
+            order.number,
+            result,
+            notification.total_amount,
+            order.total,
+            notification.failed_reason,
+        )
+    return HttpResponse("OK", content_type="text/plain")
 
 
 def thanks(request, number):

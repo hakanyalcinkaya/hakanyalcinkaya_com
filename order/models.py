@@ -4,7 +4,8 @@ from functools import partial
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Replace
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -63,6 +64,10 @@ class OrderQuerySet(models.QuerySet):
     def by_card(self):
         """Sitede kartla verilen siparişler (PayTR)."""
         return self.filter(payment_provider=CARD)
+
+    def with_merchant_oid(self, oid):
+        """PayTR'nin sipariş numarasıyla: tiresiz sipariş no (order.paytr.merchant_oid)."""
+        return self.annotate(merchant_oid=Replace("number", Value("-"), Value(""))).filter(merchant_oid=oid)
 
     def unfinished(self):
         """Ödeme adımına gelip tamamlanmayanlar (bekleyen ya da başarısız)."""
@@ -243,6 +248,23 @@ class Order(BaseModel):
                 self.cart.mark_converted()
             if not self.is_gift:
                 transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
+
+    def apply_card_result(self, success, amount, reference):
+        """Kartla ödemenin sonucu (PayTR bildirimi); aynı sonuç birden çok gelebilir. Yalnız bekleyen ya da başarısız sipariş
+        değişir (başarısız ödemeden sonra aynı formda yeniden denenip ödenebilir); ödenmiş, iade ya da iptal edilmiş
+        siparişe dokunulmaz. Başarılı ödemede tahsil edilen tutar (amount; taksitte vade farkıyla yüksek olabilir) siparişin
+        tutarından az olmamalı. Sonucu döner: "paid", "failed", "amount_mismatch" ya da "skipped"."""
+        with transaction.atomic():
+            order = type(self).objects.select_for_update().get(pk=self.pk)
+            if order.status not in (OrderStatus.PENDING, OrderStatus.FAILED):
+                return "skipped"
+            if not success:
+                order.mark_failed(reference)
+                return "failed"
+            if amount < order.total:
+                return "amount_mismatch"
+            order.mark_paid(reference=reference)
+            return "paid"
 
     def make_gift(self):
         """Elle açılan siparişi hediye yapar: tutarlar 0'a iner (satış istatistiklerinde gelir 0), indirim kodu düşer

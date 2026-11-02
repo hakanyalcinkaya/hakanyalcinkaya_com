@@ -11,6 +11,8 @@ urlpatterns = [
     path("cart/", views.cart, name="cart"),
     path("checkout/", views.checkout, name="checkout"),
     path("checkout/pay/<slug:number>/", views.payment, name="payment"),
+    # PayTR'nin ödeme sonucu bildirimi; adres PayTR panelinde tanımlıdır, değişirse orada da güncellenmeli.
+    path("checkout/paytr/notify/", views.paytr_notification, name="paytr_notification"),
     # Numarasız eski teşekkür adresi: siparişler Kurslarım'da.
     path("thanks/", RedirectView.as_view(pattern_name="page:library")),
     path("thanks/<slug:number>/", views.thanks, name="thanks"),

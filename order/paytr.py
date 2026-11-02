@@ -115,7 +115,7 @@ class Notification:
     is_success: bool
     # Tahsil edilen tutar; taksitte vade farkıyla siparişin tutarından yüksek olabilir.
     total_amount: Decimal
-    # Token alınırken gönderilen sipariş tutarı.
+    # Token alınırken gönderilen sipariş tutarı (imzaya dahil değil; tutar denetimi total_amount ile yapılır).
     payment_amount: Decimal
     is_test: bool
     failed_reason: str
