@@ -3,6 +3,8 @@
 Listeler filtreyi GET parametresinde tutar; HTMX isteğinde liste, kaydırınca (parca=satir) yalnız yeni satırlar döner.
 """
 
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
@@ -198,22 +200,47 @@ CART_FILTERS = {
 }
 
 
-@superuser_required
-def carts(request):
-    """Sepet istatistikleri (ay seçilir, ?month=YYYY-AA) ve içinde ürün olan sepetler: duruma göre filtre, e-posta araması."""
-    key = request.GET.get("status", "active")
+# Bu sekmelerde satışa dönüşmemiş sepetler misafir ve üye olarak ayrı ayrı temizlenebilir (Cart.objects.clearable).
+CLEARABLE_CART_FILTERS = ("active", "cart-step", "checkout-step", "emptied")
+CART_OWNERS = {
+    "guest": (gettext_lazy("misafir"), Q(user__isnull=True)),
+    "member": (gettext_lazy("üye"), Q(user__isnull=False)),
+}
+
+
+def _cart_filter(params):
+    """Sekme ve e-posta araması (GET ya da temizleme formundan); içinde ürün olan sepetler."""
+    key = params.get("status", "active")
     if key not in CART_FILTERS:
         key = "active"
-    query = request.GET.get("q", "").strip()
+    query = params.get("q", "").strip()
     base = Cart.objects.filter(items__isnull=False).distinct()
     if query:
         base = base.filter(user__email__icontains=query)
+    return key, query, base
+
+
+def _clearable_carts(key, base, owner):
+    rows = base.filter(CART_FILTERS[key][1], CART_OWNERS[owner][1])
+    return Cart.objects.clearable().filter(pk__in=rows.values("pk"))
+
+
+@superuser_required
+def carts(request):
+    """Sepet istatistikleri (ay seçilir, ?month=YYYY-AA) ve içinde ürün olan sepetler: duruma göre filtre, e-posta araması;
+    satışa dönüşmemiş sekmelerde misafir ve üye sepetlerini temizleme."""
+    key, query, base = _cart_filter(request.GET)
     counts = base.aggregate(**{f"n{index}": Count("pk", distinct=True, filter=condition) for index, (_label, condition) in enumerate(CART_FILTERS.values())})
     filters = [dict(key=name, label=label, count=counts[f"n{index}"]) for index, (name, (label, _condition)) in enumerate(CART_FILTERS.items())]
     items = CartItem.objects.select_related("course", "bundle")
     rows = base.filter(CART_FILTERS[key][1]).select_related("user", "discount").prefetch_related(Prefetch("items", queryset=items))
     page = _page(request, rows.order_by("-updated_at", "id"))
-    context = dict(page=page, status=key, query=query, filters=filters)
+    clear = (
+        [dict(owner=owner, label=label, count=_clearable_carts(key, base, owner).count()) for owner, (label, _condition) in CART_OWNERS.items()]
+        if key in CLEARABLE_CART_FILTERS
+        else []
+    )
+    context = dict(page=page, status=key, query=query, filters=filters, clear=clear)
     if not request.htmx or request.htmx.boosted:
         period = periods.month_period(request.GET.get("month", ""))
         context.update(
@@ -223,6 +250,23 @@ def carts(request):
             waiting=cart_stats.waiting(),
         )
     return _list_response(request, "carts", context)
+
+
+@superuser_required
+@require_POST
+def carts_clear(request):
+    """Seçili sekme ve aramadaki satışa dönüşmemiş misafir ya da üye sepetlerini kalıcı siler; siparişi olan sepetler
+    kalır. Silinen sepetler sepet istatistiklerinden de çıkar."""
+    key, query, base = _cart_filter(request.POST)
+    owner = request.POST.get("owner")
+    if key not in CLEARABLE_CART_FILTERS or owner not in CART_OWNERS:
+        return HttpResponseBadRequest()
+    carts = _clearable_carts(key, base, owner)
+    total = carts.count()
+    carts.delete()
+    messages.success(request, _("%(count)s %(owner)s sepeti silindi.") % {"count": total, "owner": CART_OWNERS[owner][0]})
+    url = f"{reverse('studio:carts')}?{urlencode(dict(status=key, q=query))}"
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
 
 
 def _cart(cart_id):

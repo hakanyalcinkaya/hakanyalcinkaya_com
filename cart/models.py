@@ -38,6 +38,11 @@ class CartQuerySet(models.QuerySet):
         Eskiden katılan sepet "siparişe dönüştü" olarak, dönüşme tarihi boş kalırdı."""
         return self.exclude(status=CartStatus.MERGED).exclude(status=CartStatus.CONVERTED, converted_at__isnull=True)
 
+    def clearable(self):
+        """Stüdyoda temizlenebilen (silinebilen) sepetler: satışa dönüşmemiş (açık ya da boşaltılmış) ve siparişi olmayan.
+        Silinen sepet ürünleri ve çıkarılan ürün kayıtlarıyla birlikte istatistiklerden de çıkar."""
+        return self.filter(status__in=(CartStatus.ACTIVE, CartStatus.EMPTIED), orders__isnull=True)
+
     def with_products(self):
         """İçine en az bir ürün eklenmiş sepetler (sonradan çıkarılmış olsa da)."""
         return self.filter(Q(items__isnull=False) | Q(removals__isnull=False)).distinct()

@@ -96,6 +96,7 @@ urlpatterns = [
     path("orders/<uuid:order_id>/status/", views_sales.order_status, name="order_status"),
     path("orders/<uuid:order_id>/resend-confirmation/", views_sales.order_resend_confirmation, name="order_resend_confirmation"),
     path("carts/", views_sales.carts, name="carts"),
+    path("carts/clear/", views_sales.carts_clear, name="carts_clear"),
     path("carts/<uuid:cart_id>/", views_sales.cart_detail, name="cart_detail"),
     path("carts/<uuid:cart_id>/gift/", views_sales.cart_gift, name="cart_gift"),
     path("students/", views_sales.students, name="students"),

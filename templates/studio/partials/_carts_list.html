@@ -9,5 +9,17 @@
     </div>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Üye e-postası" aria-label="Üye e-postası ara">
   </form>
+  {% if clear %}
+  {# Satışa dönüşmemiş sekmelerde: bu sekme ve aramadaki misafir / üye sepetlerini kalıcı siler (siparişi olanlar kalır). #}
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small">
+    <span class="text-body-secondary">Bu listeyi temizle:</span>
+    {% for item in clear %}
+    <button type="button" class="btn btn-outline-danger btn-sm py-0"{% if not item.count %} disabled{% endif %}
+      hx-post="{% url 'studio:carts_clear' %}" hx-vals='{"status": "{{ status|escapejs }}", "q": "{{ query|escapejs }}", "owner": "{{ item.owner }}"}'
+      hx-confirm="Bu listedeki {{ item.count }} {{ item.label }} sepeti kalıcı olarak silinecek ve sepet istatistiklerinden çıkacak. Devam edilsin mi?"><i class="bi bi-trash me-1" aria-hidden="true"></i>{{ item.count }} {{ item.label }} sepetini sil</button>
+    {% endfor %}
+    <span class="text-body-tertiary">Siparişi olan sepetler silinmez.</span>
+  </div>
+  {% endif %}
   <div class="list-group">{% include "studio/partials/_carts_rows.html" %}</div>
 </div>
