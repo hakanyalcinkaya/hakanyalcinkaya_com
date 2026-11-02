@@ -30,7 +30,7 @@ RESET_SESSION_KEY = "reset_email"
 UNSUBSCRIBED_SESSION_KEY = "newsletter_unsubscribed"
 
 # Hoş geldin sayfasının Bunny Stream videosu (video ID'si, ör. "0a1b2c3d-..."); boşken sayfada video bölümü gösterilmez.
-WELCOME_VIDEO_ID = ""
+WELCOME_VIDEO_ID = "8e939c58-71b5-4258-9e7c-65f19b3a6c80"
 
 # [ÖRNEK] İndirim kodu durumlarını göstermek için. Gerçek kodlar ödeme sağlayıcısında doğrulanacak.
 COUPONS = {"ORNEK10": 10}
