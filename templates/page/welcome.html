@@ -11,7 +11,7 @@
   <header class="d-flex flex-wrap align-items-end justify-content-between gap-3">
     <div>
       <h1 class="display-6 fw-semibold mb-1">{% blocktranslate with name=request.user.first_name|default:request.user.display_name %}Hoş geldin, {{ name }}{% endblocktranslate %}</h1>
-      <p class="text-body-secondary mb-0">{% translate "Aramıza katıldığın için teşekkürler. Eğitimlerden en iyi şekilde yararlanman için birkaç ipucu." %}</p>
+      <p class="text-body-secondary mb-0">{% translate "Aramıza katıldığın için teşekkürler. Kurslardan en iyi şekilde yararlanman için birkaç ipucu." %}</p>
     </div>
     <a href="{{ library_url }}" class="btn btn-outline-secondary">{% translate "Kurslarım" %}</a>
   </header>
@@ -30,10 +30,10 @@
       <div class="col-lg-5 d-flex flex-column">
         <div class="card-body p-4 p-lg-5">
           <h2 id="video-baslik" class="h4 fw-semibold">{% translate "Başlamadan önce izle" %}</h2>
-          <p class="text-body-secondary mb-0">{% translate "Bu kısa videoda platformu nasıl kullanacağını ve eğitimleri nasıl takip etmeni önerdiğimi anlatıyorum." %}</p>
+          <p class="text-body-secondary mb-0">{% translate "Bu kısa videoda platformu nasıl kullanacağını ve kursları nasıl takip etmeni önerdiğimi anlatıyorum." %}</p>
         </div>
         <div class="card-footer bg-transparent d-flex flex-wrap gap-2 px-4 px-lg-5 py-3 mt-auto">
-          <a href="{{ library_url }}" class="btn btn-primary btn-lg fs-6">{% translate "Eğitimlere başla" %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="{{ library_url }}" class="btn btn-primary btn-lg fs-6">{% translate "Kurslara başla" %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
 
   <section class="mt-5{% if video %} pt-4 border-top{% endif %}" aria-labelledby="ipucu-baslik">
     <h2 id="ipucu-baslik" class="h5 fw-semibold mb-1">{% translate "Platformu tanı" %}</h2>
-    <p class="small text-body-secondary mb-0">{% translate "Eğitimleri izlerken işine yarayacak araçlar." %}</p>
+    <p class="small text-body-secondary mb-0">{% translate "Kursları izlerken işine yarayacak araçlar." %}</p>
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mt-1">
       <div class="col">
         <a href="{{ library_url }}" class="card h-100 hover-lift text-decoration-none">

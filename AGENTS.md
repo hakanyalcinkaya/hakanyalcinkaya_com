@@ -40,6 +40,9 @@ Tüm projelerde geçerli varsayılanlar (Claude Code, Codex, Cursor). **Projenin
 - Şablon döngüsündeki FK → `select_related`, ters FK/M2M → `prefetch_related`/`Prefetch`; `__str__` ve şablonda çağrılan metotların eriştiği ilişkiler dahil.
 - Sayım/toplam `annotate`/`aggregate`; sayfalı listede `order_by` benzersiz alanla biter.
 
+## Site metinleri
+- Kullanıcıya görünen metinlerde "eğitim / eğitimler" değil, **"kurs / kurslar"** kullanılır (ör. "Kurslarım", "Kursa başla", "Kurslardan yararlan"). Kod tanımlayıcıları, URL'ler ve sayfa içi id'ler (ör. `#egitimler`) bu kurala girmez.
+
 ## Çeviri ve zaman
 - Kullanıcıya görünen her metin `_()` / `{% translate %}`; modellerde `gettext_lazy`, view'da `gettext`; `ugettext` yok.
 - `USE_TZ`, `TIME_ZONE` ve iş takviminin yerel tarih tanımına uy; `timezone.localdate()` yalnız aware datetime ile uygun yapılandırmada kullanılır. `date.today()` sunucu timezone'una bağımlıdır.
