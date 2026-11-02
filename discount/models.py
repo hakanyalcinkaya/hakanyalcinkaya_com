@@ -118,3 +118,6 @@ class Discount(BaseModel, BaseStatus):
 
     def register_use(self):
         Discount.objects.filter(pk=self.pk).update(used_count=models.F("used_count") + 1)
+
+    def release_use(self):
+        Discount.objects.filter(pk=self.pk, used_count__gt=0).update(used_count=models.F("used_count") - 1)

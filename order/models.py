@@ -31,6 +31,15 @@ PAYMENT_METHODS = {
 }
 ADMIN_PAYMENT_METHODS = ("bank_transfer", "card", "manual")
 
+# Stüdyoda elle yapılabilen durum değişiklikleri; "ödendi"ye geçiş mark_paid ile olur.
+STATUS_TRANSITIONS = {
+    OrderStatus.PENDING: (OrderStatus.PAID, OrderStatus.FAILED, OrderStatus.CANCELLED),
+    OrderStatus.FAILED: (OrderStatus.PAID, OrderStatus.PENDING, OrderStatus.CANCELLED),
+    OrderStatus.PAID: (OrderStatus.REFUNDED, OrderStatus.CANCELLED),
+    OrderStatus.REFUNDED: (OrderStatus.PAID,),
+    OrderStatus.CANCELLED: (OrderStatus.PAID, OrderStatus.PENDING),
+}
+
 
 class OrderQuerySet(models.QuerySet):
     def paid(self):
@@ -117,6 +126,10 @@ class Order(BaseModel):
         return self.status == OrderStatus.PAID
 
     @property
+    def next_statuses(self):
+        return STATUS_TRANSITIONS.get(self.status, ())
+
+    @property
     def payment_method_label(self):
         return PAYMENT_METHODS.get(self.payment_provider, self.payment_provider)
 
@@ -195,6 +208,29 @@ class Order(BaseModel):
             if self.cart_id:
                 self.cart.mark_converted()
             transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
+
+    def set_status(self, status, revoke_access=True):
+        """Yöneticinin durum değişikliği; geçersiz geçişte ValueError. "Ödendi"ye mark_paid ile geçer. Ödenmiş sipariş iade
+        ya da iptal edilince kod kullanımı geri alınır ve revoke_access ise bu siparişin açtığı kurs erişimleri kaldırılır
+        (ders ilerlemesi kalır). Kaldırılan erişim sayısını döner."""
+        from learning.models import Enrollment
+
+        if status not in self.next_statuses:
+            raise ValueError(f"{self.status} -> {status}")
+        if status == OrderStatus.PAID:
+            self.mark_paid(provider=self.payment_provider or "manual")
+            return 0
+        revoked = 0
+        with transaction.atomic():
+            was_paid = self.is_paid
+            self.status = status
+            self.save(update_fields=["status", "updated_at"])
+            if was_paid:
+                if revoke_access:
+                    revoked = Enrollment.objects.filter(order=self).delete()[1].get("learning.Enrollment", 0)
+                if self.discount_id:
+                    self.discount.release_use()
+        return revoked
 
     def mark_failed(self, reference=""):
         self.status = OrderStatus.FAILED

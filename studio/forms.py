@@ -1068,6 +1068,26 @@ class ManualOrderForm(forms.Form):
         )
 
 
+class OrderStatusForm(forms.Form):
+    """Sipariş durumunu değiştirir; seçenekler yalnız izin verilen geçişler (Order.next_statuses)."""
+
+    status = forms.ChoiceField(label=_("Yeni durum"))
+    revoke_access = forms.BooleanField(label=_("Bu siparişin açtığı kurs erişimlerini kaldır"), required=False, initial=True)
+
+    def __init__(self, *args, order, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.order = order
+        self.fields["status"].choices = [(status.value, status.label) for status in order.next_statuses]
+        self.fields["status"].widget.attrs["class"] = "form-select form-select-sm"
+        if order.is_paid:
+            self.fields["revoke_access"].widget.attrs["class"] = "form-check-input"
+        else:
+            del self.fields["revoke_access"]
+
+    def save(self):
+        return self.order.set_status(self.cleaned_data["status"], revoke_access=self.cleaned_data.get("revoke_access", False))
+
+
 class SupportBulkAction(models.TextChoices):
     CLOSE = "close", _("Kapat")
     REOPEN = "reopen", _("Yeniden aç")

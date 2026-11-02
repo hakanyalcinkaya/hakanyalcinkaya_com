@@ -40,6 +40,24 @@
     </section>
   </div>
   <div class="col-lg-5">
+    <section class="border rounded p-3 mb-4" aria-labelledby="order-status-title">
+      <div class="d-flex align-items-center gap-2 mb-2"><h2 id="order-status-title" class="h6 mb-0">Durum</h2>{% include "studio/partials/_order_status.html" %}</div>
+      <form hx-post="{% url 'studio:order_status' order.id %}" hx-confirm="Sipariş durumu değiştirilsin mi?" class="d-grid gap-2 small">
+        <div class="d-flex gap-2">
+          <label for="{{ status_form.status.id_for_label }}" class="visually-hidden">{{ status_form.status.label }}</label>
+          {{ status_form.status }}
+          <button type="submit" class="btn btn-outline-secondary btn-sm text-nowrap">Değiştir</button>
+        </div>
+        {% if status_form.revoke_access %}
+        <div class="form-check mb-0">
+          {{ status_form.revoke_access }}<label class="form-check-label" for="{{ status_form.revoke_access.id_for_label }}">{{ status_form.revoke_access.label }}</label>
+        </div>
+        <p class="text-body-secondary mb-0">İade ya da iptalde indirim kodu kullanımı geri alınır; ders ilerlemesi silinmez.</p>
+        {% else %}
+        <p class="text-body-secondary mb-0">"Ödendi" seçilirse kurs erişimleri açılır, kod kullanımı sayılır ve alıcıya onay e-postası gider.</p>
+        {% endif %}
+      </form>
+    </section>
     <dl class="border rounded p-3 small mb-0">
       <dt>Alıcı</dt>
       <dd>{{ order.email }}{% if order.user %} · <a href="{% url 'studio:student_detail' order.user_id %}">üye sayfası</a>{% endif %}</dd>

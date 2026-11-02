@@ -23,7 +23,7 @@ from learning.models import Enrollment
 from newsletter.models import Subscriber
 from order.models import Order, OrderItem, OrderStatus
 from studio import cart_stats, course_stats, order_stats, periods
-from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm
+from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm, OrderStatusForm
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
 
@@ -98,8 +98,10 @@ def _order(order_id):
 
 @superuser_required
 def order_detail(request, order_id):
-    """Sipariş kalemleri, açtığı kurs kayıtları ve ödeme bilgisi; mali kayıt olduğu için tutarlar değiştirilmez."""
-    return render(request, "studio/order_detail.html", dict(order=_order(order_id)))
+    """Sipariş kalemleri, açtığı kurs kayıtları, ödeme bilgisi ve durum değişikliği; mali kayıt olduğu için tutarlar
+    değiştirilmez."""
+    order = _order(order_id)
+    return render(request, "studio/order_detail.html", dict(order=order, status_form=OrderStatusForm(order=order)))
 
 
 @superuser_required
@@ -112,6 +114,26 @@ def order_mark_paid(request, order_id):
     else:
         order.mark_paid(provider=order.payment_provider or "manual")
         messages.success(request, _("Sipariş ödendi olarak işaretlendi; kurs kayıtları açıldı."))
+    url = reverse("studio:order_detail", args=[order.pk])
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
+
+
+@superuser_required
+@require_POST
+def order_status(request, order_id):
+    """Durumu değiştirir (Order.set_status): ödendi → erişimler açılır; ödenmiş sipariş iade/iptal → kod kullanımı geri
+    alınır, işaretliyse erişimler kaldırılır."""
+    order = _order(order_id)
+    old_label = order.get_status_display()
+    form = OrderStatusForm(request.POST, order=order)
+    if form.is_valid():
+        revoked = form.save()
+        text = _("Durum değişti: %(old)s → %(new)s.") % {"old": old_label, "new": order.get_status_display()}
+        if revoked:
+            text += " " + _("%(count)s kurs erişimi kaldırıldı.") % {"count": revoked}
+        messages.success(request, text)
+    else:
+        messages.error(request, _("Bu durum değişikliği yapılamaz."))
     url = reverse("studio:order_detail", args=[order.pk])
     return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
 
