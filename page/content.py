@@ -23,9 +23,10 @@ from cart.pricing import price_cart
 from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
 from core.money import format_try
-from core.models import Status
+from core.models import Status, VideoPlatform
 from core.site_url import absolute_url
 from core.templatetags.core_tags import share_image
+from course import video_service
 from course.models import (
     Course,
     HighlightKind,
@@ -397,6 +398,13 @@ def _library_row(enrollment, card, flat, done):
         "finished": finished,
         "last_watched": enrollment.last_watched_at,
     }
+
+
+def welcome_video(video_id):
+    """Hoş geldin videosunun oynatıcı verisi (Bunny Stream: HLS listesi ve kapak görseli); ID boşsa None."""
+    if not video_id:
+        return None
+    return video_service.get(VideoPlatform.BUNNY).playback(video_id)
 
 
 def library_page(user, status):

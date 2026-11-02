@@ -49,6 +49,14 @@
         </div>
         <p class="small text-body-secondary mt-1 mb-0">Vimeo başlığı oynatıcının içinde gösterir; Bunny'de başlık oynatıcıda görünmez, yalnız Bunny panelinde işe yarar. Kapalıyken başlık değişikliği yalnız sitede kalır. Yükleme sırasında video yine dersin adıyla açılır.</p>
       </fieldset>
+      <fieldset>
+        <legend class="h5 mb-1">Hoş geldin sayfası</legend>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" name="show_welcome_page" id="show-welcome-page"{% if form.show_welcome_page.value %} checked{% endif %}>
+          <label class="form-check-label" for="show-welcome-page">Kurs alan üyelere hoş geldin sayfasını göster</label>
+        </div>
+        <p class="small text-body-secondary mt-1 mb-0">Açıkken en az bir kursa kaydı olan üye sayfayı görür; bağlantısı Kurslarım'da ve hesap menüsünde. Kapalıyken bağlantılar gizlenir, sayfa bulunamadı (404) döner. Video, kodda (<code>page/catalog.py</code> → <code>WELCOME_VIDEO_ID</code>) tanımlıysa görünür.</p>
+      </fieldset>
     </div>
   </div>
   <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>

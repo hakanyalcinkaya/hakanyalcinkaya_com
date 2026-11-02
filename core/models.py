@@ -136,6 +136,11 @@ class SiteSettings(BaseCreatedAtUpdatedAt):
         default=False,
         help_text=_("Açıksa öğrenciler derslere not ekleyebilir; notlar Kurslarım sayfasında da görünür."),
     )
+    show_welcome_page = models.BooleanField(
+        _("hoş geldin sayfası"),
+        default=False,
+        help_text=_("Açıksa en az bir kursa kaydı olan üyeler hoş geldin sayfasını görür; bağlantısı Kurslarım'da ve hesap menüsünde."),
+    )
 
     @classmethod
     def load(cls):

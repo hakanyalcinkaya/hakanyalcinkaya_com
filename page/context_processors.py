@@ -72,6 +72,11 @@ def site(request):
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
         "library_url": reverse("page:library"),
+        # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda
+        # kullanılırsa sorgulanır.
+        "welcome_url": SimpleLazyObject(
+            lambda: reverse("page:welcome") if user.is_authenticated and user.can_view_welcome_page() else ""
+        ),
         "support_url": reverse("support:support"),
         # Destek: üyenin okumadığı yanıtı olan talepler (hesap menüsündeki "yeni mesaj" rozeti); yalnız şablonda kullanılırsa sayılır.
         "support_unread": SimpleLazyObject(lambda: _unread_support(user)),

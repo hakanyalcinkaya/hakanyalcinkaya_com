@@ -14,6 +14,7 @@ urlpatterns = [
     path("thanks/", RedirectView.as_view(pattern_name="page:library")),
     path("thanks/<slug:number>/", views.thanks, name="thanks"),
     path("my-courses/", views.library, name="library"),
+    path("welcome/", views.welcome, name="welcome"),
     # Eski Kurslarım adresleri (Podia'daki /p/products/library/ ve kısa süre kullanılan /library/): kalıcı yönlenir,
     # sorgu parametreleri korunur.
     path("library/", RedirectView.as_view(pattern_name="page:library", permanent=True, query_string=True)),

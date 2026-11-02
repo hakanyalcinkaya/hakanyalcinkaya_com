@@ -36,6 +36,7 @@ from page.catalog import (
     SELLER_TAX,
     TOPIC_FILTERS,
     UNSUBSCRIBED_SESSION_KEY,
+    WELCOME_VIDEO_ID,
     catalog_stats,
     course_by_slug,
     course_page,
@@ -594,6 +595,14 @@ def library(request):
             "cart_slugs": {card["slug"] for card in content.cart_cards(request)},
         },
     )
+
+
+@login_required
+def welcome(request):
+    """Hoş geldin sayfası: stüdyo ayarında açıksa yalnız en az bir kursa kaydı olan üyeye; diğerlerine 404."""
+    if not request.user.can_view_welcome_page():
+        raise Http404
+    return render(request, "page/welcome.html", dict(video=content.welcome_video(WELCOME_VIDEO_ID)))
 
 
 def _next_url(request, fallback):

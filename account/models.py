@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID
+from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID, SiteSettings
 from core.text import slugify_tr
 
 
@@ -82,6 +82,11 @@ class User(BaseUUID, AbstractUser):
         """Hesap rozeti, küçük harfle: ad ve soyadın baş harfleri; ikisi de yoksa e-postanın ilk iki harfi."""
         letters = "".join(name.strip()[:1] for name in (self.first_name, self.last_name) if name.strip())
         return lower_tr(letters or self.email[:2])
+
+    def can_view_welcome_page(self):
+        """Hoş geldin sayfası: stüdyo ayarında açıksa ve üyenin en az bir kurs kaydı varsa (satın alma, paket, hediye,
+        manuel ya da eski platformdan aktarım; iadede erişimi kaldırılan kurs sayılmaz)."""
+        return SiteSettings.load().show_welcome_page and self.enrollments.exists()
 
 
 class InstructorProfile(BaseModel, BaseStatus, BaseSortOrder):

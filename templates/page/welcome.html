@@ -1,0 +1,115 @@
+{% extends "_base/base.html" %}
+{% load static i18n %}
+
+{# Hoş geldin sayfası: yalnız en az bir kursa kaydı olan üyeye, stüdyo ayarında açıksa (User.can_view_welcome_page). #}
+{# Video page/catalog.py'deki WELCOME_VIDEO_ID'den; boşken video bölümü gösterilmez. #}
+{% block title %}{% translate "Hoş geldin" %} — Hakan Yalçınkaya{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <header class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+    <div>
+      <h1 class="display-6 fw-semibold mb-1">{% blocktranslate with name=request.user.first_name|default:request.user.display_name %}Hoş geldin, {{ name }}{% endblocktranslate %}</h1>
+      <p class="text-body-secondary mb-0">{% translate "Aramıza katıldığın için teşekkürler. Eğitimlerden en iyi şekilde yararlanman için birkaç ipucu." %}</p>
+    </div>
+    <a href="{{ library_url }}" class="btn btn-outline-secondary">{% translate "Kurslarım" %}</a>
+  </header>
+
+  {% if video %}
+  <section class="card shadow overflow-hidden mt-4" aria-labelledby="video-baslik">
+    <div class="row g-0">
+      <div class="col-lg-7">
+        <button type="button" class="ratio ratio-16x9 d-block w-100 h-100 border-0 p-0 bg-black hy-preview" data-preview-video="{{ video.src }}" data-video-platform="{{ video.platform }}"{% if video.poster %} data-poster="{{ video.poster }}"{% endif %} data-player-src="{% static 'js/videojs/player.js' %}" aria-label="{% translate 'Hoş geldin videosunu oynat' %}">
+          <span class="d-block">
+            {% if video.poster %}<img src="{{ video.poster }}" alt="" width="1280" height="720" decoding="async" class="w-100 h-100 object-fit-cover">{% endif %}
+            <span class="position-absolute top-50 start-50 translate-middle btn btn-primary btn-lg rounded-circle d-inline-flex align-items-center justify-content-center hy-preview-play" aria-hidden="true"><i class="bi bi-play-fill fs-2 lh-1"></i></span>
+          </span>
+        </button>
+      </div>
+      <div class="col-lg-5 d-flex flex-column">
+        <div class="card-body p-4 p-lg-5">
+          <h2 id="video-baslik" class="h4 fw-semibold">{% translate "Başlamadan önce izle" %}</h2>
+          <p class="text-body-secondary mb-0">{% translate "Bu kısa videoda platformu nasıl kullanacağını ve eğitimleri nasıl takip etmeni önerdiğimi anlatıyorum." %}</p>
+        </div>
+        <div class="card-footer bg-transparent d-flex flex-wrap gap-2 px-4 px-lg-5 py-3 mt-auto">
+          <a href="{{ library_url }}" class="btn btn-primary btn-lg fs-6">{% translate "Eğitimlere başla" %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="mt-5{% if video %} pt-4 border-top{% endif %}" aria-labelledby="ipucu-baslik">
+    <h2 id="ipucu-baslik" class="h5 fw-semibold mb-1">{% translate "Platformu tanı" %}</h2>
+    <p class="small text-body-secondary mb-0">{% translate "Eğitimleri izlerken işine yarayacak araçlar." %}</p>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mt-1">
+      <div class="col">
+        <a href="{{ library_url }}" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-collection-play text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Kaldığın yerden devam et" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "Son izlediğin kurs Kurslarım sayfasının en üstünde; tek tıkla kaldığın derse dönersin." %}</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="{{ library_url }}" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-check2-circle text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "İlerlemeni takip et" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "İzlediğin dersler tamamlandı olarak işaretlenir; her kursta ne kadar yol aldığını görürsün." %}</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="{{ library_url }}#favoriler" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-heart text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Favorilerine ekle" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "Tekrar dönmek istediğin dersleri oynatıcının altındaki kalp düğmesiyle favorilerine al." %}</p>
+          </div>
+        </a>
+      </div>
+      {% if site_settings.lesson_notes_enabled %}
+      <div class="col">
+        <a href="{{ library_url }}" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-journal-text text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Derslerde not al" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "İzlediğin derse ya da kursun geneline notlar ekle; notların Kurslarım'da da görünür." %}</p>
+          </div>
+        </a>
+      </div>
+      {% endif %}
+      <div class="col">
+        <a href="{{ settings_url }}#player" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-play-btn text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Oynatıcıyı kendine göre ayarla" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "Oynatma hızı, kalite ve altyazı tercihlerin hesap ayarlarında; her derste geçerli olur." %}</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="{{ library_url }}#degerlendirmelerim" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-star text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Kursu değerlendir" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "Görüşün diğer öğrencilere yol gösterir; puanını Kurslarım'daki Değerlendirmelerim bölümünden verebilirsin." %}</p>
+          </div>
+        </a>
+      </div>
+      <div class="col">
+        <a href="{{ support_url }}" class="card h-100 hover-lift text-decoration-none">
+          <div class="card-body p-4">
+            <i class="bi bi-life-preserver text-primary-emphasis fs-4 lh-1" aria-hidden="true"></i>
+            <h3 class="h6 fw-semibold text-body mt-3 mb-1">{% translate "Takıldığında yaz" %}</h3>
+            <p class="small text-body-secondary mb-0">{% translate "Derslerle ya da hesabınla ilgili sorularını Destek sayfasından gönder; yanıtı hesap menüsünde görürsün." %}</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
