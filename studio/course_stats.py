@@ -1,7 +1,8 @@
 """Stüdyo kurs istatistikleri: kayıtlar, izleme oranı dağılımı, ders bazında izleme, satın alanlar ve sepette bırakanlar.
 
 İzleme oranı yayındaki derslere göredir (Enrollment.objects.with_progress). Gelir yalnız kursun doğrudan satıldığı
-kalemlerden ve para birimine göre toplanır; paketle satışlarda kursa düşen pay bilinmediği için ayrı sayılır.
+kalemlerden ve para birimine göre toplanır; paketle satışlarda kursa düşen pay bilinmediği için ayrı sayılır. Hediye
+siparişler satış sayılmaz (kayıt kaynağında "Hediye" olarak görünür); iptal ve iade edilenler de sayılmaz.
 """
 
 from collections import Counter
@@ -15,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from cart.models import CartItem
 from course.models import Lesson
 from learning.models import Enrollment, EnrollmentSource
-from order.models import Order, OrderItem, OrderStatus
+from order.models import Order, OrderItem
 
 # Son açtığı ders bu olup bu kadar gündür hiç ders açmayan, kursu bitirmemiş öğrenci o derste "bıraktı" sayılır.
 LEFT_AFTER_DAYS = 14
@@ -92,7 +93,7 @@ def lessons(course):
 
 
 def buyer_orders(course):
-    return Order.objects.paid().containing(course)
+    return Order.objects.sold().containing(course)
 
 
 def left_in_cart(course):
@@ -129,9 +130,9 @@ def summary(course):
         buckets=buckets,
         sources=[dict(label=label, count=sources.get(value, 0)) for value, label in EnrollmentSource.choices if sources.get(value)],
         buyer_total=buyer_orders(course).values("email").distinct().count(),
-        bundle_sale_total=OrderItem.objects.filter(order__status=OrderStatus.PAID, bundle__courses=course).count(),
+        bundle_sale_total=OrderItem.objects.sold().filter(bundle__courses=course).count(),
         revenue=list(
-            OrderItem.objects.filter(order__status=OrderStatus.PAID, course=course)
+            OrderItem.objects.sold().filter(course=course)
             .order_by()
             .values("order__currency")
             .annotate(total=Sum("paid_price"), count=Count("pk"))

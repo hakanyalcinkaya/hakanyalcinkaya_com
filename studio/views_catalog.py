@@ -166,10 +166,12 @@ def course_stats_view(request, course_id):
 
 @superuser_required
 def stats_overview(request):
-    """Genel istatistikler: sitenin geneli, tüm kurslar tek tabloda, en çok izlenen ve bırakılan dersler, son 12 ay."""
+    """Genel istatistikler: sitenin geneli, ödeme yoluna göre siparişler, tüm kurslar tek tabloda, en çok izlenen ve
+    bırakılan dersler, son 12 ay."""
     courses = overview_stats.courses()
     context = dict(
         stats=overview_stats.summary(),
+        providers=overview_stats.providers(),
         courses=courses,
         top_watched=overview_stats.top_watched({course.pk: course.enrollment_total for course in courses}),
         top_left=overview_stats.top_left(),

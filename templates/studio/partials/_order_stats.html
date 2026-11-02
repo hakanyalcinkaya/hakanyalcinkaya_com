@@ -13,7 +13,7 @@
     <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
       <div class="small text-body-secondary">Ödenen sipariş</div>
       <div class="fs-3 fw-semibold">{{ stats.count }}</div>
-      <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.count_change %}{{ stats.items }} ürün{% if stats.with_code %} · {{ stats.with_code }} kodlu{% endif %}</div>
+      <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.count_change %}{{ stats.items }} ürün{% if stats.with_code %} · {{ stats.with_code }} kodlu{% endif %}{% if stats.gifts %} · {{ stats.gifts }} hediye ayrıca{% endif %}</div>
     </div></div>
     <div class="col-6 col-lg-3"><div class="border rounded p-3 h-100">
       <div class="small text-body-secondary">Gelir</div>

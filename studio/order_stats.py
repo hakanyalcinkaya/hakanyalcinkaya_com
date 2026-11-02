@@ -2,7 +2,8 @@
 yolu, ürün ve indirim kodu kırılımı, ödeme bekleyenler ve son 12 ayın seyri.
 
 Tutarlar para birimine göre ayrı toplanır (sitede TL, eski platformdan aktarılanlar kendi para birimiyle); farklı para
-birimleri birbirine eklenmez. Alıcı e-postayla tanınır.
+birimleri birbirine eklenmez. Alıcı e-postayla tanınır. Satış ödenmiş ve hediye olmayan siparişlerdir (Order.sold);
+hediyeler ayrı sayılır, ödeme yolu kırılımında kendi satırındadır. İptal ve iade edilenler satış sayılmaz.
 """
 
 from collections import defaultdict
@@ -40,12 +41,16 @@ def paid_in(start, end):
     return Order.objects.paid().filter(paid_at__gte=start, paid_at__lt=end)
 
 
+def sold_in(start, end):
+    return Order.objects.sold().filter(paid_at__gte=start, paid_at__lt=end)
+
+
 def summary(period):
     """Ayın özet kartları: satış, gelir (para birimine göre, önceki ayla kıyas), alıcılar, indirim, bekleyen/başarısız."""
     start, end = period["start"], period["end"]
-    orders = paid_in(start, end)
+    orders = sold_in(start, end)
     year, month = (period["year"] - 1, 12) if period["month"] == 1 else (period["year"], period["month"] - 1)
-    previous_orders = paid_in(*month_bounds(year, month))
+    previous_orders = sold_in(*month_bounds(year, month))
     revenue = by_currency(orders)
     previous_revenue = {row["currency"]: row for row in by_currency(previous_orders)}
     for row in revenue:
@@ -54,7 +59,7 @@ def summary(period):
 
     emails = set(orders.annotate(buyer=Lower("email")).values_list("buyer", flat=True))
     returning = set(
-        Order.objects.paid().filter(paid_at__lt=start).annotate(buyer=Lower("email")).filter(buyer__in=emails).values_list("buyer", flat=True)
+        Order.objects.sold().filter(paid_at__lt=start).annotate(buyer=Lower("email")).filter(buyer__in=emails).values_list("buyer", flat=True)
     )
     created = Order.objects.filter(created_at__gte=start, created_at__lt=end)
     pending = Order.objects.filter(status=OrderStatus.PENDING)
@@ -66,6 +71,7 @@ def summary(period):
         buyers=len(emails),
         new_buyers=len(emails - returning),
         returning_buyers=len(returning),
+        gifts=Order.objects.gifted().filter(paid_at__gte=start, paid_at__lt=end).count(),
         with_code=orders.exclude(discount_code="").count(),
         items=OrderItem.objects.filter(order__in=orders).count(),
         pending=by_currency(pending),
@@ -76,7 +82,7 @@ def summary(period):
 
 
 def providers(start, end):
-    """Ayın satışları ödeme yoluna göre."""
+    """Ayın ödenen siparişleri ödeme yoluna göre (hediyeler dahil, kendi satırında)."""
     rows = defaultdict(list)
     for row in paid_in(start, end).order_by().values("payment_provider", "currency").annotate(total=Sum("total"), count=Count("pk")):
         rows[row["payment_provider"]].append(row)
@@ -90,7 +96,7 @@ def providers(start, end):
 def products(start, end):
     """Ayda satılan kurs ve paketler: adet, ödenen tutar (para birimine göre), indirimli satış."""
     rows = (
-        OrderItem.objects.filter(order__status=OrderStatus.PAID, order__paid_at__gte=start, order__paid_at__lt=end)
+        OrderItem.objects.sold().filter(order__paid_at__gte=start, order__paid_at__lt=end)
         .order_by()
         .values("course_id", "bundle_id", "title", "order__currency")
         .annotate(count=Count("pk"), total=Sum("paid_price"), discounted=Count("pk", filter=Q(paid_price__lt=F("unit_price"))))
@@ -113,7 +119,7 @@ def products(start, end):
 def codes(start, end):
     """Ayın satışlarında kullanılan indirim kodları: kullanım ve düşülen tutar."""
     return list(
-        paid_in(start, end)
+        sold_in(start, end)
         .exclude(discount_code="")
         .order_by()
         .values("discount_code", "discount_id", "currency")
@@ -133,7 +139,7 @@ def trend(period):
     start, end = month_bounds(*keys[0])[0], period["end"]
     zone = timezone.get_current_timezone()
     rows = (
-        paid_in(start, end)
+        sold_in(start, end)
         .annotate(month=TruncMonth("paid_at", tzinfo=zone))
         .order_by()
         .values("month", "currency")

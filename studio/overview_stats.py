@@ -4,6 +4,9 @@ izlenen ve en çok bırakılan dersler, son 12 ayın satış, kayıt ve ders aç
 Kurs satırları kurs istatistikleriyle (course_stats) aynı tanımları kullanır: izleme oranı yayındaki derslere göre,
 gelir kursun tek başına satıldığı kalemlerden (paketle satış ayrı), sepette bırakan kursa kayıtlı olmayan üye ya da
 misafir sepetidir. Ders sayılarına yalnız kursa kayıtlı öğrenciler girer (personelin denemeleri girmez).
+
+Satış ödenmiş ve hediye olmayan siparişlerdir (Order.sold). Hediyeler, iptal ve iade edilenler satışa girmez; ödeme
+yolu tablosunda ve kurs satırlarında ayrı gösterilir.
 """
 
 from collections import Counter, defaultdict
@@ -12,12 +15,13 @@ from datetime import timedelta
 from django.db.models import Avg, Count, Exists, OuterRef, Q, Sum
 from django.db.models.functions import Lower, TruncMonth
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from cart.models import CartItem, CartStatus
 from core.models import Status
 from course.models import Course, Lesson
-from learning.models import Enrollment, LessonProgress
-from order.models import Order, OrderItem, OrderStatus
+from learning.models import Enrollment, EnrollmentSource, LessonProgress
+from order.models import GIFT, PAYMENT_METHODS, Order, OrderItem, OrderStatus
 from studio import cart_stats, course_stats, order_stats, periods
 
 # Bu kadar gün içinde ders açan öğrenci "aktif" sayılır.
@@ -48,7 +52,7 @@ def summary():
     """Özet kartları: öğrenciler, aktif öğrenciler ve izleme, tüm zamanların satışı, bu ay, şu an sepette bekleyenler."""
     since = _active_since()
     totals = Enrollment.objects.with_progress().aggregate(**_enrollment_totals())
-    paid = Order.objects.paid()
+    sold = Order.objects.sold()
     period = periods.month_period()
     return dict(
         period=period,
@@ -57,13 +61,42 @@ def summary():
         student_total=Enrollment.objects.values("user").distinct().count(),
         new_enrollments=Enrollment.objects.filter(created_at__gte=since).count(),
         active_students=Enrollment.objects.filter(last_watched_at__gte=since).values("user").distinct().count(),
-        order_total=paid.count(),
-        revenue=order_stats.by_currency(paid),
-        buyer_total=paid.annotate(buyer=Lower("email")).values("buyer").distinct().count(),
+        order_total=sold.count(),
+        revenue=order_stats.by_currency(sold),
+        buyer_total=sold.annotate(buyer=Lower("email")).values("buyer").distinct().count(),
+        gift_total=Order.objects.gifted().count(),
+        cancelled_total=Order.objects.filter(status__in=(OrderStatus.CANCELLED, OrderStatus.REFUNDED)).count(),
         month=order_stats.summary(period),
         waiting=cart_stats.waiting(),
         active_days=ACTIVE_DAYS,
     )
+
+
+def providers():
+    """Tüm zamanların siparişleri ödeme yoluna göre: ödenen sipariş, alıcı, gelir (para birimine göre); iptal ve iade
+    edilenler ayrı sütunda, satışa girmez. Hediye kendi satırında, tutarı 0."""
+    rows = {}
+
+    def entry(key):
+        return rows.setdefault(
+            key,
+            dict(key=key, label=PAYMENT_METHODS.get(key, key) or _("Belirtilmemiş"), is_gift=key == GIFT, count=0, buyers=0, amounts=[], cancelled=0, refunded=0),
+        )
+
+    paid = Order.objects.paid().order_by()
+    for row in paid.values("payment_provider", "currency").annotate(total=Sum("total"), count=Count("pk")):
+        current = entry(row["payment_provider"])
+        current["count"] += row["count"]
+        current["amounts"].append(dict(currency=row["currency"], total=row["total"]))
+    for row in paid.annotate(buyer=Lower("email")).values("payment_provider").annotate(n=Count("buyer", distinct=True)):
+        entry(row["payment_provider"])["buyers"] = row["n"]
+    closed = Order.objects.filter(status__in=(OrderStatus.CANCELLED, OrderStatus.REFUNDED)).order_by()
+    for row in closed.values("payment_provider", "status").annotate(n=Count("pk")):
+        entry(row["payment_provider"])["cancelled" if row["status"] == OrderStatus.CANCELLED else "refunded"] += row["n"]
+    order = list(PAYMENT_METHODS)
+    for current in rows.values():
+        current["amounts"].sort(key=lambda row: row["currency"] != "TRY")
+    return sorted(rows.values(), key=lambda row: (order.index(row["key"]) if row["key"] in order else len(order), row["key"]))
 
 
 def _cart_counts():
@@ -84,15 +117,22 @@ def _cart_counts():
 
 def courses():
     """Tüm kurslar kurs sırasıyla: kayıt, izlemeye başlayan, ortalama izleme, bitiren, son ACTIVE_DAYS günde ders açan,
-    satın alan (doğrudan ya da paketle), tek başına satış ve geliri, paketle satış, sepette bırakan."""
+    satın alan (doğrudan ya da paketle), tek başına satış ve geliri (ödeme yoluna göre adetleriyle), paketle satış,
+    hediye kaydı (hediye sipariş, hediye edilen sepet ya da öğrenciye hediye olarak açılan erişim), sepette bırakan."""
     progress = {
         row["course"]: row
         for row in Enrollment.objects.with_progress().order_by().values("course").annotate(**_enrollment_totals())
     }
-    paid_items = OrderItem.objects.filter(order__status=OrderStatus.PAID).order_by()
+    paid_items = OrderItem.objects.sold().order_by()
+    direct = paid_items.filter(course__isnull=False)
     revenue = defaultdict(list)
-    for row in paid_items.filter(course__isnull=False).values("course", "order__currency").annotate(total=Sum("paid_price"), count=Count("pk")):
+    for row in direct.values("course", "order__currency").annotate(total=Sum("paid_price"), count=Count("pk")):
         revenue[row["course"]].append(row)
+    methods = defaultdict(list)
+    for row in direct.values("course", "order__payment_provider").annotate(n=Count("pk")).order_by("-n"):
+        key = row["order__payment_provider"]
+        methods[row["course"]].append(dict(label=PAYMENT_METHODS.get(key, key) or _("Belirtilmemiş"), count=row["n"]))
+    gifts = dict(Enrollment.objects.filter(source=EnrollmentSource.GIFT).order_by().values_list("course").annotate(n=Count("pk")))
     bundle_sales = dict(paid_items.filter(bundle__isnull=False).values_list("bundle__courses").annotate(n=Count("pk")))
     buyers = defaultdict(set)
     for course, email in paid_items.filter(course__isnull=False).values_list("course", "order__email"):
@@ -113,6 +153,8 @@ def courses():
         course.buyer_total = len(buyers[course.pk])
         course.revenue = sorted(revenue[course.pk], key=lambda row: row["order__currency"] != "TRY")
         course.sale_total = sum(row["count"] for row in course.revenue)
+        course.sale_methods = methods[course.pk]
+        course.gift_total = gifts.get(course.pk, 0)
         course.bundle_sale_total = bundle_sales.get(course.pk, 0)
         course.cart_total = in_cart.get(course.pk, 0)
     return rows

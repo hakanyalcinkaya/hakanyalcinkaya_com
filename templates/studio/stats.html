@@ -32,7 +32,7 @@
     {% empty %}
     <div class="fs-3 fw-semibold">—</div>
     {% endfor %}
-    <div class="small text-body-tertiary">{{ stats.order_total }} sipariş · {{ stats.buyer_total }} alıcı</div>
+    <div class="small text-body-tertiary">{{ stats.order_total }} sipariş · {{ stats.buyer_total }} alıcı{% if stats.gift_total or stats.cancelled_total %}<br>Satışa girmeyen: {% if stats.gift_total %}{{ stats.gift_total }} hediye{% endif %}{% if stats.gift_total and stats.cancelled_total %} · {% endif %}{% if stats.cancelled_total %}{{ stats.cancelled_total }} iptal / iade{% endif %}{% endif %}</div>
   </div></div>
   <div class="col"><a href="{% url 'studio:orders' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
     <div class="small text-body-secondary">{{ stats.period.label }}</div>
@@ -41,7 +41,7 @@
     {% empty %}
     <div class="fs-3 fw-semibold">—</div>
     {% endfor %}
-    <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.month.count_change %}{{ stats.month.count }} sipariş · {{ stats.month.new_buyers }} yeni alıcı{% if stats.month.pending_count %} · {{ stats.month.pending_count }} ödeme bekliyor{% endif %}</div>
+    <div class="small text-body-tertiary">{% include "studio/partials/_change.html" with change=stats.month.count_change %}{{ stats.month.count }} sipariş · {{ stats.month.new_buyers }} yeni alıcı{% if stats.month.gifts %} · {{ stats.month.gifts }} hediye{% endif %}{% if stats.month.pending_count %} · {{ stats.month.pending_count }} ödeme bekliyor{% endif %}</div>
   </a></div>
   <div class="col"><a href="{% url 'studio:carts' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
     <div class="small text-body-secondary">Şu an sepette bekleyen</div>
@@ -50,9 +50,40 @@
   </a></div>
 </div>
 
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="stats-providers-title">
+  <h2 id="stats-providers-title" class="h6 mb-1">Ödeme yoluna göre</h2>
+  <p class="small text-body-secondary">Tüm zamanlar. Satış, ödenmiş siparişlerdir; hediyelerin tutarı 0'dır ve satışa girmez. İptal ve iade edilen siparişler satıştan düşülmüş olarak ayrı sütunda.</p>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="text-nowrap"><tr class="text-body-secondary">
+        <th scope="col" class="fw-medium">Ödeme yolu</th>
+        <th scope="col" class="fw-medium text-end">Ödenen sipariş</th>
+        <th scope="col" class="fw-medium text-end">Alıcı</th>
+        <th scope="col" class="fw-medium text-end">Gelir</th>
+        <th scope="col" class="fw-medium text-end">İptal</th>
+        <th scope="col" class="fw-medium text-end">İade</th>
+      </tr></thead>
+      <tbody>
+        {% for row in providers %}
+        <tr>
+          <td class="text-nowrap"><a href="{% url 'studio:orders' %}?provider={{ row.key }}" class="link-body-emphasis">{{ row.label }}</a>{% if row.is_gift %} <span class="text-body-tertiary">(satış değil)</span>{% endif %}</td>
+          <td class="text-end">{{ row.count }}</td>
+          <td class="text-end">{{ row.buyers }}</td>
+          <td class="text-end text-nowrap">{% if row.is_gift %}<span class="text-body-tertiary">—</span>{% else %}{% for amount in row.amounts %}{% include "studio/partials/_amount.html" with amount=amount.total currency=amount.currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}{% endif %}</td>
+          <td class="text-end">{% if row.cancelled %}{{ row.cancelled }}{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>
+          <td class="text-end">{% if row.refunded %}{{ row.refunded }}{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-body-secondary text-center py-4">Henüz sipariş yok.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
 <section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="stats-courses-title">
   <h2 id="stats-courses-title" class="h6 mb-1">Kurslar</h2>
-  <p class="small text-body-secondary">İzleme oranı yayındaki derslerden tamamlananların payı. Aktif: son {{ stats.active_days }} günde ders açan. Satış ve gelir kursun tek başına satıldığı siparişlerden; paketle satılanlar ayrı. Sepette: kursu sepete ekleyip almayan üye ve misafirler.</p>
+  <p class="small text-body-secondary">İzleme oranı yayındaki derslerden tamamlananların payı. Aktif: son {{ stats.active_days }} günde ders açan. Satış ve gelir kursun tek başına satıldığı siparişlerden (altında ödeme yoluna göre); paketle satılanlar ayrı. Hediye: hediye olarak açılan erişimler, satışa girmez. Sepette: kursu sepete ekleyip almayan üye ve misafirler.</p>
   <div class="table-responsive">
     <table class="table table-sm align-middle small mb-0">
       <thead class="text-nowrap"><tr class="text-body-secondary">
@@ -65,6 +96,7 @@
         <th scope="col" class="fw-medium text-end">Satın alan</th>
         <th scope="col" class="fw-medium text-end">Satış · gelir</th>
         <th scope="col" class="fw-medium text-end">Paketle</th>
+        <th scope="col" class="fw-medium text-end">Hediye</th>
         <th scope="col" class="fw-medium text-end">Sepette</th>
       </tr></thead>
       <tbody>
@@ -78,12 +110,13 @@
           <td class="text-end text-nowrap">{{ course.finished_total }}{% if course.finished_total %} <span class="text-body-tertiary">(%{{ course.finished_percent }})</span>{% endif %}</td>
           <td class="text-end">{{ course.active_total }}</td>
           <td class="text-end"><a href="{{ course_stats_url }}?tab=buyers" class="link-body-emphasis">{{ course.buyer_total }}</a></td>
-          <td class="text-end text-nowrap">{% for row in course.revenue %}{{ row.count }} · {% include "studio/partials/_amount.html" with amount=row.total currency=row.order__currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}</td>
+          <td class="text-end text-nowrap">{% for row in course.revenue %}{{ row.count }} · {% include "studio/partials/_amount.html" with amount=row.total currency=row.order__currency %}{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="text-body-tertiary">—</span>{% endfor %}{% if course.sale_methods %}<div class="text-body-tertiary text-wrap" style="min-width: 8rem">{% for method in course.sale_methods %}{{ method.label }} {{ method.count }}{% if not forloop.last %} · {% endif %}{% endfor %}</div>{% endif %}</td>
           <td class="text-end">{{ course.bundle_sale_total }}</td>
+          <td class="text-end">{{ course.gift_total }}</td>
           <td class="text-end">{% if course.cart_total %}<a href="{{ course_stats_url }}?tab=in-cart" class="link-body-emphasis">{{ course.cart_total }}</a>{% else %}<span class="text-body-tertiary">0</span>{% endif %}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="10" class="text-body-secondary text-center py-4">Henüz kurs yok.</td></tr>
+        <tr><td colspan="11" class="text-body-secondary text-center py-4">Henüz kurs yok.</td></tr>
         {% endfor %}
       </tbody>
     </table>

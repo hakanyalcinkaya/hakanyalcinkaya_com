@@ -54,6 +54,13 @@ class OrderQuerySet(models.QuerySet):
     def paid(self):
         return self.filter(status=OrderStatus.PAID)
 
+    def sold(self):
+        """Satış sayılan siparişler: ödenmiş, hediye değil. İptal ve iade edilenler zaten ödenmiş değildir."""
+        return self.paid().exclude(payment_provider=GIFT)
+
+    def gifted(self):
+        return self.paid().filter(payment_provider=GIFT)
+
     def for_user(self, user):
         return self.filter(user=user) if user.is_authenticated else self.none()
 
@@ -329,6 +336,12 @@ class Order(BaseModel):
         return self.is_paid and bool(self.user_id) and not self.is_gift
 
 
+class OrderItemQuerySet(models.QuerySet):
+    def sold(self):
+        """Satış sayılan siparişlerin kalemleri (OrderQuerySet.sold)."""
+        return self.filter(order__status=OrderStatus.PAID).exclude(order__payment_provider=GIFT)
+
+
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items", verbose_name=_("sipariş"))
     course = models.ForeignKey(
@@ -340,6 +353,8 @@ class OrderItem(BaseModel):
     title = models.CharField(_("ürün adı"), max_length=200)
     unit_price = models.DecimalField(_("fiyat (₺)"), **MONEY)
     paid_price = models.DecimalField(_("ödenen (₺)"), **MONEY)
+
+    objects = OrderItemQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("sipariş kalemi")
