@@ -1004,6 +1004,17 @@ class DateRangeForm(forms.Form):
         for field in self.fields.values():
             field.widget.attrs.update({"class": "form-control form-control-sm w-auto", "aria-label": field.label})
 
+    @property
+    def label(self):
+        """Seçilen aralığın okunur hâli: "02.11.2026", "02.11.2026 – 05.11.2026", "02.11.2026 ve sonrası" ya da "… ve öncesi"."""
+        start, end = (self.cleaned_data.get(name) if self.is_valid() else None for name in ("date_from", "date_to"))
+        start_text, end_text = (day.strftime("%d.%m.%Y") if day else "" for day in (start, end))
+        if start and end:
+            return start_text if start == end else f"{start_text} – {end_text}"
+        if start:
+            return _("%(day)s ve sonrası") % {"day": start_text}
+        return _("%(day)s ve öncesi") % {"day": end_text} if end else ""
+
     def filter(self, rows, field="created_at"):
         if not self.is_valid():
             return rows

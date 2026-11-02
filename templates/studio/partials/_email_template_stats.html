@@ -1,0 +1,18 @@
+{# Şablon başına gönderim sayıları: rows = EmailLogQuerySet.stats_by_template() (etiketli); date_query bağlantılara eklenir. #}
+<div class="table-responsive mb-4">
+  <table class="table table-sm align-middle small mb-0">
+    <thead><tr><th scope="col">Şablon</th><th scope="col" class="text-end">Toplam</th><th scope="col" class="text-end">Gönderildi</th><th scope="col" class="text-end">Hata</th><th scope="col" class="text-end">Açılma</th><th scope="col" class="text-end">Tıklama</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="{{ list_url }}?template={{ row.template }}{% if date_query %}&{{ date_query }}{% endif %}" class="text-decoration-none">{{ row.label }}</a> <code class="text-body-tertiary">{{ row.template }}</code></td>
+        <td class="text-end">{{ row.total }}</td>
+        <td class="text-end">{{ row.sent }}</td>
+        <td class="text-end{% if row.failed %} text-danger{% endif %}">{{ row.failed }}</td>
+        <td class="text-end">%{{ row.open_rate }} <span class="text-body-tertiary">({{ row.opened }})</span></td>
+        <td class="text-end">%{{ row.click_rate }} <span class="text-body-tertiary">({{ row.clicked }})</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

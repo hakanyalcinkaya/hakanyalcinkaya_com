@@ -1129,6 +1129,12 @@ def _email_log_list(request, logs, list_url, labels):
     )
 
 
+def _labelled(rows, labels):
+    for row in rows:
+        row["label"] = labels.get(row["template"], row["template"])
+    return rows
+
+
 @superuser_required
 def email_log(request):
     """Gönderim günlüğü, iki sekme: tekil e-postalar (şifre, satın alma vb.; tek alıcı) ve toplu gönderimler (bülten;
@@ -1149,11 +1155,16 @@ def email_log(request):
     context = _email_log_list(request, single, reverse("studio:email_log"), labels)
     if request.htmx and request.GET.get(ROWS_PARAM):
         return render(request, "studio/partials/_email_log_rows.html", context)
-    # Filtreler toplamların üstünde; HTMX'te liste bloğu toplamlarla birlikte yenilenir.
-    stats = single.stats_by_template()
-    for row in stats:
-        row["label"] = labels.get(row["template"], row["template"])
-    context.update(stats=stats, totals=single.stats())
+    # Filtreler toplamların üstünde; HTMX'te liste bloğu toplamlarla birlikte yenilenir. Tarih aralığı seçiliyse şablon
+    # tablosu o aralık için de gösterilir.
+    context.update(stats=_labelled(single.stats_by_template(), labels), totals=single.stats())
+    dates = context["dates"]
+    if dates.is_valid() and any(dates.cleaned_data.values()):
+        context.update(
+            dated_stats=_labelled(dates.filter(single).stats_by_template(), labels),
+            date_label=dates.label,
+            date_query=urlencode({name: request.GET[name] for name in dates.fields if request.GET.get(name)}),
+        )
     if request.htmx and not request.htmx.boosted:
         return render(request, "studio/partials/_email_log_list.html", context)
     context.update(tab="single", single_total=single.count(), batch_total=EmailBatch.objects.count())
