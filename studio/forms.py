@@ -36,7 +36,7 @@ from course.models import (
 from discount.forms import DiscountTargetsMixin
 from discount.models import Discount
 from newsletter.models import AudienceKind, Issue
-from order.models import ADMIN_PAYMENT_METHODS, PAYMENT_METHODS, Order, OrderStatus
+from order.models import ADMIN_PAYMENT_METHODS, NOTICE_STATUSES, PAYMENT_METHODS, Order, OrderStatus
 from support.models import Ticket, TicketStatus
 
 SUBTITLE_MAX_BYTES = 2 * 1024 * 1024
@@ -1068,24 +1068,57 @@ class ManualOrderForm(forms.Form):
         )
 
 
-class OrderStatusForm(forms.Form):
-    """Sipariş durumunu değiştirir; seçenekler yalnız izin verilen geçişler (Order.next_statuses)."""
+class CurrentOptionSelect(forms.Select):
+    """Geçerli değeri listede seçili ama seçilemez gösterir (ör. "Ödendi (aktif)")."""
 
-    status = forms.ChoiceField(label=_("Yeni durum"))
+    def __init__(self, *args, current="", **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current = current
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        if value == self.current:
+            option["attrs"]["disabled"] = True
+        return option
+
+
+class OrderStatusForm(forms.Form):
+    """Sipariş durumunu değiştirir. Listede geçerli durum "(aktif)" olarak seçili ve pasif durur; diğer seçenekler yalnız
+    izin verilen geçişler (Order.next_statuses). Erişim kaldırma yalnız ödenmiş siparişte, e-posta seçeneği iade/iptale
+    geçilebilen ve üyeye bağlı siparişte gösterilir."""
+
+    status = forms.ChoiceField(label=_("Durum"), error_messages={"required": _("Yeni bir durum seç.")})
     revoke_access = forms.BooleanField(label=_("Bu siparişin açtığı kurs erişimlerini kaldır"), required=False, initial=True)
+    notify = forms.BooleanField(label=_("İade / iptalde alıcıya bilgilendirme e-postası gönder"), required=False)
 
     def __init__(self, *args, order, **kwargs):
         super().__init__(*args, **kwargs)
         self.order = order
-        self.fields["status"].choices = [(status.value, status.label) for status in order.next_statuses]
-        self.fields["status"].widget.attrs["class"] = "form-select form-select-sm"
+        current = OrderStatus(order.status)
+        field = self.fields["status"]
+        field.choices = [(current.value, _("%(status)s (aktif)") % {"status": current.label})] + [
+            (status.value, status.label) for status in order.next_statuses
+        ]
+        field.initial = current.value
+        field.widget = CurrentOptionSelect(choices=field.choices, current=current.value, attrs={"class": "form-select form-select-sm"})
         if order.is_paid:
             self.fields["revoke_access"].widget.attrs["class"] = "form-check-input"
         else:
             del self.fields["revoke_access"]
+        if order.user_id and any(status in NOTICE_STATUSES for status in order.next_statuses):
+            self.fields["notify"].widget.attrs["class"] = "form-check-input"
+        else:
+            del self.fields["notify"]
+
+    def clean_status(self):
+        status = self.cleaned_data["status"]
+        if status not in self.order.next_statuses:
+            raise forms.ValidationError(_("Yeni bir durum seç."))
+        return status
 
     def save(self):
-        return self.order.set_status(self.cleaned_data["status"], revoke_access=self.cleaned_data.get("revoke_access", False))
+        data = self.cleaned_data
+        return self.order.set_status(data["status"], revoke_access=data.get("revoke_access", False), notify=data.get("notify", False))
 
 
 class SupportBulkAction(models.TextChoices):

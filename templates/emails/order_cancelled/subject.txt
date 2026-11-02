@@ -1,0 +1,1 @@
+Siparişin iptal edildi — sipariş {{ order_number }}

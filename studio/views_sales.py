@@ -21,7 +21,8 @@ from cart.pricing import price_cart
 from course.models import Course
 from learning.models import Enrollment
 from newsletter.models import Subscriber
-from order.models import Order, OrderItem, OrderStatus
+from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
+from order.tasks import send_purchase_confirmation
 from studio import cart_stats, course_stats, order_stats, periods
 from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm, OrderStatusForm
 from studio.templatetags.studio_tags import ROWS_PARAM
@@ -96,12 +97,22 @@ def _order(order_id):
     )
 
 
+OTHER_ORDERS = 10
+
+
 @superuser_required
 def order_detail(request, order_id):
-    """Sipariş kalemleri, açtığı kurs kayıtları, ödeme bilgisi ve durum değişikliği; mali kayıt olduğu için tutarlar
-    değiştirilmez."""
+    """Sipariş kalemleri, açtığı kurs kayıtları, ödeme bilgisi, durum değişikliği ve alıcının diğer siparişleri;
+    mali kayıt olduğu için tutarlar değiştirilmez."""
     order = _order(order_id)
-    return render(request, "studio/order_detail.html", dict(order=order, status_form=OrderStatusForm(order=order)))
+    others = order.other_orders()
+    context = dict(
+        order=order,
+        status_form=OrderStatusForm(order=order),
+        other_orders=others[:OTHER_ORDERS],
+        other_orders_more=others.count() > OTHER_ORDERS,
+    )
+    return render(request, "studio/order_detail.html", context)
 
 
 @superuser_required
@@ -131,9 +142,25 @@ def order_status(request, order_id):
         text = _("Durum değişti: %(old)s → %(new)s.") % {"old": old_label, "new": order.get_status_display()}
         if revoked:
             text += " " + _("%(count)s kurs erişimi kaldırıldı.") % {"count": revoked}
+        if form.cleaned_data.get("notify") and order.status in NOTICE_STATUSES and order.user_id:
+            text += " " + _("Alıcıya bilgilendirme e-postası gidiyor.")
         messages.success(request, text)
     else:
-        messages.error(request, _("Bu durum değişikliği yapılamaz."))
+        messages.error(request, next(iter(form.errors.values()))[0])
+    url = reverse("studio:order_detail", args=[order.pk])
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
+
+
+@superuser_required
+@require_POST
+def order_resend_confirmation(request, order_id):
+    """Satın alma onayı e-postasını yeniden gönderir (alıcı "gelmedi" dediğinde); ödenmiş, üyeye bağlı siparişte."""
+    order = _order(order_id)
+    if order.can_resend_confirmation:
+        send_purchase_confirmation.delay(str(order.pk))
+        messages.success(request, _("Onay e-postası %(email)s adresine yeniden gönderiliyor.") % {"email": order.email})
+    else:
+        messages.error(request, _("Onay e-postası yalnız ödenmiş ve bir üyeye bağlı siparişte gönderilir."))
     url = reverse("studio:order_detail", args=[order.pk])
     return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
 

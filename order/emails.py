@@ -89,6 +89,16 @@ def purchase_confirmation_context(order):
     }
 
 
+def order_notice_context(order, access_revoked=False):
+    """İade / iptal bilgilendirmesi: kalemler, iade tutarı (sipariş toplamı) ve erişimin kapatılıp kapatılmadığı."""
+    return {
+        **recipient_context(order.user),
+        **order_items_context([order]),
+        "refund_amount": format_money(order.total, order.currency),
+        "access_revoked": access_revoked,
+    }
+
+
 def password_reset_context(user, reset_url=None):
     return {**recipient_context(user), "reset_url": reset_url or password_url(user)}
 
@@ -104,7 +114,7 @@ def preview_context(key, user):
     context = {**sample_context(key), **recipient_context(user)}
     if key == "account_migrated":
         context.update(account_migrated_context(user))
-    elif key in ("purchase_confirmation", "admin_new_order"):
+    elif key in ("purchase_confirmation", "admin_new_order", "refund_processed", "order_cancelled"):
         order = Order.objects.paid().filter(user=user).order_by("-paid_at").first()
         if order is not None:
             context.update(order_items_context([order]))

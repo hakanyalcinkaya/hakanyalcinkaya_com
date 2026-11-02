@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block title %}Siparişin iptal edildi.{% endblock %}
+{% block preheader %}{{ order_number }} numaralı siparişin iptal edildi.{% endblock %}
+{% block eyebrow %}Sipariş {{ order_number }}{% endblock %}
+{% block heading %}Siparişin iptal edildi.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;"><strong>{{ order_number }}</strong> numaralı siparişin iptal edildi.</p>
+{% include "emails/modules/items.html" with show_prices=True %}
+{% if access_revoked %}<p style="margin: 0 0 14px;">Bu siparişle açılan eğitimlere erişimin kapatıldı.</p>{% endif %}
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Bir yanlışlık olduğunu düşünüyorsan bu e-postayı yanıtla.</p>
+{% endblock %}

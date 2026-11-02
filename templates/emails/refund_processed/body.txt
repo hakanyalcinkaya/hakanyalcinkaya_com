@@ -1,7 +1,9 @@
 {% extends "emails/base.txt" %}
 {% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
 
-{{ order_number }} numaralı siparişin için {{ refund_amount }} iade edildi. Tutarın kartına yansıması bankana göre birkaç iş günü sürebilir.
+{{ order_number }} numaralı siparişin için {{ refund_amount }} iade edildi. Tutarın kartına ya da hesabına yansıması bankana göre birkaç iş günü sürebilir.
 
 {% include "emails/_items.txt" with show_prices=True %}
-İade edilen eğitimlere erişimin kapatıldı.{% endblock %}
+{% if access_revoked %}İade edilen eğitimlere erişimin kapatıldı.
+
+{% endif %}Sorun olursa bu e-postayı yanıtlayabilirsin.{% endblock %}

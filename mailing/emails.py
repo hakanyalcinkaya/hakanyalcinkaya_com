@@ -94,8 +94,19 @@ EMAILS = {
     "refund_processed": _email(
         "İade yapıldı",
         "Satın alma",
-        "Sipariş iade edilince: iade tutarı ve kapanan erişim.",
-        {**COMMON_VARIABLES, **ITEM_VARIABLES, "refund_amount": "İade edilen tutar"},
+        "Stüdyoda sipariş iade edilince (isteğe bağlı): iade tutarı ve kapanan erişim.",
+        {
+            **COMMON_VARIABLES,
+            **ITEM_VARIABLES,
+            "refund_amount": "İade edilen tutar",
+            "access_revoked": "Bu siparişin açtığı erişimler kapatıldı mı (evet/hayır)",
+        },
+    ),
+    "order_cancelled": _email(
+        "Sipariş iptal edildi",
+        "Satın alma",
+        "Stüdyoda sipariş iptal edilince (isteğe bağlı): iptal edilen ürünler ve kapanan erişim.",
+        {**COMMON_VARIABLES, **ITEM_VARIABLES, "access_revoked": "Bu siparişin açtığı erişimler kapatıldı mı (evet/hayır)"},
     ),
     "course_granted": _email(
         "Kurs hesabına tanımlandı",
@@ -373,7 +384,8 @@ def sample_context(key):
         "password_changed": {"changed_at": when, "reset_page_url": f"{site}/account/password-reset/"},
         "email_change": {"new_email": "ayse.yeni@example.com", "confirm_url": f"{site}/account/email/ornek-onay/"},
         "payment_failed": {"retry_url": f"{site}/cart/"},
-        "refund_processed": {"items": items[:1], "refund_amount": "₺899", "order_total": "₺899"},
+        "refund_processed": {"items": items[:1], "refund_amount": "₺899", "order_total": "₺899", "access_revoked": True},
+        "order_cancelled": {"items": items[:1], "order_total": "₺899", "access_revoked": False},
         "course_granted": {"grant_reason": "Hediye", "sender_name": "Mehmet K."},
         "course_completed": {"lesson_total": 335, "completed_at": when, "review_url": f"{site}/react/#yorumlar"},
         "review_approved": {"rating": 5, "review_text": "Projelerle ilerlemek konuları kalıcı hâle getirdi."},

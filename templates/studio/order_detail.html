@@ -10,6 +10,8 @@
   </div>
   {% if not order.is_paid %}
   <button type="button" class="btn btn-primary btn-sm" hx-post="{% url 'studio:order_mark_paid' order.id %}" hx-confirm="Sipariş ödendi olarak işaretlensin mi? Kurs erişimleri açılır ve indirim kodu kullanımı sayılır."><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Ödendi olarak işaretle</button>
+  {% elif order.can_resend_confirmation %}
+  <button type="button" class="btn btn-outline-secondary btn-sm" hx-post="{% url 'studio:order_resend_confirmation' order.id %}" hx-confirm="Satın alma onayı e-postası {{ order.email }} adresine yeniden gönderilsin mi?"><i class="bi bi-envelope me-1" aria-hidden="true"></i>Onay e-postasını yeniden gönder</button>
   {% endif %}
 </div>
 <div class="row g-4">
@@ -52,6 +54,13 @@
         <div class="form-check mb-0">
           {{ status_form.revoke_access }}<label class="form-check-label" for="{{ status_form.revoke_access.id_for_label }}">{{ status_form.revoke_access.label }}</label>
         </div>
+        {% endif %}
+        {% if status_form.notify %}
+        <div class="form-check mb-0">
+          {{ status_form.notify }}<label class="form-check-label" for="{{ status_form.notify.id_for_label }}">{{ status_form.notify.label }}</label>
+        </div>
+        {% endif %}
+        {% if order.is_paid %}
         <p class="text-body-secondary mb-0">İade ya da iptalde indirim kodu kullanımı geri alınır; ders ilerlemesi silinmez.</p>
         {% else %}
         <p class="text-body-secondary mb-0">"Ödendi" seçilirse kurs erişimleri açılır, kod kullanımı sayılır ve alıcıya onay e-postası gider.</p>
@@ -66,6 +75,22 @@
       <dt>Ödeme referansı</dt><dd class="font-monospace text-break">{{ order.payment_reference|default:"—" }}</dd>
       <dt>Para birimi</dt><dd class="mb-0">{{ order.currency }}</dd>
     </dl>
+    <section class="border rounded mt-4" aria-labelledby="order-others-title">
+      <h2 id="order-others-title" class="h6 px-3 pt-3">{% if order.user %}Üyenin diğer siparişleri{% else %}Bu e-postanın diğer siparişleri{% endif %}</h2>
+      <ul class="list-group list-group-flush small">
+        {% for other in other_orders %}
+        <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+          <a href="{% url 'studio:order_detail' other.id %}" class="font-monospace">{{ other.number }}</a>
+          {% include "studio/partials/_order_status.html" with order=other %}
+          <span class="ms-auto">{% if other.currency == "TRY" %}{{ other.total|money }}{% else %}{{ other.total }} {{ other.currency }}{% endif %}</span>
+          <span class="w-100 text-body-tertiary">{{ other.paid_at|default:other.created_at|date:"d.m.Y H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-body-secondary">Başka sipariş yok.</li>
+        {% endfor %}
+        {% if other_orders_more %}<li class="list-group-item"><a href="{% url 'studio:orders' %}?q={{ order.email|urlencode }}">Tümünü gör</a></li>{% endif %}
+      </ul>
+    </section>
   </div>
 </div>
 {% endblock %}

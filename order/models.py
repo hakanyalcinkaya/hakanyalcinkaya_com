@@ -39,6 +39,8 @@ STATUS_TRANSITIONS = {
     OrderStatus.REFUNDED: (OrderStatus.PAID,),
     OrderStatus.CANCELLED: (OrderStatus.PAID, OrderStatus.PENDING),
 }
+# Alıcıya bilgilendirme e-postası gönderilebilen geçişler (e-posta anahtarı: order.tasks.NOTICE_EMAILS).
+NOTICE_STATUSES = (OrderStatus.REFUNDED, OrderStatus.CANCELLED)
 
 
 class OrderQuerySet(models.QuerySet):
@@ -209,17 +211,20 @@ class Order(BaseModel):
                 self.cart.mark_converted()
             transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
 
-    def set_status(self, status, revoke_access=True):
+    def set_status(self, status, revoke_access=True, notify=False):
         """Yöneticinin durum değişikliği; geçersiz geçişte ValueError. "Ödendi"ye mark_paid ile geçer. Ödenmiş sipariş iade
         ya da iptal edilince kod kullanımı geri alınır ve revoke_access ise bu siparişin açtığı kurs erişimleri kaldırılır
-        (ders ilerlemesi kalır). Kaldırılan erişim sayısını döner."""
+        (ders ilerlemesi kalır). notify: iade/iptalde alıcıya bilgilendirme e-postası (hesaba bağlı siparişte). Kaldırılan
+        erişim sayısını döner."""
         from learning.models import Enrollment
+        from order.tasks import send_order_notice
 
         if status not in self.next_statuses:
             raise ValueError(f"{self.status} -> {status}")
         if status == OrderStatus.PAID:
             self.mark_paid(provider=self.payment_provider or "manual")
             return 0
+        notify = notify and status in NOTICE_STATUSES and bool(self.user_id)
         revoked = 0
         with transaction.atomic():
             was_paid = self.is_paid
@@ -230,12 +235,23 @@ class Order(BaseModel):
                     revoked = Enrollment.objects.filter(order=self).delete()[1].get("learning.Enrollment", 0)
                 if self.discount_id:
                     self.discount.release_use()
+            if notify:
+                transaction.on_commit(partial(send_order_notice.delay, str(self.pk), access_revoked=bool(revoked)))
         return revoked
 
     def mark_failed(self, reference=""):
         self.status = OrderStatus.FAILED
         self.payment_reference = reference or self.payment_reference
         self.save(update_fields=["status", "payment_reference", "updated_at"])
+
+    def other_orders(self):
+        """Aynı alıcının diğer siparişleri: üyeye bağlıysa üyenin, değilse aynı e-postanın."""
+        rows = Order.objects.filter(user_id=self.user_id) if self.user_id else Order.objects.filter(email__iexact=self.email)
+        return rows.exclude(pk=self.pk).order_by("-created_at", "id")
+
+    @property
+    def can_resend_confirmation(self):
+        return self.is_paid and bool(self.user_id)
 
 
 class OrderItem(BaseModel):
