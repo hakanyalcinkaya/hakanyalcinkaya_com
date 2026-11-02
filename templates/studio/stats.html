@@ -146,7 +146,7 @@
         <th scope="col" class="fw-medium text-end">Açılan ders</th>
       </tr></thead>
       <tbody>
-        {% for row in trend %}
+        {% for row in trend reversed %}
         <tr{% if row.is_current %} class="fw-semibold" aria-current="true"{% endif %}>
           <td class="text-nowrap"><a href="{% url 'studio:orders' %}?month={{ row.key }}" class="link-body-emphasis">{{ row.label }}</a></td>
           <td><div class="d-flex align-items-center gap-2"><span class="studio-bar flex-grow-1" role="img" aria-label="{{ row.count }} sipariş"><span style="width: {{ row.percent }}%"></span></span><span class="text-nowrap">{{ row.count }}</span></div></td>
