@@ -246,6 +246,7 @@ sudo systemctl restart hakanyalcinkaya-celery     # süren video yüklemesi yar�
 ## Yayından sonra
 
 - Bunny panelinde izinli alan adı `hakanyalcinkaya.com`; Vimeo için `.env` `VIMEO_EMBED_DOMAINS`.
-- SendGrid'de gönderici alan adı doğrulaması (SPF/DKIM) ve gerçek gönderim testi.
+- SendGrid'de gönderici alan adı doğrulaması (SPF/DKIM) ve gerçek gönderim testi. SendGrid'in tıklama/açılma takibi koddan
+  kapalı (`mailing/backends.py`, `X-SMTPAPI`); panel ayarı bu siteyi etkilemez, takip sitenin kendi `EmailLog`'unda.
 - Birkaç gün sorunsuz çalışınca `.env`'de `SECURE_HSTS_SECONDS=31536000`, ardından `touch reload.txt`.
 - Diğer açık işler: kök klasördeki `TODO.md`.

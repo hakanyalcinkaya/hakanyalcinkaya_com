@@ -104,6 +104,9 @@ E-postayı kontrol et:
 
 Gönderilen her e-posta Stüdyo → E-postalar → **Gönderim günlüğü**'nde görünür (şifre bağlantısı kayıtta gizli).
 
+SendGrid'in tıklama/açılma takibi her e-postada kapalı (`mailing/backends.py`, `X-SMTPAPI` başlığı): "Şifremi belirle" bağlantısı
+sitenin kendi adresiyle (`hakanyalcinkaya.com/e/c/...`) başlamalı, `ct.sendgrid.net` ile değil.
+
 ## 9. Gerçek gönderim için ayarları değiştir
 
 `.env`:

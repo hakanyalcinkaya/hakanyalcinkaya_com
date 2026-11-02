@@ -2,12 +2,21 @@
 gider. Asıl alıcılar konu satırına ve X-Original-To başlığına yazılır. Yayına çıkarken ayar kaldırılır.
 
 EMAIL_HOSTNAME tanımlıysa Message-ID alan adı ve SMTP EHLO adı sunucunun hostname'i yerine bu ad olur; sunucu adı
-FQDN değilse (ör. `ubuntu2025srv`) bazı filtreler puan düşürür."""
+FQDN değilse (ör. `ubuntu2025srv`) bazı filtreler puan düşürür.
 
+SendGrid'in açılma ve tıklama takibi her e-postada X-SMTPAPI başlığıyla kapatılır (hesap ayarı ne olursa olsun): takip
+sitenin kendisinde (mailing.tracking, EmailLog); SendGrid'in sarması şifre bağlantılarını ct.sendgrid.net üzerinden
+geçirir ve kendi sunucusunda saklar."""
+
+import json
 from email.utils import make_msgid
 
 from django.conf import settings
 from django.core.mail.backends import console, locmem, smtp
+
+SENDGRID_NO_TRACKING = json.dumps(
+    {"filters": {"clicktrack": {"settings": {"enable": 0}}, "opentrack": {"settings": {"enable": 0}}}}
+)
 
 
 class RedirectMixin:
@@ -15,6 +24,7 @@ class RedirectMixin:
         target = getattr(settings, "EMAIL_REDIRECT_TO", "")
         hostname = getattr(settings, "EMAIL_HOSTNAME", "")
         for message in email_messages:
+            message.extra_headers.setdefault("X-SMTPAPI", SENDGRID_NO_TRACKING)
             if hostname:
                 # Django, extra_headers'da Message-ID varsa kendi üretmez (alan adı sunucu hostname'i olurdu).
                 message.extra_headers.setdefault("Message-ID", make_msgid(domain=hostname))
