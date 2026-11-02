@@ -12,6 +12,9 @@
       {% for value, label in statuses %}<option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Alıcı ya da konu" aria-label="Alıcı ya da konu ara">
+    {% for field in dates %}<label class="d-flex align-items-center gap-1 small text-body-secondary">{{ field.label }}{{ field }}</label>{% endfor %}
+    {% if is_filtered %}<span class="small text-body-tertiary">{{ page.paginator.count }} e-posta</span>
+    <a href="{{ list_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ list_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
   </form>
   <div class="table-responsive">
     <table class="table table-sm table-hover align-middle small mb-0">

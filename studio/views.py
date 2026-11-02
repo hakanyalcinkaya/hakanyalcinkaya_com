@@ -39,6 +39,7 @@ from core.markup import render_markdown
 from learning.models import Enrollment
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.forms import (
+    DateRangeForm,
     ExtraContentBulkForm,
     ExtraContentForm,
     ExtraContentUploadForm,
@@ -1094,9 +1095,12 @@ def _email_labels():
 
 
 def _email_log_list(request, logs, list_url, labels):
-    """Gönderim listesi bağlamı: şablon, durum ve adres/konu filtresi GET parametresinde, sayfalı."""
+    """Gönderim listesi bağlamı: şablon, durum, adres/konu ve gönderim günü (başlangıç/bitiş) filtresi GET
+    parametresinde, sayfalı."""
     from mailing.models import EmailStatus
 
+    dates = DateRangeForm(request.GET)
+    logs = dates.filter(logs)
     template = request.GET.get("template", "")
     status = request.GET.get("status", "")
     query = request.GET.get("q", "").strip()
@@ -1117,6 +1121,8 @@ def _email_log_list(request, logs, list_url, labels):
         query=query,
         statuses=EmailStatus.choices,
         templates=list(labels.items()),
+        dates=dates,
+        is_filtered=bool(template or status or query or (dates.is_valid() and any(dates.cleaned_data.values()))),
     )
 
 

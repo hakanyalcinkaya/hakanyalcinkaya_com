@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -10,7 +10,7 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from account.models import InstructorProfile, User
+from account.models import PASSWORD_SET, InstructorProfile, User
 from cart.models import Cart, CartItem
 from core.models import SiteSettings
 from course import video_service
@@ -991,6 +991,111 @@ class OrderFilterForm(forms.Form):
     @property
     def is_filtered(self):
         return self.is_valid() and any(value for value in self.cleaned_data.values())
+
+
+class DateRangeForm(forms.Form):
+    """Başlangıç / bitiş günü filtresi (GET); günler yerel saatle tam gün sayılır (ör. gönderim günlüğü)."""
+
+    date_from = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    date_to = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control form-control-sm w-auto", "aria-label": field.label})
+
+    def filter(self, rows, field="created_at"):
+        if not self.is_valid():
+            return rows
+        zone = timezone.get_current_timezone()
+        if self.cleaned_data.get("date_from"):
+            rows = rows.filter(**{f"{field}__gte": datetime.combine(self.cleaned_data["date_from"], time.min, tzinfo=zone)})
+        if self.cleaned_data.get("date_to"):
+            rows = rows.filter(**{f"{field}__lte": datetime.combine(self.cleaned_data["date_to"], time.max, tzinfo=zone)})
+        return rows
+
+
+class StudentFilterForm(forms.Form):
+    """Öğrenci listesi filtreleri (GET): arama, kurs, kaynak, şifre, Podia daveti, giriş, ders izleme ve sıralama.
+    Davet ve izleme alanları order.podia.with_invite ile eklenen değerlere bakar."""
+
+    SOURCE_CHOICES = (("", _("Kaynak: tümü")), ("podia", _("Podia'dan aktarılan")), ("site", _("Sitede kayıt olan")))
+    PASSWORD_CHOICES = (("", _("Şifre: tümü")), ("set", _("Şifresini belirlemiş")), ("unset", _("Şifresi yok")))
+    INVITE_CHOICES = (
+        ("", _("Davet: tümü")),
+        ("not-sent", _("Davet gönderilmedi")),
+        ("sent", _("Davet gönderildi")),
+        ("not-opened", _("Davet açılmadı")),
+        ("opened", _("Davet açıldı")),
+        ("clicked", _("Davette tıklandı")),
+    )
+    LOGIN_CHOICES = (("", _("Giriş: tümü")), ("never", _("Hiç giriş yapmadı")), ("week", _("Son 7 günde giriş")), ("month", _("Son 30 günde giriş")))
+    WATCH_CHOICES = (("", _("İzleme: tümü")), ("yes", _("Ders izlemiş")), ("no", _("Hiç ders izlememiş")))
+    SORT_CHOICES = (("", _("Yeni üyeler önce")), ("login", _("Son giriş önce")), ("invite", _("Son davet önce")))
+
+    q = forms.CharField(label=_("Ara"), required=False)
+    course = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
+    source = forms.ChoiceField(label=_("Kaynak"), required=False, choices=SOURCE_CHOICES)
+    password = forms.ChoiceField(label=_("Şifre"), required=False, choices=PASSWORD_CHOICES)
+    invite = forms.ChoiceField(label=_("Podia daveti"), required=False, choices=INVITE_CHOICES)
+    login = forms.ChoiceField(label=_("Giriş"), required=False, choices=LOGIN_CHOICES)
+    watch = forms.ChoiceField(label=_("Ders izleme"), required=False, choices=WATCH_CHOICES)
+    sort = forms.ChoiceField(label=_("Sıralama"), required=False, choices=SORT_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["course"].queryset = Course.objects.order_by("sort_order", "title")
+        for name, field in self.fields.items():
+            css = "form-select form-select-sm w-auto" if isinstance(field, (forms.ChoiceField, forms.ModelChoiceField)) else "form-control form-control-sm w-auto"
+            field.widget.attrs.setdefault("class", css)
+            field.widget.attrs.setdefault("aria-label", field.label)
+        self.fields["q"].widget.attrs.update(type="search", placeholder=_("Ad ya da e-posta"))
+
+    def filter(self, users):
+        if not self.is_valid():
+            return users
+        data = self.cleaned_data
+        if data.get("q"):
+            users = users.filter(Q(email__icontains=data["q"]) | Q(first_name__icontains=data["q"]) | Q(last_name__icontains=data["q"]))
+        if data.get("course"):
+            users = users.filter(enrollments__course=data["course"])
+        if data.get("source"):
+            users = users.filter(podia_imported=data["source"] == "podia")
+        if data.get("password") == "set":
+            users = users.filter(PASSWORD_SET)
+        elif data.get("password") == "unset":
+            users = users.exclude(PASSWORD_SET)
+        invite = data.get("invite")
+        if invite == "not-sent":
+            users = users.filter(podia_imported=True, invite_sent_at__isnull=True)
+        elif invite == "sent":
+            users = users.filter(invite_sent_at__isnull=False)
+        elif invite == "not-opened":
+            users = users.filter(invite_sent_at__isnull=False, invite_opened_at__isnull=True)
+        elif invite == "opened":
+            users = users.filter(invite_opened_at__isnull=False)
+        elif invite == "clicked":
+            users = users.filter(invite_clicked_at__isnull=False)
+        login = data.get("login")
+        if login == "never":
+            users = users.filter(last_login__isnull=True)
+        elif login in ("week", "month"):
+            users = users.filter(last_login__gte=timezone.now() - timedelta(days=7 if login == "week" else 30))
+        if data.get("watch"):
+            users = users.filter(has_watched=data["watch"] == "yes")
+        return users
+
+    def order(self, users):
+        sort = self.cleaned_data.get("sort") if self.is_valid() else ""
+        if sort == "login":
+            return users.order_by(F("last_login").desc(nulls_last=True), "-date_joined", "id")
+        if sort == "invite":
+            return users.order_by(F("invite_sent_at").desc(nulls_last=True), "-date_joined", "id")
+        return users.order_by("-date_joined", "id")
+
+    @property
+    def is_filtered(self):
+        return self.is_valid() and any(value for name, value in self.cleaned_data.items() if name != "sort")
 
 
 class ManualOrderForm(forms.Form):

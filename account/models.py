@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.db.models.functions import Lower
@@ -13,9 +14,20 @@ def lower_tr(text):
     return text.replace("İ", "i").replace("I", "ı").lower()
 
 
+# Şifresini belirlemiş hesap (User.has_usable_password() ile aynı kural); şifresiz açılanlar (Podia aktarımı, misafir
+# siparişi) set_unusable_password ile "!" önekli tutulur.
+PASSWORD_SET = ~models.Q(password__startswith=UNUSABLE_PASSWORD_PREFIX)
+
+
 class UserQuerySet(models.QuerySet):
     def with_email(self, email):
         return self.filter(email__iexact=email.strip())
+
+    def with_password(self):
+        return self.filter(PASSWORD_SET)
+
+    def without_password(self):
+        return self.exclude(PASSWORD_SET)
 
 
 class UserManager(BaseUserManager.from_queryset(UserQuerySet)):

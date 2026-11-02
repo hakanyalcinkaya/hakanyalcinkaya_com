@@ -18,13 +18,20 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import User
 from cart.models import Cart, CartItem, CartStatus
 from cart.pricing import price_cart
-from course.models import Course
 from learning.models import Enrollment
 from newsletter.models import Subscriber
+from order import podia
 from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
 from order.tasks import send_purchase_confirmation
 from studio import cart_stats, course_stats, order_stats, periods
-from studio.forms import EnrollmentGrantForm, ManualOrderForm, MemberAccessForm, OrderFilterForm, OrderStatusForm
+from studio.forms import (
+    EnrollmentGrantForm,
+    ManualOrderForm,
+    MemberAccessForm,
+    OrderFilterForm,
+    OrderStatusForm,
+    StudentFilterForm,
+)
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
 
@@ -248,25 +255,32 @@ STUDENT_FILTERS = {
 
 @superuser_required
 def students(request):
-    """Üyeler: kurs sayısı ve ödenen sipariş sayısıyla; ad/e-posta araması, kurs filtresi."""
+    """Üyeler: kurs sayısı, ödenen sipariş sayısı, son giriş ve Podia daveti durumuyla; sekmeler (kursu olan/olmayan)
+    ve StudentFilterForm filtreleri. Tam sayfada Podia davetinin özeti de gösterilir."""
     key = request.GET.get("status", "enrolled")
     if key not in STUDENT_FILTERS:
         key = "enrolled"
-    query = request.GET.get("q", "").strip()
-    course_id = request.GET.get("course", "")
-    base = User.objects.annotate(
+    filters = StudentFilterForm(request.GET)
+    base = podia.with_invite(User.objects.all()).annotate(
         enrollment_total=Count("enrollments", distinct=True),
         paid_order_total=Count("orders", filter=Q(orders__status=OrderStatus.PAID), distinct=True),
     )
-    if query:
-        base = base.filter(Q(email__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query))
-    if course_id:
-        base = base.filter(enrollments__course_id=course_id) if Course.objects.filter(pk=course_id).exists() else base.none()
+    base = filters.filter(base)
     counts = base.aggregate(**{f"n{index}": Count("pk", filter=condition) for index, (_label, condition) in enumerate(STUDENT_FILTERS.values())})
-    filters = [dict(key=name, label=label, count=counts[f"n{index}"]) for index, (name, (label, _condition)) in enumerate(STUDENT_FILTERS.items())]
-    page = _page(request, base.filter(STUDENT_FILTERS[key][1]).order_by("-date_joined", "id"))
-    context = dict(page=page, status=key, query=query, course_id=course_id, filters=filters, courses=Course.objects.order_by("title"))
+    tabs = [dict(key=name, label=label, count=counts[f"n{index}"]) for index, (name, (label, _condition)) in enumerate(STUDENT_FILTERS.items())]
+    page = _page(request, filters.order(base.filter(STUDENT_FILTERS[key][1])))
+    context = dict(page=page, status=key, filters=filters, tabs=tabs, query_string=_without(request.GET, "status", "page"))
+    if not request.htmx or request.htmx.boosted:
+        context["invite_report"] = podia.invite_report()
     return _list_response(request, "students", context)
+
+
+def _without(params, *names):
+    """GET parametreleri, verilen adlar çıkarılmış (sekme bağlantıları filtreleri korusun)."""
+    params = params.copy()
+    for name in names:
+        params.pop(name, None)
+    return params.urlencode()
 
 
 def _member(user_id):

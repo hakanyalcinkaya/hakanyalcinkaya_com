@@ -156,6 +156,8 @@ Komutun kuralları:
   bağlantı alabilir (şifresi olmayan aktarılmış hesaplar için de çalışır).
 - **Yeni Podia satışları**: Yeni dosyayla 3–5. adımları tekrarla, sonra `send_podia_invites` yalnız henüz davet
   almamış kişilere gönderir.
-- **Takip**: Gönderim günlüğünde "Hesabın taşındı" şablonunun açılma ve tıklama oranları; Django admin → Kullanıcılar'da
-  son giriş tarihleri.
+- **Takip**: Stüdyo → Öğrenciler'in üstündeki **Podia daveti** özeti: aktarılan, davet gönderilen, açan, tıklayan,
+  şifresini belirleyen ve ders izleyen; her kart listeyi o filtreyle açar. Listede kaynak, şifre, davet, giriş ve ders
+  izleme filtreleri var (ör. "Davet gönderildi" + "Şifresi yok" = hatırlatma gidecekler). Açılma sayısı eksik çıkabilir
+  (görseller kapalıysa sayılmaz); kesin adım şifre belirleme. Gönderim günlüğünde şablon ve tarih aralığıyla süzülebilir.
 - **Ödeme**: Sitede online ödeme şimdilik kapalı ("Ödeme yakında"); sepete ekleme açık.

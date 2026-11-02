@@ -10,8 +10,9 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 from django.db import transaction
+from django.db.models import Count, Exists, OuterRef, Q, Subquery
 
-from account.models import User
+from account.models import PASSWORD_SET, User
 from core.models import Status
 from course.models import Course
 from learning.models import Enrollment, EnrollmentSource
@@ -155,6 +156,41 @@ def invite_candidates(resend=False):
         invited = EmailLog.objects.filter(template="account_migrated", status=EmailStatus.SENT, user__isnull=False)
         users = users.exclude(pk__in=invited.values("user"))
     return users
+
+
+def with_invite(users):
+    """Kullanıcılara Podia aktarımı ve "Hesabın taşındı" e-postasının durumu: podia_imported, invite_sent_at (son başarılı
+    gönderim), invite_opened_at ve invite_clicked_at (gönderilen davetlerde ilk açılma / tıklama) ve has_watched (ders
+    izlemeye başladı)."""
+    from mailing.models import EmailLog, EmailStatus
+
+    invites = EmailLog.objects.filter(template="account_migrated", status=EmailStatus.SENT, user=OuterRef("pk"))
+    return users.annotate(
+        podia_imported=Exists(Order.objects.filter(user=OuterRef("pk"), payment_provider=PROVIDER)),
+        invite_sent_at=Subquery(invites.order_by("-sent_at").values("sent_at")[:1]),
+        invite_opened_at=Subquery(invites.exclude(first_opened_at=None).order_by("first_opened_at").values("first_opened_at")[:1]),
+        invite_clicked_at=Subquery(invites.exclude(first_clicked_at=None).order_by("first_clicked_at").values("first_clicked_at")[:1]),
+        has_watched=Exists(Enrollment.objects.filter(user=OuterRef("pk"), last_watched_at__isnull=False)),
+    )
+
+
+def invite_report():
+    """Podia'dan aktarılan etkin üyelerde davetin ilerleyişi: aktarılan, davet gönderilen, açan, tıklayan, şifresini
+    belirleyen ve ders izlemeye başlayan sayıları (stüdyo öğrenciler sayfası)."""
+    users = with_invite(User.objects.filter(is_active=True)).filter(podia_imported=True)
+    report = users.aggregate(
+        imported=Count("pk"),
+        sent=Count("pk", filter=Q(invite_sent_at__isnull=False)),
+        opened=Count("pk", filter=Q(invite_opened_at__isnull=False)),
+        clicked=Count("pk", filter=Q(invite_clicked_at__isnull=False)),
+        password_set=Count("pk", filter=PASSWORD_SET),
+        watched=Count("pk", filter=Q(has_watched=True)),
+    )
+    # Oranlar (%): davet gönderilen aktarılanlara, sonrakiler davet gönderilenlere göre.
+    report["sent_rate"] = round(report["sent"] * 100 / report["imported"]) if report["imported"] else 0
+    for name in ("opened", "clicked", "password_set", "watched"):
+        report[f"{name}_rate"] = round(report[name] * 100 / report["sent"]) if report["sent"] else 0
+    return report
 
 
 def unpublished_imported_courses():

@@ -1,0 +1,42 @@
+{# Podia daveti: aktarılan üyelerden kaçına davet gitti, kaçı açtı, tıkladı, şifresini belirledi, ders izledi; kartlar listeyi o filtreyle açar. #}
+{% url 'studio:students' as students_url %}
+{% if invite_report.imported %}
+<section class="mb-4" aria-labelledby="podia-invite-title">
+  <h2 id="podia-invite-title" class="h6 mb-2">Podia daveti</h2>
+  <div class="row g-2">
+    {% with report=invite_report podia_url=students_url|add:"?status=all&source=podia" %}
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Aktarılan</div>
+      <div class="fs-4 fw-semibold">{{ report.imported }}</div>
+      <div class="small text-body-tertiary">Podia siparişi olan etkin üye</div>
+    </a></div>
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}&invite=sent" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Davet gönderilen</div>
+      <div class="fs-4 fw-semibold">{{ report.sent }}</div>
+      <div class="small text-body-tertiary">%{{ report.sent_rate }} aktarılanların</div>
+    </a></div>
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}&invite=opened" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Açan</div>
+      <div class="fs-4 fw-semibold">{{ report.opened }}</div>
+      <div class="small text-body-tertiary">%{{ report.opened_rate }} davet gidenlerin</div>
+    </a></div>
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}&invite=clicked" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Tıklayan</div>
+      <div class="fs-4 fw-semibold">{{ report.clicked }}</div>
+      <div class="small text-body-tertiary">%{{ report.clicked_rate }} davet gidenlerin</div>
+    </a></div>
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}&password=set" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Şifresini belirleyen</div>
+      <div class="fs-4 fw-semibold">{{ report.password_set }}</div>
+      <div class="small text-body-tertiary">%{{ report.password_set_rate }} davet gidenlerin</div>
+    </a></div>
+    <div class="col-6 col-md-4 col-xl-2"><a href="{{ podia_url }}&watch=yes" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
+      <div class="small text-body-secondary">Ders izleyen</div>
+      <div class="fs-4 fw-semibold">{{ report.watched }}</div>
+      <div class="small text-body-tertiary">%{{ report.watched_rate }} davet gidenlerin</div>
+    </a></div>
+    {% endwith %}
+  </div>
+  {% if invite_report.sent %}<p class="small text-body-tertiary mt-2 mb-0">Görselleri kapalı e-posta programları açılmayı saymaz; kesin adım şifre belirleme. <a href="{{ students_url }}?status=all&source=podia&invite=sent&password=unset" class="link-secondary">Davet gidip şifre belirlemeyenler</a></p>{% endif %}
+</section>
+{% endif %}
