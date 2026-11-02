@@ -15,6 +15,7 @@ from pathlib import Path
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
 from course.video_service import RemoteVideo, VideoServiceError, VideoServiceNotConfigured, missing_settings
@@ -36,6 +37,10 @@ LIST_PAGE_SIZE = 1000
 UPLOAD_SIGNATURE_SECONDS = 6 * 60 * 60
 # Oynatma linkleri bu süre geçerli (CDN token koruması açıksa).
 PLAYBACK_URL_SECONDS = 6 * 60 * 60
+# Panelde seçili kapak görselinin adı bu süre önbellekte tutulur; okunamazsa kısa süre ilk kapakla devam edilir.
+THUMBNAIL_CACHE_SECONDS = 10 * 60
+THUMBNAIL_RETRY_SECONDS = 60
+THUMBNAIL_TIMEOUT = 5
 SRT_TIMESTAMP = re.compile(r"(\d{2}:\d{2}:\d{2}),(\d{3})")
 
 # Bunny'nin video durum kodları
@@ -123,12 +128,12 @@ def _error_message(response):
     return f"Bunny {response.status_code}: {detail}".strip()
 
 
-def api(method, path, **kwargs):
+def api(method, path, timeout=TIMEOUT, **kwargs):
     library_id, api_key = _credentials()
     headers = {"AccessKey": api_key, "Accept": "application/json"}
     try:
         response = requests.request(
-            method, f"{API_ROOT}/library/{library_id}{path}", headers=headers, timeout=TIMEOUT, **kwargs
+            method, f"{API_ROOT}/library/{library_id}{path}", headers=headers, timeout=timeout, **kwargs
         )
     except requests.RequestException as error:
         raise VideoServiceError(f"Bunny'ye ulaşılamadı: {error}") from error
@@ -367,6 +372,23 @@ def playlist_url(video_id):
 
 def thumbnail_url(video_id):
     return _signed(f"/{video_id}/thumbnail.jpg", video_id) if video_id else ""
+
+
+def selected_thumbnail_url(video_id):
+    """Panelde seçili kapak görseli. Bunny değiştirilen kapağı yeni adla kaydeder (ör. thumbnail_41489462.jpg);
+    thumbnail.jpg ilk otomatik kapak olarak kalır. Ad API'den okunur ve önbellekte tutulur; okunamazsa thumbnail.jpg."""
+    if not video_id:
+        return ""
+    cache_key = f"bunny:thumbnail:{video_id}"
+    name = cache.get(cache_key)
+    if name is None:
+        try:
+            name = api("GET", f"/videos/{video_id}", timeout=THUMBNAIL_TIMEOUT).get("thumbnailFileName") or "thumbnail.jpg"
+            cache.set(cache_key, name, THUMBNAIL_CACHE_SECONDS)
+        except VideoServiceError:
+            name = "thumbnail.jpg"
+            cache.set(cache_key, name, THUMBNAIL_RETRY_SECONDS)
+    return _signed(f"/{video_id}/{name}", video_id)
 
 
 def caption_url(video_id, language):

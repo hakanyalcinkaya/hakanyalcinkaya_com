@@ -401,10 +401,11 @@ def _library_row(enrollment, card, flat, done):
 
 
 def welcome_video(video_id):
-    """Hoş geldin videosunun oynatıcı verisi (Bunny Stream: HLS listesi ve kapak görseli); ID boşsa None."""
+    """Hoş geldin videosunun oynatıcı verisi (Bunny Stream: HLS listesi ve panelde seçili kapak görseli); ID boşsa None."""
     if not video_id:
         return None
-    return video_service.get(VideoPlatform.BUNNY).playback(video_id)
+    service = video_service.get(VideoPlatform.BUNNY)
+    return dict(service.playback(video_id), poster=service.selected_thumbnail_url(video_id))
 
 
 def library_page(user, status):
