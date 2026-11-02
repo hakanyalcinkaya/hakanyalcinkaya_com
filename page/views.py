@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -632,7 +632,7 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user)
         messages.success(request, f"Hoş geldin, {form.user.display_name}.")
-        return redirect(_next_url(request, reverse("page:library")))
+        return redirect(_next_url(request, form.user.get_start_url()))
     return render(request, "page/account/login.html", {"form": form})
 
 
@@ -684,7 +684,8 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     # Şifremi unuttum (1 saat) ve Podia daveti (3 gün) bağlantıları aynı sayfaya gelir.
     token_generator = ResetOrInviteTokenGenerator()
     post_reset_login = True
-    success_url = reverse_lazy("page:library")
+    def get_success_url(self):
+        return self.user.get_start_url()
 
     def form_valid(self, form):
         response = super().form_valid(form)

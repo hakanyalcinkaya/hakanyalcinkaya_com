@@ -1,7 +1,8 @@
 {% extends "_base/base.html" %}
 {% load static i18n %}
 
-{# Hoş geldin sayfası: yalnız en az bir kursa kaydı olan üyeye, stüdyo ayarında açıksa (User.can_view_welcome_page). #}
+{# Hoş geldin sayfası: stüdyo ayarında açıksa en az bir kursa kaydı olan üyeye, her zaman süper kullanıcıya (User.can_view_welcome_page). #}
+{# Bu üye giriş yapınca ya da şifresini belirleyince buraya gelir (User.get_start_url). #}
 {# Video page/catalog.py'deki WELCOME_VIDEO_ID'den; boşken video bölümü gösterilmez. #}
 {% block title %}{% translate "Hoş geldin" %} — Hakan Yalçınkaya{% endblock %}
 {% block head %}<meta name="robots" content="noindex">{% endblock %}

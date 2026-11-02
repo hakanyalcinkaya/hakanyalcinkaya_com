@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.db.models.functions import Lower
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID, SiteSettings
@@ -83,13 +84,19 @@ class User(BaseUUID, AbstractUser):
         letters = "".join(name.strip()[:1] for name in (self.first_name, self.last_name) if name.strip())
         return lower_tr(letters or self.email[:2])
 
-    def can_view_welcome_page(self):
-        """Hoş geldin sayfası: stüdyo ayarında açıksa ve üyenin en az bir kurs kaydı varsa (satın alma, paket, hediye,
-        manuel ya da eski platformdan aktarım; iadede erişimi kaldırılan kurs sayılmaz). Süper kullanıcı ayar kapalıyken ve
-        kurs kaydı olmadan da görür (yayına açmadan önce bakmak için)."""
-        if self.is_superuser:
-            return True
+    def has_welcome_page(self):
+        """Hoş geldin sayfası üyeye açık mı: stüdyo ayarında açıksa ve üyenin en az bir kurs kaydı varsa (satın alma, paket,
+        hediye, manuel ya da eski platformdan aktarım; iadede erişimi kaldırılan kurs sayılmaz)."""
         return SiteSettings.load().show_welcome_page and self.enrollments.exists()
+
+    def can_view_welcome_page(self):
+        """Sayfayı ve bağlantılarını görebilir mi: süper kullanıcı ayar kapalıyken ve kurs kaydı olmadan da görür (yayına
+        açmadan önce bakmak için)."""
+        return self.is_superuser or self.has_welcome_page()
+
+    def get_start_url(self):
+        """Giriş yapınca açılan sayfa: hoş geldin sayfası üyeye açıksa orası, değilse Kurslarım."""
+        return reverse("page:welcome") if self.has_welcome_page() else reverse("page:library")
 
 
 class InstructorProfile(BaseModel, BaseStatus, BaseSortOrder):
