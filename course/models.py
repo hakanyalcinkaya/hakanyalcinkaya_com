@@ -401,6 +401,11 @@ class Course(SlugFromTitleMixin, PricedMixin, BaseModel, BaseStatus, BaseSortOrd
     def duration_display(self):
         return hours_minutes(self.total_minutes)
 
+    @property
+    def all_lessons_minutes(self):
+        """Stüdyo: taslak ders ve bölümler dahil tüm derslerin süresi (yayındaki toplamla aynı yuvarlama)."""
+        return Lesson.objects.filter(section__course=self).aggregate(total=lesson_minutes_expression())["total"]
+
     def ensure_video_folder(self, platform):
         """Kursun platformdaki klasörünü (Bunny koleksiyonu / Vimeo klasörü) döner, yoksa açar.
 

@@ -1,11 +1,12 @@
 {% extends "studio/base.html" %}
+{% load core_tags %}
 {% block studio_title %}{{ course.title }}{% endblock %}
 {% block studio_content %}
 <nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:course_list' %}" class="link-secondary text-decoration-none">Kurslar</a> <span class="text-body-tertiary">/</span></nav>
 <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
   <div>
     <h1 class="h3 mb-1">{{ course.title }}</h1>
-    <p class="small text-body-secondary mb-1">{{ course.get_status_display }}</p>
+    <p class="small text-body-secondary mb-1">{{ course.get_status_display }}{% with published=course.total_minutes all_minutes=course.all_lessons_minutes %} · <span title="Yayındaki bölümlerin yayındaki derslerinin toplamı; sitede gösterilen süre">Toplam video süresi: <span class="fw-medium text-body">{{ published|total_minutes }}</span></span>{% if all_minutes != published %} <span class="text-body-tertiary">(taslaklarla {{ all_minutes|total_minutes }})</span>{% endif %}{% endwith %}</p>
   </div>
   <div class="d-flex flex-wrap gap-2">
     {% if title_sync_total %}
