@@ -240,6 +240,9 @@ touch reload.txt                                  # uWSGI kesintisiz yeniden yü
 sudo systemctl restart hakanyalcinkaya-celery     # süren video yüklemesi yarıda kalır; stüdyodan yeniden denenir
 ```
 
+Servisleri elle yeniden başlatmak için [Makefile](Makefile) (proje klasöründe `make -C _server` hedefleri listeler):
+`make -C _server uwsgi`, `uwsgi-celery`, `uwsgi-celery-nginx`, `all`; ortak `redis` ve `postgresql` onay ister.
+
 `_server/` altındaki bir servis dosyası değiştiyse `sudo systemctl daemon-reload`, Nginx config'i değiştiyse
 `sudo nginx -t && sudo systemctl reload nginx`, uWSGI ini değiştiyse `touch /etc/uwsgi/sites/hakanyalcinkaya.ini` (Emperor siteyi yeniden açar).
 

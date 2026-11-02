@@ -95,6 +95,13 @@ Aktarılanlar arasında kendi adresin varsa:
 python manage.py send_podia_invites --email hakan.yalcin.kaya@gmail.com
 ```
 
+`EMAIL_REDIRECT_TO` `.env`'de dururken e-posta yine sana yönlendirilir. Yalnız bu komut için yönlendirmeyi kapatıp
+e-postayı gerçekten o adrese göndermek için (ortam değişkeni `.env`'den önce gelir; site ve Celery etkilenmez):
+
+```bash
+EMAIL_REDIRECT_TO= python manage.py send_podia_invites --email hakan.yalcin.kaya@gmail.com --resend
+```
+
 E-postayı kontrol et:
 
 - Ad, kurs listesi ve tutarlar doğru mu.
