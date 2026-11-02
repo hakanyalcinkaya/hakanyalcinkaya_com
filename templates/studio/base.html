@@ -40,8 +40,8 @@
       <div class="dropdown" data-dropdown>
         <button type="button" class="studio-nav-link btn btn-link p-0 small text-decoration-none{% if section == 'mail' %} active{% endif %}" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" aria-controls="studio-mail-menu"><i class="bi bi-envelope me-1" aria-hidden="true"></i>E-posta<i class="bi bi-chevron-down ms-1 small" aria-hidden="true"></i></button>
         <ul id="studio-mail-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">
-          <li><a class="dropdown-item" href="{% url 'studio:emails' %}"><i class="bi bi-envelope me-2 text-body-tertiary" aria-hidden="true"></i>Şablonlar</a></li>
           <li><a class="dropdown-item" href="{% url 'studio:email_log' %}"><i class="bi bi-journal-text me-2 text-body-tertiary" aria-hidden="true"></i>Gönderim günlüğü</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:emails' %}"><i class="bi bi-envelope me-2 text-body-tertiary" aria-hidden="true"></i>Şablonlar</a></li>
           <li><a class="dropdown-item" href="{% url 'studio:newsletters' %}"><i class="bi bi-megaphone me-2 text-body-tertiary" aria-hidden="true"></i>Bültenler</a></li>
           <li><a class="dropdown-item" href="{% url 'studio:subscribers' %}"><i class="bi bi-people me-2 text-body-tertiary" aria-hidden="true"></i>Aboneler</a></li>
         </ul>
