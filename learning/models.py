@@ -131,6 +131,8 @@ class Enrollment(BaseModel):
 
 # Kaldığı yer dersin son bu kadar saniyesindeyse ders bir dahaki açılışta baştan başlar.
 RESUME_END_MARGIN = 10
+# Ders kaldığı yerin bu kadar saniye gerisinden açılır; izleyen son cümleyi yeniden duyar.
+RESUME_REWIND = 3
 
 
 class LessonProgress(BaseModel):
@@ -197,13 +199,14 @@ class LessonProgress(BaseModel):
 
     @classmethod
     def resume_seconds(cls, user, lesson):
-        """Dersin açılacağı saniye: kaldığı yer. Hiç izlemediyse ya da dersin son saniyelerine geldiyse 0 (baştan)."""
+        """Dersin açılacağı saniye: kaldığı yerin RESUME_REWIND sn gerisi. Hiç izlemediyse ya da dersin son saniyelerine
+        geldiyse 0 (baştan)."""
         if not user.is_authenticated:
             return 0
         position = cls.objects.filter(user=user, lesson=lesson).values_list("position_seconds", flat=True).first() or 0
         if lesson.duration_seconds and position >= lesson.duration_seconds - RESUME_END_MARGIN:
             return 0
-        return position
+        return max(position - RESUME_REWIND, 0)
 
 
 class Note(BaseModel):
