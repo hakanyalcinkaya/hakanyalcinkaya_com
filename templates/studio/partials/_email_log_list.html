@@ -13,9 +13,37 @@
     </select>
     <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm w-auto" placeholder="Alıcı ya da konu" aria-label="Alıcı ya da konu ara">
     {% for field in dates %}<label class="d-flex align-items-center gap-1 small text-body-secondary">{{ field.label }}{{ field }}</label>{% endfor %}
-    {% if is_filtered %}<span class="small text-body-tertiary">{{ page.paginator.count }} e-posta</span>
-    <a href="{{ list_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ list_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
+    {% if is_filtered %}<a href="{{ list_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ list_url }}" hx-target="#email-log-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
   </form>
+  {% if filtered %}
+  <h2 class="h6 text-body-secondary text-uppercase small mb-2">Seçilen filtre</h2>
+  {% include "studio/partials/_email_stats.html" with s=filtered %}
+  {% endif %}
+  {% if totals %}
+  <h2 class="h6 text-body-secondary text-uppercase small mb-2">Tüm tekil e-postalar</h2>
+  {% include "studio/partials/_email_stats.html" with s=totals %}
+  {% if stats %}
+  <h2 class="h6 text-body-secondary text-uppercase small mb-2">Şablonlara göre</h2>
+  <div class="table-responsive mb-4">
+    <table class="table table-sm align-middle small mb-0">
+      <thead><tr><th scope="col">Şablon</th><th scope="col" class="text-end">Toplam</th><th scope="col" class="text-end">Gönderildi</th><th scope="col" class="text-end">Hata</th><th scope="col" class="text-end">Açılma</th><th scope="col" class="text-end">Tıklama</th></tr></thead>
+      <tbody>
+        {% for row in stats %}
+        <tr>
+          <td><a href="{{ list_url }}?template={{ row.template }}" class="text-decoration-none">{{ row.label }}</a> <code class="text-body-tertiary">{{ row.template }}</code></td>
+          <td class="text-end">{{ row.total }}</td>
+          <td class="text-end">{{ row.sent }}</td>
+          <td class="text-end{% if row.failed %} text-danger{% endif %}">{{ row.failed }}</td>
+          <td class="text-end">%{{ row.open_rate }} <span class="text-body-tertiary">({{ row.opened }})</span></td>
+          <td class="text-end">%{{ row.click_rate }} <span class="text-body-tertiary">({{ row.clicked }})</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% endif %}
+  {% if not in_batch %}<h2 class="h6 text-body-secondary text-uppercase small mb-2">E-postalar</h2>{% endif %}
   <div class="table-responsive">
     <table class="table table-sm table-hover align-middle small mb-0">
       <thead><tr><th scope="col">Gönderim</th><th scope="col">Alıcı</th>{% if not in_batch %}<th scope="col">Konu</th>{% endif %}<th scope="col">Durum</th><th scope="col" class="text-end">Açılma</th><th scope="col" class="text-end">Tıklama</th></tr></thead>

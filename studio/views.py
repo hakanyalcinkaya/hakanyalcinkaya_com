@@ -1110,6 +1110,7 @@ def _email_log_list(request, logs, list_url, labels):
         logs = logs.filter(status=status)
     if query:
         logs = logs.filter(Q(to_email__icontains=query) | Q(subject__icontains=query))
+    is_filtered = bool(template or status or query or (dates.is_valid() and any(dates.cleaned_data.values())))
     page = Paginator(logs.select_related("user").order_by("-created_at", "id"), EMAIL_LOG_PAGE_SIZE).get_page(request.GET.get("page"))
     for log in page:
         log.label = labels.get(log.template, log.template)
@@ -1122,7 +1123,9 @@ def _email_log_list(request, logs, list_url, labels):
         statuses=EmailStatus.choices,
         templates=list(labels.items()),
         dates=dates,
-        is_filtered=bool(template or status or query or (dates.is_valid() and any(dates.cleaned_data.values()))),
+        is_filtered=is_filtered,
+        # Filtre seçiliyse listedeki e-postaların sayıları (toplamların yanında).
+        filtered=logs.stats() if is_filtered and not request.GET.get(ROWS_PARAM) else None,
     )
 
 
@@ -1146,12 +1149,14 @@ def email_log(request):
     context = _email_log_list(request, single, reverse("studio:email_log"), labels)
     if request.htmx and request.GET.get(ROWS_PARAM):
         return render(request, "studio/partials/_email_log_rows.html", context)
-    if request.htmx and not request.htmx.boosted:
-        return render(request, "studio/partials/_email_log_list.html", context)
+    # Filtreler toplamların üstünde; HTMX'te liste bloğu toplamlarla birlikte yenilenir.
     stats = single.stats_by_template()
     for row in stats:
         row["label"] = labels.get(row["template"], row["template"])
-    context.update(tab="single", stats=stats, totals=single.stats(), single_total=single.count(), batch_total=EmailBatch.objects.count())
+    context.update(stats=stats, totals=single.stats())
+    if request.htmx and not request.htmx.boosted:
+        return render(request, "studio/partials/_email_log_list.html", context)
+    context.update(tab="single", single_total=single.count(), batch_total=EmailBatch.objects.count())
     return render(request, "studio/email_log.html", context)
 
 
