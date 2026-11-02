@@ -51,9 +51,9 @@
         </div>
         <div class="row g-3 mb-3 audience-scope">
           <div class="col-md-6">
-            <div class="small fw-medium mb-1">Eğitimler</div>
+            <div class="small fw-medium mb-1">Kurslar</div>
             <div class="border rounded px-2 py-1 overflow-auto small" style="max-height: 12rem;">
-              {% for box in form.courses %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Eğitim yok.</span>{% endfor %}
+              {% for box in form.courses %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Kurs yok.</span>{% endfor %}
             </div>
           </div>
           <div class="col-md-6">
@@ -62,13 +62,13 @@
               {% for box in form.categories %}<div class="form-check">{{ box.tag }}<label class="form-check-label" for="{{ box.id_for_label }}">{{ box.choice_label }}</label></div>{% empty %}<span class="text-body-tertiary">Kategori yok.</span>{% endfor %}
             </div>
           </div>
-          <div class="col-12 form-text mt-1">Eğitim ya da kategori seçmezsen bütün eğitimler sayılır. "Satın almayanlar"da React seçersen React'i almamış abonelere gider. "Tüm aboneler" ve "Sadece aboneler"de (hiç eğitim almamış, yalnız bültene abone olanlar) bu seçim kullanılmaz.</div>
+          <div class="col-12 form-text mt-1">Kurs ya da kategori seçmezsen bütün kurslar sayılır. "Satın almayanlar"da React seçersen React'i almamış abonelere gider. "Tüm aboneler" ve "Sadece aboneler"de (hiç kurs almamış, yalnız bültene abone olanlar) bu seçim kullanılmaz.</div>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2 mb-3 small audience-progress">
           <span class="fw-medium">Bitirme oranı</span>
           <span class="input-group input-group-sm w-auto"><span class="input-group-text">en az %</span>{{ form.min_progress }}</span>
           <span class="input-group input-group-sm w-auto"><span class="input-group-text">en çok %</span>{{ form.max_progress }}</span>
-          <span class="form-text m-0">Yalnız "satın alanlar"da; seçilen eğitimlerden en az birinde bu aralıkta olanlar.</span>
+          <span class="form-text m-0">Yalnız "satın alanlar"da; seçilen kurslardan en az birinde bu aralıkta olanlar.</span>
           {% for error in form.max_progress.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
           {% for error in form.min_progress.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
         </div>

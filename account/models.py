@@ -85,7 +85,10 @@ class User(BaseUUID, AbstractUser):
 
     def can_view_welcome_page(self):
         """Hoş geldin sayfası: stüdyo ayarında açıksa ve üyenin en az bir kurs kaydı varsa (satın alma, paket, hediye,
-        manuel ya da eski platformdan aktarım; iadede erişimi kaldırılan kurs sayılmaz)."""
+        manuel ya da eski platformdan aktarım; iadede erişimi kaldırılan kurs sayılmaz). Süper kullanıcı ayar kapalıyken ve
+        kurs kaydı olmadan da görür (yayına açmadan önce bakmak için)."""
+        if self.is_superuser:
+            return True
         return SiteSettings.load().show_welcome_page and self.enrollments.exists()
 
 

@@ -4,6 +4,6 @@
 {{ order_number }} numaralı siparişin için {{ refund_amount }} iade edildi. Tutarın kartına ya da hesabına yansıması bankana göre birkaç iş günü sürebilir.
 
 {% include "emails/_items.txt" with show_prices=True %}
-{% if access_revoked %}İade edilen eğitimlere erişimin kapatıldı.
+{% if access_revoked %}İade edilen kurslara erişimin kapatıldı.
 
 {% endif %}Sorun olursa bu e-postayı yanıtlayabilirsin.{% endblock %}

@@ -49,12 +49,12 @@
               <li class="list-inline-item"><i class="bi bi-collection-play me-1 text-body-tertiary" aria-hidden="true"></i><span data-hero-lessons>{{ course.lessons }} ders</span></li>
             </ul>
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top mt-3 pt-3">
-              {# Sahip olunan kursta fiyat ve sepet düğmesi yerine "Eğitimlerinde" (slayt değişince site.js günceller). #}
+              {# Sahip olunan kursta fiyat ve sepet düğmesi yerine "Kurslarında" (slayt değişince site.js günceller). #}
               <div class="fs-3 fw-semibold lh-1{% if course.owned %} d-none{% endif %}" data-hero-price-box><span class="visually-hidden">Fiyat: </span><span data-hero-price>{{ course.price }}</span> <s class="fs-6 fw-normal text-body-tertiary ms-1{% if not course.list_price %} d-none{% endif %}" data-hero-list-price><span class="visually-hidden">Liste fiyatı: </span><span data-hero-list-value>{{ course.list_price }}</span></s></div>
-              <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium{% if not course.owned %} d-none{% endif %}" data-hero-owned><i class="bi bi-check2 me-1" aria-hidden="true"></i>Eğitimlerinde</span>
+              <span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium{% if not course.owned %} d-none{% endif %}" data-hero-owned><i class="bi bi-check2 me-1" aria-hidden="true"></i>Kurslarında</span>
               <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
                 <form method="post" action="{{ course.cart_url }}" class="d-flex{% if course.owned %} d-none{% endif %}">{% csrf_token %}<button type="submit" data-hero-cart class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>
-                <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1"><span data-hero-inspect-label>{% if course.owned %}Eğitime git{% else %}Kursu İncele{% endif %}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                <a href="{{ course.url }}" data-hero-inspect class="btn btn-primary btn-lg fs-6 flex-grow-1"><span data-hero-inspect-label>{% if course.owned %}Kursa git{% else %}Kursu İncele{% endif %}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
               </div>
             </div>
           </div>

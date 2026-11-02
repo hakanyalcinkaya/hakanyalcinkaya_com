@@ -54,7 +54,7 @@ EMAILS = {
     "account_migrated": _email(
         "Hesabın taşındı (Podia)",
         "Hesap",
-        "Podia'dan aktarılan müşteriye, kişi başına bir e-posta: hesabına tanımlanan eğitimler ve şifre belirleme bağlantısı.",
+        "Podia'dan aktarılan müşteriye, kişi başına bir e-posta: hesabına tanımlanan kurslar ve şifre belirleme bağlantısı.",
         {**COMMON_VARIABLES, **ITEM_VARIABLES, "set_password_url": "Şifre belirleme bağlantısı (tek kullanımlık, süreli)"},
     ),
     "password_reset": _email(
@@ -76,7 +76,7 @@ EMAILS = {
     "purchase_confirmation": _email(
         "Teşekkürler, satın alma onayı",
         "Satın alma",
-        "Ödemesi onaylanan sipariş (iyzico, stüdyoda havale onayı): satın alınan eğitimler, tutarlar, Kurslarım ve sözleşme bağlantısı.",
+        "Ödemesi onaylanan sipariş (iyzico, stüdyoda havale onayı): satın alınan kurslar, tutarlar, Kurslarım ve sözleşme bağlantısı.",
         {
             **COMMON_VARIABLES,
             **ITEM_VARIABLES,
@@ -114,10 +114,10 @@ EMAILS = {
         "Hediye ya da manuel olarak kurs erişimi açılınca.",
         {**COMMON_VARIABLES, **COURSE_VARIABLES, "grant_reason": "Neden (ör. Hediye)", "sender_name": "Hediye eden (varsa)"},
     ),
-    # Eğitim
+    # Kurs
     "course_completed": _email(
         "Tebrikler, kursu bitirdin",
-        "Eğitim",
+        "Kurs",
         "Kurstaki tüm dersler tamamlanınca.",
         {
             **COMMON_VARIABLES,
@@ -129,7 +129,7 @@ EMAILS = {
     ),
     "review_approved": _email(
         "Yorumun yayınlandı",
-        "Eğitim",
+        "Kurs",
         "Kullanıcının değerlendirmesi onaylanınca.",
         {**COMMON_VARIABLES, **COURSE_VARIABLES, "rating": "Puan (1-5)", "review_text": "Yorum metni"},
     ),

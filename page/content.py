@@ -234,7 +234,7 @@ def _topic(course, tags):
     return next((key for key, _label in catalog.TOPIC_FILTERS if key and key in words), "")
 
 
-# Mağaza: yayındaki kurslar, sahip olunanlar, sepet ve "Eğitimlerim". Veritabanında yayında kurs yoksa (yayın öncesi)
+# Mağaza: yayındaki kurslar, sahip olunanlar, sepet ve "Kurslarım". Veritabanında yayında kurs yoksa (yayın öncesi)
 # listeler örnek kurslarla dolar; örnek kurslara kimse sahip değildir.
 def owned_course_ids(user):
     if not user or not user.is_authenticated:
@@ -371,7 +371,7 @@ LIBRARY_FILTERS = (("", "Tümü"), ("in-progress", "Devam"), ("done", "Tamamlana
 
 
 def _library_row(enrollment, card, flat, done):
-    """Eğitimlerim satırı: ilerleme, durum ve kaldığı ders (catalog._owned_row ile aynı biçim)."""
+    """Kurslarım satırı: ilerleme, durum ve kaldığı ders (catalog._owned_row ile aynı biçim)."""
     total = len(flat)
     finished = bool(total and done >= total)
     if finished:
@@ -408,7 +408,7 @@ def welcome_video(video_id):
 
 
 def library_page(user, status):
-    """Eğitimlerim: kullanıcının kurs kayıtları (yayındaki kurslar), ilerlemesi ve filtreler (catalog.library_page biçimi)."""
+    """Kurslarım: kullanıcının kurs kayıtları (yayındaki kurslar), ilerlemesi ve filtreler (catalog.library_page biçimi)."""
     enrollments = (
         Enrollment.objects.filter(user=user, course__status=Status.PUBLISHED)
         .select_related("course__category", "last_lesson__section")
@@ -500,7 +500,7 @@ def course_page(course, enrolled=False, staff=False, user=None):
         "section_count": len(sections),
         "first_preview": previews[0] if previews else None,
         "enrolled": enrolled,
-        # Diğer kurslar kullanıcıya göre: sahip olunan kursta fiyat yerine "Eğitimlerinde" görünür.
+        # Diğer kurslar kullanıcıya göre: sahip olunan kursta fiyat yerine "Kurslarında" görünür.
         "others": [item for item in catalog_cards(user) if item["slug"] != course.slug],
     }
 

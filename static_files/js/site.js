@@ -288,12 +288,12 @@
       var cart = carousel.querySelector("[data-hero-cart]");
       cart.form.action = current.getAttribute("data-cart");
       cart.setAttribute("aria-label", current.getAttribute("data-cart-label"));
-      // Sahip olunan kursta sepet düğmesi ve fiyat gizlenir, "Eğitimlerinde" görünür.
+      // Sahip olunan kursta sepet düğmesi ve fiyat gizlenir, "Kurslarında" görünür.
       var owned = current.getAttribute("data-owned") === "1";
       cart.form.classList.toggle("d-none", owned);
       carousel.querySelector("[data-hero-price-box]").classList.toggle("d-none", owned);
       carousel.querySelector("[data-hero-owned]").classList.toggle("d-none", !owned);
-      carousel.querySelector("[data-hero-inspect-label]").textContent = owned ? "Eğitime git" : "Kursu İncele";
+      carousel.querySelector("[data-hero-inspect-label]").textContent = owned ? "Kursa git" : "Kursu İncele";
       var tags = carousel.querySelector("[data-hero-tags]");
       tags.replaceChildren();
       current.getAttribute("data-tags").split("|").forEach(function (tag) {
@@ -681,7 +681,7 @@
     var courseUrl = trigger.getAttribute("data-course-url");
     var previewsUrl = trigger.getAttribute("data-previews-url");
     if (courseUrl) {
-      links.push('<a class="btn btn-light" data-dialog-link href="' + courseUrl + '">Eğitim detay sayfasını incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>');
+      links.push('<a class="btn btn-light" data-dialog-link href="' + courseUrl + '">Kurs detay sayfasını incele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>');
     }
     if (previewsUrl) {
       links.push('<a class="btn btn-outline-light" data-dialog-link href="' + previewsUrl + '"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Önizleme videolarını incele</a>');

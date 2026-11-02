@@ -1,5 +1,5 @@
 """Bülten hedef kitlesi: onaylı aboneler arasından satın alma, kurs/kategori ve bitirme oranına göre seçim.
-"Sadece aboneler": hiçbir eğitimi olmayan, yalnız bültene abone kişiler (eğitim seçimi yok sayılır).
+"Sadece aboneler": hiçbir kursu olmayan, yalnız bültene abone kişiler (kurs seçimi yok sayılır).
 
 Abone ile üye e-posta adresiyle eşleşir (büyük/küçük harf duyarsız). Kurs ya da kategori seçilmezse bütün kurslar
 kapsamdadır. Bitirme oranı yalnız "satın alanlar"da kullanılır: kapsamdaki kurslardan en az birinde ilerlemesi aralıkta

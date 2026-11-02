@@ -589,7 +589,7 @@ class ReviewImportForm(forms.ModelForm):
 
 
 class IssueForm(forms.ModelForm):
-    """Bülten sayısı (yalnız taslak düzenlenir) ve hedef kitlesi. "Tüm aboneler" ve "Sadece aboneler"de eğitim/kategori,
+    """Bülten sayısı (yalnız taslak düzenlenir) ve hedef kitlesi. "Tüm aboneler" ve "Sadece aboneler"de kurs/kategori,
     "satın alanlar" dışında bitirme oranı yok sayılır."""
 
     AUDIENCE_FIELDS = ("audience", "courses", "categories", "min_progress", "max_progress")

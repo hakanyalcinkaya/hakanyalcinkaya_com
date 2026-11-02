@@ -4,6 +4,6 @@
 {{ order_number }} numaralı siparişin iptal edildi.
 
 {% include "emails/_items.txt" with show_prices=True %}
-{% if access_revoked %}Bu siparişle açılan eğitimlere erişimin kapatıldı.
+{% if access_revoked %}Bu siparişle açılan kurslara erişimin kapatıldı.
 
 {% endif %}Bir yanlışlık olduğunu düşünüyorsan bu e-postayı yanıtla.{% endblock %}

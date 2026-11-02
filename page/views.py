@@ -418,7 +418,7 @@ def add_to_cart(request, slug):
     if card is None:
         raise Http404
     if card["owned"]:
-        messages.info(request, "Bu eğitime zaten sahipsin.")
+        messages.info(request, "Bu kursa zaten sahipsin.")
         return redirect(card["url"])
     try:
         content.cart_add(request, slug)
@@ -440,7 +440,7 @@ def buy(request, slug):
     if card is None:
         raise Http404
     if card["owned"]:
-        messages.info(request, "Bu eğitime zaten sahipsin.")
+        messages.info(request, "Bu kursa zaten sahipsin.")
         return redirect(card["url"])
     try:
         content.cart_add(request, slug)

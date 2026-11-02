@@ -261,7 +261,7 @@ class Issue(BaseModel):
         return self.status == IssueStatus.DRAFT
 
     def recipients(self):
-        """Gideceği onaylı aboneler (kitle, eğitim/kategori ve bitirme oranına göre; bkz. newsletter.audience)."""
+        """Gideceği onaylı aboneler (kitle, kurs/kategori ve bitirme oranına göre; bkz. newsletter.audience)."""
         from newsletter import audience
 
         return audience.subscribers(
