@@ -18,7 +18,7 @@
   <div class="col"><a href="{% url 'studio:students' %}" class="d-block border rounded p-3 h-100 text-decoration-none link-body-emphasis">
     <div class="small text-body-secondary">Öğrenci</div>
     <div class="fs-3 fw-semibold">{{ stats.student_total }}</div>
-    <div class="small text-body-tertiary">{{ stats.enrollments.total }} kurs kaydı · son {{ stats.active_days }} günde {{ stats.new_enrollments }} yeni</div>
+    <div class="small text-body-tertiary">{{ stats.enrollments.total }} kurs kaydı<br>Son {{ stats.active_days }} günde {% for group in stats.new_enrollments %}{{ group.label|lower }} {{ group.count }}{% if not forloop.last %} · {% endif %}{% empty %}yeni kayıt yok{% endfor %}</div>
   </a></div>
   <div class="col"><div class="border rounded p-3 h-100">
     <div class="small text-body-secondary">Son {{ stats.active_days }} günde ders açan</div>

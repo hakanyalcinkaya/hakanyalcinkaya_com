@@ -55,8 +55,14 @@ def _enrollment_totals():
     )
 
 
+def _by_group(counts):
+    """{kayıt kaynağı: sayı} → ENROLLMENT_GROUPS sırasıyla [{key, label, count}]."""
+    return [dict(key=key, label=label, count=sum(counts.get(source, 0) for source in sources)) for key, label, sources in ENROLLMENT_GROUPS]
+
+
 def summary():
-    """Özet kartları: öğrenciler, aktif öğrenciler ve izleme, tüm zamanların satışı, bu ay, şu an sepette bekleyenler."""
+    """Özet kartları: öğrenciler (son ACTIVE_DAYS günün yeni kayıtları kaynağa göre), aktif öğrenciler ve izleme, tüm
+    zamanların satışı, bu ay, şu an sepette bekleyenler."""
     since = _active_since()
     totals = Enrollment.objects.with_progress().aggregate(**_enrollment_totals())
     sold = Order.objects.sold()
@@ -66,7 +72,11 @@ def summary():
         enrollments=totals,
         average_progress=round(totals["average"] or 0),
         student_total=Enrollment.objects.values("user").distinct().count(),
-        new_enrollments=Enrollment.objects.filter(created_at__gte=since).count(),
+        new_enrollments=[
+            group
+            for group in _by_group(dict(Enrollment.objects.filter(created_at__gte=since).order_by().values_list("source").annotate(n=Count("pk"))))
+            if group["count"]
+        ],
         active_students=Enrollment.objects.filter(last_watched_at__gte=since).values("user").distinct().count(),
         order_total=sold.count(),
         revenue=order_stats.by_currency(sold),
@@ -221,8 +231,6 @@ def trend():
     enrollments = by_month(Enrollment.objects.all(), "source")
     opened = by_month(LessonProgress.objects.filter(Exists(enrolled)))
     for row in rows:
-        row["enrollments"] = [
-            dict(key=key, count=sum(enrollments.get((row["key"], source), 0) for source in sources)) for key, _label, sources in ENROLLMENT_GROUPS
-        ]
+        row["enrollments"] = _by_group({source: count for (month, source), count in enrollments.items() if month == row["key"]})
         row["opened"] = opened.get((row["key"],), 0)
     return rows
