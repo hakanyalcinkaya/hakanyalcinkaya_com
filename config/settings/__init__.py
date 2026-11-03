@@ -7,7 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
 )
-env.read_env(BASE_DIR / ".env")
+# overwrite: uWSGI reload.txt ile yeniden yüklenirken eski ortam değişkenleri süreçte kalır; .env'deki yeni değer
+# onları ezmeli. (.env'den silinen değişken süreçte kalır; onun için siteyi sıfırdan başlatmak gerekir.)
+env.read_env(BASE_DIR / ".env", overwrite=True)
 
 if env("DEBUG"):
     from .settings_dev import *  # noqa: F403

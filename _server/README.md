@@ -105,6 +105,10 @@ sudo chown $USER:www-data .env && chmod 640 .env
 Doldurulacaklar: `SECRET_KEY` (dosyadaki komutla üretilir), `DB_*`, Bunny/Vimeo anahtarları, `SENDGRID_API_KEY`.
 `DEBUG=False` kalmalı. Yayına çıkarken `EMAIL_REDIRECT_TO` boş olmalı (yoksa bütün e-postalar o adrese gider).
 
+`.env` değişince: değeri değişen ya da eklenen değişken için `touch reload.txt` yeter. Bir değişken **silindiyse**
+uWSGI yeniden yüklenirken eski değer süreçte kalır; site sıfırdan başlatılır: `sudo touch /etc/uwsgi/sites/hakanyalcinkaya.ini`
+(yalnız bu site, ortak `uwsgi.service` değil). Celery her durumda `sudo systemctl restart hakanyalcinkaya-celery`.
+
 ## 9. Django
 
 ```bash
