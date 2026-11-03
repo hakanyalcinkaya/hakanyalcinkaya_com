@@ -1,0 +1,2 @@
+{# Rapor satırı (iki sütunlu tablonun içinde). Beklenen: label, value; isteğe bağlı note (gri, değerin altında). #}
+<tr><td style="padding: 7px 10px 7px 0; border-bottom: 1px solid #E5E5E5; font-size: 15px; line-height: 22px; color: #555555;" valign="top">{{ label }}</td><td style="padding: 7px 0; border-bottom: 1px solid #E5E5E5; font-size: 15px; line-height: 22px; color: #151515; text-align: right;" valign="top"><strong>{{ value }}</strong>{% if note %}<div style="font-size: 13px; line-height: 18px; color: #6B6B6B;">{{ note }}</div>{% endif %}</td></tr>

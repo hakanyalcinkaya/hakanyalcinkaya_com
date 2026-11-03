@@ -224,6 +224,23 @@ echo '30 3 * * * postgres pg_dump -Fc hakanyalcinkaya > /var/backups/hakanyalcin
 
 `media_files` (kurs görselleri, eğitmen fotoğrafları, altyazılar) ve `.env` de sunucu dışına yedeklenmelidir.
 
+## 16. Günlük rapor
+
+Her gece Türkiye saatiyle 00:00'da biten günün raporu `DAILY_REPORT_TO` adresine gider (`send_daily_report`,
+`studio/daily_report.py`). Komut günü Django'nun saat diliminden (Europe/Istanbul) hesaplar; cron satırının saati
+sunucunun saat dilimine göre yazılır. Türkiye'de yaz saati yoktur (UTC+3): sunucu UTC ise `0 21`, Europe/Istanbul ise
+`0 0`.
+
+```bash
+timedatectl | grep "Time zone"                     # sunucunun saat dilimi
+sudo touch /var/www/hakanyalcinkaya/log/daily-report.log && sudo chown deploy:www-data /var/www/hakanyalcinkaya/log/daily-report.log
+echo '0 21 * * * deploy cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj && /var/Env/hakanyalcinkaya_312/bin/python manage.py send_daily_report >> /var/www/hakanyalcinkaya/log/daily-report.log 2>&1' | sudo tee /etc/cron.d/hakanyalcinkaya-daily-report
+```
+
+Denemek için (göndermeden): `sudo -u deploy -H /var/Env/hakanyalcinkaya_312/bin/python manage.py send_daily_report --dry-run`
+(proje klasöründe). Belirli bir gün: `--date 2026-11-02`; başka adrese: `--to`. Gönderilen rapor Stüdyo → E-posta
+kayıtlarında "Günlük rapor (yönetici)" olarak görünür.
+
 ## Güncelleme (deploy)
 
 `main`'e push edilince GitHub Actions sunucuyu kendisi günceller: kurulum ve kullanım [DEPLOY.md](DEPLOY.md). Elle

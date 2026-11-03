@@ -1,0 +1,107 @@
+{% extends "emails/base.html" %}
+{% block title %}Günlük rapor · {{ day_label }}{% endblock %}
+{% block preheader %}{{ orders.sold }} satış · {{ users.members }} yeni üye · {{ users.learners }} ders açan{% if alerts %} · {{ alerts|length }} uyarı{% endif %}{% endblock %}
+{% block eyebrow %}Yönetici · Günlük rapor{% endblock %}
+{% block heading %}{{ day_label }}{% endblock %}
+{% block content %}
+{% if alerts %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin: 0 0 18px;"><tbody><tr><td style="padding: 12px 14px; border-radius: 8px; background-color: #FDECEC; font-size: 15px; line-height: 22px; color: #8A1C1C;" bgcolor="#FDECEC">
+  <strong>Dikkat</strong>
+  {% for alert in alerts %}<div>• <a href="{{ alert.url }}" style="color: #8A1C1C;">{{ alert.text }}</a></div>{% endfor %}
+</td></tr></tbody></table>
+{% endif %}
+
+{% include "emails/modules/section_title.html" with title="Özet" url=links.stats %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% include "emails/modules/stat_row.html" with label="Satış" value=headline.sales.label note=headline.sales.note %}
+  {% include "emails/modules/stat_row.html" with label="Ciro (TL)" value=headline.revenue.label note=headline.revenue.note %}
+  {% include "emails/modules/stat_row.html" with label="Yeni üye" value=headline.members.label note=headline.members.note %}
+  {% include "emails/modules/stat_row.html" with label="Yeni kurs kaydı" value=headline.enrollments.label note=headline.enrollments.note %}
+  {% include "emails/modules/stat_row.html" with label="Ürün eklenen yeni sepet" value=headline.carts.label note=headline.carts.note %}
+  {% include "emails/modules/stat_row.html" with label="Giriş yapan" value=users.logins note="şifreyle giriş; açık oturumla gelenler sayılmaz" %}
+  {% include "emails/modules/stat_row.html" with label="Ders açan öğrenci" value=users.learners %}
+</tbody></table>
+
+{% include "emails/modules/section_title.html" with title="Satış ve siparişler" url=links.orders %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% include "emails/modules/stat_row.html" with label="Satış (ödenen, hediye hariç)" value=orders.sold note=orders.sold_note %}
+  {% for row in orders.revenue %}{% include "emails/modules/stat_row.html" with label="Gelir ("|add:row.currency|add:")" value=row.label %}{% endfor %}
+  {% for method in orders.methods %}{% include "emails/modules/stat_row.html" with label=method.label value=method.count note=method.is_gift|yesno:"satışa girmez," %}{% endfor %}
+  {% include "emails/modules/stat_row.html" with label="Açılan sipariş" value=orders.created %}
+  {% for row in orders.created_statuses %}{% include "emails/modules/stat_row.html" with label="· "|add:row.label value=row.count %}{% endfor %}
+  {% include "emails/modules/stat_row.html" with label="Başarısız ödeme denemesi" value=orders.failed %}
+  {% include "emails/modules/stat_row.html" with label="İptal / iade edilen" value=orders.closed %}
+  {% include "emails/modules/stat_row.html" with label="Şu an ödeme bekleyen" value=orders.pending %}
+  {% for code in orders.codes %}{% include "emails/modules/stat_row.html" with label="Kod: "|add:code.discount_code value=code.count %}{% endfor %}
+</tbody></table>
+
+{% include "emails/modules/section_title.html" with title="Giden e-postalar" url=links.emails %}
+{% if emails.templates %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  <tr>
+    <th style="padding: 6px 10px 6px 0; border-bottom: 1px solid #E5E5E5; font-size: 13px; color: #6B6B6B; font-weight: 400;" align="left">E-posta · neden gitti</th>
+    <th style="padding: 6px 0; border-bottom: 1px solid #E5E5E5; font-size: 13px; color: #6B6B6B; font-weight: 400; white-space: nowrap;" align="right">Giden · açılan · tıklanan</th>
+  </tr>
+  {% for row in emails.templates %}
+  <tr>
+    <td style="padding: 7px 10px 7px 0; border-bottom: 1px solid #E5E5E5; font-size: 15px; line-height: 22px; color: #151515;" valign="top"><strong>{{ row.label }}</strong>{% if row.description %}<div style="font-size: 13px; line-height: 18px; color: #6B6B6B;">{{ row.description }}</div>{% endif %}</td>
+    <td style="padding: 7px 0; border-bottom: 1px solid #E5E5E5; font-size: 15px; line-height: 22px; color: #151515; white-space: nowrap;" valign="top" align="right">{{ row.sent }} · {{ row.opened }} · {{ row.clicked }}{% if row.failed %}<div style="font-size: 13px; color: #B42318;">{{ row.failed }} hata</div>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td style="padding: 7px 10px 0 0; font-size: 15px; font-weight: 700; color: #151515;">Toplam</td>
+    <td style="padding: 7px 0 0; font-size: 15px; font-weight: 700; color: #151515; white-space: nowrap;" align="right">{{ emails.totals.sent }} · {{ emails.totals.opened }} · {{ emails.totals.clicked }}</td>
+  </tr>
+</tbody></table>
+{% for batch in emails.batches %}<p style="margin: 10px 0 0; font-size: 14px; color: #555555;">Toplu gönderim: <strong>{{ batch.subject }}</strong> · {{ batch.recipients }} alıcı, {{ batch.sent }} giden, %{{ batch.open_rate }} açılma, {{ batch.unsubscribed }} çıkış</p>{% endfor %}
+{% else %}
+<p style="margin: 0; color: #6B6B6B;">E-posta gitmedi.</p>
+{% endif %}
+
+{% include "emails/modules/section_title.html" with title="Üyeler" %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% include "emails/modules/stat_row.html" with label="Yeni üye" value=users.members %}
+  {% include "emails/modules/stat_row.html" with label="Giriş yapan" value=users.logins note=users.imported_logins %}
+  {% include "emails/modules/stat_row.html" with label="Ders açan öğrenci" value=users.learners %}
+  {% include "emails/modules/stat_row.html" with label="Yeni kurs kaydı" value=users.enrollments %}
+  {% for group in users.enrollment_groups %}{% include "emails/modules/stat_row.html" with label="· "|add:group.label value=group.count %}{% endfor %}
+</tbody></table>
+
+{% include "emails/modules/section_title.html" with title="İzlenen kurslar" url=links.stats %}
+{% if courses.rows %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% for row in courses.rows %}
+  <tr><td style="padding: 7px 0; border-bottom: 1px solid #E5E5E5; font-size: 15px; line-height: 22px; color: #151515;">
+    <strong>{{ row.course.short_title|default:row.course.title }}</strong>
+    <div style="font-size: 13px; line-height: 18px; color: #555555;">{{ row.learners }} öğrenci · {{ row.opened }} ders açıldı · {{ row.completed }} ders tamamlandı{% if row.enrollments %} · {{ row.enrollments }} yeni kayıt{% endif %}{% if row.finished %} · <strong>{{ row.finished }} kursu bitirdi</strong>{% endif %}</div>
+  </td></tr>
+  {% endfor %}
+</tbody></table>
+{% if courses.top_lessons %}
+<p style="margin: 14px 0 4px; font-size: 14px; color: #555555;"><strong>En çok açılan dersler</strong></p>
+{% for row in courses.top_lessons %}<div style="font-size: 14px; line-height: 21px; color: #151515;">{{ forloop.counter }}. {{ row.lesson.title }} <span style="color: #6B6B6B;">· {{ row.lesson.section.course.short_title|default:row.lesson.section.course.title }} · {{ row.viewers }} öğrenci</span></div>{% endfor %}
+{% endif %}
+{% else %}
+<p style="margin: 0; color: #6B6B6B;">Ders açılmadı.</p>
+{% endif %}
+
+{% include "emails/modules/section_title.html" with title="Sepetler" url=links.carts %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% include "emails/modules/stat_row.html" with label="Şu an sepette bekleyen" value=carts.waiting note=carts.waiting_note %}
+  {% include "emails/modules/stat_row.html" with label="· sepet adımında / ödeme adımında" value=carts.steps %}
+  {% include "emails/modules/stat_row.html" with label="· "|add:carts.idle_label value=carts.idle %}
+  {% include "emails/modules/stat_row.html" with label="Ürün eklenen yeni sepet (gün içinde)" value=carts.created note=carts.created_note %}
+  {% include "emails/modules/stat_row.html" with label="Sepete eklenen / çıkarılan ürün" value=carts.items %}
+  {% include "emails/modules/stat_row.html" with label="Ödeme adımına geçen" value=carts.checkout %}
+  {% include "emails/modules/stat_row.html" with label="Satışa dönüşen" value=carts.converted %}
+</tbody></table>
+
+{% include "emails/modules/section_title.html" with title="Destek, yorum ve bülten" %}
+<table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%"><tbody>
+  {% include "emails/modules/stat_row.html" with label="Yeni destek talebi" value=community.tickets note=community.tickets_note %}
+  {% include "emails/modules/stat_row.html" with label="Yeni yorum" value=community.reviews note=community.reviews_note %}
+  {% include "emails/modules/stat_row.html" with label="Bülten: yeni / onaylayan / çıkan" value=community.subscribers note=community.subscribers_note %}
+</tbody></table>
+<p style="margin: 14px 0 0; font-size: 14px;"><a href="{{ links.support }}" style="color: #6366f1; text-decoration: none;">Destek</a> · <a href="{{ links.reviews }}" style="color: #6366f1; text-decoration: none;">Yorumlar</a> · <a href="{{ links.subscribers }}" style="color: #6366f1; text-decoration: none;">Aboneler</a></p>
+{% endblock %}
+{% block footer %}Yönetici bildirimi · her gece Türkiye saatiyle 00:00'da biten gün için gönderilir.{% endblock %}

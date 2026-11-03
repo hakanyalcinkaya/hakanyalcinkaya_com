@@ -1,0 +1,1 @@
+Günlük rapor · {{ day_label }}: {{ orders.sold }} satış{% for row in orders.revenue %} · {{ row.label }}{% endfor %}{% if alerts %} · {{ alerts|length }} uyarı{% endif %}

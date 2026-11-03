@@ -1,0 +1,63 @@
+{% extends "emails/base.txt" %}
+{% block content %}Günlük rapor · {{ day_label }}
+{% if alerts %}
+DİKKAT
+{% for alert in alerts %}- {{ alert.text }} {{ alert.url }}
+{% endfor %}{% endif %}
+ÖZET
+Satış: {{ headline.sales.label }} ({{ headline.sales.note }})
+Ciro (TL): {{ headline.revenue.label }} ({{ headline.revenue.note }})
+Yeni üye: {{ headline.members.label }} ({{ headline.members.note }})
+Yeni kurs kaydı: {{ headline.enrollments.label }} ({{ headline.enrollments.note }})
+Ürün eklenen yeni sepet: {{ headline.carts.label }} ({{ headline.carts.note }})
+Giriş yapan: {{ users.logins }} (şifreyle giriş; {{ users.imported_logins }})
+Ders açan öğrenci: {{ users.learners }}
+
+SATIŞ VE SİPARİŞLER
+Satış (ödenen, hediye hariç): {{ orders.sold }} ({{ orders.sold_note }})
+{% for row in orders.revenue %}Gelir ({{ row.currency }}): {{ row.label }}
+{% endfor %}{% for method in orders.methods %}{{ method.label }}: {{ method.count }}{% if method.is_gift %} (satışa girmez){% endif %}
+{% endfor %}Açılan sipariş: {{ orders.created }}{% for row in orders.created_statuses %} · {{ row.label }} {{ row.count }}{% endfor %}
+Başarısız ödeme denemesi: {{ orders.failed }}
+İptal / iade edilen: {{ orders.closed }}
+Şu an ödeme bekleyen: {{ orders.pending }}
+{% for code in orders.codes %}Kod {{ code.discount_code }}: {{ code.count }}
+{% endfor %}{{ links.orders }}
+
+GİDEN E-POSTALAR (giden · açılan · tıklanan)
+{% for row in emails.templates %}{{ row.label }}: {{ row.sent }} · {{ row.opened }} · {{ row.clicked }}{% if row.failed %} · {{ row.failed }} hata{% endif %}
+{% if row.description %}  {{ row.description }}
+{% endif %}{% empty %}E-posta gitmedi.
+{% endfor %}{% if emails.templates %}Toplam: {{ emails.totals.sent }} · {{ emails.totals.opened }} · {{ emails.totals.clicked }}
+{% endif %}{% for batch in emails.batches %}Toplu gönderim: {{ batch.subject }} · {{ batch.recipients }} alıcı, {{ batch.sent }} giden, %{{ batch.open_rate }} açılma, {{ batch.unsubscribed }} çıkış
+{% endfor %}{{ links.emails }}
+
+ÜYELER
+Yeni üye: {{ users.members }}
+Giriş yapan: {{ users.logins }} ({{ users.imported_logins }})
+Ders açan öğrenci: {{ users.learners }}
+Yeni kurs kaydı: {{ users.enrollments }}{% for group in users.enrollment_groups %} · {{ group.label }} {{ group.count }}{% endfor %}
+
+İZLENEN KURSLAR
+{% for row in courses.rows %}{{ row.course.short_title|default:row.course.title }}: {{ row.learners }} öğrenci · {{ row.opened }} ders açıldı · {{ row.completed }} ders tamamlandı{% if row.enrollments %} · {{ row.enrollments }} yeni kayıt{% endif %}{% if row.finished %} · {{ row.finished }} kursu bitirdi{% endif %}
+{% empty %}Ders açılmadı.
+{% endfor %}{% if courses.top_lessons %}En çok açılan dersler:
+{% for row in courses.top_lessons %}{{ forloop.counter }}. {{ row.lesson.title }} · {{ row.lesson.section.course.short_title|default:row.lesson.section.course.title }} · {{ row.viewers }} öğrenci
+{% endfor %}{% endif %}
+SEPETLER
+Şu an sepette bekleyen: {{ carts.waiting }} ({{ carts.waiting_note }})
+Sepet adımında / ödeme adımında: {{ carts.steps }}
+{{ carts.idle_label|capfirst }}: {{ carts.idle }}
+Ürün eklenen yeni sepet (gün içinde): {{ carts.created }} ({{ carts.created_note }})
+Sepete eklenen / çıkarılan ürün: {{ carts.items }}
+Ödeme adımına geçen: {{ carts.checkout }}
+Satışa dönüşen: {{ carts.converted }}
+{{ links.carts }}
+
+DESTEK, YORUM VE BÜLTEN
+Yeni destek talebi: {{ community.tickets }} ({{ community.tickets_note }})
+Yeni yorum: {{ community.reviews }} ({{ community.reviews_note }})
+Bülten yeni / onaylayan / çıkan: {{ community.subscribers }} ({{ community.subscribers_note }})
+
+Genel istatistik: {{ links.stats }}{% endblock %}
+{% block footer %}Yönetici bildirimi · her gece Türkiye saatiyle 00:00'da biten gün için gönderilir.{% endblock %}

@@ -225,6 +225,25 @@ EMAILS = {
         },
         recipient="admin",
     ),
+    "daily_report": _email(
+        "Günlük rapor (yönetici)",
+        "Yönetici",
+        "Her gece Türkiye saatiyle 00:00'da (send_daily_report komutu, cron) biten günün özeti: uyarılar, satış ve siparişler, "
+        "giden e-postalar, üyeler ve girişler, izlenen kurslar, sepetler, destek, yorum ve bülten.",
+        {
+            "day_label": "Raporun günü (ör. 2 Kasım 2026, Pazartesi)",
+            "alerts": "Dikkat isteyen durumlar (text, url); yoksa boş",
+            "headline": "Özet sayılar ve dün / geçen hafta aynı günle kıyas (sales, revenue, members, enrollments, carts)",
+            "orders": "Satış, ödeme yolları, sipariş durumları, iptal / iade, bekleyen, indirim kodları",
+            "emails": "Giden e-postalar: toplamlar, şablon başına (neden gittiği), toplu gönderimler",
+            "users": "Yeni üye, giriş yapan, ders açan, kaynağa göre yeni kurs kaydı",
+            "courses": "Kurs başına günün izlemesi ve en çok açılan dersler",
+            "carts": "Sepette bekleyenler ve günün sepet hareketleri",
+            "community": "Destek talepleri, yorumlar, bülten aboneleri",
+            "links": "Stüdyo sayfaları",
+        },
+        recipient="admin",
+    ),
 }
 
 
@@ -428,4 +447,9 @@ def sample_context(key):
             "studio_url": f"{site}/studio/reviews/",
         },
     }
+    if key == "daily_report":
+        # Rapor kişisel değil: önizlemede dünün gerçek raporu gösterilir.
+        from studio.daily_report import build
+
+        return {**base, **build()}
     return {**base, **extra.get(key, {})}

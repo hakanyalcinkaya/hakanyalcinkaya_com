@@ -218,6 +218,8 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # Destek: yeni mesaj bildirimi bu adrese gider; hesabı olmayan kullanıcıya yanıt bu adresten (ve yanıt adresi olarak) gider.
 SUPPORT_EMAIL = env("SUPPORT_EMAIL", default="admin@hakanyalcinkaya.com")
 SUPPORT_FROM_EMAIL = env("SUPPORT_FROM_EMAIL", default=f"Hakan Yalçınkaya <{SUPPORT_EMAIL}>")
+# Günlük rapor (send_daily_report) bu adrese gider.
+DAILY_REPORT_TO = env("DAILY_REPORT_TO", default="hakanyalcinkaya@gmail.com")
 # Cloudflare Turnstile (giriş yapmamış kullanıcının destek formunda bot koruması). Anahtar yoksa doğrulama kapalıdır.
 TURNSTILE_SITE_KEY = env("TURNSTILE_SITE_KEY", default="")
 TURNSTILE_SECRET_KEY = env("TURNSTILE_SECRET_KEY", default="")
