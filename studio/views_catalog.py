@@ -21,7 +21,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import InstructorProfile
 from course.models import Bundle, Category, Course, Technology
 from discount.models import Discount
-from studio import course_stats, overview_stats
+from studio import course_stats, overview_stats, period_stats
 from studio.forms import (
     BundleForm,
     CategoryForm,
@@ -166,11 +166,12 @@ def course_stats_view(request, course_id):
 
 @superuser_required
 def stats_overview(request):
-    """Genel istatistikler: sitenin geneli, ödeme yoluna göre siparişler, tüm kurslar tek tabloda, en çok izlenen ve
+    """Genel istatistikler: sitenin geneli, dönem karşılaştırması (bugün/dün, bu/geçen hafta, bu/geçen ay), ödeme yoluna göre siparişler, tüm kurslar tek tabloda, en çok izlenen ve
     bırakılan dersler, son 12 ay."""
     courses = overview_stats.courses()
     context = dict(
         stats=overview_stats.summary(),
+        comparison=period_stats.comparison(),
         providers=overview_stats.providers(),
         courses=courses,
         top_watched=overview_stats.top_watched({course.pk: course.enrollment_total for course in courses}),

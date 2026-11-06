@@ -50,6 +50,42 @@
   </a></div>
 </div>
 
+<section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="stats-periods-title">
+  <h2 id="stats-periods-title" class="h6 mb-1">Dönemler</h2>
+  <p class="small text-body-secondary">Türkiye saatiyle; hafta Pazartesi başlar. Yüzde, süren dönemi önceki dönemin aynı anına kadarki kısmıyla kıyaslar (bugün, dünün bu saatine kadarkiyle); o sayı önceki dönemin altında yazar. Yalnız sonradan değişmeyen anlar sayılır: ödeme, üyelik, kayıt, dersin ilk açılışı, tamamlanma.</p>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle small mb-0">
+      <thead class="text-nowrap"><tr class="text-body-secondary">
+        <th scope="col" class="fw-medium" style="min-width: 11rem"><span class="visually-hidden">Ölçüm</span></th>
+        {% for period in comparison.periods %}
+        <th scope="col" class="fw-medium text-end border-start">{{ period.label }}<div class="fw-normal text-body-tertiary">{{ period.dates }}</div></th>
+        <th scope="col" class="fw-medium text-end">{{ period.previous_label }}<div class="fw-normal text-body-tertiary">{{ period.previous_dates }}</div></th>
+        {% endfor %}
+      </tr></thead>
+      {% for section in comparison.sections %}
+      <tbody>
+        <tr><th scope="rowgroup" colspan="7" class="pt-3 text-body-secondary fw-medium border-bottom">{{ section.label }}</th></tr>
+        {% for row in section.rows %}
+        <tr>
+          <th scope="row" class="fw-normal">{{ row.label }}{% if row.note %}<div class="text-body-tertiary">{{ row.note }}</div>{% endif %}</th>
+          {% for cell in row.cells %}
+          <td class="text-end text-nowrap border-start">
+            {% if row.key == "sales" %}<a href="{% url 'studio:orders' %}?status=paid&date_from={{ cell.span.first_day|date:'Y-m-d' }}&date_to={{ cell.span.last_day|date:'Y-m-d' }}" class="fw-semibold link-body-emphasis">{{ cell.current_label }}</a>{% else %}<span class="fw-semibold">{{ cell.current_label }}</span>{% endif %}
+            {% if cell.change %}<div class="{% if cell.change.value > 0 %}text-success-emphasis{% elif cell.change.value < 0 %}text-danger-emphasis{% else %}text-body-tertiary{% endif %}" title="{{ cell.span.previous_label }} {{ cell.span.same_label }}: {{ cell.same_label }}">{{ cell.change.label }}</div>{% endif %}
+          </td>
+          <td class="text-end text-nowrap text-body-secondary">
+            {% if row.key == "sales" %}<a href="{% url 'studio:orders' %}?status=paid&date_from={{ cell.span.previous_first_day|date:'Y-m-d' }}&date_to={{ cell.span.previous_last_day|date:'Y-m-d' }}" class="link-secondary">{{ cell.previous_label }}</a>{% else %}{{ cell.previous_label }}{% endif %}
+            <div class="text-body-tertiary">{{ cell.span.same_label }} {{ cell.same_label }}</div>
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
+</section>
+
 <section class="border rounded p-3 p-lg-4 mb-4" aria-labelledby="stats-providers-title">
   <h2 id="stats-providers-title" class="h6 mb-1">Ödeme yoluna göre</h2>
   <p class="small text-body-secondary">Tüm zamanlar. Satış, ödenmiş siparişlerdir; hediyelerin tutarı 0'dır ve satışa girmez. İptal ve iade edilen siparişler satıştan düşülmüş olarak ayrı sütunda.</p>
