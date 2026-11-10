@@ -1,5 +1,6 @@
 """Stüdyo ziyaretçi istatistikleri (izometrik pano): son DAYS gündeki sepete eklemeler (CartAddEvent), kayıtlar ve girişler
-(AccountEvent) ülke, cihaz, işletim sistemi, tarayıcı, dil, geliş kaynağı ve saate göre; ders izlemeleri (LessonView) ve
+(AccountEvent) ülke, şehir, internet sağlayıcısı, cihaz, işletim sistemi, tarayıcı, dil, geliş kaynağı, ekran, saat dilimi,
+bağlantı, tema ve saate göre; ders izlemeleri (LessonView) ve
 üye sayfa ziyaretleri (PageView) cihaz ve ülkeye göre.
 
 Bilgiler kayıtların data alanından okunur (core.visitor). Bir sepete ekleme, aynı sepetten o kurs için ödenmiş ve hediye
@@ -9,7 +10,8 @@ geçtiği için girişten sonra alınanlar da sayılır. Personelin kayıtları 
 
 from datetime import timedelta
 
-from django.db.models import Count, Exists, OuterRef, Q, Sum
+from django.db.models import Case, CharField, Count, Exists, OuterRef, Q, Sum, Value, When
+from django.db.models.functions import Concat
 from django.db.models.fields.json import KT
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -27,14 +29,43 @@ TOP = 8
 WEEKDAYS = (_("Pzt"), _("Sal"), _("Çar"), _("Per"), _("Cum"), _("Cmt"), _("Paz"))
 DEVICE_LABELS = dict(desktop=_("Masaüstü"), mobile=_("Mobil"), tablet=_("Tablet"), bot=_("Bot"), other=_("Diğer"))
 DEVICE_ICONS = dict(desktop="laptop", mobile="phone", tablet="tablet", bot="robot", other="question-circle")
-# Gruplar: (anahtar, başlık, simge, JSON yolu).
+# Tarayıcı bilgisi yalnız analitik izni verenlerde var (site.js); diğerleri "Bilinmiyor" satırına düşer.
+CONSENT_NOTE = _("izin verenler")
+THEME_LABELS = dict(dark=_("Koyu"), light=_("Açık"))
+
+
+def _city_key():
+    """"Istanbul|TR": aynı adlı şehirler ülkesiyle ayrılır; şehir yoksa boş."""
+    return Case(
+        When(Q(data__geo__city__isnull=True) | Q(data__geo__city=""), then=Value("")),
+        default=Concat(KT("data__geo__city"), Value("|"), KT("data__geo__country_code"), output_field=CharField()),
+        output_field=CharField(),
+    )
+
+
+def _screen_key():
+    """"390×844"; tarayıcı bilgisi yoksa boş."""
+    return Case(
+        When(data__client__screen_width__isnull=True, then=Value("")),
+        default=Concat(KT("data__client__screen_width"), Value("×"), KT("data__client__screen_height"), output_field=CharField()),
+        output_field=CharField(),
+    )
+
+
+# Gruplar: (anahtar, başlık, simge, JSON yolu ya da ifade, not).
 GROUPS = (
-    ("device", _("Cihaz"), "phone", "data__agent__type"),
-    ("os", _("İşletim sistemi"), "windows", "data__agent__os__family"),
-    ("browser", _("Tarayıcı"), "browser-chrome", "data__agent__browser__family"),
-    ("language", _("Dil"), "translate", "data__language__base"),
-    ("source", _("İlk geliş kaynağı"), "signpost-split", "data__visit__first__referrer_host"),
-    ("campaign", _("UTM kaynağı"), "megaphone", "data__visit__first__utm__source"),
+    ("device", _("Cihaz"), "phone", "data__agent__type", ""),
+    ("os", _("İşletim sistemi"), "windows", "data__agent__os__family", ""),
+    ("browser", _("Tarayıcı"), "browser-chrome", "data__agent__browser__family", ""),
+    ("language", _("Dil"), "translate", "data__language__base", ""),
+    ("city", _("Şehir"), "geo-alt", _city_key, ""),
+    ("isp", _("İnternet sağlayıcısı"), "router", "data__geo__isp", ""),
+    ("source", _("İlk geliş kaynağı"), "signpost-split", "data__visit__first__referrer_host", CONSENT_NOTE),
+    ("campaign", _("UTM kaynağı"), "megaphone", "data__visit__first__utm__source", CONSENT_NOTE),
+    ("screen", _("Ekran boyutu"), "aspect-ratio", _screen_key, CONSENT_NOTE),
+    ("timezone", _("Saat dilimi"), "clock", "data__client__timezone", CONSENT_NOTE),
+    ("connection", _("Bağlantı"), "wifi", "data__client__connection", CONSENT_NOTE),
+    ("theme", _("Site teması"), "palette", "data__client__site_theme", CONSENT_NOTE),
 )
 
 
@@ -73,11 +104,12 @@ def _account_events(since):
 
 
 def _rows(queryset, path, with_sales=False):
-    """[{key, count, sold, percent}] en çoktan aza; boş değer "" anahtarıyla."""
+    """[{key, count, sold, percent}] en çoktan aza; boş değer "" anahtarıyla. path JSON yolu ya da ifade üreten fonksiyon."""
     values = dict(count=Count("pk"))
     if with_sales:
         values["sold"] = Count("pk", filter=Q(purchased=True))
-    rows = list(queryset.annotate(key=KT(path)).values("key").annotate(**values).order_by("-count", "key"))
+    key = KT(path) if isinstance(path, str) else path()
+    rows = list(queryset.annotate(key=key).values("key").annotate(**values).order_by("-count", "key"))
     for row in rows:
         row["key"] = row["key"] or ""
     return rows
@@ -88,12 +120,17 @@ def _label(group, key):
         return _("Bilinmiyor") if group != "source" else _("Doğrudan / bilinmiyor")
     if group == "device":
         return DEVICE_LABELS.get(key, key)
-    if group == "language":
+    if group in ("language", "connection"):
         return key.upper()
+    if group == "city":
+        city, _sep, code = key.partition("|")
+        return f"{flag(code)} {city}".strip()
+    if group == "theme":
+        return THEME_LABELS.get(key, key)
     return key
 
 
-def _group(key, label, icon, path, carts, accounts):
+def _group(key, label, icon, path, note, carts, accounts):
     cart_rows = _rows(carts, path, with_sales=True)
     account_rows = {row["key"]: row["count"] for row in _rows(accounts.filter(kind=AccountEventKind.SIGNUP), path)}
     peak = max((row["count"] for row in cart_rows), default=0)
@@ -111,7 +148,7 @@ def _group(key, label, icon, path, carts, accounts):
                 width=_percent(row["count"], peak),
             )
         )
-    return dict(key=key, label=label, icon=icon, rows=rows, more=max(len(cart_rows) - TOP, 0))
+    return dict(key=key, label=label, icon=icon, note=note, rows=rows, more=max(len(cart_rows) - TOP, 0))
 
 
 def _countries(carts, accounts):
@@ -165,7 +202,7 @@ def _heatmap(carts):
 
 
 def _split(queryset, group, path):
-    """Kısa kırılım (cihaz ya da ülke): [{label, flag, count, width}] ilk TOP."""
+    """Kısa kırılım (cihaz, ülke ya da şehir): [{label, flag, count, width}] ilk TOP."""
     rows = _rows(queryset, path)[:TOP]
     peak = max((row["count"] for row in rows), default=0)
     return [
@@ -204,6 +241,7 @@ def watching(since):
         top=[dict(row, minutes=round((row["seconds"] or 0) / 60)) for row in top],
         devices=_split(views, "device", "data__agent__type"),
         countries=_split(views, "country", "data__geo__country_code"),
+        cities=_split(views, "city", _city_key),
     )
 
 
@@ -220,6 +258,7 @@ def pages(since):
         top=[dict(row, width=_percent(row["count"], peak)) for row in top],
         devices=_split(visits, "device", "data__agent__type"),
         countries=_split(visits, "country", "data__geo__country_code"),
+        cities=_split(visits, "city", _city_key),
     )
 
 
@@ -242,7 +281,7 @@ def overview(days=DEFAULT_DAYS):
         guests=carts.filter(user__isnull=True).count(),
         **account_totals,
         countries=_countries(carts, accounts),
-        groups=[_group(key, label, icon, path, carts, accounts) for key, label, icon, path in GROUPS],
+        groups=[_group(*group, carts, accounts) for group in GROUPS],
         heatmap=_heatmap(carts),
         watching=watching(since),
         pages=pages(since),

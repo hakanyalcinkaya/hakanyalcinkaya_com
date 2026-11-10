@@ -1,11 +1,15 @@
-{# Ziyaretçi kırılımı: cihaz ve ülke (studio.visitor_stats._split satırları). #}
+{# Ziyaretçi kırılımı: cihaz, ülke ve şehir (studio.visitor_stats._split satırları). #}
 <div class="row g-3 mt-1 small">
-  <div class="col-6">
+  <div class="col-4">
     <div class="text-body-tertiary mb-1">Cihaz</div>
     {% for row in devices %}<div class="d-flex gap-2"><span class="text-truncate">{{ row.label }}</span><span class="ms-auto">{{ row.count }}</span></div>{% empty %}<div class="text-body-tertiary">—</div>{% endfor %}
   </div>
-  <div class="col-6">
+  <div class="col-4">
     <div class="text-body-tertiary mb-1">Ülke</div>
     {% for row in countries %}<div class="d-flex gap-2"><span aria-hidden="true">{{ row.flag|default:"·" }}</span><span class="text-truncate">{{ row.label }}</span><span class="ms-auto">{{ row.count }}</span></div>{% empty %}<div class="text-body-tertiary">—</div>{% endfor %}
+  </div>
+  <div class="col-4">
+    <div class="text-body-tertiary mb-1">Şehir</div>
+    {% for row in cities %}<div class="d-flex gap-2"><span class="text-truncate">{{ row.label }}</span><span class="ms-auto">{{ row.count }}</span></div>{% empty %}<div class="text-body-tertiary">—</div>{% endfor %}
   </div>
 </div>
