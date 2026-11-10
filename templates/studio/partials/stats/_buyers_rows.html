@@ -11,6 +11,7 @@
     {% for item in order.matched_items %}{{ item.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %} · {% if order.currency == "TRY" %}{{ item.paid_price|money }}{% else %}{{ item.paid_price }} {{ order.currency }}{% endif %}{% if not forloop.last %}; {% endif %}{% endfor %}
     {% if order.payment_provider %}<span class="text-body-tertiary"> · {{ order.payment_method_label }}</span>{% endif %}
   </div>
+  {% include "studio/partials/_visitor_line.html" with data=order.visitor %}
 </a>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede satın alan yok.</div>

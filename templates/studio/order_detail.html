@@ -45,6 +45,7 @@
         {% endfor %}
       </ul>
     </section>
+    {% include "studio/partials/_visitor_table.html" with rows=visitor_events title="Sepete eklerken" note="Siparişin sepetine ürün eklendiği anlardaki konum ve cihaz. IP 180 gün sonra maskelenir." id="order-visitor-title" %}
   </div>
   <div class="col-lg-5">
     <section class="border rounded p-3 mb-4" aria-labelledby="order-status-title">

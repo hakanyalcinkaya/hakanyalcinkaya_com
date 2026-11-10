@@ -19,6 +19,7 @@ from urllib.parse import unquote, urlparse
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from ipware import get_client_ip
 from user_agents import parse as parse_user_agent
 
@@ -272,3 +273,45 @@ def mask_ip(ip):
         return ""
     prefix = 24 if address.version == 4 else 48
     return str(ipaddress.ip_network(f"{address}/{prefix}", strict=False).network_address)
+
+
+DEVICE_LABELS = dict(desktop=_("Masaüstü"), mobile=_("Mobil"), tablet=_("Tablet"), bot=_("Bot"), other=_("Diğer"))
+DEVICE_ICONS = dict(desktop="laptop", mobile="phone", tablet="tablet", bot="robot", other="question-circle")
+
+
+def flag(code):
+    """"TR" → 🇹🇷; geçersizse boş."""
+    code = (code or "").upper()
+    if len(code) != 2 or not code.isalpha():
+        return ""
+    return "".join(chr(0x1F1E6 + ord(letter) - ord("A")) for letter in code)
+
+
+def summary(data):
+    """Stüdyo listeleri ve tabloları için kısa özet (internet sağlayıcısı gösterilmez); veri yoksa None."""
+    if not data:
+        return None
+    geo, agent = data.get("geo") or {}, data.get("agent") or {}
+    browser, system = agent.get("browser") or {}, agent.get("os") or {}
+    client, network = data.get("client") or {}, data.get("network") or {}
+    code = geo.get("country_code", "")
+    city = geo.get("city", "")
+    device = agent.get("type", "")
+    screen = f"{client['screen_width']}×{client['screen_height']}" if client.get("screen_width") else ""
+    return dict(
+        flag=flag(code),
+        country_code=code,
+        country=geo.get("country") or code,
+        city=city,
+        region=geo.get("region", ""),
+        place=", ".join(part for part in (city, geo.get("country") or code) if part),
+        device=DEVICE_LABELS.get(device, device),
+        device_icon=DEVICE_ICONS.get(device, "question-circle"),
+        os=" ".join(part for part in (system.get("family", ""), system.get("version", "")) if part),
+        browser=" ".join(part for part in (browser.get("family", ""), browser.get("version", "").split(".")[0]) if part),
+        language=(data.get("language") or {}).get("primary", ""),
+        screen=screen,
+        timezone=client.get("timezone", ""),
+        ip=network.get("ip", ""),
+        ip_masked=bool(network.get("masked")),
+    )

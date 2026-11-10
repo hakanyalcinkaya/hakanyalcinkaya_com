@@ -13,6 +13,7 @@
     {{ member.enrollment_total }} kurs · {{ member.paid_order_total }} ödenen sipariş{% if member.last_login %} · son giriş {{ member.last_login|ago }}{% else %} · hiç giriş yapmadı{% endif %}{% if member.has_watched %} · ders izliyor{% endif %}
     {% if member.invite_sent_at %} · davet {{ member.invite_sent_at|ago }}{% if member.invite_clicked_at %}, tıklandı{% elif member.invite_opened_at %}, açıldı{% else %}, açılmadı{% endif %}{% elif member.podia_imported %} · davet gönderilmedi{% endif %}
   </div>
+  {% include "studio/partials/_visitor_line.html" with data=member.visitor %}
 </a>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede üye yok.</div>

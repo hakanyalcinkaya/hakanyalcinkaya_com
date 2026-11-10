@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from core.duration import clock, hours_minutes
 from core.money import format_try
 from core.site_url import absolute_url
+from core.visitor import summary as visitor_summary
 
 register = template.Library()
 
@@ -47,3 +48,9 @@ def absolute(path):
 def share_image(image):
     """Paylaşım görseli (og:image): sayfadaki WebP kapağın aynı adlı JPEG'i; bazı platformlar WebP önizleme göstermez."""
     return image.removesuffix(".webp") + ".jpg" if image.endswith(".webp") else image
+
+
+@register.filter
+def visitor(data):
+    """Ziyaretçi kaydının data alanından kısa özet (core.visitor.summary); yoksa None."""
+    return visitor_summary(data)

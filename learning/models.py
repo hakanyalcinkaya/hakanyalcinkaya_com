@@ -19,6 +19,11 @@ class EnrollmentSource(models.TextChoices):
 
 
 class EnrollmentQuerySet(models.QuerySet):
+    def with_visitor(self):
+        """visitor: öğrencinin bu kurstaki son ders izlemesinin ziyaretçi bilgileri (LessonView.data), yoksa None."""
+        latest = LessonView.objects.filter(user=OuterRef("user"), lesson__section__course=OuterRef("course")).order_by("-created_at").values("data")[:1]
+        return self.annotate(visitor=Subquery(latest, output_field=models.JSONField()))
+
     def for_user(self, user):
         if not user.is_authenticated:
             return self.none()

@@ -1,0 +1,30 @@
+{# Ziyaretçi bilgileri tablosu: rows = [{at, label, data}] (studio.visitor_stats.*_events). İnternet sağlayıcısı gösterilmez. #}
+{% load core_tags %}
+<section class="border rounded {{ class|default:'mt-4' }}" aria-labelledby="{{ id|default:'visitor-title' }}">
+  <h2 id="{{ id|default:'visitor-title' }}" class="h6 px-3 pt-3 mb-1">{{ title|default:"Ziyaretçi bilgileri" }}</h2>
+  <p class="small text-body-tertiary px-3 mb-2">{{ note|default:"Kayıt anındaki konum ve cihaz. IP 180 gün sonra maskelenir." }}</p>
+  {% if rows %}
+  <div class="table-responsive">
+    <table class="table table-sm small align-middle mb-0">
+      <thead><tr class="text-body-tertiary"><th class="fw-normal ps-3">Zaman</th><th class="fw-normal">Olay</th><th class="fw-normal">Konum</th><th class="fw-normal">Cihaz</th><th class="fw-normal">İşletim sistemi</th><th class="fw-normal">Tarayıcı</th><th class="fw-normal">Dil</th><th class="fw-normal">Ekran</th><th class="fw-normal pe-3">IP</th></tr></thead>
+      <tbody>
+        {% for row in rows %}{% with v=row.data|visitor %}
+        <tr>
+          <td class="ps-3 text-nowrap"><time datetime="{{ row.at|date:'c' }}" title="{{ row.at|date:'d.m.Y H:i' }}">{{ row.at|date:"d.m.Y H:i" }}</time></td>
+          <td class="text-truncate" style="max-width: 18rem" title="{{ row.label }}">{{ row.label }}</td>
+          <td class="text-nowrap">{% if v.place %}<span aria-hidden="true">{{ v.flag }}</span> {{ v.place }}{% if v.region and v.region != v.city %} <span class="text-body-tertiary">({{ v.region }})</span>{% endif %}{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+          <td class="text-nowrap">{% if v %}<i class="bi bi-{{ v.device_icon }} text-body-tertiary" aria-hidden="true"></i> {{ v.device }}{% else %}—{% endif %}</td>
+          <td class="text-nowrap">{{ v.os|default:"—" }}</td>
+          <td class="text-nowrap">{{ v.browser|default:"—" }}</td>
+          <td class="text-nowrap">{{ v.language|default:"—" }}</td>
+          <td class="text-nowrap">{{ v.screen|default:"—" }}</td>
+          <td class="pe-3 text-nowrap font-monospace">{{ v.ip|default:"—" }}{% if v.ip_masked %} <span class="text-body-tertiary" title="180 gün sonra maskelendi">(maskeli)</span>{% endif %}</td>
+        </tr>
+        {% endwith %}{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="small text-body-secondary px-3 pb-3 mb-0">Henüz kayıt yok.</p>
+  {% endif %}
+</section>

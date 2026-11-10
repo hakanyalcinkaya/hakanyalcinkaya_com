@@ -4,7 +4,7 @@ from functools import partial
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
-from django.db.models import Q, Value
+from django.db.models import OuterRef, Q, Subquery, Value
 from django.db.models.functions import Replace
 from django.urls import reverse
 from django.utils import timezone
@@ -51,6 +51,13 @@ NOTICE_STATUSES = (OrderStatus.REFUNDED, OrderStatus.CANCELLED)
 
 
 class OrderQuerySet(models.QuerySet):
+    def with_visitor(self):
+        """visitor: siparişin sepetine son eklemenin ziyaretçi bilgileri (CartAddEvent.data), yoksa None."""
+        from cart.models import CartAddEvent
+
+        latest = CartAddEvent.objects.filter(cart=OuterRef("cart")).order_by("-created_at").values("data")[:1]
+        return self.annotate(visitor=Subquery(latest, output_field=models.JSONField()))
+
     def paid(self):
         return self.filter(status=OrderStatus.PAID)
 

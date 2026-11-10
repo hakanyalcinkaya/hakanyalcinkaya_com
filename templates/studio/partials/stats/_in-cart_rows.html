@@ -8,6 +8,7 @@
     <time class="ms-auto small text-body-tertiary" datetime="{{ item.created_at|date:'c' }}" title="{{ item.created_at|date:'d.m.Y H:i' }}">{{ item.created_at|ago }} ekledi</time>
     {% if item.cart.user_id and item.cart.is_active %}<a href="{% url 'studio:order_create' %}?cart={{ item.cart_id }}" class="btn btn-outline-primary btn-sm py-0">Sipariş oluştur</a>{% endif %}
   </div>
+  {% include "studio/partials/_visitor_line.html" with data=item.visitor %}
 </div>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Sepette bırakan yok.</div>

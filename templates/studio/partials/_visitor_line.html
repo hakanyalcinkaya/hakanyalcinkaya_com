@@ -1,0 +1,7 @@
+{# Ziyaretçi özeti tek satırda (core_tags.visitor): bayrak ve şehir, cihaz, işletim sistemi, tarayıcı. data: kaydın data alanı. #}
+{% load core_tags %}{% with v=data|visitor %}{% if v %}<span class="d-inline-flex flex-wrap align-items-center column-gap-2 small text-body-tertiary" title="{% if v.language %}Dil {{ v.language }}{% endif %}{% if v.screen %} · ekran {{ v.screen }}{% endif %}{% if v.timezone %} · {{ v.timezone }}{% endif %}">
+  {% if v.place %}<span><span aria-hidden="true">{{ v.flag }}</span> {{ v.city|default:v.country }}</span>{% endif %}
+  <span><i class="bi bi-{{ v.device_icon }}" aria-hidden="true"></i> {{ v.device }}</span>
+  {% if v.os %}<span>{{ v.os }}</span>{% endif %}
+  {% if v.browser %}<span>{{ v.browser }}</span>{% endif %}
+</span>{% endif %}{% endwith %}

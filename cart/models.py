@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import OuterRef, Q, Subquery
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -47,6 +47,11 @@ class CartQuerySet(models.QuerySet):
     def with_products(self):
         """İçine en az bir ürün eklenmiş sepetler (sonradan çıkarılmış olsa da)."""
         return self.filter(Q(items__isnull=False) | Q(removals__isnull=False)).distinct()
+
+    def with_visitor(self):
+        """visitor: sepete son eklemenin ziyaretçi bilgileri (CartAddEvent.data), yoksa None."""
+        latest = CartAddEvent.objects.filter(cart=OuterRef("pk")).order_by("-created_at").values("data")[:1]
+        return self.annotate(visitor=Subquery(latest, output_field=models.JSONField()))
 
 
 class Cart(BaseModel):
@@ -202,6 +207,16 @@ class Cart(BaseModel):
 
 
 class CartItemQuerySet(models.QuerySet):
+    def with_visitor(self):
+        """visitor: ürünün bu sepete son eklenmesinin ziyaretçi bilgileri (CartAddEvent.data), yoksa None."""
+        latest = (
+            CartAddEvent.objects.filter(cart=OuterRef("cart"))
+            .filter(Q(course=OuterRef("course")) | Q(bundle=OuterRef("bundle")))
+            .order_by("-created_at")
+            .values("data")[:1]
+        )
+        return self.annotate(visitor=Subquery(latest, output_field=models.JSONField()))
+
     def for_course(self, course):
         """Kursu doğrudan ya da içindeki bir paketle içeren ürünler."""
         return self.filter(Q(course=course) | Q(bundle__courses=course)).distinct()

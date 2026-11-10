@@ -10,6 +10,7 @@
     {% if cart.user_id and cart.is_active %}<a href="{% url 'studio:order_create' %}?cart={{ cart.id }}" class="btn btn-outline-primary btn-sm py-0 position-relative z-2">Sipariş oluştur</a>{% endif %}
   </div>
   <div class="small text-body-secondary">{% for item in cart.items.all %}{{ item.product.title }}{% if item.bundle_id %} <span class="text-body-tertiary">(paket)</span>{% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
+  {% include "studio/partials/_visitor_line.html" with data=cart.visitor %}
 </div>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede sepet yok.</div>

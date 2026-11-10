@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
+from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -29,6 +30,11 @@ class UserQuerySet(models.QuerySet):
 
     def without_password(self):
         return self.exclude(PASSWORD_SET)
+
+    def with_visitor(self):
+        """visitor: son kayıt ya da girişin ziyaretçi bilgileri (AccountEvent.data), yoksa None."""
+        latest = AccountEvent.objects.filter(user=OuterRef("pk")).order_by("-created_at").values("data")[:1]
+        return self.annotate(visitor=Subquery(latest, output_field=models.JSONField()))
 
 
 class UserManager(BaseUserManager.from_queryset(UserQuerySet)):

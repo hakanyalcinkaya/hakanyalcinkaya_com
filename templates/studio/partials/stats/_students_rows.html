@@ -15,6 +15,7 @@
       {% if enrollment.last_lesson %}<div class="text-body-tertiary text-truncate">{{ enrollment.last_lesson.title }}</div>{% endif %}
     </div>
   </div>
+  {% include "studio/partials/_visitor_line.html" with data=enrollment.visitor %}
 </a>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede öğrenci yok.</div>

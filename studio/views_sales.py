@@ -25,7 +25,7 @@ from newsletter.models import Subscriber
 from order import podia
 from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
 from order.tasks import send_purchase_confirmation
-from studio import cart_stats, course_stats, order_stats, periods
+from studio import cart_stats, course_stats, order_stats, periods, visitor_stats
 from studio.forms import (
     EnrollmentGrantForm,
     ManualOrderForm,
@@ -61,7 +61,7 @@ def orders(request):
     base = Order.objects.all()
     filters = OrderFilterForm(request.GET, orders=base)
     rows = filters.filter(base)
-    page = _page(request, rows.select_related("user").prefetch_related("items").order_by("-created_at", "id"))
+    page = _page(request, rows.select_related("user").prefetch_related("items").with_visitor().order_by("-created_at", "id"))
     context = dict(page=page, filters=filters, revenue=course_stats.revenue(rows.paid()))
     if not request.htmx or request.htmx.boosted:
         period = periods.month_period(request.GET.get("month", ""))
@@ -120,6 +120,7 @@ def order_detail(request, order_id):
         status_form=OrderStatusForm(order=order),
         other_orders=others[:OTHER_ORDERS],
         other_orders_more=others.count() > OTHER_ORDERS,
+        visitor_events=visitor_stats.cart_events(order.cart),
     )
     return render(request, "studio/order_detail.html", context)
 
@@ -233,7 +234,7 @@ def carts(request):
     counts = base.aggregate(**{f"n{index}": Count("pk", distinct=True, filter=condition) for index, (_label, condition) in enumerate(CART_FILTERS.values())})
     filters = [dict(key=name, label=label, count=counts[f"n{index}"]) for index, (name, (label, _condition)) in enumerate(CART_FILTERS.items())]
     items = CartItem.objects.select_related("course", "bundle")
-    rows = base.filter(CART_FILTERS[key][1]).select_related("user", "discount").prefetch_related(Prefetch("items", queryset=items))
+    rows = base.filter(CART_FILTERS[key][1]).select_related("user", "discount").prefetch_related(Prefetch("items", queryset=items)).with_visitor()
     page = _page(request, rows.order_by("-updated_at", "id"))
     clear = (
         [dict(owner=owner, label=label, count=_clearable_carts(key, base, owner).count()) for owner, (label, _condition) in CART_OWNERS.items()]
@@ -284,6 +285,7 @@ def cart_detail(request, cart_id):
         removals=cart.removals.select_related("course", "bundle"),
         orders=cart.orders.prefetch_related("items").order_by("-created_at", "id"),
         owned=Enrollment.objects.filter(user=cart.user).select_related("course").order_by("course__title") if cart.user_id else [],
+        visitor_events=visitor_stats.cart_events(cart),
     )
     return render(request, "studio/cart_detail.html", context)
 
@@ -326,7 +328,7 @@ def students(request):
     base = filters.filter(base)
     counts = base.aggregate(**{f"n{index}": Count("pk", filter=condition) for index, (_label, condition) in enumerate(STUDENT_FILTERS.values())})
     tabs = [dict(key=name, label=label, count=counts[f"n{index}"]) for index, (name, (label, _condition)) in enumerate(STUDENT_FILTERS.items())]
-    page = _page(request, filters.order(base.filter(STUDENT_FILTERS[key][1])))
+    page = _page(request, filters.order(base.filter(STUDENT_FILTERS[key][1])).with_visitor())
     context = dict(page=page, status=key, filters=filters, tabs=tabs, query_string=_without(request.GET, "status", "page"))
     if not request.htmx or request.htmx.boosted:
         context["invite_report"] = podia.invite_report()
@@ -358,6 +360,7 @@ def student_detail(request, user_id):
         subscriber=Subscriber.objects.by_email(member.email),
         grant_form=EnrollmentGrantForm(user=member),
         access_form=MemberAccessForm(instance=member, editor=request.user),
+        visitor_events=visitor_stats.member_events(member),
     )
     return render(request, "studio/student_detail.html", context)
 

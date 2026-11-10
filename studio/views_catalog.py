@@ -114,7 +114,7 @@ def _stats_list(request, course, tab):
         orders = course_stats.buyer_orders(course)
         filters = OrderFilterForm(request.GET, orders=orders, with_status=False, with_course=False)
         rows = filters.filter(orders).select_related("user").prefetch_related("items__bundle__courses")
-        page = _page(request, rows.order_by("-paid_at", "id"))
+        page = _page(request, rows.with_visitor().order_by("-paid_at", "id"))
         for order in page:
             order.matched_items = [
                 item for item in order.items.all()
@@ -126,7 +126,7 @@ def _stats_list(request, course, tab):
         if query:
             rows = rows.filter(cart__user__email__icontains=query)
         unfinished = course_stats.unfinished_orders(course).select_related("user").order_by("-created_at", "id")[:STATS_PAGE_SIZE]
-        return dict(context, page=_page(request, rows.order_by("-created_at", "id")), unfinished=unfinished)
+        return dict(context, page=_page(request, rows.with_visitor().order_by("-created_at", "id")), unfinished=unfinished)
     if tab == "lessons":
         return dict(context, lessons=course_stats.lessons(course), left_after_days=course_stats.LEFT_AFTER_DAYS)
     bucket = request.GET.get("progress", "")
@@ -142,7 +142,7 @@ def _stats_list(request, course, tab):
         rows = rows.filter(course_stats.left_filter(left_lesson))
     if query:
         rows = rows.filter(Q(user__email__icontains=query) | Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
-    page = _page(request, rows.order_by("-progress", F("last_watched_at").desc(nulls_last=True), "id"))
+    page = _page(request, rows.with_visitor().order_by("-progress", F("last_watched_at").desc(nulls_last=True), "id"))
     return dict(context, page=page, bucket=bucket, buckets=course_stats.PROGRESS_BUCKETS, left_lesson=left_lesson)
 
 

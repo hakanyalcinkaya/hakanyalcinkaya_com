@@ -12,6 +12,7 @@
     <span class="text-truncate">{% for item in order.items.all %}{{ item.title }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
     <span class="ms-auto text-body-tertiary">{% if order.payment_provider %}{{ order.payment_method_label }} · {% endif %}{{ order.paid_at|default:order.created_at|date:"d.m.Y H:i" }}</span>
   </div>
+  {% include "studio/partials/_visitor_line.html" with data=order.visitor %}
 </a>
 {% empty %}
 <div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede sipariş yok.</div>

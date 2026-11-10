@@ -1,5 +1,5 @@
 """Stüdyo ziyaretçi istatistikleri (izometrik pano): son DAYS gündeki sepete eklemeler (CartAddEvent), kayıtlar ve girişler
-(AccountEvent) ülke, şehir, internet sağlayıcısı, cihaz, işletim sistemi, tarayıcı, dil, geliş kaynağı, ekran, saat dilimi,
+(AccountEvent) ülke, şehir, cihaz, işletim sistemi, tarayıcı, dil, geliş kaynağı, ekran, saat dilimi,
 bağlantı, tema ve saate göre; ders izlemeleri (LessonView) ve
 üye sayfa ziyaretleri (PageView) cihaz ve ülkeye göre.
 
@@ -18,6 +18,7 @@ from django.utils.translation import gettext_lazy as _
 
 from account.models import AccountEvent, AccountEventKind, PageView
 from cart.models import CartAddEvent
+from core.visitor import DEVICE_ICONS, DEVICE_LABELS, flag
 from learning.models import LessonView
 from order.models import OrderItem
 
@@ -27,8 +28,6 @@ DAY_CHOICES = (7, 30, 90, 365)
 DEFAULT_DAYS = 30
 TOP = 8
 WEEKDAYS = (_("Pzt"), _("Sal"), _("Çar"), _("Per"), _("Cum"), _("Cmt"), _("Paz"))
-DEVICE_LABELS = dict(desktop=_("Masaüstü"), mobile=_("Mobil"), tablet=_("Tablet"), bot=_("Bot"), other=_("Diğer"))
-DEVICE_ICONS = dict(desktop="laptop", mobile="phone", tablet="tablet", bot="robot", other="question-circle")
 # Tarayıcı bilgisi yalnız analitik izni verenlerde var (site.js); diğerleri "Bilinmiyor" satırına düşer.
 CONSENT_NOTE = _("izin verenler")
 THEME_LABELS = dict(dark=_("Koyu"), light=_("Açık"))
@@ -59,7 +58,6 @@ GROUPS = (
     ("browser", _("Tarayıcı"), "browser-chrome", "data__agent__browser__family", ""),
     ("language", _("Dil"), "translate", "data__language__base", ""),
     ("city", _("Şehir"), "geo-alt", _city_key, ""),
-    ("isp", _("İnternet sağlayıcısı"), "router", "data__geo__isp", ""),
     ("source", _("İlk geliş kaynağı"), "signpost-split", "data__visit__first__referrer_host", CONSENT_NOTE),
     ("campaign", _("UTM kaynağı"), "megaphone", "data__visit__first__utm__source", CONSENT_NOTE),
     ("screen", _("Ekran boyutu"), "aspect-ratio", _screen_key, CONSENT_NOTE),
@@ -75,14 +73,6 @@ def days_param(value):
     except (TypeError, ValueError):
         return DEFAULT_DAYS
     return days if days in DAY_CHOICES else DEFAULT_DAYS
-
-
-def flag(code):
-    """"TR" → 🇹🇷; geçersizse boş."""
-    code = (code or "").upper()
-    if len(code) != 2 or not code.isalpha():
-        return ""
-    return "".join(chr(0x1F1E6 + ord(letter) - ord("A")) for letter in code)
 
 
 def _percent(part, whole):
@@ -286,3 +276,33 @@ def overview(days=DEFAULT_DAYS):
         watching=watching(since),
         pages=pages(since),
     )
+
+
+# Stüdyo detay sayfalarının ziyaretçi tabloları: [{at, label, data}] yeniden eskiye.
+MEMBER_EVENTS = 25
+
+
+def _cart_rows(events):
+    return [
+        dict(at=event.created_at, label=f"{event.get_source_display()} · {event.course or event.bundle or '—'}", data=event.data)
+        for event in events
+    ]
+
+
+def cart_events(cart):
+    """Sepete eklemeler (misafir sepetinden üyenin sepetine geçenler dahil)."""
+    if cart is None:
+        return []
+    return _cart_rows(cart.add_events.select_related("course", "bundle").order_by("-created_at"))
+
+
+def member_events(user, limit=MEMBER_EVENTS):
+    """Üyenin kayıt ve girişleri, sepete eklemeleri, ders izlemeleri ve sayfa ziyaretleri birlikte; son limit kayıt."""
+    rows = [dict(at=event.created_at, label=event.get_kind_display(), data=event.data) for event in AccountEvent.objects.filter(user=user)[:limit]]
+    rows += _cart_rows(CartAddEvent.objects.filter(user=user).select_related("course", "bundle")[:limit])
+    rows += [
+        dict(at=view.created_at, label=_("Ders izledi · %(lesson)s") % dict(lesson=view.lesson or "—"), data=view.data)
+        for view in LessonView.objects.filter(user=user).select_related("lesson")[:limit]
+    ]
+    rows += [dict(at=visit.created_at, label=_("Sayfa · %(path)s") % dict(path=visit.path), data=visit.data) for visit in PageView.objects.filter(user=user)[:limit]]
+    return sorted(rows, key=lambda row: row["at"], reverse=True)[:limit]
