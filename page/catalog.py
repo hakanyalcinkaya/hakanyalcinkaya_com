@@ -698,7 +698,7 @@ def _continue_slugs(slug):
     return lesson["section_slug"], lesson["lesson_slug"]
 
 
-LEGAL_UPDATED = "2 Kasım 2026"
+LEGAL_UPDATED = "10 Kasım 2026"
 
 _PRIVACY = (
     (
@@ -707,11 +707,11 @@ _PRIVACY = (
     ),
     (
         "Topladığımız veriler",
-        "Hesap oluştururken verdiğin ad ve e-posta adresi, satın aldığın kurslar, ders ilerlemen ve aldığın notlar. Kartla ödemede ödeme adımında yazdığın ad soyad, cep telefonu ve e-posta adresi ödemenin yapılabilmesi için ödeme sağlayıcısı PayTR’ye iletilir; telefon numaran bizde saklanmaz. Kart bilgilerini doğrudan PayTR’nin güvenli formuna girersin; kart bilgilerin bize ulaşmaz.",
+        "Hesap oluştururken verdiğin ad ve e-posta adresi, satın aldığın kurslar, ders ilerlemen ve aldığın notlar. Kartla ödemede ödeme adımında yazdığın ad soyad, cep telefonu ve e-posta adresi ödemenin yapılabilmesi için ödeme sağlayıcısı PayTR’ye iletilir; telefon numaran bizde saklanmaz. Kart bilgilerini doğrudan PayTR’nin güvenli formuna girersin; kart bilgilerin bize ulaşmaz. Sepete kurs eklediğinde, kayıt olduğunda, giriş yaptığında, üyeyken bir sayfa açtığında ve ders izlediğinde (hangi dersi, ne kadar süre izlediğin ve bitirip bitirmediğin) o anki IP adresin, IP adresine göre ülke, şehir ve internet sağlayıcın, tarayıcın, işletim sistemin, cihaz türün ve dil tercihin kaydedilir; analitiğe izin verdiysen ekran boyutu, saat dilimi, tema tercihi ve siteye ilk geldiğin sayfa ile kaynak (ör. arama motoru, kampanya bağlantısı) da eklenir.",
     ),
     (
         "Verileri hangi amaçla kullanıyoruz",
-        "Kurslara erişimini sağlamak, ilerlemeni kaydetmek, siparişlerini yönetmek ve izin verdiysen yeni kurslardan haberdar etmek için.",
+        "Kurslara erişimini sağlamak, ilerlemeni kaydetmek, siparişlerini yönetmek, izin verdiysen yeni kurslardan haberdar etmek, hesabını kötüye kullanıma karşı korumak ve sitenin nasıl kullanıldığını (hangi ülkelerden, hangi cihazlarla, hangi kaynaklardan gelindiğini) istatistik olarak anlamak için.",
     ),
     (
         "Verilerin aktarılması",
@@ -719,7 +719,7 @@ _PRIVACY = (
     ),
     (
         "Saklama süresi",
-        "Hesabın açık olduğu sürece ve yasal yükümlülüklerin gerektirdiği süre boyunca saklanır. Hesabını kapattığında veriler makul süre içinde silinir ya da anonimleştirilir.",
+        "Hesabın açık olduğu sürece ve yasal yükümlülüklerin gerektirdiği süre boyunca saklanır. Hesabını kapattığında veriler makul süre içinde silinir ya da anonimleştirilir. Sepete ekleme, kayıt, giriş, sayfa ziyareti ve ders izleme kayıtlarındaki IP adresi 180 gün sonra maskelenir (son kısmı silinir); ülke, şehir ve cihaz bilgileri istatistik için saklanmaya devam eder.",
     ),
     (
         "Çerezler",
@@ -781,6 +781,7 @@ _COOKIES = (
             ("messages", "Zorunlu çerez", "“Kaydedildi” gibi bildirimleri bir sonraki sayfaya taşır.", "Bir sonraki sayfaya kadar"),
             ("site-theme, site-accent", "Tarayıcı depolaması (tercih)", "Seçtiğin tema ve vurgu rengini hatırlar.", "Sen silene kadar"),
             ("hy-analytics-consent", "Tarayıcı depolaması (tercih)", "Analitik çerezlere izin verip vermediğini hatırlar.", "Sen silene kadar"),
+            ("hy_client, hy-first-visit, hy-page-views", "Analitik çerez ve tarayıcı depolaması (izinle)", "Ekran boyutunu, saat dilimini, tema tercihini, sayfa görüntüleme sayısını ve siteye ilk geldiğin sayfa ile kaynağı tutar; yalnız sepete ekleme, kayıt, giriş, üye sayfa ziyareti ve ders izlemede bu siteye kaydedilir.", "30 gün (depolama: sen silene kadar)"),
             ("_ga, _ga_*", "Analitik çerez (izinle)", "Google Analytics: hangi sayfaların ziyaret edildiğini ve sitenin nasıl kullanıldığını istatistik olarak ölçer.", "2 yıl"),
         ),
     ),
@@ -895,7 +896,7 @@ def _analytics_rows(kind, rows):
         if table:
             table = [
                 tuple(
-                    (name, "Analitik çerez", *rest) if name.startswith("_ga") else (name, kind_label, *rest)
+                    (name, "Analitik çerez", *rest) if name.startswith(("_ga", "hy_client")) else (name, kind_label, *rest)
                     for name, kind_label, *rest in table[0]
                     if name != "hy-analytics-consent"
                 )

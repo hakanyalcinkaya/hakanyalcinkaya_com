@@ -1,11 +1,12 @@
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Case, Count, IntegerField, OuterRef, Subquery, Value, When
 from django.db.models.functions import Cast, Coalesce, Round
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel, Status
+from core.models import BaseModel, BaseVisitorEvent, Status
 from course.models import SubtitleLanguage
 
 
@@ -348,3 +349,72 @@ class PlayerPreference(BaseModel):
             "autoplay": self.autoplay,
             "autoplayNext": self.autoplay_next,
         }
+
+
+# Konum bildirimleri arasında bundan uzun ileri sıçrama (ileri sarma) izlenen süreye eklenmez.
+WATCH_STEP_LIMIT = 30
+
+
+class LessonView(BaseVisitorEvent):
+    """Ders izleme (istatistik için): üye × ders × gün başına bir satır. Ders sayfası açılınca oluşur (o günkü ilk
+    açılışın ziyaretçi bilgileri data alanında, core.visitor), oynatıcının konum bildirimleri izlenen süreyi ve en ileri
+    saniyeyi, tamamlama da completed_at'i günceller. Önizleme ziyaretçileri (giriş yapmamış) kaydedilmez."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="lesson_views", verbose_name=_("kullanıcı"))
+    lesson = models.ForeignKey("course.Lesson", on_delete=models.SET_NULL, null=True, blank=True, related_name="views", verbose_name=_("ders"))
+    day = models.DateField(_("gün"))
+    opens = models.PositiveIntegerField(_("açılış"), default=1)
+    watched_seconds = models.PositiveIntegerField(_("izlenen saniye"), default=0)
+    last_position = models.PositiveIntegerField(_("son saniye"), default=0)
+    max_position = models.PositiveIntegerField(_("en ileri saniye"), default=0)
+    completed_at = models.DateTimeField(_("tamamlanma"), null=True, blank=True)
+
+    class Meta(BaseVisitorEvent.Meta):
+        verbose_name = _("ders izleme")
+        verbose_name_plural = _("ders izlemeleri")
+        constraints = [models.UniqueConstraint(fields=("user", "lesson", "day"), name="lesson_view_unique_user_lesson_day")]
+        indexes = [
+            models.Index(fields=("day",), name="lesson_view_day"),
+            GinIndex(fields=("data",), name="lesson_view_data"),
+        ]
+
+    def __str__(self):
+        return f"{self.user or '-'} · {self.lesson or '-'} · {self.day}"
+
+    @classmethod
+    def open(cls, request, lesson):
+        """Ders sayfası açılışı: bugünün kaydını açar ya da açılış sayısını artırır."""
+        from core.visitor import collect
+
+        today = timezone.localdate()
+        view = cls.objects.filter(user=request.user, lesson=lesson, day=today).first()
+        if view is not None:
+            cls.objects.filter(pk=view.pk).update(opens=models.F("opens") + 1, updated_at=timezone.now())
+            return view
+        data = dict(collect(request, light=True), lesson=dict(title=str(lesson.title)[:300], course_id=str(lesson.section.course_id)))
+        view, _created = cls.objects.get_or_create(user=request.user, lesson=lesson, day=today, defaults=dict(data=data))
+        return view
+
+    @classmethod
+    def _today(cls, user, lesson):
+        return cls.objects.filter(user=user, lesson=lesson, day=timezone.localdate()).first()
+
+    @classmethod
+    def record_position(cls, user, lesson, seconds):
+        """Oynatıcının konum bildirimi: önceki konumdan WATCH_STEP_LIMIT saniyeye kadar ileri gidiş izlenmiş sayılır."""
+        view = cls._today(user, lesson)
+        if view is None:
+            return
+        step = seconds - view.last_position
+        if 0 < step <= WATCH_STEP_LIMIT:
+            view.watched_seconds += step
+        view.last_position = seconds
+        view.max_position = max(view.max_position, seconds)
+        view.save(update_fields=["watched_seconds", "last_position", "max_position", "updated_at"])
+
+    @classmethod
+    def record_completed(cls, user, lesson, done):
+        view = cls._today(user, lesson)
+        if view is not None:
+            view.completed_at = timezone.now() if done else None
+            view.save(update_fields=["completed_at", "updated_at"])

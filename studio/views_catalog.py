@@ -21,7 +21,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import InstructorProfile
 from course.models import Bundle, Category, Course, Technology
 from discount.models import Discount
-from studio import course_stats, dashboard_stats, overview_stats, period_stats
+from studio import course_stats, dashboard_stats, overview_stats, period_stats, visitor_stats
 from studio.forms import (
     BundleForm,
     CategoryForm,
@@ -185,7 +185,8 @@ def stats_overview(request):
 
 @superuser_required
 def stats_dashboard(request):
-    """İzometrik pano: genel istatistiklerin özeti kuleler, dönem nabzı, son 12 ay çubukları ve kurs şehri olarak."""
+    """İzometrik pano: genel istatistiklerin özeti kuleler, dönem nabzı, son 12 ay çubukları ve kurs şehri olarak; altta
+    ziyaretçiler (sepete ekleme, kayıt, giriş), dönem ?days= ile."""
     stats = overview_stats.summary()
     context = dict(
         stats=stats,
@@ -193,6 +194,7 @@ def stats_dashboard(request):
         pulse=dashboard_stats.pulse(period_stats.comparison()),
         trend=dashboard_stats.trend(overview_stats.trend()),
         city=dashboard_stats.city(overview_stats.courses()),
+        visitors=visitor_stats.overview(visitor_stats.days_param(request.GET.get("days"))),
     )
     return render(request, "studio/stats_dashboard.html", context)
 

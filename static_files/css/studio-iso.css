@@ -229,6 +229,40 @@ a.iso-prism:focus-visible .iso-top { outline: 2px solid var(--bs-emphasis-color)
 .col:nth-child(6n + 5) .iso-cube { --c: #14B8A6; }
 .col:nth-child(6n + 6) .iso-cube { --c: #A855F7; }
 
+/* Ziyaretçiler: ülke kuleleri, gün × saat ızgarası, kırılım çubukları */
+.iso-scene--countries { --pitch: clamp(34px, 7vw, 64px); --hmax: calc(var(--pitch) * 2.4); --scene-h: calc(var(--pitch) * 5); }
+.iso-scene--heat { --pitch: clamp(10px, 2.3vw, 22px); --cell: calc(var(--pitch) * 0.78); --hmax: calc(var(--pitch) * 4); --scene-h: calc(var(--pitch) * 13); }
+.iso-scene--heat .iso-prism { animation-delay: calc(var(--i, 0) * 25ms + 120ms); }
+.iso-prism--country { --c: #14B8A6; }
+.iso-prism--heat { --c: color-mix(in srgb, var(--bs-secondary-color) 35%, transparent); }
+.iso-prism--heat.has-value { --c: #F97316; }
+.iso-float--flag { font-size: calc(var(--cell) * 0.52); background: var(--bs-body-bg); }
+.iso-rank li + li { border-top: 1px solid var(--bs-border-color-translucent); }
+.iso-group {
+  border-radius: var(--bs-border-radius);
+  background: var(--bs-tertiary-bg);
+  padding: 0.75rem;
+}
+.iso-bar + .iso-bar { margin-top: 0.5rem; }
+.iso-bar-track {
+  height: 6px;
+  margin-top: 0.2rem;
+  border-radius: 3px;
+  background: var(--bs-border-color-translucent);
+  overflow: hidden;
+}
+.iso-bar-fill {
+  display: block;
+  height: 100%;
+  width: calc(var(--w) * 1%);
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6366F1, #EC4899);
+  transform-origin: left;
+  animation: iso-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 150ms);
+}
+@keyframes iso-grow { from { transform: scaleX(0); } }
+
 /* Hareket */
 @keyframes iso-rise { from { --t: 0; } }
 @keyframes iso-bob { 50% { transform: translateY(-7px); } }
@@ -243,7 +277,8 @@ a.iso-prism:focus-visible .iso-top { outline: 2px solid var(--bs-emphasis-color)
 
 @media (prefers-reduced-motion: reduce) {
   .iso-prism,
-  .iso-pulse { animation: none; }
+  .iso-pulse,
+  .iso-bar-fill { animation: none; }
   .iso-float,
   .iso-ring { animation: none; }
   .iso-ring { display: none; }

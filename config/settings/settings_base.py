@@ -25,6 +25,7 @@ BASE_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "django.contrib.sitemaps",
 ]
 
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "account.middleware.MemberPageViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -92,6 +94,8 @@ AUTH_USER_MODEL = "account.User"
 # ziyaretçi alttaki bantta izin verince yüklenir; kapalıyken her sayfada doğrudan yüklenir. Çerez ve Gizlilik
 # Politikası'ndaki analitik metinleri bu ayara göre değişir.
 GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="")
+# MaxMind GeoLite2 klasörü (GeoLite2-City.mmdb, GeoLite2-ASN.mmdb): sepete ekleme kaydında şehir ve internet sağlayıcısı.
+GEOIP_PATH = env("GEOIP_PATH", default="")
 GOOGLE_ANALYTICS_CONSENT = env.bool("GOOGLE_ANALYTICS_CONSENT", default=True)
 
 # Bunny Stream (varsayılan platform): yönetim panelinden video/altyazı yükleme, başlık güncelleme, süre okuma ve sitede HLS oynatma.

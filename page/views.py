@@ -20,11 +20,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 
+from account.models import AccountEventKind
 from account.tokens import ResetOrInviteTokenGenerator
+from cart.models import CartAddSource
 from cart.request_cart import current_cart
 from core import ratelimit
 from core.turnstile import client_ip
 from course.models import Course, Lesson, Review, ReviewSource
+from learning import tracking as learning_tracking
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
 from newsletter.models import Subscriber
@@ -278,6 +281,8 @@ def lesson(request, course_slug, section_slug, lesson_slug):
         favorite = dict(lesson_id=lesson.pk, is_favorite=Favorite.is_favorite(request.user, lesson))
         # Kaldığı yer: oynatıcı oradan başlar ve izlerken yazar.
         position = dict(lesson_id=lesson.pk, start=LessonProgress.resume_seconds(request.user, lesson))
+        # Ders izleme istatistiği: bugünkü açılış ve ziyaretçi bilgileri (learning.tracking).
+        learning_tracking.lesson_opened(request, lesson)
         enrollment = Enrollment.objects.for_user(request.user).filter(course=course).first()
         if enrollment is not None:
             # Kaldığı ders: Kurslarım'daki "Kaldığın dersten devam et", son izleme tarihi ve stüdyodaki izleme bilgisi.
@@ -400,6 +405,7 @@ def lesson_complete(request, lesson_id):
     lesson = _member_lesson(request, lesson_id)
     done = request.POST.get("done") == "1"
     LessonProgress.set_completed(request.user, lesson, done)
+    learning_tracking.completed_changed(request.user, lesson, done)
     if not request.htmx:
         return redirect(lesson.get_absolute_url())
     context = dict(
@@ -420,6 +426,7 @@ def lesson_position(request, lesson_id):
     if not form.is_valid():
         return JsonResponse(dict(ok=False, errors=form.errors.get_json_data()), status=400)
     LessonProgress.save_position(request.user, lesson, form.cleaned_data["seconds"])
+    learning_tracking.position_saved(request.user, lesson, form.cleaned_data["seconds"])
     return HttpResponse(status=204)
 
 
@@ -466,7 +473,7 @@ def buy(request, slug):
         messages.info(request, "Bu kursa zaten sahipsin.")
         return redirect(card["url"])
     try:
-        content.cart_add(request, slug)
+        content.cart_add(request, slug, source=CartAddSource.BUY)
     except ValidationError as error:
         messages.info(request, error.messages[0])
         return redirect("page:cart")
@@ -733,6 +740,7 @@ def signup(request):
     form = SignupForm(request.POST if request.method == "POST" else None, remote_ip=client_ip(request))
     if form.is_valid():
         user = form.save()
+        request.account_event_kind = AccountEventKind.SIGNUP
         auth_login(request, user)
         messages.success(request, f"Hesabın oluşturuldu. Hoş geldin, {user.first_name}!")
         return redirect("page:index")

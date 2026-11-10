@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from account.models import InstructorProfile, User
+from account.models import AccountEvent, InstructorProfile, PageView, User
 
 
 @admin.register(User)
@@ -45,3 +45,31 @@ class InstructorProfileAdmin(SortableAdminMixin, admin.ModelAdmin):
         (_("Yayın"), {"fields": ("status", "published_at")}),
     )
 
+
+
+@admin.register(AccountEvent)
+class AccountEventAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "kind", "country", "device", "created_at")
+    list_filter = ("kind", "created_at", ("ip_masked_at", admin.EmptyFieldListFilter))
+    search_fields = ("user__email",)
+    list_select_related = ("user",)
+    raw_id_fields = ("user",)
+    readonly_fields = ("user", "kind", "data", "ip_masked_at", "created_at", "updated_at")
+
+    @admin.display(description=_("ülke"))
+    def country(self, obj):
+        return (obj.data.get("geo") or {}).get("country_code", "")
+
+    @admin.display(description=_("cihaz"))
+    def device(self, obj):
+        return (obj.data.get("agent") or {}).get("type", "")
+
+
+@admin.register(PageView)
+class PageViewAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "view_name", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("user__email", "path")
+    list_select_related = ("user",)
+    raw_id_fields = ("user",)
+    readonly_fields = ("user", "path", "view_name", "data", "ip_masked_at", "created_at", "updated_at")

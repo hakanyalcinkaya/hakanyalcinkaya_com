@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from learning.models import Enrollment, Favorite, LessonProgress, Note, PlayerPreference
+from learning.models import Enrollment, Favorite, LessonProgress, LessonView, Note, PlayerPreference
 
 
 @admin.register(Enrollment)
@@ -47,3 +47,13 @@ class PlayerPreferenceAdmin(admin.ModelAdmin):
     search_fields = ("user__email",)
     list_select_related = ("user",)
     autocomplete_fields = ("user",)
+
+
+@admin.register(LessonView)
+class LessonViewAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "opens", "watched_seconds", "max_position", "completed_at")
+    list_filter = ("day",)
+    search_fields = ("user__email", "lesson__title")
+    list_select_related = ("user", "lesson")
+    raw_id_fields = ("user", "lesson")
+    readonly_fields = ("user", "lesson", "day", "opens", "watched_seconds", "last_position", "max_position", "completed_at", "data", "ip_masked_at", "created_at", "updated_at")

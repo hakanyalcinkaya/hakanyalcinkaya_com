@@ -245,6 +245,49 @@ Denemek için (göndermeden): `sudo -u deploy -H /var/Env/hakanyalcinkaya_312/bi
 (proje klasöründe). Belirli bir gün: `--date 2026-11-02`; başka adrese: `--to`. Gönderilen rapor Stüdyo → E-posta
 kayıtlarında "Günlük rapor (yönetici)" olarak görünür.
 
+## 17. Ziyaretçi bilgileri: GeoLite2 ve IP maskeleme
+
+Sepete ekleme, kayıt, giriş, üye sayfa ziyareti ve ders izlemede ziyaretçinin ağ, konum, cihaz ve dil bilgisi kaydedilir
+(`core/visitor.py`). Site Cloudflare arkasında: IP `CF-Connecting-IP`, ülke `CF-IPCountry` başlığından gelir. Bu
+başlıklar yalnız istek gerçekten Cloudflare'den geliyorsa güvenilirdir; sunucu doğrudan erişime açıksa Nginx'te yalnız
+Cloudflare IP aralıklarına izin verilmelidir.
+
+Şehir, bölge ve internet sağlayıcısı için MaxMind GeoLite2 (ücretsiz hesap: https://www.maxmind.com/en/geolite2/signup,
+sonra Account → Manage License Keys → Generate new license key). Dosyalar git'e girmez; `.env` içinde `GEOIP_PATH`
+klasörü verilir. Dosya yoksa şehir ve sağlayıcı boş kalır, kayıt yine yazılır. Komutlar root olarak; `.env` deploy
+kullanıcısınındır, ona deploy olarak yazılır.
+
+```bash
+apt update && apt install -y geoipupdate             # bulunamazsa: add-apt-repository ppa:maxmind/ppa
+cp /etc/GeoIP.conf /etc/GeoIP.conf.bak 2>/dev/null || true
+tee /etc/GeoIP.conf >/dev/null <<'CONF'
+AccountID <hesap no>
+LicenseKey <lisans anahtarı>
+EditionIDs GeoLite2-City GeoLite2-ASN
+DatabaseDirectory /var/lib/GeoIP
+CONF
+chmod 600 /etc/GeoIP.conf                            # lisans anahtarı başkası okumasın
+mkdir -p /var/lib/GeoIP && geoipupdate -v            # GeoLite2-City.mmdb ve GeoLite2-ASN.mmdb iner
+ls -l /var/lib/GeoIP                                 # dosyalar herkesçe okunur (644) olmalı; uWSGI okuyabilsin
+cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj
+grep -q '^GEOIP_PATH=' .env || sudo -u deploy sh -c "echo 'GEOIP_PATH=/var/lib/GeoIP' >> .env"
+sudo -u deploy touch reload.txt                      # yalnız bu site yeniden yüklenir
+echo '0 4 * * 3 root /usr/bin/geoipupdate' > /etc/cron.d/geoipupdate   # her Çarşamba 04:00 güncelle
+```
+
+Denemek için (proje klasöründe):
+`sudo -u deploy -H /var/Env/hakanyalcinkaya_312/bin/python manage.py shell -c "from core.visitor import _geo; from django.test import RequestFactory; print(_geo(RequestFactory().get('/'), '85.105.0.1'))"`
+— `country_code: TR` ve `isp` dolu gelmeli (`city` her IP için olmayabilir).
+
+IP adresi 180 gün sonra maskelenir (IPv4'te son sekizli, IPv6'da /48 sonrası sıfırlanır); ülke, şehir ve cihaz kalır:
+
+```bash
+sudo touch /var/www/hakanyalcinkaya/log/mask-ips.log && sudo chown deploy:www-data /var/www/hakanyalcinkaya/log/mask-ips.log
+echo '30 1 * * * deploy cd /var/www/hakanyalcinkaya/hakanyalcinkaya_dj && /var/Env/hakanyalcinkaya_312/bin/python manage.py mask_visitor_ips >> /var/www/hakanyalcinkaya/log/mask-ips.log 2>&1' | sudo tee /etc/cron.d/hakanyalcinkaya-mask-ips
+```
+
+Denemek için: `manage.py mask_visitor_ips --dry-run`.
+
 ## Güncelleme (deploy)
 
 `main`'e push edilince GitHub Actions sunucuyu kendisi günceller: kurulum ve kullanım [DEPLOY.md](DEPLOY.md). Elle

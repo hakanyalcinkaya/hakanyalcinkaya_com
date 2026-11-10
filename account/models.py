@@ -1,11 +1,12 @@
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID, SiteSettings
+from core.models import BaseModel, BaseSortOrder, BaseStatus, BaseUUID, BaseVisitorEvent, SiteSettings
 from core.text import slugify_tr
 
 
@@ -142,3 +143,51 @@ class InstructorProfile(BaseModel, BaseStatus, BaseSortOrder):
     def initials(self):
         return lower_tr("".join(part[:1] for part in self.display_name.split()[:2]))
 
+
+
+class AccountEventKind(models.TextChoices):
+    SIGNUP = "signup", _("Kayıt")
+    LOGIN = "login", _("Giriş")
+
+
+class AccountEvent(BaseVisitorEvent):
+    """Kayıt ve giriş (istatistik için, silinmez): o anki ağ, konum, cihaz, dil, tarayıcı ve geliş bilgileri data
+    alanında (core.visitor.collect, account.tracking). Kayıt olan kullanıcı aynı anda giriş yapar; bu tek "signup"
+    kaydıdır. IP, core.visitor.IP_RETENTION_DAYS gün sonra maskelenir."""
+
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="account_events", verbose_name=_("kullanıcı")
+    )
+    kind = models.CharField(_("tür"), max_length=10, choices=AccountEventKind, db_index=True)
+
+    class Meta(BaseVisitorEvent.Meta):
+        verbose_name = _("kayıt / giriş")
+        verbose_name_plural = _("kayıtlar ve girişler")
+        indexes = [
+            models.Index(fields=("kind", "created_at"), name="account_event_kind_created"),
+            GinIndex(fields=("data",), name="account_event_data"),
+        ]
+
+    def __str__(self):
+        return f"{self.user or '-'} · {self.get_kind_display()} · {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class PageView(BaseVisitorEvent):
+    """Giriş yapmış üyenin tam sayfa ziyareti (istatistik için; account.middleware.MemberPageViewMiddleware): adres,
+    görünüm adı ve ziyaretçi bilgileri (core.visitor, hafif). Personel, stüdyo, yönetim, HTMX parçaları, yönlendirmeler
+    ve hatalar kaydedilmez. IP, core.visitor.IP_RETENTION_DAYS gün sonra maskelenir."""
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="page_views", verbose_name=_("kullanıcı"))
+    path = models.CharField(_("adres"), max_length=300)
+    view_name = models.CharField(_("görünüm"), max_length=100, blank=True, db_index=True)
+
+    class Meta(BaseVisitorEvent.Meta):
+        verbose_name = _("sayfa ziyareti")
+        verbose_name_plural = _("sayfa ziyaretleri")
+        indexes = [
+            models.Index(fields=("created_at",), name="page_view_created"),
+            models.Index(fields=("user", "created_at"), name="page_view_user_created"),
+        ]
+
+    def __str__(self):
+        return f"{self.user or '-'} · {self.path}"

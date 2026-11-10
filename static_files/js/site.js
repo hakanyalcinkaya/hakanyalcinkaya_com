@@ -1267,3 +1267,71 @@
 
   syncTheme();
 })();
+
+/* Ziyaretçi bilgisi çerezi (hy_client, core/visitor.py okur): ekran, saat dilimi, dil, tema, cihaz kapasitesi ve siteye
+   ilk giriş (sayfa, referrer, UTM). Sepete ekleme, kayıt, giriş, üye sayfa ziyareti ve ders izlemede kaydedilir; çerez başka yere gönderilmez.
+   Analitik izni gerekir (çerez politikası). */
+(function () {
+  "use strict";
+
+  function store(key, value) {
+    try {
+      if (value === undefined) return JSON.parse(localStorage.getItem(key) || "null");
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      return null;
+    }
+    return value;
+  }
+
+  function raw(key) {
+    try {
+      return localStorage.getItem(key) || "";
+    } catch (error) {
+      return "";
+    }
+  }
+
+  // İzin bandı açıksa (data-consent) yalnız analitiğe izin verilmişse yazılır; izin yoksa çerez ve kayıtlar silinir.
+  var allowed = !document.querySelector("[data-consent]") || raw("hy-analytics-consent") === "granted";
+  if (!allowed) {
+    document.cookie = "hy_client=; Path=/; Max-Age=0; SameSite=Lax";
+    try {
+      localStorage.removeItem("hy-first-visit");
+      localStorage.removeItem("hy-page-views");
+    } catch (error) {
+      // depolama kapalı
+    }
+    return;
+  }
+
+  var first = store("hy-first-visit");
+  if (!first) {
+    var params = new URLSearchParams(location.search);
+    var utm = {};
+    ["source", "medium", "campaign", "term", "content"].forEach(function (key) {
+      var value = params.get("utm_" + key);
+      if (value) utm[key] = value.slice(0, 100);
+    });
+    var ref = document.referrer && document.referrer.indexOf(location.origin) !== 0 ? document.referrer : "";
+    first = store("hy-first-visit", { land: location.pathname.slice(0, 200), ref: ref.slice(0, 300), utm: utm, at: new Date().toISOString() });
+  }
+  var views = (store("hy-page-views") || 0) + 1;
+  store("hy-page-views", views);
+
+  var media = function (query) { return window.matchMedia && window.matchMedia(query).matches; };
+  var connection = navigator.connection || {};
+  var data = {
+    sw: screen.width, sh: screen.height, vw: window.innerWidth, vh: window.innerHeight,
+    dpr: Math.round((window.devicePixelRatio || 1) * 100) / 100, cd: screen.colorDepth,
+    tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || ""), tzo: -new Date().getTimezoneOffset(),
+    langs: (navigator.languages || [navigator.language]).slice(0, 5),
+    cs: media("(prefers-color-scheme: dark)") ? "dark" : "light", rm: media("(prefers-reduced-motion: reduce)"),
+    tp: navigator.maxTouchPoints || 0, hc: navigator.hardwareConcurrency || 0, dm: navigator.deviceMemory || 0,
+    net: connection.effectiveType || "", save: !!connection.saveData,
+    theme: raw("site-theme"), accent: raw("site-accent"),
+    pv: views, first: first || {}
+  };
+  var secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = "hy_client=" + encodeURIComponent(JSON.stringify(data)) + "; Path=/; Max-Age=2592000; SameSite=Lax" + secure;
+})();

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from cart.models import Cart, CartItem, CartItemRemoval
+from cart.models import Cart, CartAddEvent, CartItem, CartItemRemoval
 
 
 class CartItemInline(admin.TabularInline):
@@ -45,3 +45,21 @@ class CartItemAdmin(admin.ModelAdmin):
     autocomplete_fields = ("course", "bundle")
     raw_id_fields = ("cart",)
 
+
+
+@admin.register(CartAddEvent)
+class CartAddEventAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "source", "user", "country", "device", "created_at")
+    list_filter = ("source", "created_at", ("ip_masked_at", admin.EmptyFieldListFilter))
+    search_fields = ("course__title", "bundle__title", "user__email")
+    list_select_related = ("course", "bundle", "user")
+    raw_id_fields = ("cart", "course", "bundle", "user")
+    readonly_fields = ("cart", "course", "bundle", "user", "source", "data", "ip_masked_at", "created_at", "updated_at")
+
+    @admin.display(description=_("ülke"))
+    def country(self, obj):
+        return (obj.data.get("geo") or {}).get("country_code", "")
+
+    @admin.display(description=_("cihaz"))
+    def device(self, obj):
+        return (obj.data.get("agent") or {}).get("type", "")

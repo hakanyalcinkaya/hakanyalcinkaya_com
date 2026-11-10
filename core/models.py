@@ -149,3 +149,33 @@ class SiteSettings(BaseCreatedAtUpdatedAt):
     @classmethod
     def title_sync_enabled(cls):
         return cls.load().sync_video_titles
+
+
+class VisitorEventQuerySet(models.QuerySet):
+    def unmasked_before(self, moment):
+        """IP'si henüz maskelenmemiş, verilen andan önceki kayıtlar."""
+        return self.filter(created_at__lt=moment, ip_masked_at__isnull=True)
+
+
+class BaseVisitorEvent(BaseModel):
+    """Ziyaretçi bilgisi tutan kayıtların ortak alanları: data (core.visitor.collect) ve IP'nin maskelendiği an."""
+
+    data = models.JSONField(_("bilgiler"), default=dict, blank=True)
+    ip_masked_at = models.DateTimeField(_("IP maskelenme"), null=True, blank=True)
+
+    objects = VisitorEventQuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+        ordering = ("-created_at",)
+
+    def mask_ip(self, moment=None):
+        """IP'yi maskeler (data.network.ip), maskelenme anını yazar; diğer bilgiler değişmez."""
+        from core.visitor import mask_ip
+
+        network = dict(self.data.get("network") or {})
+        network["ip"] = mask_ip(network.get("ip", ""))
+        network["masked"] = True
+        self.data = dict(self.data, network=network)
+        self.ip_masked_at = moment or timezone.now()
+        self.save(update_fields=["data", "ip_masked_at", "updated_at"])

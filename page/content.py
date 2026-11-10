@@ -18,7 +18,8 @@ from django.templatetags.static import static
 from django.urls import reverse
 
 from account.models import User
-from cart.models import CartRemovalReason
+from cart import tracking
+from cart.models import CartAddSource, CartRemovalReason
 from cart.pricing import price_cart
 from cart.request_cart import current_cart
 from core.duration import ceil_minutes, clock, hours_minutes
@@ -344,13 +345,16 @@ def order_thanks(order, user):
     return dict(items=items, start_url=lesson.get_absolute_url() if lesson else "", headline=headline)
 
 
-def cart_add(request, slug):
-    """Kursu sepete ekler; veritabanındaki kursta sepet kaydına (sahip olunan ya da paketteki kurs eklenmez)."""
+def cart_add(request, slug, source=CartAddSource.ADD):
+    """Kursu sepete ekler; veritabanındaki kursta sepet kaydına (sahip olunan ya da paketteki kurs eklenmez). Eklenince
+    ekleyenin bilgileri istatistik için kaydedilir (cart.tracking)."""
     course = Course.objects.filter(slug=slug).first()
     if course is None:
         catalog.cart_add(request.session, slug)
         return
-    current_cart(request, create=True).add_course(course)
+    cart = current_cart(request, create=True)
+    cart.add_course(course)
+    tracking.record(request, cart, source, course=course)
 
 
 def cart_remove(request, slug):

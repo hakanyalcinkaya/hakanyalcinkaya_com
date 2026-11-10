@@ -1,11 +1,12 @@
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModel
+from core.models import BaseModel, BaseVisitorEvent
 
 
 class CartStatus(models.TextChoices):
@@ -193,6 +194,8 @@ class Cart(BaseModel):
             if self.checkout_at and not target.checkout_at:
                 target.checkout_at = self.checkout_at
                 target.save(update_fields=["checkout_at", "updated_at"])
+            # Sepete ekleme kayıtları satın alma izlensin diye üyenin sepetine geçer.
+            self.add_events.update(cart=target, user=target.user)
             self.status = CartStatus.MERGED
             self.save(update_fields=["status", "updated_at"])
         return target
@@ -277,3 +280,38 @@ class CartItemRemoval(BaseModel):
     @property
     def product(self):
         return self.bundle if self.bundle_id else self.course
+
+
+class CartAddSource(models.TextChoices):
+    ADD = "add", _("Sepete ekle")
+    BUY = "buy", _("Hemen satın al")
+
+
+class CartAddEvent(BaseVisitorEvent):
+    """Sepete her ekleme (istatistik için, silinmez): ekleyenin ağ, konum, cihaz, dil, tarayıcı ve geliş bilgileri ile
+    ürün data alanında (cart.tracking). Sepet, ürün ya da üye silinse de kayıt kalır; misafir sepeti üyeninkine katılınca
+    kayıt üyenin sepetine geçer. IP, core.visitor.IP_RETENTION_DAYS gün sonra maskelenir."""
+
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, related_name="add_events", verbose_name=_("sepet"))
+    course = models.ForeignKey(
+        "course.Course", on_delete=models.SET_NULL, null=True, blank=True, related_name="cart_add_events", verbose_name=_("kurs")
+    )
+    bundle = models.ForeignKey(
+        "course.Bundle", on_delete=models.SET_NULL, null=True, blank=True, related_name="cart_add_events", verbose_name=_("paket")
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="cart_add_events", verbose_name=_("kullanıcı")
+    )
+    source = models.CharField(_("kaynak"), max_length=10, choices=CartAddSource, default=CartAddSource.ADD)
+
+    class Meta(BaseVisitorEvent.Meta):
+        verbose_name = _("sepete ekleme")
+        verbose_name_plural = _("sepete eklemeler")
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("created_at",), name="cart_add_event_created"),
+            GinIndex(fields=("data",), name="cart_add_event_data"),
+        ]
+
+    def __str__(self):
+        return f"{self.course or self.bundle or '-'} · {self.created_at:%Y-%m-%d %H:%M}"
