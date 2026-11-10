@@ -8,6 +8,7 @@
     <p class="text-body-secondary mb-0">Tüm kurslar tek yerde. Ayrıntı için kurs adına, aylık satış ve sepet hunisi için siparişler ve sepetler sayfasına bak.</p>
   </div>
   <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'studio:stats_dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box me-1" aria-hidden="true"></i>İzometrik pano</a>
     <a href="{% url 'studio:orders' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-receipt me-1" aria-hidden="true"></i>Siparişler</a>
     <a href="{% url 'studio:carts' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-cart me-1" aria-hidden="true"></i>Sepetler</a>
     <a href="{% url 'studio:students' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-mortarboard me-1" aria-hidden="true"></i>Öğrenciler</a>

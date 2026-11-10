@@ -1,0 +1,252 @@
+/* Stüdyo izometrik pano (studio/stats_dashboard.html).
+   Sahne ortografik: .iso-floor zemini rotateX(55deg) rotateZ(-45deg) ile yatırılır, her .iso-prism üç yüzle (üst, ön,
+   sol yan) yükselir; zemin -45° döndüğü için görünen kenarlar y = hücre (sağ alt) ve x = 0 (sol alt) kenarlarıdır. Yükseklik --t (0–1, kayıtlı özellik) ile verilir ve sahne görünür olunca sıfırdan büyür. */
+
+@property --t {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.iso-card {
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-lg);
+  background: var(--bs-body-bg);
+  padding: 1rem;
+}
+@media (min-width: 992px) {
+  .iso-card { padding: 1.5rem; }
+}
+
+/* Sahne ve zemin */
+.iso-scene {
+  --pitch: 64px;
+  --cell: calc(var(--pitch) * 0.64);
+  --hmax: calc(var(--pitch) * 2.2);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--scene-h, 360px);
+  overflow: hidden;
+  border-radius: var(--bs-border-radius);
+  background:
+    radial-gradient(ellipse at 50% 70%, color-mix(in srgb, var(--bs-primary) 14%, transparent), transparent 65%),
+    var(--bs-tertiary-bg);
+}
+.iso-scene--towers { --pitch: clamp(48px, 11vw, 104px); --hmax: calc(var(--pitch) * 2.1); --scene-h: calc(var(--pitch) * 4.3); }
+.iso-scene--trend { --pitch: clamp(22px, 5.2vw, 52px); --cell: calc(var(--pitch) * 0.58); --hmax: calc(var(--pitch) * 3.4); --scene-h: calc(var(--pitch) * 8.6); }
+.iso-scene--city { --pitch: clamp(46px, 10vw, 88px); --cell: calc(var(--pitch) * 0.7); --hmax: calc(var(--pitch) * 2.6); --scene-h: calc(var(--pitch) * 5.4); }
+
+.iso-floor {
+  position: relative;
+  flex: none;
+  width: calc(var(--cols) * var(--pitch));
+  height: calc(var(--rows) * var(--pitch));
+  margin-top: calc(var(--hmax) * 0.55);
+  transform: rotateX(55deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+  border-radius: 6px;
+  background-color: color-mix(in srgb, var(--bs-body-bg) 70%, transparent);
+  background-image:
+    linear-gradient(var(--bs-border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bs-border-color) 1px, transparent 1px);
+  background-size: calc(var(--pitch) / 2) calc(var(--pitch) / 2);
+  box-shadow: 0 0 0 1px var(--bs-border-color);
+}
+
+/* Prizma */
+.iso-prism {
+  --c: var(--bs-primary);
+  --h: calc(var(--t) * var(--hmax));
+  --lift: 0px;
+  position: absolute;
+  left: calc(var(--x) * var(--pitch) + (var(--pitch) - var(--cell)) / 2);
+  top: calc(var(--y) * var(--pitch) + (var(--pitch) - var(--cell)) / 2);
+  width: var(--cell);
+  height: var(--cell);
+  transform: translateZ(var(--lift));
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: iso-rise 1.2s cubic-bezier(0.2, 0.9, 0.25, 1.12) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 120ms);
+}
+a.iso-prism:hover,
+a.iso-prism:focus-visible,
+.iso-prism[title]:hover { --lift: 10px; }
+a.iso-prism:focus-visible { outline: none; }
+a.iso-prism:focus-visible .iso-top { outline: 2px solid var(--bs-emphasis-color); outline-offset: 2px; }
+
+.iso-face {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.iso-top {
+  inset: 0;
+  transform: translateZ(var(--h));
+  background: color-mix(in srgb, var(--c) 88%, white);
+  color: #fff;
+  font-size: calc(var(--cell) * 0.42);
+  border-radius: 2px;
+}
+.iso-top .bi { transform: rotate(45deg); }
+.iso-front {
+  left: 0;
+  top: 100%;
+  width: 100%;
+  height: var(--h);
+  transform-origin: top;
+  transform: rotateX(90deg);
+  background: color-mix(in srgb, var(--c) 72%, black);
+}
+.iso-side {
+  left: 0;
+  top: 0;
+  width: var(--h);
+  height: 100%;
+  transform-origin: left;
+  transform: rotateY(-90deg);
+  background: color-mix(in srgb, var(--c) 52%, black);
+}
+
+/* Kulenin üstünde kameraya dönük yüzen simge */
+.iso-billboard {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateZ(calc(var(--h) + var(--cell) * 0.9)) rotateZ(45deg) rotateX(-55deg);
+  pointer-events: none;
+}
+.iso-float {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--cell) * 0.78);
+  height: calc(var(--cell) * 0.78);
+  border-radius: 50%;
+  background: var(--bs-body-bg);
+  color: var(--c);
+  font-size: calc(var(--cell) * 0.38);
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--c) 70%, transparent), 0 0 0 1px var(--bs-border-color);
+  animation: iso-bob 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -0.6s);
+}
+
+/* Gelir kulesinin altında yayılan halka */
+.iso-ring {
+  position: absolute;
+  inset: -40%;
+  border: 2px solid var(--c);
+  border-radius: 50%;
+  transform: translateZ(1px);
+  opacity: 0;
+  animation: iso-ring 2.8s ease-out infinite 1.4s;
+  pointer-events: none;
+}
+
+.iso-prism--students { --c: #6366F1; }
+.iso-prism--active { --c: #3B82F6; }
+.iso-prism--revenue { --c: #F59E0B; }
+.iso-prism--sales { --c: #EC4899; }
+.iso-prism--carts { --c: #14B8A6; }
+.iso-prism--enroll { --c: #6366F1; }
+.iso-prism--sales.is-current .iso-top { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--c) 88%, white) 0 4px, color-mix(in srgb, var(--c) 70%, white) 4px 8px); }
+
+/* Kurs binaları: pencere şeritleri, bitiren oranı kadar aydınlık kat */
+.iso-prism--building .iso-front {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 7px, rgb(255 255 255 / 0.1) 7px 9px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--c) 55%, white) calc(var(--done) * 1%), transparent 0),
+    color-mix(in srgb, var(--c) 72%, black);
+}
+.iso-prism--building .iso-side {
+  background:
+    repeating-linear-gradient(to right, transparent 0 7px, rgb(255 255 255 / 0.08) 7px 9px),
+    linear-gradient(to right, color-mix(in srgb, var(--c) 40%, white) calc(var(--done) * 1%), transparent 0),
+    color-mix(in srgb, var(--c) 52%, black);
+}
+
+/* Açıklamalar */
+/* Kule rengi yalnız etiketin simgesinde: kuleyle açıklamayı renk eşler. */
+.iso-legend { padding: 0.25rem 0; }
+.iso-legend .bi { color: var(--c, var(--bs-primary)); }
+.iso-legend--students { --c: #6366F1; }
+.iso-legend--active { --c: #3B82F6; }
+.iso-legend--revenue { --c: #F59E0B; }
+.iso-legend--sales { --c: #EC4899; }
+.iso-legend--carts { --c: #14B8A6; }
+
+.iso-dot {
+  display: inline-block;
+  width: 0.65em;
+  height: 0.65em;
+  margin-right: 0.35em;
+  border-radius: 2px;
+  background: var(--c);
+  transform: rotate(45deg) scaleY(0.8);
+  flex: none;
+}
+.iso-dot--sales { --c: #EC4899; }
+.iso-dot--enroll { --c: #6366F1; }
+.iso-trend-table { --bs-table-bg: transparent; }
+.iso-trend-table td { font-variant-numeric: tabular-nums; }
+
+/* Nabız kartları ve küçük küp */
+.iso-pulse {
+  animation: iso-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+.iso-pulse-cell {
+  border-radius: var(--bs-border-radius);
+  background: var(--bs-tertiary-bg);
+  padding: 0.5rem 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+.iso-cube {
+  --c: var(--bs-primary);
+  --s: 26px;
+  position: relative;
+  flex: none;
+  width: var(--s);
+  height: var(--s);
+  margin: 10px 12px 14px 10px;
+  transform: rotateX(55deg) rotateZ(-45deg);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.iso-pulse:hover .iso-cube { transform: rotateX(55deg) rotateZ(45deg); }
+.iso-cube > span { position: absolute; display: flex; align-items: center; justify-content: center; }
+.iso-cube-top { inset: 0; transform: translateZ(var(--s)); background: color-mix(in srgb, var(--c) 88%, white); color: #fff; font-size: 14px; }
+.iso-cube-top .bi { transform: rotate(45deg); }
+.iso-cube-left { left: 0; top: 100%; width: 100%; height: var(--s); transform-origin: top; transform: rotateX(90deg); background: color-mix(in srgb, var(--c) 72%, black); }
+.iso-cube-right { left: 0; top: 0; width: var(--s); height: 100%; transform-origin: left; transform: rotateY(-90deg); background: color-mix(in srgb, var(--c) 52%, black); }
+.col:nth-child(6n + 1) .iso-cube { --c: #EC4899; }
+.col:nth-child(6n + 2) .iso-cube { --c: #F59E0B; }
+.col:nth-child(6n + 3) .iso-cube { --c: #6366F1; }
+.col:nth-child(6n + 4) .iso-cube { --c: #3B82F6; }
+.col:nth-child(6n + 5) .iso-cube { --c: #14B8A6; }
+.col:nth-child(6n + 6) .iso-cube { --c: #A855F7; }
+
+/* Hareket */
+@keyframes iso-rise { from { --t: 0; } }
+@keyframes iso-bob { 50% { transform: translateY(-7px); } }
+@keyframes iso-ring {
+  0% { opacity: 0.7; transform: translateZ(1px) scale(0.5); }
+  100% { opacity: 0; transform: translateZ(1px) scale(1.4); }
+}
+@keyframes iso-up { from { opacity: 0; transform: translateY(12px); } }
+
+/* Sahne ekrana girene kadar beklet (studio-iso.js ekler ve kaldırır); JS yoksa hemen oynar. */
+.is-waiting .iso-prism { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .iso-prism,
+  .iso-pulse { animation: none; }
+  .iso-float,
+  .iso-ring { animation: none; }
+  .iso-ring { display: none; }
+  .iso-prism,
+  .iso-cube { transition: none; }
+}

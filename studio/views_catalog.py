@@ -21,7 +21,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import InstructorProfile
 from course.models import Bundle, Category, Course, Technology
 from discount.models import Discount
-from studio import course_stats, overview_stats, period_stats
+from studio import course_stats, dashboard_stats, overview_stats, period_stats
 from studio.forms import (
     BundleForm,
     CategoryForm,
@@ -181,6 +181,20 @@ def stats_overview(request):
         left_after_days=course_stats.LEFT_AFTER_DAYS,
     )
     return render(request, "studio/stats.html", context)
+
+
+@superuser_required
+def stats_dashboard(request):
+    """İzometrik pano: genel istatistiklerin özeti kuleler, dönem nabzı, son 12 ay çubukları ve kurs şehri olarak."""
+    stats = overview_stats.summary()
+    context = dict(
+        stats=stats,
+        towers=dashboard_stats.towers(stats),
+        pulse=dashboard_stats.pulse(period_stats.comparison()),
+        trend=dashboard_stats.trend(overview_stats.trend()),
+        city=dashboard_stats.city(overview_stats.courses()),
+    )
+    return render(request, "studio/stats_dashboard.html", context)
 
 
 # Katalog: aynı liste/form/silme akışı; satırlar türe özel partial ile çizilir.
