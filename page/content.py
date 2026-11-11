@@ -249,16 +249,22 @@ def owned_course_ids(user):
 
 
 def catalog_cards(user=None):
-    """Sitede listelenen kurs kartları; `owned` kullanıcının kurs kaydına (Enrollment) göre."""
-    courses = list(Course.objects.published().select_related("category").prefetch_related("technologies"))
+    """Sitede listelenen kurs kartları (yöneticiye taslak kurslar da, Course.objects.listed_for); `owned` kullanıcının
+    kurs kaydına (Enrollment) göre."""
+    courses = list(Course.objects.listed_for(user).select_related("category").prefetch_related("technologies"))
     if not courses:
         return [dict(card, owned=False, amount=Decimal(str(catalog.price_amount(card["price"])))) for card in catalog.course_catalog()]
     durations = defaultdict(list)
-    lessons = Lesson.objects.published().filter(section__status=Status.PUBLISHED, section__course__in=courses)
+    published = models.Q(status=Status.PUBLISHED, section__status=Status.PUBLISHED)
+    # Taslak kursun dersleri de çoğunlukla taslaktır; yöneticinin kartında hepsi sayılır.
+    lessons = Lesson.objects.filter(published | models.Q(section__course__status=Status.DRAFT), section__course__in=courses)
     for course_id, seconds in lessons.values_list("section__course_id", "duration_seconds"):
         durations[course_id].append({"seconds": seconds or 0})
     owned = owned_course_ids(user)
-    return [dict(_course_card(course, durations[course.pk]), owned=course.pk in owned) for course in courses]
+    return [
+        dict(_course_card(course, durations[course.pk]), owned=course.pk in owned, draft=course.status == Status.DRAFT)
+        for course in courses
+    ]
 
 
 def card_by_slug(slug, user=None, cards=None):
@@ -453,9 +459,10 @@ def welcome_video(video_id):
 
 
 def library_page(user, status):
-    """Kurslarım: kullanıcının kurs kayıtları (yayındaki kurslar), ilerlemesi ve filtreler (catalog.library_page biçimi)."""
+    """Kurslarım: kullanıcının kurs kayıtları (listelenen kurslar; yöneticiye taslaklar da), ilerlemesi ve filtreler
+    (catalog.library_page biçimi)."""
     enrollments = (
-        Enrollment.objects.filter(user=user, course__status=Status.PUBLISHED)
+        Enrollment.objects.filter(user=user, course__in=Course.objects.listed_for(user))
         .select_related("course__category", "last_lesson__section")
         .prefetch_related("course__technologies")
         # Son izlenen önce; hiç izlenmeyen (boş) sona: PostgreSQL azalan sırada boşları başa koyar.

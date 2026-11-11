@@ -223,6 +223,12 @@ class CourseQuerySet(StatusQuerySet):
             ),
         )
 
+    def listed_for(self, user):
+        """Sitede listelenen ve satın alınabilen kurslar: herkese yayındakiler, yöneticiye taslaklar da (yeni kursu
+        yayına almadan görmek ve satın almayı denemek için). Arşivdekiler listelenmez."""
+        statuses = (Status.PUBLISHED, Status.DRAFT) if user is not None and user.is_staff else (Status.PUBLISHED,)
+        return self.filter(status__in=statuses)
+
     def for_listing(self):
         return self.published().select_related("category").prefetch_related("subcategories", "technologies")
 
