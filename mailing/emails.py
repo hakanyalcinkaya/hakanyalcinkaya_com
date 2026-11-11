@@ -76,7 +76,7 @@ EMAILS = {
     "purchase_confirmation": _email(
         "Satın alma onayı",
         "Satın alma",
-        "Ödemesi onaylanan sipariş (PayTR ile kartla ödeme, stüdyoda havale onayı): satın alınan kurslar, tutarlar, Kurslarım ve sözleşme bağlantısı.",
+        "Ödemesi onaylanan sipariş (iyzico ile kartla ödeme, stüdyoda havale onayı): satın alınan kurslar, tutarlar, Kurslarım ve sözleşme bağlantısı.",
         {
             **COMMON_VARIABLES,
             **ITEM_VARIABLES,

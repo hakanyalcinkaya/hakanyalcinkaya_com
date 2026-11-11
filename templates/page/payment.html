@@ -1,11 +1,9 @@
 {% extends "_base/base.html" %}
 {% load core_tags %}
 
-{# Kartla ödeme (/checkout/pay/<sipariş no>/): PayTR'nin ödeme formu ya da dönüşten sonra onay beklenirken durum. #}
+{# Kartla ödeme (/checkout/pay/<sipariş no>/?result=ok): iyzico'dan dönüşten sonra onay beklenirken durum. #}
 {% block title %}Kartla ödeme — Hakan Yalçınkaya{% endblock %}
-{% block head %}<meta name="robots" content="noindex">
-{# PayTR dönüşü iframe içinde açılırsa sayfa üst pencereye taşınır. #}
-<script>if (window.top !== window.self) window.top.location.href = window.location.href;</script>{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
 
 {% block content %}
 <div class="container py-4 py-lg-5">
@@ -14,12 +12,12 @@
 
   <div class="row g-4 g-lg-5">
     <div class="col-lg-7">
-      <section class="card" aria-label="Ödeme formu">
+      <section class="card" aria-label="Ödeme durumu">
         <div class="card-body p-2 p-sm-3">
           {% include "page/partials/payment_status.html" %}
         </div>
       </section>
-      <p class="small text-body-tertiary mt-3 mb-0"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i>Kart bilgilerini PayTR'nin güvenli formuna giriyorsun; kart bilgilerin bu sitede saklanmaz.</p>
+      <p class="small text-body-tertiary mt-3 mb-0"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i>Kart bilgilerini iyzico'nun güvenli ödeme sayfasına girdin; kart bilgilerin bu sitede saklanmaz.</p>
     </div>
 
     <aside class="col-lg-5" aria-labelledby="ozet-baslik">
@@ -42,15 +40,7 @@
           <p class="small text-body-tertiary mt-3 mb-0">Kurslar <b class="text-body-secondary">{{ order.email }}</b> hesabına açılacak.</p>
         </div>
       </div>
-      {% if not waiting %}<a href="{% url 'page:checkout' %}" class="d-inline-block small mt-3"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Ödeme adımına dön</a>{% endif %}
     </aside>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{% if iframe_url %}
-<script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
-<script>iFrameResize({}, "#paytriframe");</script>
-{% endif %}
 {% endblock %}

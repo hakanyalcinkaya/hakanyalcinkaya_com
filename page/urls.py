@@ -11,8 +11,10 @@ urlpatterns = [
     path("cart/", views.cart, name="cart"),
     path("checkout/", views.checkout, name="checkout"),
     path("checkout/pay/<slug:number>/", views.payment, name="payment"),
-    # PayTR'nin ödeme sonucu bildirimi; adres PayTR panelinde tanımlıdır, değişirse orada da güncellenmeli.
-    path("checkout/paytr/notify/", views.paytr_notification, name="paytr_notification"),
+    # iyzico'nun ödemeden sonra tarayıcıyı döndürdüğü adres (ödeme formu açılırken gönderilir).
+    path("checkout/iyzico/callback/<slug:number>/", views.iyzico_callback, name="iyzico_callback"),
+    # iyzico webhook'u; adres iyzico panelinde (Ayarlar › Bildirimler) tanımlıdır, değişirse orada da güncellenmeli.
+    path("checkout/iyzico/webhook/", views.iyzico_webhook, name="iyzico_webhook"),
     # Numarasız eski teşekkür adresi: siparişler Kurslarım'da.
     path("thanks/", RedirectView.as_view(pattern_name="page:library")),
     path("thanks/<slug:number>/", views.thanks, name="thanks"),

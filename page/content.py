@@ -6,6 +6,7 @@ Taslak kurs, bölüm ve dersler yalnız personele görünür (stüdyodan yüklen
 """
 
 import json
+import logging
 import re
 from collections import defaultdict
 from decimal import Decimal
@@ -40,9 +41,11 @@ from course.models import (
     rating_summary,
 )
 from learning.models import Enrollment, LessonProgress
-from order import paytr
+from order import iyzico
 from order.models import Order
 from page import catalog
+
+logger = logging.getLogger(__name__)
 
 # Kurs taslakları (eski platformdaki adreslerle); eski kurs adreslerini yönlendirmek için okunur.
 OUTLINE_DIR = Path(__file__).resolve().parent.parent / "course" / "outlines"
@@ -309,22 +312,38 @@ def create_card_order(request, email):
 
 
 def start_card_payment(request, order, name, phone):
-    """PayTR ödeme formunun token'ı; oturuma yazılır, ödeme sayfası (Order.get_payment_url) iframe'i bununla açar.
-    PayTR müşteriyi ödeme sayfasına ?result=ok ya da ?result=fail ile döndürür. PayTR reddederse PaytrError."""
-    payment_url = request.build_absolute_uri(order.get_payment_url())
-    token = paytr.create_token(
+    """iyzico ödeme formunu açar; ödeme sayfasının adresi oturuma yazılır (Order.get_payment_url müşteriyi oraya
+    gönderir). iyzico ödemeden sonra tarayıcıyı siparişin callback adresine döndürür. iyzico reddederse IyzicoError."""
+    page_url = iyzico.initialize(
         order,
         client_ip(request),
         name,
         phone,
-        paytr.DIGITAL_ADDRESS,
-        ok_url=f"{payment_url}?result=ok",
-        fail_url=f"{payment_url}?result=fail",
+        callback_url=request.build_absolute_uri(reverse("page:iyzico_callback", kwargs={"number": order.number})),
     )
-    tokens = dict(list(request.session.get(catalog.PAYMENT_SESSION_KEY, {}).items())[-4:])
-    tokens[order.number] = token
-    request.session[catalog.PAYMENT_SESSION_KEY] = tokens
-    return token
+    pages = dict(list(request.session.get(catalog.PAYMENT_SESSION_KEY, {}).items())[-4:])
+    pages[order.number] = page_url
+    request.session[catalog.PAYMENT_SESSION_KEY] = pages
+    return page_url
+
+
+def apply_card_payment(token, number=None):
+    """Kartla ödemenin sonucunu token ile iyzico'dan sorar ve siparişe işler (Order.apply_card_result). number verilirse
+    (callback adresindeki sipariş) iyzico'nun sepet numarası onunla aynı olmalı: başka siparişin token'ı bu siparişi
+    ödeyemez. (sipariş ya da None, sonuç) döner; sonuç apply_card_result'unkiler, "review" (incelemede) ya da
+    "unknown" (sipariş eşleşmedi). iyzico'ya ulaşılamazsa IyzicoError."""
+    payment = iyzico.retrieve(token)
+    order = Order.objects.by_card().filter(number=payment.basket_id).first()
+    if order is None or (number and order.number != number):
+        logger.error("iyzico ödemesi: sipariş eşleşmedi (sepet %s, adres %s)", payment.basket_id, number)
+        return None, "unknown"
+    if payment.in_review:
+        logger.info("iyzico ödemesi %s: incelemede (tahsil %s TL)", order.number, payment.paid_price)
+        return order, "review"
+    result = order.apply_card_result(payment.is_success, payment.paid_price, payment.payment_id)
+    log = logger.info if result in ("paid", "failed", "skipped") else logger.error
+    log("iyzico ödemesi %s: %s (tahsil %s TL, sipariş %s TL) %s", order.number, result, payment.paid_price, order.total, payment.error)
+    return order, result
 
 
 def order_thanks(order, user):

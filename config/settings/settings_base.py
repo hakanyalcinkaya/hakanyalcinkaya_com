@@ -228,14 +228,14 @@ DAILY_REPORT_TO = env("DAILY_REPORT_TO", default="hakanyalcinkaya@gmail.com")
 # Cloudflare Turnstile (giriş yapmamış kullanıcının destek formunda bot koruması). Anahtar yoksa doğrulama kapalıdır.
 TURNSTILE_SITE_KEY = env("TURNSTILE_SITE_KEY", default="")
 TURNSTILE_SECRET_KEY = env("TURNSTILE_SECRET_KEY", default="")
-# PayTR iFrame API (kartla ödeme, order/paytr.py). Mağaza bilgileri PayTR panelinde (Destek & Kurulum › Entegrasyon
-# Bilgileri); tanımlı değilse kartla ödeme yapılamaz. Test modunda karttan para çekilmez (PayTR'nin test kartlarıyla).
-PAYTR_MERCHANT_ID = env("PAYTR_MERCHANT_ID", default="")
-PAYTR_MERCHANT_KEY = env("PAYTR_MERCHANT_KEY", default="")
-PAYTR_MERCHANT_SALT = env("PAYTR_MERCHANT_SALT", default="")
-PAYTR_TEST_MODE = env.bool("PAYTR_TEST_MODE", default=True)
-# Taksit: 1 yalnız tek çekim; 2-12 ödeme formunda gösterilecek en fazla taksit sayısı.
-PAYTR_MAX_INSTALLMENT = env.int("PAYTR_MAX_INSTALLMENT", default=1)
+# iyzico Checkout Form (kartla ödeme, order/iyzico.py). Anahtarlar iyzico panelinde (Ayarlar › Firma Ayarları); tanımlı
+# değilse kartla ödeme yapılamaz. Sandbox anahtarları ayrı hesaptan (sandbox-merchant.iyzipay.com) gelir; canlıda
+# IYZICO_BASE_URL=https://api.iyzipay.com.
+IYZICO_API_KEY = env("IYZICO_API_KEY", default="")
+IYZICO_SECRET_KEY = env("IYZICO_SECRET_KEY", default="")
+IYZICO_BASE_URL = env("IYZICO_BASE_URL", default="https://sandbox-api.iyzipay.com")
+# Taksit: 1 yalnız tek çekim; 2-12 ödeme sayfasında gösterilecek en fazla taksit sayısı (2, 3, 6, 9, 12).
+IYZICO_MAX_INSTALLMENT = env.int("IYZICO_MAX_INSTALLMENT", default=1)
 # Ödeme sayfasında kartla ödeme: boş kapalı ("Yakında"), "staff" yalnız yöneticilere (prod'da test modunda denemek
 # için), "all" herkese açık.
 CARD_PAYMENT_OPEN = env("CARD_PAYMENT_OPEN", default="")

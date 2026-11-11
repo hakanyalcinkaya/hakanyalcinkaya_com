@@ -15,7 +15,6 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonRespo
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
@@ -31,7 +30,7 @@ from learning import tracking as learning_tracking
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
 from mailing.models import EmailLog
 from newsletter.models import Subscriber
-from order import paytr
+from order import iyzico
 from order.models import Order
 from page import content
 from page.catalog import (
@@ -553,10 +552,10 @@ def cart(request):
 
 
 def card_payment_open(request):
-    """Kartla ödeme (PayTR) açık mı: settings.CARD_PAYMENT_OPEN "all" herkese, "staff" yalnız yöneticilere. Kapalıyken
+    """Kartla ödeme (iyzico) açık mı: settings.CARD_PAYMENT_OPEN "all" herkese, "staff" yalnız yöneticilere. Kapalıyken
     sipariş oluşturulmaz, sepet bekler."""
     mode = settings.CARD_PAYMENT_OPEN
-    return paytr.is_configured() and (mode == "all" or (mode == "staff" and request.user.is_staff))
+    return iyzico.is_configured() and (mode == "all" or (mode == "staff" and request.user.is_staff))
 
 
 def checkout(request):
@@ -589,7 +588,7 @@ def checkout(request):
             return redirect(order.get_thanks_url())
         try:
             content.start_card_payment(request, order, form.cleaned_data["name"], form.cleaned_data["phone"])
-        except paytr.PaytrError:
+        except iyzico.IyzicoError:
             order.mark_failed()
             messages.error(request, "Ödeme sayfası şu an açılamadı; biraz sonra tekrar dene. Sorun sürerse bize yaz.")
             return redirect("page:checkout")
@@ -608,64 +607,72 @@ def checkout(request):
     )
 
 
-@xframe_options_sameorigin
 def payment(request, number):
-    """Kartla ödeme: PayTR'nin ödeme formu (iframe). PayTR müşteriyi ?result=ok ya da ?result=fail ile buraya döndürür
-    (dönüş iframe içinde açılırsa sayfa üst pencereye taşınır). Dönüş ödemenin kanıtı değildir: sipariş yalnız PayTR
-    bildirimiyle ödenir; o gelene kadar sayfa birkaç saniyede bir durumu sorar (HTMX), ödenince teşekkür sayfasına geçer."""
+    """Kartla ödeme: müşteri iyzico'nun ödeme sayfasına gönderilir (adresi oturumda). iyzico tarayıcıyı callback'e
+    döndürür; callback sonucu işleyip buraya ?result=ok ya da ?result=fail ile yönlendirir. Sonuç henüz kesinleşmediyse
+    (incelemede ya da webhook bekleniyor) sayfa birkaç saniyede bir durumu sorar (HTMX), ödenince teşekkür sayfasına geçer."""
     orders = Order.objects.by_card().visible_to(request.user, request.session.get(ORDERS_SESSION_KEY, []))
     order = get_object_or_404(orders, number=number)
     go = HttpResponseClientRedirect if request.htmx else redirect
     if order.is_paid:
         return go(order.get_thanks_url())
     result = request.GET.get("result")
-    token = request.session.get(PAYMENT_SESSION_KEY, {}).get(order.number)
     if order.is_failed or result == "fail":
         messages.error(request, "Ödeme tamamlanamadı, kartından para çekilmedi. Bilgilerini kontrol edip tekrar deneyebilirsin.")
         return go(reverse("page:checkout"))
-    if result != "ok" and not token:
+    if result == "ok":
+        if request.htmx:
+            return render(request, "page/partials/payment_status.html", dict(order=order))
+        return render(request, "page/payment.html", dict(order=order, steps=purchase_steps(1)))
+    page_url = request.session.get(PAYMENT_SESSION_KEY, {}).get(order.number)
+    if not page_url:
         messages.info(request, "Ödeme oturumunun süresi doldu; kartla ödemeyi yeniden başlat.")
         return go(reverse("page:checkout"))
-    context = dict(order=order, waiting=result == "ok", iframe_url="" if result == "ok" else paytr.iframe_url(token))
-    if request.htmx:
-        return render(request, "page/partials/payment_status.html", context)
-    return render(request, "page/payment.html", dict(context, steps=purchase_steps(1)))
+    return redirect(page_url)
 
 
 @csrf_exempt
 @require_POST
-def paytr_notification(request):
-    """PayTR Bildirim URL'si (panelde: Destek & Kurulum › Ayarlar › Bildirim URL Ayarları). Ödeme sonucunu PayTR sunucusu
-    POST eder; yetkiyi imza verir (CSRF anahtarı taşıyamaz). Sipariş yalnız burada ödenir. PayTR yanıt olarak yalnız
-    düz "OK" bekler, almazsa aynı bildirimi yeniden gönderir; işlenemeyen bildirim de (bulunamayan sipariş, tutar farkı)
-    günlüğe yazılıp OK ile kapatılır, tekrar gelmesi bir şey değiştirmez."""
+def iyzico_callback(request, number):
+    """iyzico'nun ödemeden sonraki dönüşü: tarayıcı iyzico'nun sitesinden token ile POST eder (CSRF anahtarı taşıyamaz,
+    oturum çerezi gelmeyebilir). Yetkiyi token ile iyzico'dan sorulan sonuç verir; sonuç işlenip ödeme sayfasına
+    yönlenir. iyzico'ya ulaşılamazsa sipariş bekler, sonucu webhook işler."""
+    token = request.POST.get("token", "")
+    result = "unknown"
+    if token:
+        try:
+            result = content.apply_card_payment(token, number)[1]
+        except iyzico.IyzicoError:
+            result = "error"
+    outcome = "fail" if result in ("failed", "unknown") else "ok"
+    return redirect(f"{reverse('page:payment', kwargs={'number': number})}?result={outcome}")
+
+
+@csrf_exempt
+@require_POST
+def iyzico_webhook(request):
+    """iyzico webhook'u (panelde: Ayarlar › Bildirimler). Gövdedeki token ile sonuç iyzico'dan sorulur, gövdenin geri
+    kalanına güvenilmez; müşteri dönüşten önce sayfayı kapatsa ya da ödeme incelemeden sonra onaylansa da sipariş ödenir.
+    Aynı bildirim birden çok gelebilir. İşlenemeyen bildirim günlüğe yazılıp 200 ile kapatılır; iyzico'ya ulaşılamazsa
+    503 döner, iyzico yeniden dener."""
     try:
-        notification = paytr.parse_notification(request.POST)
-    except paytr.PaytrError:
-        logger.warning("PayTR bildirimi reddedildi: imza geçersiz (%s)", request.POST.get("merchant_oid", ""))
-        return HttpResponseBadRequest("PAYTR notification failed: bad hash")
-    order = Order.objects.by_card().with_merchant_oid(notification.merchant_oid).first()
-    if order is None:
-        logger.error("PayTR bildirimi: sipariş bulunamadı (%s)", notification.merchant_oid)
-    elif notification.is_test and not settings.PAYTR_TEST_MODE:
-        logger.warning("PayTR bildirimi: canlı modda test ödemesi işlenmedi (%s)", order.number)
-    else:
-        result = order.apply_card_result(notification.is_success, notification.total_amount, notification.merchant_oid)
-        log = logger.info if result in ("paid", "failed") else logger.error
-        log(
-            "PayTR bildirimi %s: %s (tahsil %s TL, sipariş %s TL) %s",
-            order.number,
-            result,
-            notification.total_amount,
-            order.total,
-            notification.failed_reason,
-        )
+        data = json.loads(request.body)
+    except ValueError:
+        data = None
+    token = data.get("token") if isinstance(data, dict) else ""
+    if not token:
+        logger.warning("iyzico webhook'u reddedildi: token yok")
+        return HttpResponseBadRequest("missing token")
+    try:
+        content.apply_card_payment(token)
+    except iyzico.IyzicoError:
+        return HttpResponse("retry", status=503, content_type="text/plain")
     return HttpResponse("OK", content_type="text/plain")
 
 
 def thanks(request, number):
     """Satın almadan sonra ödenmiş siparişin özeti. Yalnız siparişin sahibi ya da siparişi bu tarayıcıda veren görür;
-    kartla ödeme sayfası PayTR onayı gelince buraya geçer (Order.get_thanks_url)."""
+    kartla ödeme sayfası iyzico onayı gelince buraya geçer (Order.get_thanks_url)."""
     orders = Order.objects.paid().visible_to(request.user, request.session.get(ORDERS_SESSION_KEY, []))
     order = get_object_or_404(orders, number=number)
     return render(request, "page/thanks.html", dict(order=order, steps=purchase_steps(2), **content.order_thanks(order, request.user)))

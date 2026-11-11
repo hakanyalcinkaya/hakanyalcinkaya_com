@@ -23,8 +23,8 @@ COUPON_SESSION_KEY = "coupon"
 ORDER_SESSION_KEY = "last_order"
 # Bu tarayıcıda verilen siparişlerin numaraları: misafir de kendi teşekkür sayfasını görebilir (Order.objects.visible_to).
 ORDERS_SESSION_KEY = "orders"
-# Kartla ödemede PayTR iframe token'ları, sipariş numarasına göre (son birkaç sipariş).
-PAYMENT_SESSION_KEY = "paytr_tokens"
+# Kartla ödemede iyzico ödeme sayfasının adresi, sipariş numarasına göre (son birkaç sipariş).
+PAYMENT_SESSION_KEY = "iyzico_pages"
 NEWSLETTER_SESSION_KEY = "newsletter_email"
 # [ÖRNEK] Sipariş modeli yokken satın alınan kurslar oturumda tutulur.
 PURCHASED_SESSION_KEY = "purchased"
@@ -698,7 +698,7 @@ def _continue_slugs(slug):
     return lesson["section_slug"], lesson["lesson_slug"]
 
 
-LEGAL_UPDATED = "10 Kasım 2026"
+LEGAL_UPDATED = "11 Kasım 2026"
 
 _PRIVACY = (
     (
@@ -707,7 +707,7 @@ _PRIVACY = (
     ),
     (
         "Topladığımız veriler",
-        "Hesap oluştururken verdiğin ad ve e-posta adresi, satın aldığın kurslar, ders ilerlemen ve aldığın notlar. Kartla ödemede ödeme adımında yazdığın ad soyad, cep telefonu ve e-posta adresi ödemenin yapılabilmesi için ödeme sağlayıcısı PayTR’ye iletilir; telefon numaran bizde saklanmaz. Kart bilgilerini doğrudan PayTR’nin güvenli formuna girersin; kart bilgilerin bize ulaşmaz. Sepete kurs eklediğinde, kayıt olduğunda, giriş yaptığında, üyeyken bir sayfa açtığında ve ders izlediğinde (hangi dersi, ne kadar süre izlediğin ve bitirip bitirmediğin) o anki IP adresin, IP adresine göre ülke, şehir ve internet sağlayıcın, tarayıcın, işletim sistemin, cihaz türün ve dil tercihin kaydedilir; analitiğe izin verdiysen ekran boyutu, saat dilimi, tema tercihi ve siteye ilk geldiğin sayfa ile kaynak (ör. arama motoru, kampanya bağlantısı) da eklenir.",
+        "Hesap oluştururken verdiğin ad ve e-posta adresi, satın aldığın kurslar, ders ilerlemen ve aldığın notlar. Kartla ödemede ödeme adımında yazdığın ad soyad, cep telefonu ve e-posta adresi ödemenin yapılabilmesi için ödeme sağlayıcısı iyzico’ya iletilir; telefon numaran bizde saklanmaz. Kart bilgilerini doğrudan iyzico’nun güvenli ödeme sayfasına girersin; kart bilgilerin bize ulaşmaz. Sepete kurs eklediğinde, kayıt olduğunda, giriş yaptığında, üyeyken bir sayfa açtığında ve ders izlediğinde (hangi dersi, ne kadar süre izlediğin ve bitirip bitirmediğin) o anki IP adresin, IP adresine göre ülke, şehir ve internet sağlayıcın, tarayıcın, işletim sistemin, cihaz türün ve dil tercihin kaydedilir; analitiğe izin verdiysen ekran boyutu, saat dilimi, tema tercihi ve siteye ilk geldiğin sayfa ile kaynak (ör. arama motoru, kampanya bağlantısı) da eklenir.",
     ),
     (
         "Verileri hangi amaçla kullanıyoruz",
@@ -715,7 +715,7 @@ _PRIVACY = (
     ),
     (
         "Verilerin aktarılması",
-        "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme altyapısı PayTR, e-posta gönderimi) ve izin verirsen ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
+        "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme altyapısı iyzico, e-posta gönderimi) ve izin verirsen ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
     ),
     (
         "Saklama süresi",
@@ -847,7 +847,7 @@ _DISTANCE_SALES = (
     ),
     (
         "Ürün ve ödeme bilgileri",
-        "Satın alınan kursların adı, adedi ve vergiler dâhil toplam satış bedeli, ödeme adımındaki sipariş özetinde ve siparişin ardından gönderilen onay e-postasında yer alır. Ödeme kredi kartı ya da banka kartı ile, PayTR ödeme altyapısı üzerinden tek seferde alınır; kart bilgileri satıcıya iletilmez.",
+        "Satın alınan kursların adı, adedi ve vergiler dâhil toplam satış bedeli, ödeme adımındaki sipariş özetinde ve siparişin ardından gönderilen onay e-postasında yer alır. Ödeme kredi kartı ya da banka kartı ile, iyzico ödeme altyapısı üzerinden tek seferde alınır; kart bilgileri satıcıya iletilmez.",
     ),
     (
         "Ön bilgilendirme",
@@ -880,7 +880,7 @@ COOKIE_COLUMNS = ("Ad", "Tür", "Amaç", "Süre")
 # Analitik izin bandı kapalıyken (GOOGLE_ANALYTICS_CONSENT=False) Google Analytics her ziyaretçide yüklenir; metinler
 # bunu söyler, izin kaydı satırı çıkar. Anahtar: (belge, bölüm başlığı).
 _ANALYTICS_WITHOUT_CONSENT = {
-    ("privacy", "Verilerin aktarılması"): "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme altyapısı PayTR, e-posta gönderimi) ve ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
+    ("privacy", "Verilerin aktarılması"): "Veriler yalnızca hizmetin çalışması için gereken sağlayıcılarla (barındırma, ödeme altyapısı iyzico, e-posta gönderimi) ve ziyaret istatistikleri için Google Analytics ile paylaşılır. Satılmaz ve reklam amacıyla aktarılmaz.",
     ("cookies", "Kullandığımız çerezler"): "Sitede hizmetin çalışması için zorunlu çerezler, senin seçtiğin tercihleri hatırlayan tarayıcı kayıtları ve ziyaretleri ölçen analitik çerezler kullanılır.",
     ("cookies", "Analitik ve reklam çerezleri"): "Ziyaretleri ölçmek için Google Analytics kullanılır. Analitik çerezleri tarayıcı ayarlarından engelleyebilir ya da Google'ın Analytics devre dışı bırakma eklentisini kullanabilirsin. Reklam amaçlı çerez kullanılmıyor.",
 }

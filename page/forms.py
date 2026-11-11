@@ -12,7 +12,7 @@ from account.models import User
 from core.turnstile import TurnstileMixin
 from discount.models import Discount
 from learning.models import PlayerPreference
-from order.paytr import NAME_LENGTH as PAYTR_NAME_LENGTH
+from order.iyzico import NAME_LENGTH as PAYMENT_NAME_LENGTH
 
 INPUT_CLASS = "form-control-lg fs-6"
 LABEL_CLASS = "small fw-medium text-body-secondary"
@@ -488,7 +488,7 @@ class PasswordChangeForm(CurrentPasswordMixin, StyledForm):
 
 class CheckoutForm(StyledForm):
     """Ödeme adımı: misafir e-postasını yazar (üyeninki hesabından gelir); herkes Mesafeli Satış Sözleşmesi'ni onaylar.
-    Ad soyad ve telefon ödeme sağlayıcısına (PayTR) gider, siparişte saklanmaz."""
+    Ad soyad ve telefon ödeme sağlayıcısına (iyzico) gider, siparişte saklanmaz."""
 
     email = email_field()
     name = name_field(placeholder="Ad Soyad", noun="adını soyadını")
@@ -504,7 +504,7 @@ class CheckoutForm(StyledForm):
     )
 
     def clean_name(self):
-        return " ".join(self.cleaned_data["name"].split())[:PAYTR_NAME_LENGTH]
+        return " ".join(self.cleaned_data["name"].split())[:PAYMENT_NAME_LENGTH]
 
     def clean_phone(self):
         # Rakamlar ve baştaki + kalır; boşluk, tire ve parantez atılır.

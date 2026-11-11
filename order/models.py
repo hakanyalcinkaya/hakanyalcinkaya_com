@@ -4,8 +4,7 @@ from functools import partial
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
-from django.db.models import OuterRef, Q, Subquery, Value
-from django.db.models.functions import Replace
+from django.db.models import OuterRef, Q, Subquery
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -76,12 +75,8 @@ class OrderQuerySet(models.QuerySet):
         return self.filter(Q(items__course=course) | Q(items__bundle__courses=course)).distinct()
 
     def by_card(self):
-        """Sitede kartla verilen siparişler (PayTR)."""
+        """Sitede kartla verilen siparişler (iyzico)."""
         return self.filter(payment_provider=CARD)
-
-    def with_merchant_oid(self, oid):
-        """PayTR'nin sipariş numarasıyla: tiresiz sipariş no (order.paytr.merchant_oid)."""
-        return self.annotate(merchant_oid=Replace("number", Value("-"), Value(""))).filter(merchant_oid=oid)
 
     def unfinished(self):
         """Ödeme adımına gelip tamamlanmayanlar (bekleyen ya da başarısız)."""
@@ -224,7 +219,7 @@ class Order(BaseModel):
 
     def mark_paid(self, provider="", reference=""):
         """Ödemeyi onaylar: kurs kayıtlarını açar, kod kullanımını sayar, sepeti kapatır; işlem kaydedilince alıcıya satın
-        alma onayı e-postası gider (PayTR bildirimi, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
+        alma onayı e-postası gider (iyzico ödemesi, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
         kayıtların kaynağı "Hediye"dir ve onay e-postası gitmez."""
         from learning.models import Enrollment, EnrollmentSource
         from order.tasks import send_purchase_confirmation
@@ -264,7 +259,7 @@ class Order(BaseModel):
                 transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
 
     def apply_card_result(self, success, amount, reference):
-        """Kartla ödemenin sonucu (PayTR bildirimi); aynı sonuç birden çok gelebilir. Yalnız bekleyen ya da başarısız sipariş
+        """Kartla ödemenin sonucu (iyzico callback'i ya da webhook'u); aynı sonuç birden çok gelebilir. Yalnız bekleyen ya da başarısız sipariş
         değişir (başarısız ödemeden sonra aynı formda yeniden denenip ödenebilir); ödenmiş, iade ya da iptal edilmiş
         siparişe dokunulmaz. Başarılı ödemede tahsil edilen tutar (amount; taksitte vade farkıyla yüksek olabilir) siparişin
         tutarından az olmamalı. Sonucu döner: "paid", "failed", "amount_mismatch" ya da "skipped"."""
