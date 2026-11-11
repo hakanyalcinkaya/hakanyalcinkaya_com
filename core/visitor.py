@@ -288,23 +288,23 @@ def flag(code):
 
 
 def summary(data):
-    """Stüdyo listeleri ve tabloları için kısa özet (internet sağlayıcısı gösterilmez); veri yoksa None."""
+    """Stüdyo listeleri ve tabloları için kısa özet; veri yoksa None."""
     if not data:
         return None
     geo, agent = data.get("geo") or {}, data.get("agent") or {}
     browser, system = agent.get("browser") or {}, agent.get("os") or {}
     client, network = data.get("client") or {}, data.get("network") or {}
     code = geo.get("country_code", "")
+    country = geo.get("country") or code
     city = geo.get("city", "")
     device = agent.get("type", "")
     screen = f"{client['screen_width']}×{client['screen_height']}" if client.get("screen_width") else ""
     return dict(
         flag=flag(code),
-        country_code=code,
-        country=geo.get("country") or code,
+        country=country,
         city=city,
         region=geo.get("region", ""),
-        place=", ".join(part for part in (city, geo.get("country") or code) if part),
+        place=", ".join(part for part in (city, country) if part),
         device=DEVICE_LABELS.get(device, device),
         device_icon=DEVICE_ICONS.get(device, "question-circle"),
         os=" ".join(part for part in (system.get("family", ""), system.get("version", "")) if part),
