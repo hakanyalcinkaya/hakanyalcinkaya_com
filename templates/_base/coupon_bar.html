@@ -1,5 +1,4 @@
-{# Bağlantıdaki kod geçersizse (invalid_coupon, discount.middleware) kişiye özel kod isteme bağlantısıyla uyarı.
-Geçerli indirim kodu (coupon, page.content.coupon_prices): menünün altında ince şerit, kaldırma düğmesiyle. Sepet, ödeme, kurs ve ders sayfalarında kod kendi kutusunda gösterildiği için çıkmaz (show_coupon_bar). #}
+{# Bağlantıdaki kod geçersizse (invalid_coupon, discount.middleware) kişiye özel kod isteme bağlantısıyla uyarı. Geçerli indirim kodu (coupon, page.content.coupon_prices): menünün altında ince şerit, kaldırma düğmesiyle. Sepet, ödeme, kurs ve ders sayfalarında kod kendi kutusunda gösterildiği için çıkmaz (show_coupon_bar). #}
 {% if show_coupon_bar and coupon %}
 <div class="border-bottom bg-success-subtle" role="status">
   <div class="container py-2 small text-success-emphasis text-center">
