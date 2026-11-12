@@ -382,7 +382,7 @@ def _copy(course):
         "audience": detail.get("audience") or list(course.get("audience", ())),
         "access": detail.get("access")
         or "Kursa kaydolduktan sonra videoları hemen platformdan izlemeye başlayabilirsin.",
-        # Örnek verideki indirim bağlantısı eski platforma gidiyor; sitedeki kod akışı (?code=) gelene kadar gösterilmez.
+        # Örnek verideki indirim bağlantısı eski platforma gidiyor; sitedeki kod akışı (?coupon=) gelene kadar gösterilmez.
         "discount": None,
     }
 

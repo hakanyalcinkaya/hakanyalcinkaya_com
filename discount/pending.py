@@ -1,8 +1,8 @@
-"""Bağlantıyla gelen indirim kodu (?code=KOD): oturumda bekler, sepet açılınca ya da açık sepete hemen uygulanır.
+"""Bağlantıyla gelen indirim kodu (?coupon=KOD): oturumda bekler, sepet açılınca ya da açık sepete hemen uygulanır.
 
 Kod geçerliyse (discount.Discount.validate_for) oturuma yazılır; açık sepet varsa kod ona uygulanır ve oturumdan düşer,
-yoksa ilk sepet açıldığında (cart.request_cart.current_cart) uygulanır. Kurs sayfası bekleyen ya da sepetteki kodla
-indirimli fiyatı gösterir (active_discount).
+yoksa ilk sepet açıldığında (cart.request_cart.current_cart) uygulanır. Sitedeki fiyatlar bekleyen ya da sepetteki
+kodla indirimli gösterilir (active_discount, page.content.coupon_prices).
 """
 
 from django.core.exceptions import ValidationError
@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from discount.models import Discount
 
 PENDING_CODE_SESSION_KEY = "pending_discount_code"
-CODE_PARAM = "code"
+CODE_PARAM = "coupon"
 
 
 def _valid(code, user):
@@ -22,13 +22,17 @@ def _valid(code, user):
 
 
 def capture(request, cart):
-    """Bağlantıdaki kodu oturuma yazar; açık sepet (cart) varsa hemen uygular. Uygulanan ya da bekleyen indirim kodu
-    döner; geçersizse ValidationError (eski bekleyen kod oturumda kalır)."""
+    """Bağlantıdaki kodu oturuma yazar; açık sepet (cart) varsa hemen uygular. (indirim kodu, yeni mi) döner: kod zaten
+    bekliyor ya da sepete uygulanmışsa (adres parametresi kaldığı için sayfa yenilenince) yeni sayılmaz. Geçersizse
+    ValidationError (eski bekleyen kod oturumda kalır)."""
     discount = _valid(request.GET.get(CODE_PARAM, ""), request.user)
+    is_new = request.session.get(PENDING_CODE_SESSION_KEY) != discount.code and (cart is None or cart.discount_id != discount.pk)
+    if cart is not None and cart.discount_id == discount.pk:
+        return discount, is_new
     request.session[PENDING_CODE_SESSION_KEY] = discount.code
     if cart is not None:
         apply_pending(request, cart)
-    return discount
+    return discount, is_new
 
 
 def apply_pending(request, cart):

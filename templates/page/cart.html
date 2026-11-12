@@ -36,7 +36,7 @@
             <div class="flex-grow-1 min-w-0">
               <div class="d-flex flex-wrap justify-content-between gap-2">
                 <h2 class="h6 fw-semibold mb-1"><a href="{{ course.url }}" class="link-body-emphasis text-decoration-none">{{ course.title }}</a>{% if course.draft %} {% include "components/draft_badge.html" %}{% endif %}</h2>
-                <span class="fw-semibold">{{ course.price }}{% include "components/list_price.html" %}</span>
+                <span class="fw-semibold">{% include "components/price.html" %}</span>
               </div>
               <p class="small text-body-tertiary mb-2">{{ course.meta_line }}</p>
               <form method="post" action="{{ course.remove_url }}">
@@ -87,7 +87,7 @@
           <img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover flex-shrink-0" style="width:96px;height:54px">
           <span class="flex-grow-1 min-w-0">
             <a href="{{ course.url }}" class="d-block fw-semibold small link-body-emphasis text-decoration-none">{{ course.short }}</a>
-            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {{ course.price }}</span>
+            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {% include "components/price.html" with strike_class="text-body-tertiary" no_list=True %}</span>
           </span>
           <form method="post" action="{{ course.cart_url }}" class="flex-shrink-0">
             {% csrf_token %}

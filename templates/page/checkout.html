@@ -52,7 +52,7 @@
             <li class="d-flex gap-3 align-items-start">
               <img src="{% static course.image %}" alt="" width="192" height="108" class="rounded-1 object-fit-cover flex-shrink-0" style="width:72px;height:41px">
               <span class="flex-grow-1 small fw-medium min-w-0">{{ course.title }}</span>
-              <span class="small fw-semibold">{{ course.price }}</span>
+              <span class="small fw-semibold text-end">{% include "components/price.html" with strike_class="d-block fw-normal text-body-tertiary" no_list=True %}</span>
             </li>
             {% endfor %}
           </ul>

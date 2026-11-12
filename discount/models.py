@@ -89,6 +89,9 @@ class Discount(BaseModel, BaseStatus):
     def price_for(self, product, base_price):
         if not self.applies_to(product):
             return base_price
+        return self._discounted(base_price)
+
+    def _discounted(self, base_price):
         if self.kind == DiscountKind.PERCENT:
             price = base_price * (Decimal("100") - self.value) / Decimal("100")
         elif self.kind == DiscountKind.AMOUNT:
@@ -96,6 +99,21 @@ class Discount(BaseModel, BaseStatus):
         else:
             price = min(self.value, base_price)
         return max(price, Decimal("0")).quantize(CENT, rounding=ROUND_HALF_UP)
+
+    def course_prices(self, courses):
+        """Kodun düşürdüğü kurs fiyatları {kurs id: indirimli fiyat} (applies_to ile aynı kural, iki sorguyla); fiyatı
+        değişmeyen kurslar yer almaz."""
+        targets = set(self.courses.values_list("pk", flat=True))
+        if not targets and (self.kind != DiscountKind.PERCENT or self.bundles.exists()):
+            return {}
+        prices = {}
+        for course in courses:
+            if targets and course.pk not in targets:
+                continue
+            price = self._discounted(course.price)
+            if price < course.price:
+                prices[course.pk] = price
+        return prices
 
     def uses_by(self, user):
         if not user or not user.is_authenticated:

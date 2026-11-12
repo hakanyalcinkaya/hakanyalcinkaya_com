@@ -29,6 +29,12 @@ def total_minutes(minutes):
 
 
 @register.filter
+def coupon_price(card, coupon):
+    """Kurs kartının geçerli indirim koduyla fiyatı (page.content.coupon_prices); kod bu kursu düşürmüyorsa boş."""
+    return (coupon or {}).get("prices", {}).get(card.get("course_id"), "") if card else ""
+
+
+@register.filter
 def ago(value):
     """Göreli zaman, tek birimle: "az önce", "3 saat önce", "1 gün önce", "2 ay önce"."""
     if not value:

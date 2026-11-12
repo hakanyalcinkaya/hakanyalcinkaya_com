@@ -383,14 +383,22 @@ def cart_add(request, slug, source=CartAddSource.ADD):
     tracking.record(request, cart, source, course=course)
 
 
+def coupon_prices(request):
+    """Geçerli indirim kodu (bağlantıyla gelip oturumda bekleyen ya da sepete uygulanmış) ve düşürdüğü kurs fiyatları:
+    {"code": KOD, "prices": {kurs id: "₺80"}}; kod yoksa boş sözlük. İstek başına bir kez hesaplanır (kartlar, kurs ve
+    ders sayfaları aynı sonucu kullanır)."""
+    if not hasattr(request, "_coupon_prices"):
+        discount = pending.active_discount(request, current_cart(request))
+        prices = discount.course_prices(Course.objects.listed_for(request.user)) if discount else {}
+        request._coupon_prices = dict(code=discount.code, prices={pk: format_try(price) for pk, price in prices.items()}) if prices else {}
+    return request._coupon_prices
+
+
 def course_coupon_price(request, course):
-    """Kurs sayfasında geçerli indirim kodu (bağlantıyla gelip oturumda bekleyen ya da sepete uygulanmış) bu kursun
-    fiyatını düşürüyorsa kod ve indirimli fiyat; düşürmüyorsa None."""
-    discount = pending.active_discount(request, current_cart(request))
-    if discount is None:
-        return None
-    price = discount.price_for(course, course.price)
-    return dict(code=discount.code, price=format_try(price)) if price < course.price else None
+    """Kurs ve ders sayfasında: geçerli indirim kodu bu kursun fiyatını düşürüyorsa kod ve indirimli fiyat; yoksa None."""
+    coupon = coupon_prices(request)
+    price = coupon.get("prices", {}).get(course.pk)
+    return dict(code=coupon["code"], price=price) if price else None
 
 
 def cart_remove(request, slug):

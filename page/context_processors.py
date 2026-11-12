@@ -71,6 +71,8 @@ def site(request):
         "show_explore": not user.is_authenticated,
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
+        # Geçerli indirim kodunun düşürdüğü kurs fiyatları (content.coupon_prices); kartlarda course|coupon_price:coupon ile.
+        "coupon": SimpleLazyObject(lambda: content.coupon_prices(request)),
         "library_url": reverse("page:library"),
         # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda
         # kullanılırsa sorgulanır.

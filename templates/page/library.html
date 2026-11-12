@@ -196,7 +196,7 @@
           <a href="{{ course.url }}" class="flex-shrink-0" tabindex="-1" aria-hidden="true"><img src="{% static course.image %}" alt="" width="256" height="144" loading="lazy" class="rounded-1 object-fit-cover" style="width:128px;height:72px"></a>
           <span class="flex-grow-1 min-w-0">
             <a href="{{ course.url }}" class="d-block fw-semibold link-body-emphasis text-decoration-none">{{ course.short }}</a>
-            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {{ course.price }}</span>
+            <span class="d-block small text-body-tertiary">{{ course.meta_line }} · {% include "components/price.html" with strike_class="text-body-tertiary" no_list=True %}</span>
           </span>
           {% if course.slug in cart_slugs %}
           <a href="{{ cart_url }}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1 text-nowrap flex-shrink-0"><i class="bi bi-bag-check" aria-hidden="true"></i>Sepette</a>
