@@ -23,6 +23,7 @@ from account.models import AccountEventKind
 from account.tokens import ResetOrInviteTokenGenerator
 from cart.models import CartAddSource
 from cart.request_cart import current_cart
+from discount import pending
 from core import ratelimit
 from core.turnstile import client_ip
 from course.models import Course, Lesson, Review, ReviewSource
@@ -507,6 +508,16 @@ def course_coupon(request, slug):
         messages.error(request, form.errors["code"][0])
         return redirect(course.get_absolute_url())
     return render(request, "page/partials/course_coupon.html", dict(course=course, coupon_form=form))
+
+
+@require_POST
+def coupon_remove(request):
+    """Bağlantıyla gelen ya da sepete uygulanan indirim kodunu kaldırır (kurs, ders ve liste sayfalarındaki "Kaldır");
+    geldiği sayfaya kod parametresi olmadan döner."""
+    pending.remove(request, current_cart(request))
+    messages.info(request, "İndirim kodu kaldırıldı.")
+    url = pending.without_code(_next_url(request, reverse("page:course_list")))
+    return HttpResponseClientRedirect(url) if request.htmx else redirect(url)
 
 
 def _coupon(request, cart, items, action, next_url):

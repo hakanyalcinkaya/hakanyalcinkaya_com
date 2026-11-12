@@ -24,6 +24,10 @@ NAV_PAGES = {
 }
 
 
+# İndirim kodunu kendi kutusunda (kaldırma düğmesiyle) gösteren sayfalar: üstteki kod şeridi bunlarda çıkmaz.
+COUPON_BOX_PAGES = {"cart", "checkout", "course_detail", "course_reviews", "lesson", "root_course", "root_lesson"}
+
+
 def site(request):
     index_url = reverse("page:index")
     course_list_url = reverse("page:course_list")
@@ -73,6 +77,8 @@ def site(request):
         "cart_count": cart_count,
         # Geçerli indirim kodunun düşürdüğü kurs fiyatları (content.coupon_prices); kartlarda course|coupon_price:coupon ile.
         "coupon": SimpleLazyObject(lambda: content.coupon_prices(request)),
+        # Kod şeridi: kodun kendi kutusunda göründüğü sayfalarda (sepet, ödeme, kurs, ders) gösterilmez.
+        "show_coupon_bar": url_name not in COUPON_BOX_PAGES,
         "library_url": reverse("page:library"),
         # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda
         # kullanılırsa sorgulanır.

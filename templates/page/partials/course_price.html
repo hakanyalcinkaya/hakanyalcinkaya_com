@@ -1,7 +1,7 @@
 {# Satın alma kartındaki büyük fiyat: geçerli indirim kodu (course.coupon, content.course_coupon_price) varsa indirimli fiyat, üstü çizili fiyat ve "KOD uygulandı". #}
 {% if course.coupon %}
 <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">İndirimli fiyat: </span>{{ course.coupon.price }} <s class="fs-6 fw-normal text-body-tertiary ms-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</s></div>
-<div class="small text-success-emphasis mt-2"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ course.coupon.code }}</b> uygulandı</div>
+<div class="small text-success-emphasis mt-2"><i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ course.coupon.code }}</b> uygulandı{% include "components/coupon_remove.html" %}</div>
 {% else %}
 <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}{% include "components/list_price.html" %}</div>
 {% endif %}

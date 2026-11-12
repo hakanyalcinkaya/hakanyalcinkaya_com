@@ -5,7 +5,10 @@ yoksa ilk sepet açıldığında (cart.request_cart.current_cart) uygulanır. Si
 kodla indirimli gösterilir (active_discount, page.content.coupon_prices).
 """
 
+from urllib.parse import urlsplit, urlunsplit
+
 from django.core.exceptions import ValidationError
+from django.http import QueryDict
 
 from discount.models import Discount
 
@@ -63,3 +66,18 @@ def active_discount(request, cart):
             return None
         return cart.discount
     return None
+
+
+def remove(request, cart):
+    """Ziyaretçinin indirim kodunu kaldırır: oturumda bekleyen kod düşer, açık sepetteki kod çıkar."""
+    request.session.pop(PENDING_CODE_SESSION_KEY, None)
+    if cart is not None and cart.is_active and cart.discount_id:
+        cart.remove_discount()
+
+
+def without_code(url):
+    """Adresten kod parametresi (?coupon=) çıkarılmış hâli: kod kaldırılınca sayfaya dönerken yeniden uygulanmasın."""
+    parts = urlsplit(url)
+    params = QueryDict(parts.query, mutable=True)
+    params.pop(CODE_PARAM, None)
+    return urlunsplit(parts._replace(query=params.urlencode()))

@@ -1,0 +1,9 @@
+{# Geçerli indirim kodu (coupon, page.content.coupon_prices): menünün altında ince şerit, kaldırma düğmesiyle. Sepet, ödeme, kurs ve ders sayfalarında kod kendi kutusunda gösterildiği için çıkmaz (show_coupon_bar). #}
+{% if show_coupon_bar and coupon %}
+<div class="border-bottom bg-success-subtle" role="status">
+  <div class="container py-2 small text-success-emphasis text-center">
+    <i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ coupon.code }}</b> indirim kodu uygulandı; geçerli olduğu kurslarda indirimli fiyat gösteriliyor.
+    {% include "components/coupon_remove.html" with link_class="link-success" %}
+  </div>
+</div>
+{% endif %}

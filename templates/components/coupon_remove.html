@@ -1,0 +1,2 @@
+{# Uygulanan indirim kodunu kaldırma düğmesi (page:coupon_remove); bulunulan sayfaya kod parametresi olmadan dönülür. #}
+<form method="post" action="{% url 'page:coupon_remove' %}" class="d-inline">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" class="btn btn-link btn-sm p-0 ms-1 align-baseline{% if link_class %} {{ link_class }}{% endif %}">Kaldır</button></form>

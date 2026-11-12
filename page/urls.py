@@ -59,6 +59,7 @@ urlpatterns = [
     path("courses/<slug:slug>/remove-from-cart/", views.remove_from_cart, name="remove_from_cart"),
     path("courses/<slug:slug>/buy/", views.buy, name="buy"),
     path("courses/<slug:slug>/coupon/", views.course_coupon, name="course_coupon"),
+    path("coupon/remove/", views.coupon_remove, name="coupon_remove"),
     path("courses/<slug:slug>/review/", views.course_review, name="course_review"),
     path("courses/<slug:slug>/reviews/", views.course_reviews, name="course_reviews"),
     path("courses/<slug:slug>/", views.course_detail, name="course_detail"),
