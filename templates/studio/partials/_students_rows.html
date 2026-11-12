@@ -1,21 +1,23 @@
 {% load core_tags %}
 {% for member in page %}
-<a href="{% url 'studio:student_detail' member.id %}" class="list-group-item list-group-item-action py-2">
-  <div class="d-flex flex-wrap align-items-center gap-2">
-    <span class="fw-medium">{{ member.display_name }}</span><span class="small text-body-secondary">{{ member.email }}</span>
+<tr>
+  <td>
+    <a href="{% url 'studio:student_detail' member.id %}" class="fw-medium text-decoration-none">{{ member.display_name }}</a>
     {% if not member.is_active %}<span class="badge rounded-1 bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-medium">Kapalı</span>{% endif %}
     {% if member.is_superuser %}<span class="badge rounded-1 border text-body-secondary fw-medium">Yönetici</span>{% endif %}
     {% if member.podia_imported %}<span class="badge rounded-1 border text-body-secondary fw-medium">Podia</span>{% endif %}
     {% if not member.has_usable_password %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">Şifresi yok</span>{% endif %}
-    <time class="ms-auto small text-body-tertiary" datetime="{{ member.date_joined|date:'c' }}" title="{{ member.date_joined|date:'d.m.Y H:i' }}">{{ member.date_joined|ago }} üye oldu</time>
-  </div>
-  <div class="small text-body-secondary">
-    {{ member.enrollment_total }} kurs · {{ member.paid_order_total }} ödenen sipariş{% if member.last_login %} · son giriş {{ member.last_login|ago }}{% else %} · hiç giriş yapmadı{% endif %}{% if member.has_watched %} · ders izliyor{% endif %}
-    {% if member.invite_sent_at %} · davet {{ member.invite_sent_at|ago }}{% if member.invite_clicked_at %}, tıklandı{% elif member.invite_opened_at %}, açıldı{% else %}, açılmadı{% endif %}{% elif member.podia_imported %} · davet gönderilmedi{% endif %}
-  </div>
-  {% include "studio/partials/_visitor_line.html" with data=member.visitor %}
-</a>
+    <div class="text-body-tertiary">{{ member.email }}</div>
+  </td>
+  <td class="text-end">{{ member.enrollment_total }}</td>
+  <td class="text-end">{{ member.paid_order_total }}</td>
+  <td class="text-nowrap">{% if member.last_login %}<time datetime="{{ member.last_login|date:'c' }}" title="{{ member.last_login|date:'d.m.Y H:i' }}">{{ member.last_login|ago }}</time>{% else %}<span class="text-body-tertiary">Hiç giriş yapmadı</span>{% endif %}</td>
+  <td class="text-nowrap">{% if member.has_watched %}Ders izliyor{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+  <td class="text-nowrap">{% if member.invite_sent_at %}<time datetime="{{ member.invite_sent_at|date:'c' }}" title="{{ member.invite_sent_at|date:'d.m.Y H:i' }}">{{ member.invite_sent_at|ago }}</time>{% if member.invite_clicked_at %}, tıklandı{% elif member.invite_opened_at %}, açıldı{% else %}, açılmadı{% endif %}{% elif member.podia_imported %}<span class="text-body-tertiary">Gönderilmedi</span>{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+  <td class="text-nowrap"><time datetime="{{ member.date_joined|date:'c' }}" title="{{ member.date_joined|date:'d.m.Y H:i' }}">{{ member.date_joined|ago }}</time></td>
+  <td>{% include "studio/partials/_visitor_line.html" with data=member.visitor %}</td>
+</tr>
 {% empty %}
-<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede üye yok.</div>
+<tr><td colspan="8" class="text-body-secondary text-center py-4">Bu filtrede üye yok.</td></tr>
 {% endfor %}
-{% include "studio/partials/_more_rows.html" %}
+{% include "studio/partials/_more_table_rows.html" with colspan=8 %}

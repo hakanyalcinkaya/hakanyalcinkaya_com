@@ -10,5 +10,12 @@
     {% for field in filters %}{{ field }}{% endfor %}
     {% if filters.is_filtered %}<a href="{{ students_url }}?status={{ status }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ students_url }}?status={{ status }}" hx-target="#student-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
   </form>
-  <div class="list-group">{% include "studio/partials/_students_rows.html" %}</div>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle small mb-0">
+      <thead><tr><th scope="col">Üye</th><th scope="col" class="text-end">Kurs</th><th scope="col" class="text-end">Ödenen sipariş</th><th scope="col">Son giriş</th><th scope="col">İzleme</th><th scope="col">Podia daveti</th><th scope="col">Üyelik</th><th scope="col">Ziyaretçi</th></tr></thead>
+      <tbody>
+        {% include "studio/partials/_students_rows.html" %}
+      </tbody>
+    </table>
+  </div>
 </div>
