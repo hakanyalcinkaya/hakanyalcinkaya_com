@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
-from django.db.models import Case, Count, IntegerField, OuterRef, Subquery, Value, When
+from django.db.models import Case, Count, IntegerField, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import Cast, Coalesce, Round
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -359,6 +359,11 @@ class PlayerPreference(BaseModel):
 # Konum bildirimleri arasında bundan uzun ileri sıçrama (ileri sarma) izlenen süreye eklenmez.
 WATCH_STEP_LIMIT = 30
 
+# İzleme kaydının durumu: tamamlanan; tamamlanmamış ama oynatılmış (izlemeye başlayan); yalnız sayfası açılmış.
+WATCH_COMPLETED = Q(completed_at__isnull=False)
+WATCH_STARTED = Q(completed_at__isnull=True) & (Q(max_position__gt=0) | Q(watched_seconds__gt=0))
+WATCH_OPENED = Q(completed_at__isnull=True, max_position=0, watched_seconds=0)
+
 
 class LessonView(BaseVisitorEvent):
     """Ders izleme (istatistik için): üye × ders × gün başına bir satır. Ders sayfası açılınca oluşur (o günkü ilk
@@ -385,6 +390,15 @@ class LessonView(BaseVisitorEvent):
 
     def __str__(self):
         return f"{self.user or '-'} · {self.lesson or '-'} · {self.day}"
+
+    @property
+    def is_completed(self):
+        return self.completed_at is not None
+
+    @property
+    def is_started(self):
+        """Tamamlanmamış ama oynatılmış (izlemeye başlanmış)."""
+        return not self.is_completed and (self.max_position > 0 or self.watched_seconds > 0)
 
     @property
     def reached_percent(self):

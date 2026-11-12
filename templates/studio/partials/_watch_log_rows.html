@@ -3,7 +3,7 @@
 <div class="list-group-item py-2">
   <div class="d-flex flex-wrap align-items-center gap-2">
     {% if view.user %}<a href="{% url 'studio:student_detail' view.user_id %}" class="fw-medium">{{ view.user.display_name }}</a><span class="small text-body-secondary">{{ view.user.email }}</span>{% else %}<span class="text-body-tertiary">—</span>{% endif %}
-    {% if view.completed_at %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium" title="{{ view.completed_at|date:'d.m.Y H:i' }}">Tamamlandı</span>{% endif %}
+    {% if view.completed_at %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium" title="{{ view.completed_at|date:'d.m.Y H:i' }}">Tamamlandı</span>{% elif view.is_started %}<span class="badge rounded-1 bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-medium">İzlemeye başladı</span>{% else %}<span class="badge rounded-1 border text-body-secondary fw-medium">Yalnız açtı</span>{% endif %}
     <time class="ms-auto small text-body-tertiary" datetime="{{ view.updated_at|date:'c' }}" title="Son hareket {{ view.updated_at|date:'d.m.Y H:i' }}">{{ view.day|date:"d.m.Y" }}</time>
   </div>
   <div class="small">

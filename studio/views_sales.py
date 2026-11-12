@@ -20,7 +20,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import User
 from cart.models import Cart, CartItem, CartStatus
 from cart.pricing import price_cart
-from learning.models import Enrollment, LessonView
+from learning.models import WATCH_COMPLETED, WATCH_OPENED, WATCH_STARTED, Enrollment, LessonView
 from newsletter.models import Subscriber
 from order import podia
 from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
@@ -339,10 +339,11 @@ def students(request):
 @superuser_required
 def watch_log(request):
     """Tüm üyelerin ders izleme kayıtları (üye × ders × gün): açılış, izlenen süre, ulaşılan yer, tamamlanma ve
-    ziyaretçi bilgisi; WatchLogFilterForm filtreleri. Üstte filtredeki kayıt, üye ve toplam izleme süresi."""
+    ziyaretçi bilgisi; WatchLogFilterForm filtreleri. Üstte filtredeki kayıt, üye, toplam izleme süresi ve durumlara
+    göre (tamamlanan, izlemeye başlayan, yalnız açan) sayılar."""
     filters = WatchLogFilterForm(request.GET)
     rows = filters.filter(LessonView.objects.filter(user__isnull=False))
-    totals = rows.aggregate(views=Count("pk"), members=Count("user", distinct=True), seconds=Sum("watched_seconds"), completed=Count("pk", filter=Q(completed_at__isnull=False)))
+    totals = rows.aggregate(views=Count("pk"), members=Count("user", distinct=True), seconds=Sum("watched_seconds"), completed=Count("pk", filter=WATCH_COMPLETED), started=Count("pk", filter=WATCH_STARTED), opened=Count("pk", filter=WATCH_OPENED))
     page = _page(request, rows.select_related("user", "lesson__section__course").order_by("-day", "-updated_at", "id"))
     return _list_response(request, "watch_log", dict(page=page, filters=filters, totals=totals))
 

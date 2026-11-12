@@ -35,6 +35,7 @@ from course.models import (
 )
 from discount.forms import DiscountTargetsMixin
 from discount.models import Discount
+from learning.models import WATCH_COMPLETED, WATCH_OPENED, WATCH_STARTED
 from newsletter.models import AudienceKind, Issue
 from order.models import ADMIN_PAYMENT_METHODS, GIFT, NOTICE_STATUSES, PAYMENT_METHODS, Order, OrderStatus
 from support.models import Ticket, TicketStatus
@@ -1110,16 +1111,24 @@ class StudentFilterForm(forms.Form):
 
 
 class WatchLogFilterForm(forms.Form):
-    """Ders izleme kayıtları filtreleri (GET): üye araması, kurs, ders adı, izleme günü aralığı ve tamamlanma."""
+    """Ders izleme kayıtları filtreleri (GET): üye araması, kurs, ders adı, izleme günü aralığı ve durum (tamamlanan,
+    tamamlanmayan, izlemeye başlayan, yalnız açan; learning.models.WATCH_*)."""
 
-    COMPLETED_CHOICES = (("", _("Tamamlanma: tümü")), ("yes", _("Tamamlanan")), ("no", _("Tamamlanmayan")))
+    STATE_CHOICES = (
+        ("", _("Durum: tümü")),
+        ("completed", _("Tamamlanan")),
+        ("not-completed", _("Tamamlanmayan")),
+        ("started", _("İzlemeye başlayan (tamamlamamış)")),
+        ("opened", _("Yalnız açan (oynatmamış)")),
+    )
+    STATES = {"completed": WATCH_COMPLETED, "not-completed": ~WATCH_COMPLETED, "started": WATCH_STARTED, "opened": WATCH_OPENED}
 
     q = forms.CharField(label=_("Üye"), required=False)
     course = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
     lesson = forms.CharField(label=_("Ders"), required=False)
     date_from = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
     date_to = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
-    completed = forms.ChoiceField(label=_("Tamamlanma"), required=False, choices=COMPLETED_CHOICES)
+    state = forms.ChoiceField(label=_("Durum"), required=False, choices=STATE_CHOICES)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1145,8 +1154,8 @@ class WatchLogFilterForm(forms.Form):
             views = views.filter(day__gte=data["date_from"])
         if data.get("date_to"):
             views = views.filter(day__lte=data["date_to"])
-        if data.get("completed"):
-            views = views.filter(completed_at__isnull=data["completed"] == "no")
+        if data.get("state"):
+            views = views.filter(self.STATES[data["state"]])
         return views
 
     @property
