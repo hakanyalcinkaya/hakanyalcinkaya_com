@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container py-2 py-lg-5">
   <div class="row g-4 g-lg-5">
     <div class="col-lg-8">
       <nav aria-label="Sayfa konumu">
@@ -37,14 +37,7 @@
           <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ section_count }}</dt><dd class="small text-body-tertiary mt-1 mb-0">bölüm</dd></div>
           <div class="col"><dt class="fs-4 fw-semibold lh-1">{{ preview_count }}</dt><dd class="small text-body-tertiary mt-1 mb-0">ücretsiz önizleme</dd></div>
         </dl>
-        <div class="d-flex flex-wrap align-items-center gap-1 mt-4" aria-label="Kategori">
-          <span class="small text-body-tertiary me-2 hy-meta-label">Kategori</span>
-          {% for name in detail.categories %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ name }}</span>{% endfor %}
-        </div>
-        <div class="d-flex flex-wrap align-items-center gap-1 mt-2" aria-label="Kullanılan teknolojiler">
-          <span class="small text-body-tertiary me-2 hy-meta-label">Teknolojiler</span>
-          {% for item in detail.stack %}<span class="badge rounded-1 bg-body-tertiary border text-body fw-medium">{{ item }}</span>{% endfor %}
-        </div>
+        {% include "page/partials/course_tags.html" with tags_class="d-none d-lg-block mt-4" %}
       </header>
 
       <div class="d-lg-none mt-4" data-buy-card>
@@ -65,6 +58,7 @@
           </div>
         </div>
       </div>
+      {% include "page/partials/course_tags.html" with tags_class="d-lg-none mt-4" %}
 
       <div class="sticky-top top-nav hy-section-bar mt-5" data-section-bar>
         <ul class="nav nav-underline flex-nowrap overflow-x-auto scrollbar-none px-1 px-sm-3" aria-label="Sayfa bölümleri" data-section-nav>

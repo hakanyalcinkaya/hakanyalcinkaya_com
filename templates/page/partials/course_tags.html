@@ -1,0 +1,11 @@
+{# Kurs sayfası: kategori ve teknoloji etiketleri. Masaüstünde başlıkta, mobilde satın alma kartının altında. #}
+<div class="{{ tags_class }}">
+  <div class="d-flex flex-wrap align-items-center gap-1" aria-label="Kategori">
+    <span class="small text-body-tertiary me-2 hy-meta-label">Kategori</span>
+    {% for name in detail.categories %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ name }}</span>{% endfor %}
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-1 mt-2" aria-label="Kullanılan teknolojiler">
+    <span class="small text-body-tertiary me-2 hy-meta-label">Teknolojiler</span>
+    {% for item in detail.stack %}<span class="badge rounded-1 bg-body-tertiary border text-body fw-medium">{{ item }}</span>{% endfor %}
+  </div>
+</div>
