@@ -23,6 +23,10 @@
         </ol>
       </nav>
 
+      <div class="d-lg-none card shadow overflow-hidden mb-4">
+        {% include "page/partials/preview_media.html" %}
+      </div>
+
       <header>
         <h1 class="display-5 fw-semibold lh-1">{{ course.title }}{% if course.draft %} {% include "components/draft_badge.html" %}{% endif %}</h1>
         <p class="lead text-body-secondary mt-3 mb-0">{{ detail.subtitle }}</p>
@@ -45,7 +49,6 @@
 
       <div class="d-lg-none mt-4" data-buy-card>
         <div class="card shadow overflow-hidden">
-          {% include "page/partials/preview_media.html" with media_class=" border-bottom" %}
           <div class="card-body p-4">
             <div class="d-flex align-items-baseline justify-content-between gap-3">
               {% include "page/partials/course_price.html" %}
