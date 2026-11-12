@@ -5,5 +5,12 @@
     {% if filters.is_filtered %}<a href="{{ watch_log_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ watch_log_url }}" hx-target="#watch-log-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
   </form>
   <p class="small text-body-secondary mb-2">{{ totals.views }} kayıt · {{ totals.members }} üye · {{ totals.seconds|default:0|lesson_clock }} izlendi · {{ totals.completed }} tamamlandı · {{ totals.started }} izlemeye başladı, tamamlamadı · {{ totals.opened }} yalnız açıldı</p>
-  <div class="list-group">{% include "studio/partials/_watch_log_rows.html" %}</div>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle small mb-0">
+      <thead><tr><th scope="col">Üye</th><th scope="col">Kurs › Ders</th><th scope="col">Gün</th><th scope="col">Durum</th><th scope="col" class="text-end">Açılış</th><th scope="col" class="text-end">İzlenen</th><th scope="col" class="text-end">En ileri</th><th scope="col">Ziyaretçi</th></tr></thead>
+      <tbody>
+        {% include "studio/partials/_watch_log_rows.html" %}
+      </tbody>
+    </table>
+  </div>
 </div>
