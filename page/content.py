@@ -30,6 +30,7 @@ from core.site_url import absolute_url
 from core.templatetags.core_tags import share_image
 from core.turnstile import client_ip
 from course import video_service
+from discount import pending
 from course.models import (
     Course,
     HighlightKind,
@@ -380,6 +381,16 @@ def cart_add(request, slug, source=CartAddSource.ADD):
     cart = current_cart(request, create=True)
     cart.add_course(course)
     tracking.record(request, cart, source, course=course)
+
+
+def course_coupon_price(request, course):
+    """Kurs sayfasında geçerli indirim kodu (bağlantıyla gelip oturumda bekleyen ya da sepete uygulanmış) bu kursun
+    fiyatını düşürüyorsa kod ve indirimli fiyat; düşürmüyorsa None."""
+    discount = pending.active_discount(request, current_cart(request))
+    if discount is None:
+        return None
+    price = discount.price_for(course, course.price)
+    return dict(code=discount.code, price=format_try(price)) if price < course.price else None
 
 
 def cart_remove(request, slug):

@@ -167,6 +167,7 @@ def _course_page(request, course):
     # Personel dersleri izleyebilir (enrolled) ama satın alma düğmeleri yalnız gerçek kurs kaydına göre gizlenir.
     enrollment = Enrollment.objects.for_user(request.user).filter(course=course).select_related("last_lesson").first()
     page["course"]["owned"] = enrollment is not None
+    page["course"]["coupon"] = None if enrollment else content.course_coupon_price(request, course)
     resume = enrollment.continue_lesson() if enrollment else None
     page["first_lesson_url"] = resume.get_absolute_url() if resume else (page["lessons"][0]["url"] if page["lessons"] else "")
     return page

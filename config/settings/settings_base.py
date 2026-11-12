@@ -65,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "discount.middleware.PendingDiscountCodeMiddleware",
     "account.middleware.MemberPageViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]

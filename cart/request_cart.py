@@ -5,16 +5,18 @@ katılır (sahip olunan kurslar taşınmaz).
 """
 
 from cart.models import Cart
+from discount.pending import apply_pending
 
 GUEST_CART_SESSION_KEY = "guest_cart_id"
 
 
 def current_cart(request, create=False):
-    """Açık sepet; yoksa None (create=True ise açılır)."""
+    """Açık sepet; yoksa None (create=True ise açılır, bağlantıyla gelip bekleyen indirim kodu ona uygulanır)."""
     if request.user.is_authenticated:
         cart = Cart.objects.active().filter(user=request.user).first()
         if cart is None and create:
             cart = Cart.objects.create(user=request.user)
+            apply_pending(request, cart)
         return cart
     cart_id = request.session.get(GUEST_CART_SESSION_KEY)
     cart = Cart.objects.active().filter(pk=cart_id, user__isnull=True).first() if cart_id else None
@@ -23,6 +25,7 @@ def current_cart(request, create=False):
             request.session.save()
         cart = Cart.objects.create(session_key=request.session.session_key)
         request.session[GUEST_CART_SESSION_KEY] = str(cart.pk)
+        apply_pending(request, cart)
     return cart
 
 

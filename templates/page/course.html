@@ -48,7 +48,7 @@
           {% include "page/partials/preview_media.html" with media_class=" border-bottom" %}
           <div class="card-body p-4">
             <div class="d-flex align-items-baseline justify-content-between gap-3">
-              <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}{% include "components/list_price.html" %}</div>
+              {% include "page/partials/course_price.html" %}
               {% if first_preview and not course.owned %}<a href="{{ first_preview.url }}?play=1" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
             </div>
             {% include "page/partials/buy_actions.html" %}
