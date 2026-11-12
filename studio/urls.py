@@ -101,6 +101,7 @@ urlpatterns = [
     path("carts/<uuid:cart_id>/", views_sales.cart_detail, name="cart_detail"),
     path("carts/<uuid:cart_id>/gift/", views_sales.cart_gift, name="cart_gift"),
     path("students/", views_sales.students, name="students"),
+    path("students/watching/", views_sales.watch_log, name="watch_log"),
     path("students/<uuid:user_id>/", views_sales.student_detail, name="student_detail"),
     path("students/<uuid:user_id>/enroll/", views_sales.student_enroll, name="student_enroll"),
     path("students/<uuid:user_id>/access/", views_sales.student_access, name="student_access"),

@@ -1109,6 +1109,51 @@ class StudentFilterForm(forms.Form):
         return self.is_valid() and any(value for name, value in self.cleaned_data.items() if name != "sort")
 
 
+class WatchLogFilterForm(forms.Form):
+    """Ders izleme kayıtları filtreleri (GET): üye araması, kurs, ders adı, izleme günü aralığı ve tamamlanma."""
+
+    COMPLETED_CHOICES = (("", _("Tamamlanma: tümü")), ("yes", _("Tamamlanan")), ("no", _("Tamamlanmayan")))
+
+    q = forms.CharField(label=_("Üye"), required=False)
+    course = forms.ModelChoiceField(label=_("Kurs"), queryset=Course.objects.none(), required=False, empty_label=_("Tüm kurslar"))
+    lesson = forms.CharField(label=_("Ders"), required=False)
+    date_from = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    date_to = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    completed = forms.ChoiceField(label=_("Tamamlanma"), required=False, choices=COMPLETED_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["course"].queryset = Course.objects.order_by("sort_order", "title")
+        for name, field in self.fields.items():
+            css = "form-select form-select-sm w-auto" if isinstance(field, (forms.ChoiceField, forms.ModelChoiceField)) else "form-control form-control-sm w-auto"
+            field.widget.attrs.setdefault("class", css)
+            field.widget.attrs.setdefault("aria-label", field.label)
+        self.fields["q"].widget.attrs.update(type="search", placeholder=_("Ad ya da e-posta"))
+        self.fields["lesson"].widget.attrs.update(type="search", placeholder=_("Ders adı"))
+
+    def filter(self, views):
+        if not self.is_valid():
+            return views
+        data = self.cleaned_data
+        if data.get("q"):
+            views = views.filter(Q(user__email__icontains=data["q"]) | Q(user__first_name__icontains=data["q"]) | Q(user__last_name__icontains=data["q"]))
+        if data.get("course"):
+            views = views.filter(lesson__section__course=data["course"])
+        if data.get("lesson"):
+            views = views.filter(lesson__title__icontains=data["lesson"])
+        if data.get("date_from"):
+            views = views.filter(day__gte=data["date_from"])
+        if data.get("date_to"):
+            views = views.filter(day__lte=data["date_to"])
+        if data.get("completed"):
+            views = views.filter(completed_at__isnull=data["completed"] == "no")
+        return views
+
+    @property
+    def is_filtered(self):
+        return self.is_valid() and any(value for value in self.cleaned_data.values())
+
+
 class ManualOrderForm(forms.Form):
     """Yöneticinin açtığı sipariş (ör. havale/EFT): üye, kurslar/paketler, ödeme yolu ve isteğe bağlı indirim kodu.
     Tutarlar bugünkü fiyatlardan hesaplanır; "ödendi" seçilirse kurs erişimi hemen açılır, değilse sipariş bekler.

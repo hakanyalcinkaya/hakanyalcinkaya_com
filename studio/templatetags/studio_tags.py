@@ -75,7 +75,7 @@ NAV_SECTIONS = (
     ("courses", ("course_", "section_", "lesson_", "extra_content", "subtitle_")),
     ("catalog", ("catalog_",)),
     ("sales", ("order", "cart")),
-    ("students", ("student", "enrollment")),
+    ("students", ("student", "enrollment", "watch_log")),
     ("reviews", ("review",)),
     ("support", ("support",)),
     ("mail", ("email", "newsletter", "subscriber")),

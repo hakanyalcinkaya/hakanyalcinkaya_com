@@ -20,7 +20,7 @@
 
 <section class="mb-4" aria-labelledby="member-courses-title">
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-    <h2 id="member-courses-title" class="h5 mb-0">Kursları</h2>
+    <h2 id="member-courses-title" class="h5 mb-0">Kursları <a href="{% url 'studio:watch_log' %}?q={{ member.email|urlencode }}" class="small fw-normal ms-2">İzleme kayıtları</a></h2>
     {% if grant_form.fields.course.queryset.exists %}
     <form method="post" action="{% url 'studio:student_enroll' member.id %}" class="d-flex flex-wrap align-items-center gap-2">
       {% csrf_token %}

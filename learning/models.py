@@ -386,6 +386,12 @@ class LessonView(BaseVisitorEvent):
     def __str__(self):
         return f"{self.user or '-'} · {self.lesson or '-'} · {self.day}"
 
+    @property
+    def reached_percent(self):
+        """En ileri saniyenin ders süresine oranı (yüzde, en çok 100); süre bilinmiyorsa None."""
+        duration = self.lesson.duration_seconds if self.lesson_id else None
+        return min(100, round(self.max_position * 100 / duration)) if duration else None
+
     @classmethod
     def open(cls, request, lesson):
         """Ders sayfası açılışı: bugünün kaydını açar ya da açılış sayısını artırır."""

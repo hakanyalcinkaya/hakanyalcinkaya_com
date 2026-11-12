@@ -1,0 +1,20 @@
+{% load core_tags %}
+{% for view in page %}
+<div class="list-group-item py-2">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    {% if view.user %}<a href="{% url 'studio:student_detail' view.user_id %}" class="fw-medium">{{ view.user.display_name }}</a><span class="small text-body-secondary">{{ view.user.email }}</span>{% else %}<span class="text-body-tertiary">—</span>{% endif %}
+    {% if view.completed_at %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium" title="{{ view.completed_at|date:'d.m.Y H:i' }}">Tamamlandı</span>{% endif %}
+    <time class="ms-auto small text-body-tertiary" datetime="{{ view.updated_at|date:'c' }}" title="Son hareket {{ view.updated_at|date:'d.m.Y H:i' }}">{{ view.day|date:"d.m.Y" }}</time>
+  </div>
+  <div class="small">
+    {% if view.lesson %}<span class="text-body-secondary">{{ view.lesson.section.course.short_title }} ›</span> {{ view.lesson.title }}{% else %}<span class="text-body-tertiary">{{ view.data.lesson.title|default:"Silinmiş ders" }}</span>{% endif %}
+  </div>
+  <div class="small text-body-secondary">
+    {{ view.opens }} açılış · {{ view.watched_seconds|lesson_clock }} izledi · en ileri {{ view.max_position|lesson_clock }}{% if view.lesson.duration_seconds %} / {{ view.lesson.duration_seconds|lesson_clock }}{% endif %}{% with percent=view.reached_percent %}{% if percent is not None %} <span class="text-body-tertiary">(%{{ percent }})</span>{% endif %}{% endwith %}
+  </div>
+  {% include "studio/partials/_visitor_line.html" with data=view.data %}
+</div>
+{% empty %}
+<div class="list-group-item text-body-secondary small py-4 text-center">Bu filtrede izleme kaydı yok.</div>
+{% endfor %}
+{% include "studio/partials/_more_rows.html" %}

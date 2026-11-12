@@ -1,0 +1,9 @@
+{% load core_tags %}{% url 'studio:watch_log' as watch_log_url %}
+<div id="watch-log-list">
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ watch_log_url }}" hx-get="{{ watch_log_url }}" hx-target="#watch-log-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[type=search]" hx-sync="this:replace">
+    {% for field in filters %}{{ field }}{% endfor %}
+    {% if filters.is_filtered %}<a href="{{ watch_log_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ watch_log_url }}" hx-target="#watch-log-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
+  </form>
+  <p class="small text-body-secondary mb-2">{{ totals.views }} kayıt · {{ totals.members }} üye · {{ totals.seconds|default:0|lesson_clock }} izlendi · {{ totals.completed }} tamamlandı</p>
+  <div class="list-group">{% include "studio/partials/_watch_log_rows.html" %}</div>
+</div>

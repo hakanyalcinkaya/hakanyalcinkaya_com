@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Prefetch, Q
+from django.db.models import Count, F, Prefetch, Q, Sum
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -20,7 +20,7 @@ from django_htmx.http import HttpResponseClientRedirect
 from account.models import User
 from cart.models import Cart, CartItem, CartStatus
 from cart.pricing import price_cart
-from learning.models import Enrollment
+from learning.models import Enrollment, LessonView
 from newsletter.models import Subscriber
 from order import podia
 from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
@@ -33,6 +33,7 @@ from studio.forms import (
     OrderFilterForm,
     OrderStatusForm,
     StudentFilterForm,
+    WatchLogFilterForm,
 )
 from studio.templatetags.studio_tags import ROWS_PARAM
 from studio.views import _toast, superuser_required
@@ -333,6 +334,17 @@ def students(request):
     if not request.htmx or request.htmx.boosted:
         context["invite_report"] = podia.invite_report()
     return _list_response(request, "students", context)
+
+
+@superuser_required
+def watch_log(request):
+    """Tüm üyelerin ders izleme kayıtları (üye × ders × gün): açılış, izlenen süre, ulaşılan yer, tamamlanma ve
+    ziyaretçi bilgisi; WatchLogFilterForm filtreleri. Üstte filtredeki kayıt, üye ve toplam izleme süresi."""
+    filters = WatchLogFilterForm(request.GET)
+    rows = filters.filter(LessonView.objects.filter(user__isnull=False))
+    totals = rows.aggregate(views=Count("pk"), members=Count("user", distinct=True), seconds=Sum("watched_seconds"), completed=Count("pk", filter=Q(completed_at__isnull=False)))
+    page = _page(request, rows.select_related("user", "lesson__section__course").order_by("-day", "-updated_at", "id"))
+    return _list_response(request, "watch_log", dict(page=page, filters=filters, totals=totals))
 
 
 def _without(params, *names):

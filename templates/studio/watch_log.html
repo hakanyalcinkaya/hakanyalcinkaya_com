@@ -1,0 +1,9 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}İzleme kayıtları{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">İzleme kayıtları</h1>
+  <p class="text-body-secondary mb-0">Tüm üyelerin ders izlemeleri: her satır bir üyenin bir dersi o gün izlemesi. Süre ileri sarmalar hariç izlenen kısımdır; yüzde dersin ulaşılan en ileri yeridir.</p>
+</div>
+{% include "studio/partials/_watch_log_list.html" %}
+{% endblock %}
