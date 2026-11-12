@@ -43,10 +43,12 @@
       <div class="d-lg-none mt-4" data-buy-card>
         <div class="card shadow overflow-hidden">
           <div class="card-body p-4">
+            {% if not course.owned %}
             <div class="d-flex align-items-baseline justify-content-between gap-3">
               {% include "page/partials/course_price.html" %}
-              {% if first_preview and not course.owned %}<a href="{{ first_preview.url }}?play=1" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
+              {% if first_preview %}<a href="{{ first_preview.url }}?play=1" class="small fw-medium">{{ preview_count }} dersi ücretsiz izle</a>{% endif %}
             </div>
+            {% endif %}
             {% include "page/partials/buy_actions.html" %}
             {% if detail.discount %}
             <div class="border rounded p-3 mt-3 small">
