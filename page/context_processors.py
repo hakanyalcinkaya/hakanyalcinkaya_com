@@ -53,7 +53,7 @@ def site(request):
         "canonical_url": absolute_url(request.path),
         "courses": cards,
         "nav_items": nav_items,
-        "year": timezone.now().year,
+        "year": timezone.localdate().year,
         "login_url": reverse("page:login"),
         "join_url": reverse("page:signup"),
         "logout_url": reverse("page:logout"),

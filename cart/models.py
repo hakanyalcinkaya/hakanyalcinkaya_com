@@ -329,4 +329,4 @@ class CartAddEvent(BaseVisitorEvent):
         ]
 
     def __str__(self):
-        return f"{self.course or self.bundle or '-'} · {self.created_at:%Y-%m-%d %H:%M}"
+        return f"{self.course or self.bundle or '-'} · {timezone.localtime(self.created_at):%Y-%m-%d %H:%M}"
