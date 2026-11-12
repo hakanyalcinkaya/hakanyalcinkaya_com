@@ -272,6 +272,9 @@ def lesson(request, course_slug, section_slug, lesson_slug):
         target = next((item for item in page["previews"] if item["n"] > page["current"]["n"]), page["previews"][0])
         messages.info(request, f"“{page['current']['title']}” dersi kursu satın alınca açılır; şimdilik ücretsiz önizlemeyi izleyebilirsin.")
         return redirect(f"{target['url']}?play=1")
+    if course is not None and not enrolled:
+        # Önizleme ziyaretçisi: bağlantıyla gelen ya da sepetteki indirim kodu fiyatı düşürüyorsa düğmelerde indirimli fiyat.
+        page["course"] = dict(page["course"], coupon=content.course_coupon_price(request, course))
     lesson = page["current"].get("object")
     # Favori ve tamamlama düğmeleri kursa erişimi olan üyeye; önizleme ziyaretçisine gösterilmez.
     favorite = None

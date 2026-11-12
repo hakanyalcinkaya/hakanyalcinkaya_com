@@ -25,7 +25,7 @@
       {% if preview %}
       <span class="badge rounded-1 bg-primary-subtle text-primary-emphasis border border-primary-subtle fw-medium px-3 d-none d-xl-inline-flex align-items-center align-self-stretch">Ücretsiz önizleme</span>
       {% if not nav_member %}<a href="{{ login_url }}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary d-none d-md-inline-flex">Giriş Yap</a>{% endif %}
-      <a href="{{ course.buy_url }}" class="btn btn-primary d-none d-sm-inline-flex"><span class="d-none d-md-inline">Kursu Hemen&nbsp;</span>Satın Al · {{ course.price }}</a>
+      <a href="{{ course.buy_url }}" class="btn btn-primary d-none d-sm-inline-flex"><span class="d-none d-md-inline">Kursu Hemen&nbsp;</span>Satın Al · {{ course.coupon.price|default:course.price }}</a>
       {% if show_cart %}{% include "_base/cart_button.html" %}{% endif %}
       {% if nav_member %}{% include "_base/account_menu.html" %}{% endif %}
       {% else %}
@@ -57,7 +57,7 @@
         <div class="col-6"><a href="{{ login_url }}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary btn-lg fs-6 w-100"><i class="bi bi-person me-2" aria-hidden="true"></i>Giriş Yap</a></div>
         {% endif %}
         {% if preview %}
-        <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 w-100">Satın Al · {{ course.price }}</a></div>
+        <div class="{% if nav_member %}col-12{% else %}col-6{% endif %}"><a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 w-100">Satın Al · {{ course.coupon.price|default:course.price }}</a></div>
         {% endif %}
       </div>
       {% endif %}
@@ -80,7 +80,7 @@
             <h2 class="h4 fw-semibold mt-2">Bu ders kursun tam sürümünde</h2>
             <p class="opacity-75 mb-4">{{ total }} dersin tamamına ve her bölümdeki projelere erişmek için kursa kaydol. Kaydolduktan sonra izlemeye hemen başlayabilirsin.</p>
             <div class="d-flex flex-wrap justify-content-center gap-2">
-              <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Kursu Hemen Satın Al · {{ course.price }}</a>
+              <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6">Kursu Hemen Satın Al · {{ course.coupon.price|default:course.price }}</a>
               {% if previews %}<a href="{{ previews.0.url }}?play=1" class="btn btn-outline-light btn-lg fs-6">Ücretsiz önizlemeye dön</a>{% endif %}
             </div>
           </div>
@@ -126,7 +126,7 @@
           {% if next %}
           <a href="{{ next.url }}{% if preview %}?play=1{% endif %}" class="btn btn-primary ms-sm-auto"{% if favorite %} data-complete-on-leave{% endif %}>Sonraki{% if preview %}<span class="d-none d-sm-inline"> önizleme</span>{% endif %} <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% elif preview %}
-          <a href="{{ course.buy_url }}" class="btn btn-primary ms-sm-auto">Tamamına eriş<span class="d-none d-sm-inline"> · {{ course.price }}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a href="{{ course.buy_url }}" class="btn btn-primary ms-sm-auto">Tamamına eriş<span class="d-none d-sm-inline"> · {{ course.coupon.price|default:course.price }}</span> <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
           {% else %}
           <button type="button" class="btn btn-primary ms-sm-auto" disabled>Sonraki <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></button>
           {% endif %}
@@ -184,7 +184,7 @@
                 </ul>
               </div>
               <div class="col-md-5">
-                <div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>
+                {% if course.coupon %}{% include "page/partials/course_price.html" %}{% else %}<div class="fs-2 fw-semibold lh-1"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</div>{% endif %}
                 {% include "page/partials/buy_actions.html" %}
                 <div class="small mt-3"><a href="{{ course.url }}">Kurs detayları</a></div>
               </div>
@@ -283,7 +283,7 @@
         {% if preview %}
         <div class="border-top p-3 d-none d-lg-block flex-shrink-0">
           <div class="d-flex align-items-center gap-3">
-            <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+            <div class="lh-sm"><div class="fw-semibold fs-5">{% if course.coupon %}<span class="visually-hidden">İndirimli fiyat: </span>{{ course.coupon.price }} <s class="small fw-normal text-body-tertiary"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</s> <span class="small fw-normal text-success-emphasis"><i class="bi bi-tag-fill" aria-hidden="true"></i> {{ course.coupon.code }}</span>{% else %}{{ course.price }}{% endif %}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
             <a href="{{ course.buy_url }}" class="btn btn-primary flex-grow-1"><span class="d-none d-xxl-inline">Kursu Hemen </span>Satın Al</a>
           </div>
         </div>
@@ -305,7 +305,7 @@
 {% if preview %}
 <div class="fixed-bottom d-lg-none bg-body bg-opacity-75 navbar-blur border-top">
   <div class="container-fluid d-flex align-items-center gap-3 py-2 px-3">
-    <div class="lh-sm"><div class="fw-semibold fs-5">{{ course.price }}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
+    <div class="lh-sm"><div class="fw-semibold fs-5">{% if course.coupon %}<span class="visually-hidden">İndirimli fiyat: </span>{{ course.coupon.price }} <s class="small fw-normal text-body-tertiary"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</s> <span class="small fw-normal text-success-emphasis"><i class="bi bi-tag-fill" aria-hidden="true"></i> {{ course.coupon.code }}</span>{% else %}{{ course.price }}{% endif %}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
     <a href="{{ course.buy_url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1"><span class="d-none d-sm-inline">Kursu Hemen </span>Satın Al</a>
   </div>
 </div>
