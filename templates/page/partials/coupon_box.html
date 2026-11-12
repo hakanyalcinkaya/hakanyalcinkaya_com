@@ -12,6 +12,7 @@
   </form>
   {% else %}
   {% crispy coupon_form %}
+  {% if coupon_form.errors %}{% include "components/personal_discount_link.html" %}{% endif %}
   {% endif %}
 </div>
 {% endif %}

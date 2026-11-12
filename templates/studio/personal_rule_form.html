@@ -1,0 +1,21 @@
+{% extends "studio/base.html" %}
+{% load crispy_forms_tags %}
+{% block studio_title %}{{ rule.get_audience_display }} kuralı{% endblock %}
+{% block studio_content %}
+<nav aria-label="Konum" class="small mb-2"><a href="{% url 'studio:personal_discounts' %}" class="link-secondary text-decoration-none">Özel indirim kodları</a> <span class="text-body-tertiary">/</span></nav>
+<h1 class="h3 mb-1">{{ rule.get_audience_display }} için özel indirim kuralı</h1>
+<p class="text-body-secondary mb-4">"{{ rule.get_audience_display }}" seçen ziyaretçiye bu indirimle SPC ile başlayan, tek kullanımlık kod üretilir ve e-postasına gönderilir.</p>
+<form method="post" class="border rounded p-3 p-lg-4">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger small" role="alert">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  <div class="row gx-4">
+    {% for field in form.visible_fields %}
+    <div class="{% if not field.field.widget.input_type or field.field.widget.allow_multiple_selected or field.field.widget.input_type == 'checkbox' %}col-12{% else %}col-lg-6{% endif %}">{{ field|as_crispy_field }}</div>
+    {% endfor %}
+  </div>
+  <div class="d-flex gap-2 mt-2">
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a href="{% url 'studio:personal_discounts' %}" class="btn btn-outline-secondary">Vazgeç</a>
+  </div>
+</form>
+{% endblock %}

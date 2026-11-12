@@ -34,7 +34,7 @@ from course.models import (
     VideoUpload,
 )
 from discount.forms import DiscountTargetsMixin
-from discount.models import Discount
+from discount.models import Discount, PersonalAudience, PersonalDiscountRule, PersonalRequestResult
 from learning.models import WATCH_COMPLETED, WATCH_OPENED, WATCH_STARTED
 from newsletter.models import AudienceKind, Issue
 from order.models import ADMIN_PAYMENT_METHODS, GIFT, NOTICE_STATUSES, PAYMENT_METHODS, Order, OrderStatus
@@ -886,6 +886,66 @@ class DiscountForm(DiscountTargetsMixin, forms.ModelForm):
             self.fields[name].input_formats = DATETIME_FORMATS
         self.fields["courses"].queryset = Course.objects.order_by("sort_order", "title")
         self.fields["bundles"].queryset = Bundle.objects.order_by("sort_order", "title")
+
+
+class PersonalDiscountRuleForm(DiscountTargetsMixin, forms.ModelForm):
+    """Öğrenci ya da çalışan için özel indirim kuralı (kitle adresten gelir)."""
+
+    class Meta:
+        model = PersonalDiscountRule
+        fields = ("kind", "value", "valid_days", "allow_repeat", "courses", "bundles", "note", "status")
+        widgets = {"courses": forms.CheckboxSelectMultiple, "bundles": forms.CheckboxSelectMultiple}
+        help_texts = {
+            "courses": _("Yüzde indirimde kurs ve paket seçilmezse hepsinde geçerlidir."),
+            "valid_days": _("Kod, isteğin yapıldığı andan bu kadar gün sonra geçersiz olur."),
+            "status": _("Yalnız yayındaki kurallar istek formunda seçilebilir."),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["courses"].queryset = Course.objects.order_by("sort_order", "title")
+        self.fields["bundles"].queryset = Bundle.objects.order_by("sort_order", "title")
+
+
+class PersonalRequestFilterForm(forms.Form):
+    """Özel indirim kodu istekleri filtreleri (GET): e-posta ya da kod araması, beyan, sonuç ve istek günü aralığı."""
+
+    q = forms.CharField(label=_("Ara"), required=False)
+    audience = forms.ChoiceField(label=_("Beyan"), required=False)
+    result = forms.ChoiceField(label=_("Sonuç"), required=False)
+    date_from = forms.DateField(label=_("Başlangıç"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+    date_to = forms.DateField(label=_("Bitiş"), required=False, widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["audience"].choices = [("", _("Beyan: tümü"))] + list(PersonalAudience.choices)
+        self.fields["result"].choices = [("", _("Sonuç: tümü"))] + list(PersonalRequestResult.choices)
+        for name, field in self.fields.items():
+            css = "form-select form-select-sm w-auto" if isinstance(field, forms.ChoiceField) else "form-control form-control-sm w-auto"
+            field.widget.attrs.setdefault("class", css)
+            field.widget.attrs.setdefault("aria-label", field.label)
+        self.fields["q"].widget.attrs.update(type="search", placeholder=_("E-posta ya da kod"))
+
+    def filter(self, rows):
+        if not self.is_valid():
+            return rows
+        data = self.cleaned_data
+        if data.get("q"):
+            rows = rows.filter(Q(email__icontains=data["q"]) | Q(discount__code__icontains=data["q"]))
+        if data.get("audience"):
+            rows = rows.filter(audience=data["audience"])
+        if data.get("result"):
+            rows = rows.filter(result=data["result"])
+        zone = timezone.get_current_timezone()
+        if data.get("date_from"):
+            rows = rows.filter(created_at__gte=datetime.combine(data["date_from"], time.min, tzinfo=zone))
+        if data.get("date_to"):
+            rows = rows.filter(created_at__lte=datetime.combine(data["date_to"], time.max, tzinfo=zone))
+        return rows
+
+    @property
+    def is_filtered(self):
+        return self.is_valid() and any(value for value in self.cleaned_data.values())
 
 
 class EnrollmentGrantForm(forms.Form):

@@ -19,13 +19,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 
-from account.models import AccountEventKind
+from account.models import AccountEventKind, User
 from account.tokens import ResetOrInviteTokenGenerator
 from cart.models import CartAddSource
 from cart.request_cart import current_cart
 from discount import pending
+from discount.models import PersonalDiscountRequest, PersonalDiscountRule
 from core import ratelimit
 from core.turnstile import client_ip
+from core.visitor import collect
 from course.models import Course, Lesson, Review, ReviewSource
 from learning import tracking as learning_tracking
 from learning.models import Enrollment, Favorite, LessonProgress, PlayerPreference
@@ -58,6 +60,7 @@ from page.forms import (
     AppearanceForm,
     CheckoutForm,
     CouponForm,
+    PersonalDiscountForm,
     EmailChangeForm,
     LessonPositionForm,
     LoginForm,
@@ -80,6 +83,9 @@ logger = logging.getLogger(__name__)
 # Bülten aboneliği sınırı: IP başına saatte, e-posta başına günde (başkasının kutusuna onay e-postası yağdırılmasın).
 NEWSLETTER_IP_LIMIT = (5, 60 * 60)
 NEWSLETTER_EMAIL_LIMIT = (3, 24 * 60 * 60)
+# Özel indirim kodu isteği sınırı: IP başına saatte, e-posta başına saatte.
+PERSONAL_DISCOUNT_IP_LIMIT = (10, 60 * 60)
+PERSONAL_DISCOUNT_EMAIL_LIMIT = (3, 60 * 60)
 # Hesap ayarlarından kendi adresine şifre sıfırlama bağlantısı: kullanıcı başına saatte 3.
 SETTINGS_RESET_LINK_LIMIT = (3, 60 * 60)
 
@@ -508,6 +514,36 @@ def course_coupon(request, slug):
         messages.error(request, form.errors["code"][0])
         return redirect(course.get_absolute_url())
     return render(request, "page/partials/course_coupon.html", dict(course=course, coupon_form=form))
+
+
+def personal_discount(request):
+    """Kişiye özel indirim kodu: e-posta ve öğrenci / çalışan beyanıyla kurala göre kod e-postayla gönderilir (yeni ya
+    da hâlâ geçerli kod), kural izin vermiyorsa nedeni gösterilir (PersonalDiscountRequest.handle). Geçersiz indirim
+    kodundan sonra buraya yönlendirilir."""
+    rules = list(PersonalDiscountRule.objects.published())
+    member = request.user.is_authenticated
+    form = PersonalDiscountForm(
+        request.POST if request.method == "POST" else None,
+        rules=rules,
+        remote_ip=client_ip(request),
+        initial={"email": request.user.email} if member else None,
+    )
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data["email"]
+        if not (
+            ratelimit.allow("personal-discount-ip", client_ip(request), *PERSONAL_DISCOUNT_IP_LIMIT)
+            and ratelimit.allow("personal-discount-email", email, *PERSONAL_DISCOUNT_EMAIL_LIMIT)
+        ):
+            messages.error(request, "Çok fazla istek geldi; biraz sonra yeniden dene.")
+            return redirect("page:personal_discount")
+        user = request.user if member else User.objects.with_email(email).first()
+        sent = PersonalDiscountRequest.handle(form.rule, email, form.cleaned_data["audience"], user=user, data=collect(request, user))
+        if sent.is_sent:
+            messages.success(request, f"Sana özel indirim kodunu {email} adresine gönderdik.")
+        else:
+            messages.error(request, sent.refusal_message)
+        return redirect("page:personal_discount")
+    return render(request, "page/personal_discount.html", dict(form=form, available=bool(rules)))
 
 
 @require_POST

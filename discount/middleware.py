@@ -24,6 +24,8 @@ class PendingDiscountCodeMiddleware:
             discount, is_new = pending.capture(request, current_cart(request))
         except ValidationError as error:
             messages.error(request, error.messages[0])
+            # Sayfadaki şerit kişiye özel kod isteme bağlantısını gösterir (page.context_processors.site).
+            request.invalid_coupon = request.GET.get(pending.CODE_PARAM, "").strip().upper()[:40]
         else:
             if is_new:
                 messages.success(request, f"{discount.code} indirim kodu uygulandı.")

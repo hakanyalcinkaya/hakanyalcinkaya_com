@@ -1,0 +1,15 @@
+{% load core_tags %}
+{% for row in page %}
+<tr>
+  <td class="text-nowrap"><time datetime="{{ row.created_at|date:'c' }}" title="{{ row.created_at|date:'d.m.Y H:i' }}">{{ row.created_at|date:"d.m.Y H:i" }}</time></td>
+  <td>{% if row.user %}<a href="{% url 'studio:student_detail' row.user_id %}" class="text-decoration-none">{{ row.email }}</a>{% else %}{{ row.email }}<div class="text-body-tertiary">Hesabı yok</div>{% endif %}</td>
+  <td>{{ row.get_audience_display }}</td>
+  <td class="text-nowrap">{% if row.result == results.SENT %}<span class="badge rounded-1 bg-success-subtle text-success-emphasis border border-success-subtle fw-medium">{{ row.get_result_display }}</span>{% elif row.result == results.RESENT %}<span class="badge rounded-1 border text-body-secondary fw-medium">{{ row.get_result_display }}</span>{% else %}<span class="badge rounded-1 bg-danger-subtle text-danger-emphasis border border-danger-subtle fw-medium">{{ row.get_result_display }}</span>{% endif %}</td>
+  <td class="text-nowrap">{% if row.discount %}<span class="font-monospace fw-medium">{{ row.discount.code }}</span> <span class="text-body-tertiary">{{ row.discount.label }}</span>
+    <div class="text-body-tertiary">{% if row.discount.is_used_up %}Kullanıldı{% elif row.discount.is_expired %}Süresi doldu{% else %}{{ row.discount.valid_until|date:"d.m.Y H:i" }} tarihine kadar{% endif %}</div>{% else %}<span class="text-body-tertiary">—</span>{% endif %}</td>
+  <td>{% include "studio/partials/_visitor_line.html" with data=row.data %}</td>
+</tr>
+{% empty %}
+<tr><td colspan="6" class="text-body-secondary text-center py-4">Bu filtrede istek yok.</td></tr>
+{% endfor %}
+{% include "studio/partials/_more_table_rows.html" with colspan=6 %}

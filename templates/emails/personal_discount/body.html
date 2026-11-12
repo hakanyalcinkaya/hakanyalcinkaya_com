@@ -1,0 +1,14 @@
+{% extends "emails/base.html" %}
+{% block title %}Sana özel indirim kodun{% endblock %}
+{% block preheader %}{{ code }} · {{ discount_label }} indirim{% if valid_until %}, {{ valid_until|date:"j F" }} tarihine kadar{% endif %}.{% endblock %}
+{% block eyebrow %}İndirim{% endblock %}
+{% block heading %}Sana özel indirim kodun{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;">Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},</p>
+<p style="margin: 0 0 14px;">{% if resent %}Sana daha önce tanımladığımız indirim kodu hâlâ geçerli.{% else %}{{ audience }} olarak sana özel bir indirim kodu tanımladık.{% endif %}</p>
+<p style="margin: 0 0 6px; font-size: 14px; color: #6B6B6B;">İndirim kodu</p>
+<p style="margin: 0 0 14px; font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: 1px; font-family: 'Fira Mono', Menlo, Consolas, monospace;">{{ code }}</p>
+<p style="margin: 0 0 14px;"><b>{{ discount_label }}</b> indirim · {% if products %}{{ products|join:", " }}{% else %}tüm kurslarda{% endif %}{% if valid_until %}<br>Son kullanma: {{ valid_until|date:"j F Y, H:i" }}{% endif %}</p>
+{% include "emails/modules/button.html" with url=courses_url label="İndirimli fiyatları gör" %}
+<p style="margin: 18px 0 0; font-size: 14px; line-height: 20px; color: #9B9B9B;">Kod tek kullanımlıktır. Bağlantıdan gelince kod sepetine kendiliğinden uygulanır.</p>
+{% endblock %}

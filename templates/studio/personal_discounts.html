@@ -1,0 +1,33 @@
+{% extends "studio/base.html" %}
+{% block studio_title %}Özel indirim kodları{% endblock %}
+{% block studio_content %}
+<div class="mb-4">
+  <h1 class="h3 mb-1">Özel indirim kodları</h1>
+  <p class="text-body-secondary mb-0">Geçersiz indirim kodu giren ziyaretçi öğrenci ya da çalışan olduğunu seçip kişiye özel kod ister; kural yayındaysa SPC ile başlayan tek kullanımlık kod e-postasına gider. Aynı e-postaya geçerli kodu varken aynı kod yeniden gönderilir.</p>
+</div>
+<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+  {% for item in rules %}
+  <div class="col">
+    <div class="border rounded p-3 h-100">
+      <div class="d-flex align-items-center gap-2">
+        <h2 class="h6 mb-0">{{ item.label }}</h2>
+        {% if item.rule %}{% include "studio/partials/catalog/_status.html" with item=item.rule %}{% endif %}
+        <a href="{% url 'studio:personal_rule_edit' item.audience %}" class="btn btn-outline-secondary btn-sm ms-auto">{% if item.rule %}Düzenle{% else %}Kural tanımla{% endif %}</a>
+      </div>
+      {% if item.rule %}
+      <div class="small mt-2"><b>{{ item.rule.label }}</b> · {{ item.rule.get_kind_display }} · {{ item.rule.valid_days }} gün geçerli</div>
+      <div class="small text-body-secondary">
+        {% for course in item.rule.courses.all %}{{ course.short_title|default:course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}{% for bundle in item.rule.bundles.all %}{% if forloop.first and item.rule.courses.all %}, {% endif %}{{ bundle.short_title }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if not item.rule.courses.all and not item.rule.bundles.all %}tüm kurs ve paketler{% endif %}
+        · {% if item.rule.allow_repeat %}süre dolunca yeni kod verilir{% else %}süre dolunca yeni kod verilmez{% endif %}
+      </div>
+      <div class="small text-body-tertiary mt-1">{{ item.rule.issued }} kod verildi · {{ item.rule.used }} kullanıldı{% if item.rule.note %} · {{ item.rule.note }}{% endif %}</div>
+      {% else %}
+      <p class="small text-body-secondary mt-2 mb-0">Kural yok; formda bu seçenek görünmez.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<h2 class="h5 mb-3">İstekler</h2>
+{% include "studio/partials/_personal_discounts_list.html" %}
+{% endblock %}

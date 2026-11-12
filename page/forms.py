@@ -10,7 +10,7 @@ from django.utils.html import format_html
 
 from account.models import User
 from core.turnstile import TurnstileMixin
-from discount.models import Discount
+from discount.models import Discount, PersonalAudience
 from learning.models import PlayerPreference
 from order.iyzico import NAME_LENGTH as PAYMENT_NAME_LENGTH
 
@@ -538,6 +538,28 @@ class CheckoutForm(StyledForm):
             Row(Column("name", css_class="col-sm-6"), Column("phone", css_class="col-sm-6")),
             "agreement",
         )
+
+
+class PersonalDiscountForm(TurnstileMixin, StyledForm):
+    """Kişiye özel indirim kodu isteği: e-posta ve öğrenci / çalışan beyanı (yalnız yayındaki kuralların kitleleri)."""
+
+    email = email_field()
+    audience = forms.ChoiceField(
+        label="Öğrenci misin, çalışan mı?",
+        widget=forms.RadioSelect,
+        error_messages={"required": "Öğrenci mi çalışan mı olduğunu seç.", "invalid_choice": "Öğrenci mi çalışan mı olduğunu seç."},
+    )
+
+    def __init__(self, *args, rules, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.rules = {rule.audience: rule for rule in rules}
+        self.fields["audience"].choices = [(value, label) for value, label in PersonalAudience.choices if value in self.rules]
+        self.fields["audience"].widget.attrs["class"] = ""
+        self.helper.layout = Layout("email", "audience", *self.turnstile_fields(), submit("İndirim kodumu gönder", icon="bi-send"))
+
+    @property
+    def rule(self):
+        return self.rules[self.cleaned_data["audience"]]
 
 
 class CouponForm(StyledForm):

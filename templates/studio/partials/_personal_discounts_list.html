@@ -1,0 +1,16 @@
+{% url 'studio:personal_discounts' as list_url %}
+<div id="personal-request-list">
+  <form class="d-flex flex-wrap align-items-center gap-2 mb-3" action="{{ list_url }}" hx-get="{{ list_url }}" hx-target="#personal-request-list" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, input changed delay:400ms from:input[type=search]" hx-sync="this:replace">
+    {% for field in filters %}{{ field }}{% endfor %}
+    {% if filters.is_filtered %}<a href="{{ list_url }}" class="btn btn-link btn-sm link-secondary" hx-get="{{ list_url }}" hx-target="#personal-request-list" hx-swap="outerHTML" hx-push-url="true">Temizle</a>{% endif %}
+  </form>
+  <p class="small text-body-secondary mb-2">{{ totals.total }} istek · {{ totals.sent }} yeni kod · {{ totals.resent }} yeniden gönderildi · {{ totals.refused_expired }} süre doldu, verilmedi · {{ totals.refused_used }} kullanılmış, verilmedi</p>
+  <div class="table-responsive">
+    <table class="table table-sm table-hover align-middle small mb-0">
+      <thead><tr><th scope="col">İstek</th><th scope="col">E-posta</th><th scope="col">Beyan</th><th scope="col">Sonuç</th><th scope="col">Kod</th><th scope="col">Ziyaretçi</th></tr></thead>
+      <tbody>
+        {% include "studio/partials/_personal_discounts_rows.html" %}
+      </tbody>
+    </table>
+  </div>
+</div>

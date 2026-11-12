@@ -1,4 +1,4 @@
-"""Ziyaretçi kayıtlarında (sepete ekleme, kayıt, giriş, ders izleme, sayfa ziyareti) IP_RETENTION_DAYS günden eski IP'leri maskeler; ülke, şehir,
+"""Ziyaretçi kayıtlarında (sepete ekleme, kayıt, giriş, ders izleme, sayfa ziyareti, özel indirim isteği) IP_RETENTION_DAYS günden eski IP'leri maskeler; ülke, şehir,
 cihaz ve diğer bilgiler kalır. Sunucuda cron her gece çalıştırır (_server/README.md, "IP maskeleme"). Örnek:
     python manage.py mask_visitor_ips
     python manage.py mask_visitor_ips --dry-run     # yalnız kaç kayıt maskeleneceğini yaz
@@ -12,9 +12,10 @@ from django.utils import timezone
 from account.models import AccountEvent, PageView
 from cart.models import CartAddEvent
 from core.visitor import IP_RETENTION_DAYS
+from discount.models import PersonalDiscountRequest
 from learning.models import LessonView
 
-MODELS = (CartAddEvent, AccountEvent, LessonView, PageView)
+MODELS = (CartAddEvent, AccountEvent, LessonView, PageView, PersonalDiscountRequest)
 
 
 class Command(BaseCommand):

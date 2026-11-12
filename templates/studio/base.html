@@ -23,6 +23,7 @@
         <ul id="studio-catalog-menu" class="dropdown-menu shadow small" data-dropdown-menu data-bs-popper="static">
           <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'bundles' %}"><i class="bi bi-stack me-2 text-body-tertiary" aria-hidden="true"></i>Paketler</a></li>
           <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'discounts' %}"><i class="bi bi-ticket-perforated me-2 text-body-tertiary" aria-hidden="true"></i>İndirim kodları</a></li>
+          <li><a class="dropdown-item" href="{% url 'studio:personal_discounts' %}"><i class="bi bi-person-badge me-2 text-body-tertiary" aria-hidden="true"></i>Özel indirim kodları</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'categories' %}"><i class="bi bi-diagram-3 me-2 text-body-tertiary" aria-hidden="true"></i>Kategoriler</a></li>
           <li><a class="dropdown-item" href="{% url 'studio:catalog_list' 'technologies' %}"><i class="bi bi-cpu me-2 text-body-tertiary" aria-hidden="true"></i>Teknolojiler</a></li>

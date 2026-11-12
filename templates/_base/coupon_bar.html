@@ -1,9 +1,18 @@
-{# Geçerli indirim kodu (coupon, page.content.coupon_prices): menünün altında ince şerit, kaldırma düğmesiyle. Sepet, ödeme, kurs ve ders sayfalarında kod kendi kutusunda gösterildiği için çıkmaz (show_coupon_bar). #}
+{# Bağlantıdaki kod geçersizse (invalid_coupon, discount.middleware) kişiye özel kod isteme bağlantısıyla uyarı.
+Geçerli indirim kodu (coupon, page.content.coupon_prices): menünün altında ince şerit, kaldırma düğmesiyle. Sepet, ödeme, kurs ve ders sayfalarında kod kendi kutusunda gösterildiği için çıkmaz (show_coupon_bar). #}
 {% if show_coupon_bar and coupon %}
 <div class="border-bottom bg-success-subtle" role="status">
   <div class="container py-2 small text-success-emphasis text-center">
     <i class="bi bi-tag-fill me-1" aria-hidden="true"></i><b>{{ coupon.code }}</b> indirim kodu uygulandı; geçerli olduğu kurslarda indirimli fiyat gösteriliyor.
     {% include "components/coupon_remove.html" with link_class="link-success" %}
+  </div>
+</div>
+{% endif %}
+{% if invalid_coupon and personal_discount_open %}
+<div class="border-bottom bg-warning-subtle" role="status">
+  <div class="container py-2 small text-warning-emphasis text-center">
+    <i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i><b>{{ invalid_coupon }}</b> indirim kodu geçerli değil.
+    <a href="{% url 'page:personal_discount' %}" class="link-warning fw-medium ms-1">Sana özel indirim kodu gönderelim mi?</a>
   </div>
 </div>
 {% endif %}

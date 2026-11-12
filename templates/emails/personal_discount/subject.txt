@@ -1,0 +1,1 @@
+{% if resent %}Sana özel indirim kodun hâlâ geçerli: {{ code }}{% else %}Sana özel indirim kodun: {{ code }}{% endif %}

@@ -5,6 +5,7 @@ from django.utils.functional import SimpleLazyObject
 
 from core.models import SiteSettings
 from core.version import app_version
+from discount.models import PersonalDiscountRule
 from core.site_url import absolute_url
 from newsletter.models import Subscriber
 
@@ -79,6 +80,9 @@ def site(request):
         "coupon": SimpleLazyObject(lambda: content.coupon_prices(request)),
         # Kod şeridi: kodun kendi kutusunda göründüğü sayfalarda (sepet, ödeme, kurs, ders) gösterilmez.
         "show_coupon_bar": url_name not in COUPON_BOX_PAGES,
+        # Bağlantıyla gelen kod geçersizse (discount.middleware) şeritte kişiye özel kod isteme bağlantısı.
+        "invalid_coupon": getattr(request, "invalid_coupon", ""),
+        "personal_discount_open": SimpleLazyObject(lambda: PersonalDiscountRule.objects.published().exists()),
         "library_url": reverse("page:library"),
         # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda
         # kullanılırsa sorgulanır.

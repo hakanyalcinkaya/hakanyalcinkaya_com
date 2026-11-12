@@ -3,6 +3,7 @@
 <div class="mt-3" data-course-coupon>
   {% if coupon_form %}
   {% crispy coupon_form %}
+  {% if coupon_form.errors %}{% include "components/personal_discount_link.html" %}{% endif %}
   {% else %}
   <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" hx-get="{% url 'page:course_coupon' slug=course.slug %}" hx-target="closest [data-course-coupon]" hx-swap="outerHTML"><i class="bi bi-tag me-1" aria-hidden="true"></i>İndirim kodun var mı?</button>
   {% endif %}

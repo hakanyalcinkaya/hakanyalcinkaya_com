@@ -1,0 +1,12 @@
+{% extends "emails/base.txt" %}
+{% block content %}Merhaba{% if greeting_name %} {{ greeting_name }}{% endif %},
+
+{% if resent %}Sana daha önce tanımladığımız indirim kodu hâlâ geçerli.{% else %}{{ audience }} olarak sana özel bir indirim kodu tanımladık.{% endif %}
+
+İndirim kodu: {{ code }}
+İndirim: {{ discount_label }}
+Geçerli olduğu kurslar: {% if products %}{{ products|join:", " }}{% else %}tüm kurslar{% endif %}
+{% if valid_until %}Son kullanma: {{ valid_until|date:"j F Y, H:i" }}
+{% endif %}Kod tek kullanımlıktır.
+
+İndirimli fiyatları gör: {{ courses_url }}{% endblock %}

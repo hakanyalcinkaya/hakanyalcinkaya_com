@@ -1,0 +1,31 @@
+{% extends "_base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sana özel indirim kodu — Hakan Yalçınkaya{% endblock %}
+{% block description %}Öğrenci ya da çalışan olarak sana özel indirim kodu iste; kod e-posta adresine gelsin.{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% include "_base/turnstile_script.html" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <section class="col-lg-8 col-xl-6 mx-auto" aria-labelledby="ozel-indirim-baslik">
+      <header class="text-center mb-4">
+        <i class="bi bi-ticket-perforated fs-1 text-primary-emphasis" aria-hidden="true"></i>
+        <h1 id="ozel-indirim-baslik" class="h3 fw-semibold mt-2 mb-1">Sana özel indirim kodu</h1>
+        <p class="text-body-secondary mb-0">Öğrenci misin, çalışan mı? Seç, sana özel indirim kodunu e-posta adresine gönderelim.</p>
+      </header>
+      <div class="card">
+        <div class="card-body p-4">
+          {% if available %}
+          {% crispy form %}
+          <p class="small text-body-tertiary mt-3 mb-0">Kod tek kullanımlıktır ve belirli bir süre geçerlidir; e-postadaki bağlantıdan gelince sepetine kendiliğinden uygulanır. Gelen kutunda göremezsen istenmeyen (spam) klasörüne de bak.</p>
+          {% else %}
+          <p class="text-body-secondary text-center mb-0">Şu an kişiye özel indirim kodu tanımlanmıyor.</p>
+          {% endif %}
+        </div>
+      </div>
+      <p class="text-center mt-3 mb-0"><a href="{% url 'page:course_list' %}" class="fw-medium">Kurslara dön <i class="bi bi-arrow-right" aria-hidden="true"></i></a></p>
+    </section>
+  </div>
+</div>
+{% endblock %}

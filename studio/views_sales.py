@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Prefetch, Q, Sum
-from django.http import HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -21,6 +21,7 @@ from account.models import User
 from cart.models import Cart, CartItem, CartStatus
 from cart.pricing import price_cart
 from learning.models import WATCH_COMPLETED, WATCH_OPENED, WATCH_STARTED, Enrollment, LessonView
+from discount.models import PersonalAudience, PersonalDiscountRequest, PersonalDiscountRule, PersonalRequestResult
 from newsletter.models import Subscriber
 from order import podia
 from order.models import NOTICE_STATUSES, Order, OrderItem, OrderStatus
@@ -32,6 +33,8 @@ from studio.forms import (
     MemberAccessForm,
     OrderFilterForm,
     OrderStatusForm,
+    PersonalDiscountRuleForm,
+    PersonalRequestFilterForm,
     StudentFilterForm,
     WatchLogFilterForm,
 )
@@ -432,3 +435,39 @@ def subscriber_action(request, subscriber_id, action):
     subscriber = Subscriber.objects.with_unsubscribe_email().get(pk=subscriber.pk)
     response = render(request, "studio/partials/_subscriber_row.html", dict(subscriber=subscriber))
     return _toast(response, "success", str(message))
+
+
+# Kişiye özel indirim kodları
+@superuser_required
+def personal_discounts(request):
+    """Öğrenci ve çalışan kuralları (verilen ve kullanılan kod sayısıyla) ve istekler: e-posta, beyan, sonuç, gönderilen
+    kodun durumu ve ziyaretçi bilgisi; PersonalRequestFilterForm filtreleri ve sonuçlara göre sayılar."""
+    filters = PersonalRequestFilterForm(request.GET)
+    rows = filters.filter(PersonalDiscountRequest.objects.all())
+    totals = rows.aggregate(total=Count("pk"), **{result.replace("-", "_"): Count("pk", filter=Q(result=result)) for result in PersonalRequestResult.values})
+    page = _page(request, rows.select_related("user", "discount").order_by("-created_at", "id"))
+    context = dict(page=page, filters=filters, totals=totals, results=PersonalRequestResult)
+    if not request.htmx or request.htmx.boosted:
+        rules = {
+            rule.audience: rule
+            for rule in PersonalDiscountRule.objects.annotate(
+                issued=Count("requests", filter=Q(requests__result=PersonalRequestResult.SENT)),
+                used=Count("requests", filter=Q(requests__result=PersonalRequestResult.SENT, requests__discount__used_count__gt=0)),
+            )
+        }
+        context["rules"] = [dict(audience=value, label=label, rule=rules.get(value)) for value, label in PersonalAudience.choices]
+    return _list_response(request, "personal_discounts", context)
+
+
+@superuser_required
+def personal_rule_edit(request, audience):
+    """Öğrenci ya da çalışan kuralını tanımlar / düzenler; yoksa kaydedilince açılır."""
+    if audience not in PersonalAudience.values:
+        raise Http404
+    rule = PersonalDiscountRule.objects.filter(audience=audience).first() or PersonalDiscountRule(audience=audience)
+    form = PersonalDiscountRuleForm(request.POST or None, instance=rule)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("%(audience)s kuralı kaydedildi.") % {"audience": rule.get_audience_display()})
+        return redirect("studio:personal_discounts")
+    return render(request, "studio/personal_rule_form.html", dict(form=form, rule=rule, is_new=rule._state.adding))

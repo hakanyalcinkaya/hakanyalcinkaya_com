@@ -114,6 +114,25 @@ EMAILS = {
         "Hediye ya da manuel olarak kurs erişimi açılınca.",
         {**COMMON_VARIABLES, **COURSE_VARIABLES, "grant_reason": "Neden (ör. Hediye)", "sender_name": "Hediye eden (varsa)"},
     ),
+    # İndirim
+    "personal_discount": _email(
+        "Sana özel indirim kodu",
+        "İndirim",
+        "Öğrenci / çalışan beyanıyla istenen kişiye özel indirim kodu (yeni ya da hâlâ geçerli kod); bağlantı kodu sepete uygular.",
+        {
+            "greeting_name": "Selamlamada ad (üyeyse)",
+            "email": "İsteyen e-posta",
+            "site_url": "Sitenin adresi",
+            "code": "İndirim kodu (SPC…)",
+            "discount_label": "İndirim (ör. %20)",
+            "valid_until": "Son kullanma zamanı",
+            "audience": "Beyan (Öğrenci / Çalışan)",
+            "products": "Geçerli olduğu kurs ve paket adları; boşsa tüm kurslar",
+            "courses_url": "Kurslar sayfası, kod uygulanmış (?coupon=)",
+            "resent": "Geçerli kod yeniden mi gönderildi",
+        },
+        recipient="guest",
+    ),
     # Kurs
     "course_completed": _email(
         "Tebrikler, kursu bitirdin",
@@ -398,6 +417,15 @@ def sample_context(key):
             "agreement_url": f"{site}/distance-sales-agreement/",
             "thanks_url": f"{site}/thanks/HY-260314-A1B2C3/",
             "set_password_url": f"{site}/account/password-reset/ornek/belirtec/",
+        },
+        "personal_discount": {
+            "code": "SPCK7M2QX",
+            "discount_label": "%20",
+            "valid_until": when,
+            "audience": "Öğrenci",
+            "products": [items[0]["title"], items[1]["title"]],
+            "courses_url": f"{site}/courses/?coupon=SPCK7M2QX",
+            "resent": False,
         },
         "password_reset": {"reset_url": f"{site}/account/password-reset/ornek/belirtec/"},
         "password_changed": {"changed_at": when, "reset_page_url": f"{site}/account/password-reset/"},

@@ -1,0 +1,2 @@
+{# Geçersiz indirim kodundan sonra: kişiye özel kod isteme sayfası (yayında özel indirim kuralı varsa). #}
+{% if personal_discount_open %}<a href="{% url 'page:personal_discount' %}" class="d-inline-block small fw-medium mt-2"><i class="bi bi-ticket-perforated me-1" aria-hidden="true"></i>Sana özel indirim kodu gönderelim mi?</a>{% endif %}
