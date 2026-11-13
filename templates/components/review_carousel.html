@@ -51,7 +51,7 @@
   </div>
 </div>
 
-<div class="overflow-hidden mt-3 d-none" data-review-ready>
+<div class="overflow-hidden mt-3 d-none" data-review-ready style="touch-action:pan-y">
   <div class="d-flex" data-review-track style="transition:transform .5s cubic-bezier(.22,.8,.24,1)">
     {% for review in reviews %}
     <div class="px-2" data-review-slide role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ reviews|length }}: {{ review.name }}">

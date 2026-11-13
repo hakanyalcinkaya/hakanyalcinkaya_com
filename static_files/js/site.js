@@ -467,6 +467,20 @@
     reviews.addEventListener("focusout", function () { paused = false; });
     prev.addEventListener("click", function () { go(page - 1); });
     next.addEventListener("click", function () { go(page + 1); });
+    var startX = null;
+    var startY = 0;
+    ready.addEventListener("pointerdown", function (event) {
+      startX = event.clientX;
+      startY = event.clientY;
+    });
+    ready.addEventListener("pointercancel", function () { startX = null; });
+    ready.addEventListener("pointerup", function (event) {
+      if (startX == null) return;
+      var dx = event.clientX - startX;
+      var dy = event.clientY - startY;
+      startX = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(page + (dx < 0 ? 1 : -1));
+    });
     window.matchMedia("(min-width: 768px)").addEventListener("change", function () {
       go(0);
     });
