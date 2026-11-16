@@ -1016,71 +1016,113 @@
     });
   }
 
-  // Çıkış niyeti: giriş yapmamış ziyaretçi sayfada iki saniye kaldıktan sonra siteden çıkmaya yönelirse "sana özel
-  // indirim kodu" penceresi (page:exit_offer) açılır. Masaüstünde imleç pencerenin üst kısmından çıkınca ya da yukarı
-  // (sekme, adres çubuğu, kapat düğmesi) hızla gidince; dokunmatik ekranda sayfa aşağıdayken hızla yukarı kaydırılınca.
-  // Her ikisinde başka sekmeye geçip dönünce de. Tarayıcı oturumu boyunca (sekme kapanana dek) bir kez gösterilir.
+  // Çıkış niyeti (yalnız giriş yapmamış ziyaretçi; pencere ve ikon sunucuda yalnız ona eklenir): sayfada iki saniye
+  // kaldıktan sonra siteden çıkmaya yönelirse "sana özel indirim kodu" penceresi (page:exit_offer) açılır. Masaüstünde
+  // imleç pencerenin üst kısmından çıkınca ya da yukarı (sekme, adres çubuğu, kapat düğmesi) hızla gidince; dokunmatik
+  // ekranda sayfa aşağıdayken hızla yukarı kaydırılınca, ikinci sayfaya geçince ya da sitede 20 saniye geçirince. Her
+  // ikisinde başka sekmeye geçip dönünce de. Kendiliğinden tarayıcı oturumu boyunca (sekme kapanana dek) bir kez açılır.
+  // Pencere kapatılınca sağ alt köşede ikon kalır; ikona basınca pencere yeniden açılır.
   var exitDialog = document.getElementById("exit-offer");
+  var exitReopen = document.querySelector("[data-exit-reopen]");
   if (exitDialog && window.htmx) {
     var EXIT_KEY = "hy-exit-offer";
+    var EXIT_CLOSED_KEY = "hy-exit-offer-closed";
+    var EXIT_VISIT_KEY = "hy-exit-visit";
     var EXIT_ARM_MS = 2000;
-    var exitSeen = false;
-    try {
-      exitSeen = Boolean(window.sessionStorage.getItem(EXIT_KEY));
-    } catch (error) {}
-    if (!exitSeen) {
-      var exitArmed = false;
-      var exitFired = false;
-      window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);
-      var exitIntent = function () {
-        if (!exitArmed || exitFired || document.querySelector("dialog[open]")) return;
+    var EXIT_ENGAGED_MS = 20000;
+    var store = function (storage, key, value) {
+      try {
+        if (value === undefined) return window[storage].getItem(key);
+        if (value === null) window[storage].removeItem(key);
+        else window[storage].setItem(key, value);
+      } catch (error) {}
+      return null;
+    };
+    var openExitOffer = function () {
+      window.htmx.ajax("GET", exitDialog.getAttribute("data-exit-offer"), { target: "#exit-offer-body", swap: "innerHTML" });
+    };
+    var showReopen = function (on) {
+      if (exitReopen) exitReopen.hidden = !on;
+    };
+    showReopen(Boolean(store("localStorage", EXIT_CLOSED_KEY)));
+    var exitArmed = false;
+    var exitFired = Boolean(store("sessionStorage", EXIT_KEY));
+    window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);
+    var exitIntent = function () {
+      if (!exitArmed || exitFired || document.querySelector("dialog[open]")) return;
+      exitFired = true;
+      store("sessionStorage", EXIT_KEY, "1");
+      openExitOffer();
+    };
+    if (exitReopen) {
+      exitReopen.addEventListener("click", function () {
         exitFired = true;
-        try {
-          window.sessionStorage.setItem(EXIT_KEY, "1");
-        } catch (error) {}
-        window.htmx.ajax("GET", exitDialog.getAttribute("data-exit-offer"), { target: "#exit-offer-body", swap: "innerHTML" });
-      };
-      // İmlecin son ~150 ms'deki dikey hızı (px/ms, eksi = yukarı). Hızlı harekette tarayıcı az mousemove gönderir; tek
-      // ölçüm yerine kısa pencere kullanılır.
-      var mouseTrail = [];
-      var mouseSpeed = function () {
-        if (mouseTrail.length < 2) return 0;
-        var first = mouseTrail[0];
-        var last = mouseTrail[mouseTrail.length - 1];
-        return (last.y - first.y) / Math.max(last.t - first.t, 1);
-      };
-      document.addEventListener("mousemove", function (event) {
-        var now = performance.now();
-        mouseTrail.push({ y: event.clientY, t: now });
-        while (mouseTrail.length > 2 && now - mouseTrail[0].t > 150) mouseTrail.shift();
-        // Yukarı hızla gidiyor ve bu hızla ~250 ms içinde pencerenin üstünden çıkacak.
-        var speed = mouseSpeed();
-        if (speed < -0.6 && event.clientY + speed * 250 < 0) exitIntent();
-      }, { passive: true });
-      // İmleç belgeden çıktı: üst kısımdan ya da yukarı doğru giderken (hızlı harekette son konum 0'a inmeyebilir).
-      document.addEventListener("mouseout", function (event) {
-        if (event.relatedTarget) return;
-        if (event.clientY < 120 || mouseSpeed() < -0.3) exitIntent();
-      });
-      // Dokunmatik: sayfanın aşağısındayken hızla yukarı kaydırma (adres çubuğuna, geri düğmesine yönelme).
-      if (window.matchMedia("(pointer: coarse)").matches) {
-        var lastScroll = { y: window.scrollY, t: performance.now() };
-        window.addEventListener("scroll", function () {
-          var now = performance.now();
-          var y = window.scrollY;
-          var speed = (y - lastScroll.y) / Math.max(now - lastScroll.t, 1);
-          if (lastScroll.y > window.innerHeight && speed < -3) exitIntent();
-          lastScroll = { y: y, t: now };
-        }, { passive: true });
-      }
-      // Başka sekmeye / uygulamaya geçip geri döndü.
-      document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "visible") exitIntent();
+        store("sessionStorage", EXIT_KEY, "1");
+        openExitOffer();
       });
     }
+    // İmlecin son ~150 ms'deki dikey hızı (px/ms, eksi = yukarı). Hızlı harekette tarayıcı az mousemove gönderir; tek
+    // ölçüm yerine kısa pencere kullanılır.
+    var mouseTrail = [];
+    var mouseSpeed = function () {
+      if (mouseTrail.length < 2) return 0;
+      var first = mouseTrail[0];
+      var last = mouseTrail[mouseTrail.length - 1];
+      return (last.y - first.y) / Math.max(last.t - first.t, 1);
+    };
+    document.addEventListener("mousemove", function (event) {
+      var now = performance.now();
+      mouseTrail.push({ y: event.clientY, t: now });
+      while (mouseTrail.length > 2 && now - mouseTrail[0].t > 150) mouseTrail.shift();
+      // Yukarı hızla gidiyor ve bu hızla ~250 ms içinde pencerenin üstünden çıkacak.
+      var speed = mouseSpeed();
+      if (speed < -0.6 && event.clientY + speed * 250 < 0) exitIntent();
+    }, { passive: true });
+    // İmleç belgeden çıktı: üst kısımdan ya da yukarı doğru giderken (hızlı harekette son konum 0'a inmeyebilir).
+    document.addEventListener("mouseout", function (event) {
+      if (event.relatedTarget) return;
+      if (event.clientY < 120 || mouseSpeed() < -0.3) exitIntent();
+    });
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      // Dokunmatik: sayfanın aşağısındayken hızla yukarı kaydırma (adres çubuğuna, geri düğmesine yönelme).
+      var lastScroll = { y: window.scrollY, t: performance.now() };
+      window.addEventListener("scroll", function () {
+        var now = performance.now();
+        var y = window.scrollY;
+        var speed = (y - lastScroll.y) / Math.max(now - lastScroll.t, 1);
+        if (lastScroll.y > window.innerHeight && speed < -3) exitIntent();
+        lastScroll = { y: y, t: now };
+      }, { passive: true });
+      // Dokunmatik: sitede vakit geçirdi. Oturumun başlangıcı ve gezilen farklı sayfa sayısı sessionStorage'da; ikinci
+      // sayfada iki saniye sonra, değilse oturumun 20. saniyesinde açılır (yenileme yeni sayfa sayılmaz).
+      var visit = null;
+      try {
+        visit = JSON.parse(store("sessionStorage", EXIT_VISIT_KEY) || "null");
+      } catch (error) {}
+      if (!visit || typeof visit.start !== "number") visit = { start: Date.now(), pages: 0, path: "" };
+      if (visit.path !== location.pathname) {
+        visit.pages += 1;
+        visit.path = location.pathname;
+      }
+      store("sessionStorage", EXIT_VISIT_KEY, JSON.stringify(visit));
+      var wait = visit.pages >= 2 ? 0 : EXIT_ENGAGED_MS - (Date.now() - visit.start);
+      window.setTimeout(exitIntent, Math.max(wait, EXIT_ARM_MS + 50));
+    }
+    // Başka sekmeye / uygulamaya geçip geri döndü.
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") exitIntent();
+    });
+    document.body.addEventListener("htmx:afterRequest", function (event) {
+      // Teklif yok (yayında kural kalmadı): ikon da kalkar.
+      if (event.detail.target && event.detail.target.id === "exit-offer-body" && event.detail.xhr.status === 204) {
+        store("localStorage", EXIT_CLOSED_KEY, null);
+        showReopen(false);
+      }
+    });
     document.body.addEventListener("htmx:afterSwap", function (event) {
       if (event.detail.target.id !== "exit-offer-body" || exitDialog.open || !event.detail.target.childElementCount) return;
       document.documentElement.classList.add("hy-dialog-open");
+      showReopen(false);
       exitDialog.showModal();
     });
     exitDialog.addEventListener("click", function (event) {
@@ -1089,6 +1131,8 @@
     exitDialog.addEventListener("close", function () {
       document.documentElement.classList.remove("hy-dialog-open");
       document.getElementById("exit-offer-body").innerHTML = "";
+      store("localStorage", EXIT_CLOSED_KEY, "1");
+      showReopen(true);
     });
   }
 

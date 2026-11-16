@@ -382,3 +382,8 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-marquee-card blockquote{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-size:.9375rem}
 @keyframes hy-marquee{to{transform:translateX(calc(-50% - .5rem))}}
 @media (prefers-reduced-motion:reduce){.hy-marquee-track{animation:none}.hy-marquee{overflow-x:auto}}
+/* Çıkış niyeti penceresini yeniden açan ikon: sağ alt köşe; mobilde alttaki satın alma / ders çubuğunun üstünde durur. */
+.hy-exit-fab{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:1030;width:3.25rem;height:3.25rem;padding:0;animation:hy-fab-in .35s cubic-bezier(.22,.8,.24,1)}
+.hy-exit-fab[hidden]{display:none!important}
+@media (max-width:991.98px){body:has(.fixed-bottom.d-lg-none:not([hidden])) .hy-exit-fab{bottom:calc(5rem + env(safe-area-inset-bottom))}}
+@keyframes hy-fab-in{from{opacity:0;transform:scale(.6)}}

@@ -55,7 +55,9 @@
 {# Ortak pencere (ör. "Tüm yorumlar"): içerik hx-target="#site-dialog-body" ile yüklenince açılır (site.js). #}
 <dialog class="hy-site-dialog" id="site-dialog" aria-labelledby="site-dialog-title"><div id="site-dialog-body"></div></dialog>
 {# Çıkış niyeti: giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (site.js, page:exit_offer). #}
-{% if exit_offer and not coupon %}<dialog class="hy-site-dialog hy-exit-dialog" id="exit-offer" data-exit-offer="{% url 'page:exit_offer' %}" aria-labelledby="exit-offer-title"><div id="exit-offer-body"></div></dialog>{% endif %}
+{# Pencere bir kez kapatılınca sağ alt köşede kalan ikon onu yeniden açar. Yalnız giriş yapmamış ziyaretçide. #}
+{% if exit_offer and not coupon %}<dialog class="hy-site-dialog hy-exit-dialog" id="exit-offer" data-exit-offer="{% url 'page:exit_offer' %}" aria-labelledby="exit-offer-title"><div id="exit-offer-body"></div></dialog>
+<button type="button" class="btn btn-primary rounded-circle shadow d-inline-flex align-items-center justify-content-center hy-exit-fab" data-exit-reopen hidden aria-label="Sana özel indirim kodu" title="Sana özel indirim kodu"><i class="bi bi-gift fs-5" aria-hidden="true"></i></button>{% endif %}
 {% include "_base/consent.html" %}
 <script src="{% static 'js/htmx.min.js' %}"></script>
 <script src="{% static 'js/sweetalert2.min.js' %}"></script>
