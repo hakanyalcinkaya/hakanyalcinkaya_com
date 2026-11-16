@@ -1016,20 +1016,19 @@
     });
   }
 
-  // Çıkış niyeti: giriş yapmamış ziyaretçi sayfada birkaç saniye kaldıktan sonra siteden çıkmaya yönelirse "sana özel
-  // indirim kodu" penceresi (page:exit_offer) bir kez açılır. Masaüstünde imleç pencerenin üstünden çıkınca ya da üst
-  // kenara (sekme, kapat düğmesi) hızla gidince; dokunmatik ekranda sayfa aşağıdayken hızla yukarı kaydırılınca. Her
-  // ikisinde başka sekmeye geçip dönünce de. Açıldıktan sonra EXIT_DAYS gün yeniden gösterilmez.
+  // Çıkış niyeti: giriş yapmamış ziyaretçi sayfada iki saniye kaldıktan sonra siteden çıkmaya yönelirse "sana özel
+  // indirim kodu" penceresi (page:exit_offer) açılır. Masaüstünde imleç pencerenin üst kısmından çıkınca ya da yukarı
+  // (sekme, adres çubuğu, kapat düğmesi) hızla gidince; dokunmatik ekranda sayfa aşağıdayken hızla yukarı kaydırılınca.
+  // Her ikisinde başka sekmeye geçip dönünce de. Tarayıcı oturumu boyunca (sekme kapanana dek) bir kez gösterilir.
   var exitDialog = document.getElementById("exit-offer");
   if (exitDialog && window.htmx) {
     var EXIT_KEY = "hy-exit-offer";
-    var EXIT_DAYS = 7;
-    var EXIT_ARM_MS = 5000;
-    var exitSeen = 0;
+    var EXIT_ARM_MS = 2000;
+    var exitSeen = false;
     try {
-      exitSeen = Number(window.localStorage.getItem(EXIT_KEY)) || 0;
+      exitSeen = Boolean(window.sessionStorage.getItem(EXIT_KEY));
     } catch (error) {}
-    if (Date.now() - exitSeen > EXIT_DAYS * 864e5) {
+    if (!exitSeen) {
       var exitArmed = false;
       var exitFired = false;
       window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);
@@ -1037,24 +1036,32 @@
         if (!exitArmed || exitFired || document.querySelector("dialog[open]")) return;
         exitFired = true;
         try {
-          window.localStorage.setItem(EXIT_KEY, String(Date.now()));
+          window.sessionStorage.setItem(EXIT_KEY, "1");
         } catch (error) {}
         window.htmx.ajax("GET", exitDialog.getAttribute("data-exit-offer"), { target: "#exit-offer-body", swap: "innerHTML" });
       };
-      // İmleç belgeden pencerenin üstünden çıktı (adres çubuğu, sekmeler).
-      document.addEventListener("mouseout", function (event) {
-        if (!event.relatedTarget && event.clientY <= 0) exitIntent();
-      });
-      // İmleç üst kenara hızla gidiyor: son ölçümden bu yana hız px/ms.
-      var lastMouse = null;
+      // İmlecin son ~150 ms'deki dikey hızı (px/ms, eksi = yukarı). Hızlı harekette tarayıcı az mousemove gönderir; tek
+      // ölçüm yerine kısa pencere kullanılır.
+      var mouseTrail = [];
+      var mouseSpeed = function () {
+        if (mouseTrail.length < 2) return 0;
+        var first = mouseTrail[0];
+        var last = mouseTrail[mouseTrail.length - 1];
+        return (last.y - first.y) / Math.max(last.t - first.t, 1);
+      };
       document.addEventListener("mousemove", function (event) {
         var now = performance.now();
-        if (lastMouse && now - lastMouse.t > 0 && now - lastMouse.t < 100) {
-          var speed = (event.clientY - lastMouse.y) / (now - lastMouse.t);
-          if (event.clientY < 60 && speed < -1.5) exitIntent();
-        }
-        lastMouse = { y: event.clientY, t: now };
+        mouseTrail.push({ y: event.clientY, t: now });
+        while (mouseTrail.length > 2 && now - mouseTrail[0].t > 150) mouseTrail.shift();
+        // Yukarı hızla gidiyor ve bu hızla ~250 ms içinde pencerenin üstünden çıkacak.
+        var speed = mouseSpeed();
+        if (speed < -0.6 && event.clientY + speed * 250 < 0) exitIntent();
       }, { passive: true });
+      // İmleç belgeden çıktı: üst kısımdan ya da yukarı doğru giderken (hızlı harekette son konum 0'a inmeyebilir).
+      document.addEventListener("mouseout", function (event) {
+        if (event.relatedTarget) return;
+        if (event.clientY < 120 || mouseSpeed() < -0.3) exitIntent();
+      });
       // Dokunmatik: sayfanın aşağısındayken hızla yukarı kaydırma (adres çubuğuna, geri düğmesine yönelme).
       if (window.matchMedia("(pointer: coarse)").matches) {
         var lastScroll = { y: window.scrollY, t: performance.now() };
