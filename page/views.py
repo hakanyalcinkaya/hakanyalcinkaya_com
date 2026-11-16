@@ -547,8 +547,8 @@ def personal_discount(request):
 
 
 def exit_offer(request):
-    """Siteden çıkmaya yönelen giriş yapmamış ziyaretçiye (site.js) "sana özel indirim kodu" penceresi: kuralların
-    indirimleri, isteme bağlantısı ve kayan öğrenci yorumları. Yayında kural yoksa ya da üye girişliyse boş yanıt (pencere
+    """Siteden çıkmaya yönelen giriş yapmamış ziyaretçiye (site.js) "sana özel indirim kodu" penceresi: teklif (oranlar
+    yazılmaz), isteme bağlantısı ve kayan öğrenci yorumları. Yayında kural yoksa ya da üye girişliyse boş yanıt (pencere
     açılmaz); doğrudan açılınca istek sayfasına gider."""
     if not request.htmx:
         return redirect("page:personal_discount")
@@ -560,7 +560,6 @@ def exit_offer(request):
         request,
         "page/partials/exit_offer.html",
         dict(
-            rules=rules,
             valid_days=max(rule.valid_days for rule in rules),
             review_rows=[row for row in (reviews[::2], reviews[1::2]) if row],
             rating=Review.objects.rating_summary(),

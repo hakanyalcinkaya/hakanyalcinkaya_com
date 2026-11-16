@@ -6,9 +6,7 @@
     <h2 id="exit-offer-title" class="display-6 fw-semibold lh-sm mb-3">Sana özel <span class="text-primary-emphasis">indirim kodu</span> ister misin?</h2>
     <p class="text-body-secondary mb-4">Öğrenciysen ya da çalışıyorsan söyle, kurslarda geçerli sana özel indirim kodunu hemen e-posta adresine gönderelim. Üye olman gerekmez.</p>
     <ul class="list-unstyled d-grid gap-2 mb-4">
-      {% for rule in rules %}
-      <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>{{ rule.get_audience_display }} için <b>{{ rule.label }}</b> indirim</span></li>
-      {% endfor %}
+      <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>Öğrenci ya da çalışan olmana göre <b>sana özel indirim kodu</b> tanımlanır</span></li>
       <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>E-postadaki bağlantıyla sepetine kendiliğinden uygulanır</span></li>
       <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>Tek kullanımlık, {{ valid_days }} gün geçerli</span></li>
     </ul>
