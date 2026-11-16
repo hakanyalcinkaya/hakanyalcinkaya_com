@@ -2,7 +2,7 @@
   <div class="container hy-nav">
     <a href="{% url 'page:index' %}#top" class="navbar-brand d-flex align-items-center gap-2 fw-semibold fs-6" aria-label="{% if nav_member %}Ana Sayfa{% else %}Hakan Yalçınkaya — Ana Sayfa{% endif %}">
       <span class="font-monospace small border rounded-1 bg-body-tertiary px-2 py-1" aria-hidden="true"><span class="text-primary-emphasis">[</span>hy<span class="text-primary-emphasis">]</span></span>
-      {% if not nav_member %}<span class="hy-brand-name">Hakan Yalçınkaya</span>{% endif %}
+      {% if show_brand_name %}<span class="hy-brand-name">Hakan Yalçınkaya</span>{% endif %}
     </a>
 
     <div class="hy-nav-tools d-flex align-items-center gap-2 order-lg-last">

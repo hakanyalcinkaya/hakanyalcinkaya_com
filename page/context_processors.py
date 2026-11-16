@@ -37,6 +37,12 @@ EXIT_OFFER_SKIPPED_PAGES = {
     "password_reset", "password_reset_sent", "password_reset_confirm",
 }
 
+# Logonun yanındaki "Hakan Yalçınkaya" adı giriş yapmamış ziyaretçiye yalnız bu sayfalarda yazılır; diğerlerinde yalnız
+# logo görünür.
+BRAND_NAME_PAGES = {
+    "index", "login", "signup", "password_reset", "password_reset_sent", "password_reset_confirm",
+}
+
 
 def site(request):
     index_url = reverse("page:index")
@@ -78,6 +84,7 @@ def site(request):
         "google_analytics_id": "" if user.is_staff else settings.GOOGLE_ANALYTICS_ID,
         "analytics_consent": settings.GOOGLE_ANALYTICS_CONSENT,
         "nav_member": user.is_authenticated,
+        "show_brand_name": not user.is_authenticated and url_name in BRAND_NAME_PAGES,
         "account_user": user if user.is_authenticated else None,
         # Sepet simgesi herkese, her zaman (boşken de) üst menüde görünür.
         "show_cart": True,
