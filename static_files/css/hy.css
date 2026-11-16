@@ -370,6 +370,9 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-review-link:hover .badge{color:var(--bs-primary-text-emphasis)!important;border-color:var(--bs-primary-border-subtle)!important}
 /* Çıkış niyeti penceresi ("sana özel indirim kodu"): dar ekranda yalnız teklif, geniş ekranda yanda kayan yorumlar. */
 .hy-exit-dialog{width:min(30rem,94vw)}
+/* İndirim penceresi tam opak: arkadaki buzlu sayfa pencereye karışmaz (cam bulanıklığı yok, zemin sayfa rengi); köşelerdeki
+   ana renk parıltısı korunur. */
+.hy-exit-dialog{--hy-glass-bg:radial-gradient(60% 45% at 0% 0%,rgba(var(--bs-primary-rgb),.14),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(var(--bs-primary-rgb),.08),transparent 70%),var(--bs-body-bg);backdrop-filter:none;-webkit-backdrop-filter:none}
 .hy-exit-dialog>div{overflow-y:auto}
 @media (min-width:992px){.hy-exit-dialog{width:min(72rem,94vw)}}
 /* İndirim penceresi açıkken arkadaki sayfa buzlu camın ardında kalır: bulanık, soluk ve koyulaşmış; üstte hafif bir
