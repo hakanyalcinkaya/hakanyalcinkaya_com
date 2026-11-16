@@ -28,6 +28,13 @@ NAV_PAGES = {
 # İndirim kodunu kendi kutusunda (kaldırma düğmesiyle) gösteren sayfalar: üstteki kod şeridi bunlarda çıkmaz.
 COUPON_BOX_PAGES = {"cart", "checkout", "course_detail", "course_reviews", "lesson", "root_course", "root_lesson"}
 
+# Çıkış niyeti penceresinin ("sana özel indirim kodu", site.js) açılmadığı sayfalar: ödeme adımları, hesap formları ve
+# kod isteme sayfasının kendisi.
+EXIT_OFFER_SKIPPED_PAGES = {
+    "cart", "checkout", "payment", "iyzico_callback", "thanks", "personal_discount", "login", "signup",
+    "password_reset", "password_reset_sent", "password_reset_confirm",
+}
+
 
 def site(request):
     index_url = reverse("page:index")
@@ -82,6 +89,9 @@ def site(request):
         "show_coupon_bar": url_name not in COUPON_BOX_PAGES,
         # Bağlantıyla gelen kod geçersizse (discount.middleware) şeritte kişiye özel kod isteme bağlantısı.
         "invalid_coupon": getattr(request, "invalid_coupon", ""),
+        # Giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (page:exit_offer); kod
+        # uygulanmışsa şablonda çıkmaz.
+        "exit_offer": not user.is_authenticated and url_name not in EXIT_OFFER_SKIPPED_PAGES,
         "personal_discount_open": SimpleLazyObject(lambda: PersonalDiscountRule.objects.published().exists()),
         "library_url": reverse("page:library"),
         # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda

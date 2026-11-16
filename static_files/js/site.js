@@ -1016,6 +1016,75 @@
     });
   }
 
+  // Çıkış niyeti: giriş yapmamış ziyaretçi sayfada birkaç saniye kaldıktan sonra siteden çıkmaya yönelirse "sana özel
+  // indirim kodu" penceresi (page:exit_offer) bir kez açılır. Masaüstünde imleç pencerenin üstünden çıkınca ya da üst
+  // kenara (sekme, kapat düğmesi) hızla gidince; dokunmatik ekranda sayfa aşağıdayken hızla yukarı kaydırılınca. Her
+  // ikisinde başka sekmeye geçip dönünce de. Açıldıktan sonra EXIT_DAYS gün yeniden gösterilmez.
+  var exitDialog = document.getElementById("exit-offer");
+  if (exitDialog && window.htmx) {
+    var EXIT_KEY = "hy-exit-offer";
+    var EXIT_DAYS = 7;
+    var EXIT_ARM_MS = 5000;
+    var exitSeen = 0;
+    try {
+      exitSeen = Number(window.localStorage.getItem(EXIT_KEY)) || 0;
+    } catch (error) {}
+    if (Date.now() - exitSeen > EXIT_DAYS * 864e5) {
+      var exitArmed = false;
+      var exitFired = false;
+      window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);
+      var exitIntent = function () {
+        if (!exitArmed || exitFired || document.querySelector("dialog[open]")) return;
+        exitFired = true;
+        try {
+          window.localStorage.setItem(EXIT_KEY, String(Date.now()));
+        } catch (error) {}
+        window.htmx.ajax("GET", exitDialog.getAttribute("data-exit-offer"), { target: "#exit-offer-body", swap: "innerHTML" });
+      };
+      // İmleç belgeden pencerenin üstünden çıktı (adres çubuğu, sekmeler).
+      document.addEventListener("mouseout", function (event) {
+        if (!event.relatedTarget && event.clientY <= 0) exitIntent();
+      });
+      // İmleç üst kenara hızla gidiyor: son ölçümden bu yana hız px/ms.
+      var lastMouse = null;
+      document.addEventListener("mousemove", function (event) {
+        var now = performance.now();
+        if (lastMouse && now - lastMouse.t > 0 && now - lastMouse.t < 100) {
+          var speed = (event.clientY - lastMouse.y) / (now - lastMouse.t);
+          if (event.clientY < 60 && speed < -1.5) exitIntent();
+        }
+        lastMouse = { y: event.clientY, t: now };
+      }, { passive: true });
+      // Dokunmatik: sayfanın aşağısındayken hızla yukarı kaydırma (adres çubuğuna, geri düğmesine yönelme).
+      if (window.matchMedia("(pointer: coarse)").matches) {
+        var lastScroll = { y: window.scrollY, t: performance.now() };
+        window.addEventListener("scroll", function () {
+          var now = performance.now();
+          var y = window.scrollY;
+          var speed = (y - lastScroll.y) / Math.max(now - lastScroll.t, 1);
+          if (lastScroll.y > window.innerHeight && speed < -3) exitIntent();
+          lastScroll = { y: y, t: now };
+        }, { passive: true });
+      }
+      // Başka sekmeye / uygulamaya geçip geri döndü.
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") exitIntent();
+      });
+    }
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event.detail.target.id !== "exit-offer-body" || exitDialog.open || !event.detail.target.childElementCount) return;
+      document.documentElement.classList.add("hy-dialog-open");
+      exitDialog.showModal();
+    });
+    exitDialog.addEventListener("click", function (event) {
+      if (event.target === exitDialog || event.target.closest("[data-dialog-close]")) exitDialog.close();
+    });
+    exitDialog.addEventListener("close", function () {
+      document.documentElement.classList.remove("hy-dialog-open");
+      document.getElementById("exit-offer-body").innerHTML = "";
+    });
+  }
+
   // Ders tamamlama: video durdurulmadan 5 sn oynayınca ders "tamamlandı" olarak işaretlenir. Durdurulursa sayaç
   // baştan başlar. Ders zaten tamamlandıysa ya da kullanıcı bu sayfada düğmeyle elle seçim yaptıysa denenmez.
   var AUTO_COMPLETE_MS = 5000;

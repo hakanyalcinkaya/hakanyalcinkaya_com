@@ -1,0 +1,40 @@
+{# Çıkış niyeti penceresi (page:exit_offer, site.js): solda kişiye özel indirim kodu teklifi, geniş ekranda sağda iki sıra halinde sürekli kayan öğrenci yorumları (ikinci sıra ters yönde). Kayan sıralar kesintisiz dönsün diye yorumlar iki kez yazılır; ikinci kopya ekran okuyucudan gizlidir. #}
+<button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-1" data-dialog-close aria-label="Kapat"></button>
+<div class="row g-0 flex-grow-1">
+  <section class="col-lg-6 d-flex flex-column p-4 p-md-5">
+    <p class="small fw-semibold text-uppercase text-primary-emphasis mb-3" style="letter-spacing:.12em"><i class="bi bi-gift me-1" aria-hidden="true"></i>Gitmeden önce</p>
+    <h2 id="exit-offer-title" class="display-6 fw-semibold lh-sm mb-3">Sana özel <span class="text-primary-emphasis">indirim kodu</span> ister misin?</h2>
+    <p class="text-body-secondary mb-4">Öğrenciysen ya da çalışıyorsan söyle, kurslarda geçerli sana özel indirim kodunu hemen e-posta adresine gönderelim. Üye olman gerekmez.</p>
+    <ul class="list-unstyled d-grid gap-2 mb-4">
+      {% for rule in rules %}
+      <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>{{ rule.get_audience_display }} için <b>{{ rule.label }}</b> indirim</span></li>
+      {% endfor %}
+      <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>E-postadaki bağlantıyla sepetine kendiliğinden uygulanır</span></li>
+      <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-primary-emphasis" aria-hidden="true"></i><span>Tek kullanımlık, {{ valid_days }} gün geçerli</span></li>
+    </ul>
+    <a href="{% url 'page:personal_discount' %}" class="btn btn-primary btn-lg rounded-pill w-100 fw-semibold">İndirim kodumu gönder <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+    <button type="button" class="btn btn-link link-secondary link-underline-opacity-0 small mt-2" data-dialog-close>Hayır, teşekkürler</button>
+    {% if rating.count %}
+    <p class="small text-body-secondary border-top pt-3 mt-auto mb-0">{% include "page/partials/stars.html" with rating=rating.stars %} <b class="text-body ms-1">{{ rating.average|floatformat:1 }}</b> · {{ rating.count }} öğrenci değerlendirmesi</p>
+    {% endif %}
+  </section>
+  {% if review_rows %}
+  <section class="col-lg-6 d-none d-lg-flex flex-column justify-content-center py-5 hy-exit-side" aria-labelledby="exit-offer-reviews">
+    <div class="px-5 mb-4">
+      <p class="small fw-semibold text-uppercase text-body-tertiary mb-2" style="letter-spacing:.12em">Öğrenci yorumları</p>
+      <h3 id="exit-offer-reviews" class="h5 fw-semibold mb-0">Kursları alanlar ne diyor?</h3>
+    </div>
+    <div class="d-grid gap-3">
+      {% for row in review_rows %}
+      <div class="hy-marquee{% if forloop.counter == 2 %} hy-marquee-reverse{% endif %}" style="--hy-marquee-time:{% widthratio row|length 1 9 %}s">
+        <div class="hy-marquee-track">
+          {% for review in row %}<div class="hy-marquee-card">{% include "components/review_card.html" %}</div>{% endfor %}
+          {% for review in row %}<div class="hy-marquee-card" aria-hidden="true" inert>{% include "components/review_card.html" %}</div>{% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4"><a href="{% url 'page:all_reviews' %}" class="btn btn-outline-secondary rounded-pill">Tüm yorumları oku <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a></div>
+  </section>
+  {% endif %}
+</div>

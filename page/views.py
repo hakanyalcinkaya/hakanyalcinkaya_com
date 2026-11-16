@@ -546,6 +546,28 @@ def personal_discount(request):
     return render(request, "page/personal_discount.html", dict(form=form, available=bool(rules)))
 
 
+def exit_offer(request):
+    """Siteden çıkmaya yönelen giriş yapmamış ziyaretçiye (site.js) "sana özel indirim kodu" penceresi: kuralların
+    indirimleri, isteme bağlantısı ve kayan öğrenci yorumları. Yayında kural yoksa ya da üye girişliyse boş yanıt (pencere
+    açılmaz); doğrudan açılınca istek sayfasına gider."""
+    if not request.htmx:
+        return redirect("page:personal_discount")
+    rules = list(PersonalDiscountRule.objects.published())
+    if request.user.is_authenticated or not rules:
+        return HttpResponse(status=204)
+    reviews = content.home_reviews()["reviews"]
+    return render(
+        request,
+        "page/partials/exit_offer.html",
+        dict(
+            rules=rules,
+            valid_days=max(rule.valid_days for rule in rules),
+            review_rows=[row for row in (reviews[::2], reviews[1::2]) if row],
+            rating=Review.objects.rating_summary(),
+        ),
+    )
+
+
 @require_POST
 def coupon_remove(request):
     """Bağlantıyla gelen ya da sepete uygulanan indirim kodunu kaldırır (kurs, ders ve liste sayfalarındaki "Kaldır");
