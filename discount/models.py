@@ -168,14 +168,28 @@ class PersonalAudience(models.TextChoices):
     EMPLOYEE = "employee", _("Çalışan")
 
 
+# Aralıklı kuralda rastgele seçilen indirimin adımı: yüzdede 1 puan, tutar ve sabit fiyatta 10 TL.
+RANGE_STEPS = {DiscountKind.PERCENT: Decimal("1"), DiscountKind.AMOUNT: Decimal("10"), DiscountKind.FIXED_PRICE: Decimal("10")}
+
+
 class PersonalDiscountRule(BaseModel, BaseStatus):
-    """Kitle (öğrenci ya da çalışan) başına bir kural: üretilecek kodun indirimi, geçerli olduğu kurslar/paketler, kaç gün
+    """Kitle (öğrenci ya da çalışan) başına bir kural: üretilecek kodun indirimi (sabit ya da value–value_max aralığında
+    her kodda rastgele, RANGE_STEPS adımıyla), geçerli olduğu kurslar/paketler, kaç gün
     geçerli olduğu ve süresi dolan ya da kullanılan koddan sonra aynı e-postaya yeni kod verilip verilmeyeceği. Yalnız
     yayındaki kurallar istek formunda seçilebilir."""
 
     audience = models.CharField(_("kitle"), max_length=20, choices=PersonalAudience, unique=True)
     kind = models.CharField(_("tür"), max_length=20, choices=DiscountKind, default=DiscountKind.PERCENT)
     value = models.DecimalField(_("değer"), max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0"))])
+    value_max = models.DecimalField(
+        _("en fazla (aralık için)"),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text=_("Doluysa her kodun indirimi değer ile bu sayı arasında rastgele seçilir (yüzdede 1, TL'de 10 TL adımla); boşsa indirim sabittir."),
+    )
     courses = models.ManyToManyField("course.Course", blank=True, related_name="personal_discount_rules", verbose_name=_("kurslar"))
     bundles = models.ManyToManyField("course.Bundle", blank=True, related_name="personal_discount_rules", verbose_name=_("paketler"))
     valid_days = models.PositiveSmallIntegerField(_("geçerlilik (gün)"), default=3, validators=[MinValueValidator(1)])
@@ -198,10 +212,37 @@ class PersonalDiscountRule(BaseModel, BaseStatus):
         super().clean()
         if self.kind == DiscountKind.PERCENT and not Decimal("0") < (self.value or 0) <= Decimal("100"):
             raise ValidationError({"value": _("Yüzde indirim 0 ile 100 arasında olmalı.")})
+        if self.value_max is None or self.value is None:
+            return
+        if self.value_max < self.value:
+            raise ValidationError({"value_max": _("En fazla, değerden küçük olamaz.")})
+        if self.kind == DiscountKind.PERCENT and self.value_max > Decimal("100"):
+            raise ValidationError({"value_max": _("Yüzde indirim 100'ü geçemez.")})
+        step = RANGE_STEPS[self.kind]
+        if self.is_range and (self.value % step or self.value_max % step):
+            if self.kind == DiscountKind.PERCENT:
+                raise ValidationError({"value_max": _("Yüzde aralığının iki ucu da tam sayı olmalı.")})
+            raise ValidationError({"value_max": _("TL aralığının iki ucu da 10'un katı olmalı (ör. 3000–3500).")})
+
+    @property
+    def is_range(self):
+        return self.value_max is not None and self.value_max > self.value
 
     @property
     def label(self):
-        return Discount(kind=self.kind, value=self.value).label
+        low = Discount(kind=self.kind, value=self.value).label
+        if not self.is_range:
+            return low
+        high = Discount(kind=self.kind, value=self.value_max).label
+        return f"{low}–{high.lstrip('%')}" if self.kind == DiscountKind.PERCENT else f"{low}–{high}"
+
+    def pick_value(self):
+        """Üretilecek kodun indirimi: sabitse değer, aralıktaysa iki uç dahil adım katlarından rastgele biri."""
+        if not self.is_range:
+            return self.value
+        step = RANGE_STEPS[self.kind]
+        count = int((self.value_max - self.value) // step)
+        return self.value + step * secrets.randbelow(count + 1)
 
     @staticmethod
     def new_code():
@@ -217,7 +258,7 @@ class PersonalDiscountRule(BaseModel, BaseStatus):
             discount = Discount.objects.create(
                 code=self.new_code(),
                 kind=self.kind,
-                value=self.value,
+                value=self.pick_value(),
                 valid_from=now,
                 valid_until=now + timedelta(days=self.valid_days),
                 max_uses=1,

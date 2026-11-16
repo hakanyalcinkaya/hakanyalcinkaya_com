@@ -893,10 +893,11 @@ class PersonalDiscountRuleForm(DiscountTargetsMixin, forms.ModelForm):
 
     class Meta:
         model = PersonalDiscountRule
-        fields = ("kind", "value", "valid_days", "allow_repeat", "courses", "bundles", "note", "status")
+        fields = ("kind", "value", "value_max", "valid_days", "allow_repeat", "courses", "bundles", "note", "status")
         widgets = {"courses": forms.CheckboxSelectMultiple, "bundles": forms.CheckboxSelectMultiple}
         help_texts = {
             "courses": _("Yüzde indirimde kurs ve paket seçilmezse hepsinde geçerlidir."),
+            "value": _("Sabit indirim ya da aralığın alt sınırı."),
             "valid_days": _("Kod, isteğin yapıldığı andan bu kadar gün sonra geçersiz olur."),
             "status": _("Yalnız yayındaki kurallar istek formunda seçilebilir."),
         }

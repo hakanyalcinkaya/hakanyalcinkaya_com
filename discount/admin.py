@@ -30,7 +30,7 @@ class DiscountAdmin(admin.ModelAdmin):
 
 @admin.register(PersonalDiscountRule)
 class PersonalDiscountRuleAdmin(admin.ModelAdmin):
-    list_display = ("audience", "kind", "value", "valid_days", "allow_repeat", "status")
+    list_display = ("audience", "kind", "label", "valid_days", "allow_repeat", "status")
     autocomplete_fields = ("courses", "bundles")
 
 
