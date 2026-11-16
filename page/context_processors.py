@@ -33,15 +33,19 @@ COUPON_BOX_PAGES = {"cart", "checkout", "course_detail", "course_reviews", "less
 # Çıkış niyeti penceresinin ("sana özel indirim kodu", site.js) açılmadığı sayfalar: ödeme adımları, hesap formları ve
 # kod isteme sayfasının kendisi.
 EXIT_OFFER_SKIPPED_PAGES = {
-    "cart", "checkout", "payment", "iyzico_callback", "thanks", "personal_discount", "login", "signup",
+    "checkout", "payment", "iyzico_callback", "thanks", "personal_discount", "login", "signup",
     "password_reset", "password_reset_sent", "password_reset_confirm",
 }
 
-# Logonun yanındaki "Hakan Yalçınkaya" adı giriş yapmamış ziyaretçiye yalnız bu sayfalarda yazılır; diğerlerinde yalnız
-# logo görünür.
+# Logonun yanındaki "Hakan Yalçınkaya" adı giriş yapmamış ziyaretçiye mobilde yalnız bu sayfalarda yazılır; diğerlerinde
+# mobilde yalnız logo görünür (geniş ekranda ad her sayfada yazılır).
 BRAND_NAME_PAGES = {
     "index", "login", "signup", "password_reset", "password_reset_sent", "password_reset_confirm",
 }
+
+# Bu sayfalarda pencere kendiliğinden açılmaz; indirim kodu uygulanmamışsa sağ alttaki hediye ikonu her zaman görünür
+# ve pencere ikonla açılır.
+EXIT_OFFER_ICON_ONLY_PAGES = {"cart"}
 
 
 def site(request):
@@ -101,6 +105,7 @@ def site(request):
         # Giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (page:exit_offer); kod
         # uygulanmışsa şablonda çıkmaz. Bu tarayıcıdan kod gönderildiyse pencere de ikon da artık çıkmaz (site.js ikonu
         # hatırlayan kaydı exit_offer_sent ile siler).
+        "exit_offer_manual": url_name in EXIT_OFFER_ICON_ONLY_PAGES,
         "exit_offer_seen": bool(request.session.get(EXIT_OFFER_SEEN_SESSION_KEY)),
         "exit_offer_sent": bool(request.session.get(PERSONAL_DISCOUNT_SENT_SESSION_KEY)),
         "exit_offer": (

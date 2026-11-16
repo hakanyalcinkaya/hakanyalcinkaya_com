@@ -1053,7 +1053,7 @@
     // Pencere bu tarayıcıda açılmışsa (sunucu oturumu ikonu görünür gönderir ya da localStorage hatırlar) ikon her
     // sayfada görünür; ikisi birbirini tamamlar.
     var reopenSeen = Boolean(exitReopen && !exitReopen.hidden);
-    if (reopenSeen) store("localStorage", EXIT_CLOSED_KEY, "1");
+    if (reopenSeen && !exitDialog.hasAttribute("data-exit-manual")) store("localStorage", EXIT_CLOSED_KEY, "1");
     showReopen(reopenSeen || Boolean(store("localStorage", EXIT_CLOSED_KEY)));
     // İkon, alttaki sabit çubukların (mobil satın alma çubuğu, ders çubuğu, çerez bandı) üstünde durur: görünenlerin
     // yüksekliği kadar yukarı kalkar (--hy-fab-lift).
@@ -1081,11 +1081,13 @@
         bottomBars.forEach(function (bar) { barResize.observe(bar); });
       }
     }
+    // Sepet gibi sayfalarda pencere kendiliğinden açılmaz, yalnız ikonla açılır.
+    var exitManual = exitDialog.hasAttribute("data-exit-manual");
     var exitArmed = false;
     var exitFired = Boolean(store("sessionStorage", EXIT_KEY));
     window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);
     var exitIntent = function () {
-      if (!exitArmed || exitFired || document.querySelector("dialog[open]")) return;
+      if (exitManual || !exitArmed || exitFired || document.querySelector("dialog[open]")) return;
       exitFired = true;
       store("sessionStorage", EXIT_KEY, "1");
       openExitOffer();
