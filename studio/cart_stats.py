@@ -1,7 +1,8 @@
 """Stüdyo sepet istatistikleri: ayın sepet hunisi (sepet → ödeme adımı → sipariş → ödeme), ürün bazında eklenen ve
 çıkarılanlar, şu an sepette bekleyenler.
 
-Huni, ay içinde açılan sepetleri izler (kohort). Üye sepetine katılan misafir sepetleri sayılmaz; ürünleri üyenin
+Huni, ay içinde açılan sepetleri izler (kohort). "Ödendi" yalnız satışı sayar (ödenmiş, hediye olmayan sipariş;
+cart.models.CartOutcome); hediye edilen ve siparişi iptal / iade edilen sepetler ayrı sayılır. Üye sepetine katılan misafir sepetleri sayılmaz; ürünleri üyenin
 sepetinde sayılır. Çıkarılan ürünler ve ödeme adımına geçiş, kaydı tutulmaya başladığı tarihten itibaren bilinir.
 """
 
@@ -13,7 +14,7 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from cart.models import Cart, CartItem, CartItemRemoval, CartRemovalReason, CartStatus
+from cart.models import OUTCOME_CONDITIONS, Cart, CartItem, CartItemRemoval, CartOutcome, CartRemovalReason, CartStatus
 from course.models import Bundle, Course
 from order.models import Order, OrderStatus
 
@@ -28,7 +29,7 @@ def _percent(part, whole):
 def funnel(start, end):
     """Ayda açılıp içine ürün eklenen sepetlerin hangi adıma kadar gittiği."""
     cohort = Cart.objects.countable().with_products().filter(created_at__gte=start, created_at__lt=end)
-    carts = Cart.objects.filter(pk__in=cohort.values("pk")).annotate(
+    carts = Cart.objects.filter(pk__in=cohort.values("pk")).with_outcome().annotate(
         has_order=Exists(Order.objects.filter(cart=OuterRef("pk"))),
     )
     totals = carts.aggregate(
@@ -36,8 +37,9 @@ def funnel(start, end):
         members=Count("pk", filter=Q(user__isnull=False)),
         checkout=Count("pk", filter=Q(checkout_at__isnull=False) | Q(has_order=True) | Q(status=CartStatus.CONVERTED)),
         ordered=Count("pk", filter=Q(has_order=True)),
-        paid=Count("pk", filter=Q(status=CartStatus.CONVERTED)),
-        gifted=Count("pk", filter=Q(status=CartStatus.GIFTED)),
+        paid=Count("pk", filter=OUTCOME_CONDITIONS[CartOutcome.SOLD]),
+        gifted=Count("pk", filter=OUTCOME_CONDITIONS[CartOutcome.GIFTED]),
+        cancelled=Count("pk", filter=OUTCOME_CONDITIONS[CartOutcome.CANCELLED]),
         emptied=Count("pk", filter=Q(status=CartStatus.EMPTIED)),
         open=Count("pk", filter=Q(status=CartStatus.ACTIVE)),
     )
@@ -46,7 +48,7 @@ def funnel(start, end):
         ("total", _("Sepete ürün ekledi")),
         ("checkout", _("Ödeme adımına geçti")),
         ("ordered", _("Sipariş oluştu")),
-        ("paid", _("Ödendi")),
+        ("paid", _("Ödendi (satış)")),
     )
     steps, previous = [], total
     for key, label in labels:
@@ -61,9 +63,9 @@ def _product_key(course_id, bundle_id):
 
 
 def products(start, end):
-    """Ürün bazında: ayda eklenen, ziyaretçinin çıkardığı, paket/sahiplik nedeniyle düşen, sepetten satın alınan ve
-    şu an açık sepetlerde bekleyen adetler. Eklenen = ayda eklenip hâlâ sepette duran + ayda eklenip sonradan çıkan."""
-    rows = defaultdict(lambda: dict(added=0, removed=0, dropped=0, purchased=0, waiting=0))
+    """Ürün bazında: ayda eklenen, ziyaretçinin çıkardığı, paket/sahiplik nedeniyle düşen, sepetten satın alınan (satış),
+    hediye edilen, siparişi iptal / iade edilen ve şu an açık sepetlerde bekleyen adetler. Eklenen = ayda eklenip hâlâ sepette duran + ayda eklenip sonradan çıkan."""
+    rows = defaultdict(lambda: dict(added=0, removed=0, dropped=0, purchased=0, gifted=0, cancelled=0, waiting=0))
     items = CartItem.objects.filter(cart__in=Cart.objects.countable()).order_by()
     removals = CartItemRemoval.objects.countable().order_by()
 
@@ -76,7 +78,11 @@ def products(start, end):
     in_month = removals.filter(created_at__gte=start, created_at__lt=end)
     collect(in_month.filter(reason=CartRemovalReason.REMOVED), "removed")
     collect(in_month.exclude(reason=CartRemovalReason.REMOVED), "dropped")
-    collect(items.filter(cart__status=CartStatus.CONVERTED, cart__converted_at__gte=start, cart__converted_at__lt=end), "purchased")
+    closed = Cart.objects.with_outcome().filter(
+        Q(converted_at__gte=start, converted_at__lt=end) | Q(status=CartStatus.GIFTED, gifted_at__gte=start, gifted_at__lt=end)
+    )
+    for outcome, field in ((CartOutcome.SOLD, "purchased"), (CartOutcome.GIFTED, "gifted"), (CartOutcome.CANCELLED, "cancelled")):
+        collect(items.filter(cart__in=closed.filter(OUTCOME_CONDITIONS[outcome]).values("pk")), field)
     collect(items.filter(cart__status=CartStatus.ACTIVE), "waiting")
 
     courses = Course.objects.in_bulk([pk for kind, pk in rows if kind == "course"])

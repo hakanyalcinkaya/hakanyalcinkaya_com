@@ -7,7 +7,7 @@
   <div>
     <h1 class="h3 mb-1">{% if cart.user %}{{ cart.user.email }}{% else %}Misafir sepeti{% endif %}</h1>
     <div class="d-flex flex-wrap align-items-center gap-2 small text-body-secondary">
-      <span class="badge rounded-1 border text-body-secondary fw-medium">{{ cart.get_status_display }}</span>
+      {% include "studio/partials/_cart_status.html" %}
       {% if cart.is_active and cart.checkout_at %}<span class="badge rounded-1 text-bg-warning fw-medium">Ödeme adımında</span>{% endif %}
       {% if cart.user %}<a href="{% url 'studio:student_detail' cart.user_id %}">üye sayfası</a>{% else %}<span class="font-monospace">{{ cart.session_key|truncatechars:12|default:"—" }}</span>{% endif %}
     </div>
@@ -85,7 +85,7 @@
         <li class="d-flex gap-2"><i class="bi bi-cart-plus text-body-tertiary" aria-hidden="true"></i><span>Sepet açıldı</span><span class="ms-auto text-body-secondary">{{ cart.created_at|date:"d.m.Y H:i" }}</span></li>
         <li class="d-flex gap-2"><i class="bi bi-credit-card text-body-tertiary" aria-hidden="true"></i><span>Ödeme adımına geçti</span><span class="ms-auto text-body-secondary">{{ cart.checkout_at|date:"d.m.Y H:i"|default:"—" }}</span></li>
         {% if cart.emptied_at %}<li class="d-flex gap-2"><i class="bi bi-cart-x text-body-tertiary" aria-hidden="true"></i><span>Boşaltıldı</span><span class="ms-auto text-body-secondary">{{ cart.emptied_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
-        {% if cart.converted_at %}<li class="d-flex gap-2"><i class="bi bi-check2-circle text-success" aria-hidden="true"></i><span>Ödendi, sipariş oldu</span><span class="ms-auto text-body-secondary">{{ cart.converted_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
+        {% if cart.converted_at %}{% with outcome=cart.outcome %}<li class="d-flex gap-2">{% if outcome == "gifted" %}<i class="bi bi-gift text-info" aria-hidden="true"></i><span>Hediye siparişi oldu (satış sayılmaz)</span>{% elif outcome == "cancelled" %}<i class="bi bi-x-circle text-danger" aria-hidden="true"></i><span>Sipariş oldu, sonra iptal / iade edildi (satış sayılmaz)</span>{% else %}<i class="bi bi-check2-circle text-success" aria-hidden="true"></i><span>Ödendi, sipariş oldu</span>{% endif %}<span class="ms-auto text-body-secondary">{{ cart.converted_at|date:"d.m.Y H:i" }}</span></li>{% endwith %}{% endif %}
         {% if cart.gifted_at %}<li class="d-flex gap-2"><i class="bi bi-gift text-success" aria-hidden="true"></i><span>Hediye edildi</span><span class="ms-auto text-body-secondary">{{ cart.gifted_at|date:"d.m.Y H:i" }}</span></li>{% endif %}
         {% if cart.is_merged %}<li class="d-flex gap-2"><i class="bi bi-person-check text-body-tertiary" aria-hidden="true"></i><span>Giriş yapınca üye sepetine katıldı</span></li>{% endif %}
         <li class="d-flex gap-2"><i class="bi bi-clock-history text-body-tertiary" aria-hidden="true"></i><span>Son değişiklik</span><span class="ms-auto text-body-secondary" title="{{ cart.updated_at|date:'d.m.Y H:i' }}">{{ cart.updated_at|ago }}</span></li>

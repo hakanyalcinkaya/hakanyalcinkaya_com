@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import OuterRef, Q, Subquery
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -21,6 +21,24 @@ class CartRemovalReason(models.TextChoices):
     REMOVED = "removed", _("Ziyaretçi çıkardı")
     BUNDLE = "bundle", _("Paket eklenince çıktı")
     OWNED = "owned", _("Kursa sahip olunca düştü")
+
+
+class CartOutcome(models.TextChoices):
+    """Siparişe dönüşen ya da hediye edilen sepetin akıbeti (CartQuerySet.with_outcome). Sepet "siparişe dönüştü" olarak
+    kalır; siparişi sonradan iptal ya da iade edilse, hediyeye çevrilse de. Satış yalnız ödenmiş, hediye olmayan siparişle
+    sayılır (Order.objects.sold)."""
+
+    SOLD = "sold", _("Satış")
+    GIFTED = "gifted", _("Hediye")
+    CANCELLED = "cancelled", _("İptal / iade")
+
+
+# with_outcome ile açıklanan sepetlerde akıbete göre koşullar (istatistik sayımları ve stüdyo sekmeleri).
+OUTCOME_CONDITIONS = {
+    CartOutcome.SOLD: Q(status=CartStatus.CONVERTED, converted_at__isnull=False, has_sale=True),
+    CartOutcome.GIFTED: Q(status=CartStatus.GIFTED) | Q(status=CartStatus.CONVERTED, converted_at__isnull=False, has_sale=False, has_gift_order=True),
+    CartOutcome.CANCELLED: Q(status=CartStatus.CONVERTED, converted_at__isnull=False, has_sale=False, has_gift_order=False),
+}
 
 
 class CartQuerySet(models.QuerySet):
@@ -43,6 +61,13 @@ class CartQuerySet(models.QuerySet):
         """Stüdyoda temizlenebilen (silinebilen) sepetler: satışa dönüşmemiş (açık ya da boşaltılmış) ve siparişi olmayan.
         Silinen sepet ürünleri ve çıkarılan ürün kayıtlarıyla birlikte istatistiklerden de çıkar."""
         return self.filter(status__in=(CartStatus.ACTIVE, CartStatus.EMPTIED), orders__isnull=True)
+
+    def with_outcome(self):
+        """Sepetin siparişlerinden akıbet bilgisi: ödenmiş satış, hediye siparişi var mı (OUTCOME_CONDITIONS, Cart.outcome)."""
+        from order.models import Order
+
+        orders = Order.objects.filter(cart=OuterRef("pk"))
+        return self.annotate(has_sale=Exists(orders.sold()), has_gift_order=Exists(orders.gifted()))
 
     def with_products(self):
         """İçine en az bir ürün eklenmiş sepetler (sonradan çıkarılmış olsa da)."""
@@ -87,6 +112,18 @@ class Cart(BaseModel):
     @property
     def is_active(self):
         return self.status == CartStatus.ACTIVE
+
+    @property
+    def outcome(self):
+        """Siparişe dönüşen ya da hediye edilen sepetin akıbeti (CartOutcome), değilse "". Siparişe dönüşenlerde
+        with_outcome ile yüklenmiş olmalı."""
+        if self.status == CartStatus.GIFTED:
+            return CartOutcome.GIFTED
+        if self.status != CartStatus.CONVERTED or self.converted_at is None or not hasattr(self, "has_sale"):
+            return ""
+        if self.has_sale:
+            return CartOutcome.SOLD
+        return CartOutcome.GIFTED if self.has_gift_order else CartOutcome.CANCELLED
 
     @property
     def is_merged(self):

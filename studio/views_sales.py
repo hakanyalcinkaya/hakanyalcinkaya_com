@@ -18,7 +18,7 @@ from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 
 from account.models import User
-from cart.models import Cart, CartItem, CartStatus
+from cart.models import OUTCOME_CONDITIONS, Cart, CartItem, CartOutcome, CartStatus
 from cart.pricing import price_cart
 from learning.models import WATCH_COMPLETED, WATCH_OPENED, WATCH_STARTED, Enrollment, LessonView
 from discount.models import PersonalAudience, PersonalDiscountRequest, PersonalDiscountRule, PersonalRequestResult
@@ -199,8 +199,9 @@ CART_FILTERS = {
     "cart-step": (gettext_lazy("Sepette bekleyen"), Q(status=CartStatus.ACTIVE, checkout_at__isnull=True)),
     "checkout-step": (gettext_lazy("Ödeme adımında kalan"), Q(status=CartStatus.ACTIVE, checkout_at__isnull=False)),
     "emptied": (gettext_lazy("Boşaltılan"), Q(status=CartStatus.EMPTIED)),
-    "converted": (gettext_lazy("Siparişe dönüşen"), Q(status=CartStatus.CONVERTED, converted_at__isnull=False)),
-    "gifted": (gettext_lazy("Hediye edilen"), Q(status=CartStatus.GIFTED)),
+    "converted": (gettext_lazy("Satışa dönüşen"), OUTCOME_CONDITIONS[CartOutcome.SOLD]),
+    "gifted": (gettext_lazy("Hediye edilen"), OUTCOME_CONDITIONS[CartOutcome.GIFTED]),
+    "cancelled": (gettext_lazy("İptal / iade edilen"), OUTCOME_CONDITIONS[CartOutcome.CANCELLED]),
     "all": (gettext_lazy("Tümü"), Q()),
 }
 
@@ -219,7 +220,7 @@ def _cart_filter(params):
     if key not in CART_FILTERS:
         key = "active"
     query = params.get("q", "").strip()
-    base = Cart.objects.filter(items__isnull=False).distinct()
+    base = Cart.objects.filter(items__isnull=False).distinct().with_outcome()
     if query:
         base = base.filter(user__email__icontains=query)
     return key, query, base
@@ -275,7 +276,7 @@ def carts_clear(request):
 
 
 def _cart(cart_id):
-    return get_object_or_404(Cart.objects.select_related("user", "discount"), pk=cart_id)
+    return get_object_or_404(Cart.objects.select_related("user", "discount").with_outcome(), pk=cart_id)
 
 
 @superuser_required

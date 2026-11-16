@@ -17,7 +17,7 @@ from django.db.models import Count, Exists, OuterRef, Q, Sum
 from django.urls import reverse
 from django.utils import timezone
 
-from cart.models import Cart, CartItem, CartItemRemoval, CartRemovalReason
+from cart.models import OUTCOME_CONDITIONS, Cart, CartItem, CartItemRemoval, CartOutcome, CartRemovalReason
 from core.money import format_money
 from course.models import Course, Lesson, Review, VideoUpload, VideoUploadStatus
 from learning.models import Enrollment, EnrollmentSource, LessonProgress
@@ -195,7 +195,7 @@ def _carts(start, end):
         created_note=f"{totals['total'] - totals['members']} misafir · {totals['members']} üye",
         items=f"{added} / {removed}",
         checkout=Cart.objects.countable().filter(_within("checkout_at", start, end)).count(),
-        converted=Cart.objects.filter(_within("converted_at", start, end)).count(),
+        converted=Cart.objects.with_outcome().filter(_within("converted_at", start, end)).filter(OUTCOME_CONDITIONS[CartOutcome.SOLD]).count(),
     )
 
 

@@ -35,7 +35,7 @@
       {% if period.following %}<a href="{{ carts_url }}?month={{ period.following }}" class="btn btn-outline-secondary" aria-label="Sonraki ay"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>{% else %}<span class="btn btn-outline-secondary disabled" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>{% endif %}
     </nav>
   </div>
-  <p class="small text-body-secondary">Bu ay açılıp içine ürün eklenen {{ funnel.total }} sepet ({{ funnel.members }} üye, {{ funnel.guests }} misafir). Bugün: {{ funnel.open }} açık, {{ funnel.emptied }} boşaltıldı{% if funnel.gifted %}, {{ funnel.gifted }} hediye edildi{% endif %}.</p>
+  <p class="small text-body-secondary">Bu ay açılıp içine ürün eklenen {{ funnel.total }} sepet ({{ funnel.members }} üye, {{ funnel.guests }} misafir). Bugün: {{ funnel.open }} açık, {{ funnel.emptied }} boşaltıldı.</p>
   <div class="d-grid gap-2 mb-4">
     {% for step in funnel.steps %}
     <div class="row g-2 align-items-center small">
@@ -44,6 +44,13 @@
       <span class="col-4 col-md-3 text-end text-body-secondary">{{ step.count }} · %{{ step.percent }}{% if not forloop.first and step.lost %} <span class="text-danger-emphasis">−{{ step.lost }}</span>{% endif %}</span>
     </div>
     {% endfor %}
+  </div>
+  {# Satış sayılmayan kapanışlar: hediye edilen ve siparişi iptal / iade edilen sepetler (listede kendi sekmeleri). #}
+  <div class="d-flex flex-wrap gap-2 mb-4 small">
+    <a href="{{ carts_url }}?status=converted" class="badge rounded-1 text-bg-success fw-medium text-decoration-none"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>{{ funnel.paid }} satış</a>
+    <a href="{{ carts_url }}?status=gifted" class="badge rounded-1 text-bg-info fw-medium text-decoration-none"><i class="bi bi-gift me-1" aria-hidden="true"></i>{{ funnel.gifted }} hediye</a>
+    <a href="{{ carts_url }}?status=cancelled" class="badge rounded-1 text-bg-danger fw-medium text-decoration-none"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>{{ funnel.cancelled }} iptal / iade</a>
+    <span class="text-body-tertiary align-self-center">Hediye ve iptal / iade satış sayılmaz.</span>
   </div>
 
   <h3 class="h6">Ürünler</h3>
@@ -55,7 +62,9 @@
           <th scope="col" class="fw-medium">Kurs / paket</th>
           <th scope="col" class="fw-medium text-end" title="Bu ay sepete eklenme sayısı">Eklenen</th>
           <th scope="col" class="fw-medium text-end" title="Bu ay ziyaretçinin sepetten çıkardığı">Çıkarılan</th>
-          <th scope="col" class="fw-medium text-end" title="Bu ay ödenen siparişle sepetten satın alınan">Satın alınan</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay ödenen (hediye olmayan) siparişle sepetten satın alınan">Satın alınan</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay hediye edilen sepetlerde">Hediye</th>
+          <th scope="col" class="fw-medium text-end" title="Bu ay siparişe dönüşüp siparişi iptal ya da iade edilen sepetlerde">İptal / iade</th>
           <th scope="col" class="fw-medium text-end" title="Bugün açık sepetlerde">Şu an sepette</th>
         </tr>
       </thead>
@@ -66,6 +75,8 @@
           <td class="text-end">{{ row.added }}</td>
           <td class="text-end">{{ row.removed }}{% if row.removed %} <span class="text-body-tertiary">%{{ row.removed_percent }}</span>{% endif %}{% if row.dropped %}<div class="text-body-tertiary" title="Paket eklenince ya da kursa sahip olunca sepetten düştü">+{{ row.dropped }} otomatik</div>{% endif %}</td>
           <td class="text-end">{{ row.purchased }}</td>
+          <td class="text-end{% if not row.gifted %} text-body-tertiary{% else %} text-info-emphasis{% endif %}">{{ row.gifted }}</td>
+          <td class="text-end{% if not row.cancelled %} text-body-tertiary{% else %} text-danger-emphasis{% endif %}">{{ row.cancelled }}</td>
           <td class="text-end">{{ row.waiting }}</td>
         </tr>
         {% endfor %}

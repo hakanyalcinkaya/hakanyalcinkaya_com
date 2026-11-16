@@ -3,7 +3,7 @@
 <div class="list-group-item list-group-item-action py-2 position-relative">
   <div class="d-flex flex-wrap align-items-center gap-2">
     <a href="{% url 'studio:cart_detail' cart.id %}" class="fw-medium link-body-emphasis text-decoration-none stretched-link">{% if cart.user %}{{ cart.user.email }}{% else %}Misafir{% endif %}</a>
-    <span class="badge rounded-1 border text-body-secondary fw-medium">{{ cart.get_status_display }}</span>
+    {% include "studio/partials/_cart_status.html" %}
     {% if cart.is_active and cart.checkout_at %}<span class="badge rounded-1 text-bg-warning fw-medium">Ödeme adımında</span>{% endif %}
     {% if cart.discount %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace">{{ cart.discount.code }}</span>{% endif %}
     <time class="ms-auto small text-body-tertiary" datetime="{{ cart.updated_at|date:'c' }}" title="{{ cart.updated_at|date:'d.m.Y H:i' }}">{{ cart.updated_at|ago }}</time>
