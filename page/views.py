@@ -40,6 +40,7 @@ from page.catalog import (
     NEWSLETTER_SESSION_KEY,
     ORDERS_SESSION_KEY,
     PAYMENT_SESSION_KEY,
+    PERSONAL_DISCOUNT_SENT_SESSION_KEY,
     RESET_SESSION_KEY,
     SELLER_ADDRESS,
     SELLER_TAX,
@@ -539,6 +540,7 @@ def personal_discount(request):
         user = request.user if member else User.objects.with_email(email).first()
         sent = PersonalDiscountRequest.handle(form.rule, email, form.cleaned_data["audience"], user=user, data=collect(request, user))
         if sent.is_sent:
+            request.session[PERSONAL_DISCOUNT_SENT_SESSION_KEY] = True
             messages.success(request, f"Sana özel indirim kodunu {email} adresine gönderdik.")
         else:
             messages.error(request, sent.refusal_message)

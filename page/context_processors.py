@@ -13,6 +13,7 @@ from page import content
 from page.catalog import (
     NAV,
     NEWSLETTER_SESSION_KEY,
+    PERSONAL_DISCOUNT_SENT_SESSION_KEY,
 )
 
 # Menü bölümüne ait sayfalar (url adı -> NAV kimliği).
@@ -90,8 +91,14 @@ def site(request):
         # Bağlantıyla gelen kod geçersizse (discount.middleware) şeritte kişiye özel kod isteme bağlantısı.
         "invalid_coupon": getattr(request, "invalid_coupon", ""),
         # Giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (page:exit_offer); kod
-        # uygulanmışsa şablonda çıkmaz.
-        "exit_offer": not user.is_authenticated and url_name not in EXIT_OFFER_SKIPPED_PAGES,
+        # uygulanmışsa şablonda çıkmaz. Bu tarayıcıdan kod gönderildiyse pencere de ikon da artık çıkmaz (site.js ikonu
+        # hatırlayan kaydı exit_offer_sent ile siler).
+        "exit_offer_sent": bool(request.session.get(PERSONAL_DISCOUNT_SENT_SESSION_KEY)),
+        "exit_offer": (
+            not user.is_authenticated
+            and url_name not in EXIT_OFFER_SKIPPED_PAGES
+            and not request.session.get(PERSONAL_DISCOUNT_SENT_SESSION_KEY)
+        ),
         "personal_discount_open": SimpleLazyObject(lambda: PersonalDiscountRule.objects.published().exists()),
         "library_url": reverse("page:library"),
         # Hoş geldin sayfası: ayar açıksa ve üyenin kurs kaydı varsa adresi, yoksa boş (bağlantılar gizlenir); yalnız şablonda

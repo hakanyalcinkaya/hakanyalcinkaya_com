@@ -1021,7 +1021,13 @@
   // imleç pencerenin üst kısmından çıkınca ya da yukarı (sekme, adres çubuğu, kapat düğmesi) hızla gidince; dokunmatik
   // ekranda sayfa aşağıdayken hızla yukarı kaydırılınca, ikinci sayfaya geçince ya da sitede 20 saniye geçirince. Her
   // ikisinde başka sekmeye geçip dönünce de. Kendiliğinden tarayıcı oturumu boyunca (sekme kapanana dek) bir kez açılır.
-  // Pencere kapatılınca sağ alt köşede ikon kalır; ikona basınca pencere yeniden açılır.
+  // Pencere bir kez açılınca (kapatılsa da, içindeki bağlantıyla başka sayfaya gidilse de) sağ alt köşede ikon kalır;
+  // ikona basınca pencere yeniden açılır. İkon, indirim kodu e-postayla gönderilene dek (body[data-exit-offer-sent]) kalır.
+  if (document.body.hasAttribute("data-exit-offer-sent")) {
+    try {
+      window.localStorage.removeItem("hy-exit-offer-closed");
+    } catch (error) {}
+  }
   var exitDialog = document.getElementById("exit-offer");
   var exitReopen = document.querySelector("[data-exit-reopen]");
   if (exitDialog && window.htmx) {
@@ -1123,6 +1129,7 @@
       if (event.detail.target.id !== "exit-offer-body" || exitDialog.open || !event.detail.target.childElementCount) return;
       document.documentElement.classList.add("hy-dialog-open");
       showReopen(false);
+      store("localStorage", EXIT_CLOSED_KEY, "1");
       exitDialog.showModal();
     });
     exitDialog.addEventListener("click", function (event) {
