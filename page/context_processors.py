@@ -11,6 +11,7 @@ from newsletter.models import Subscriber
 
 from page import content
 from page.catalog import (
+    EXIT_OFFER_SEEN_SESSION_KEY,
     NAV,
     NEWSLETTER_SESSION_KEY,
     PERSONAL_DISCOUNT_SENT_SESSION_KEY,
@@ -93,6 +94,7 @@ def site(request):
         # Giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (page:exit_offer); kod
         # uygulanmışsa şablonda çıkmaz. Bu tarayıcıdan kod gönderildiyse pencere de ikon da artık çıkmaz (site.js ikonu
         # hatırlayan kaydı exit_offer_sent ile siler).
+        "exit_offer_seen": bool(request.session.get(EXIT_OFFER_SEEN_SESSION_KEY)),
         "exit_offer_sent": bool(request.session.get(PERSONAL_DISCOUNT_SENT_SESSION_KEY)),
         "exit_offer": (
             not user.is_authenticated

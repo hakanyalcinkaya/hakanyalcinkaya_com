@@ -1050,7 +1050,37 @@
     var showReopen = function (on) {
       if (exitReopen) exitReopen.hidden = !on;
     };
-    showReopen(Boolean(store("localStorage", EXIT_CLOSED_KEY)));
+    // Pencere bu tarayıcıda açılmışsa (sunucu oturumu ikonu görünür gönderir ya da localStorage hatırlar) ikon her
+    // sayfada görünür; ikisi birbirini tamamlar.
+    var reopenSeen = Boolean(exitReopen && !exitReopen.hidden);
+    if (reopenSeen) store("localStorage", EXIT_CLOSED_KEY, "1");
+    showReopen(reopenSeen || Boolean(store("localStorage", EXIT_CLOSED_KEY)));
+    // İkon, alttaki sabit çubukların (mobil satın alma çubuğu, ders çubuğu, çerez bandı) üstünde durur: görünenlerin
+    // yüksekliği kadar yukarı kalkar (--hy-fab-lift).
+    if (exitReopen) {
+      var bottomBars = Array.prototype.slice.call(document.querySelectorAll(".fixed-bottom, [data-consent]"));
+      var liftReopen = function () {
+        var lift = 0;
+        bottomBars.forEach(function (bar) {
+          if (!bar.getClientRects().length) return;
+          var rect = bar.getBoundingClientRect();
+          if (rect.bottom >= window.innerHeight - 2) lift = Math.max(lift, window.innerHeight - rect.top);
+        });
+        exitReopen.style.setProperty("--hy-fab-lift", Math.max(Math.round(lift), 0) + "px");
+      };
+      liftReopen();
+      window.addEventListener("resize", liftReopen, { passive: true });
+      if (window.MutationObserver) {
+        var barObserver = new MutationObserver(liftReopen);
+        bottomBars.forEach(function (bar) {
+          barObserver.observe(bar, { attributes: true, attributeFilter: ["class", "hidden", "style"] });
+        });
+      }
+      if (window.ResizeObserver) {
+        var barResize = new ResizeObserver(liftReopen);
+        bottomBars.forEach(function (bar) { barResize.observe(bar); });
+      }
+    }
     var exitArmed = false;
     var exitFired = Boolean(store("sessionStorage", EXIT_KEY));
     window.setTimeout(function () { exitArmed = true; }, EXIT_ARM_MS);

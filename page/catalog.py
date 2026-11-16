@@ -32,6 +32,8 @@ RESET_SESSION_KEY = "reset_email"
 UNSUBSCRIBED_SESSION_KEY = "newsletter_unsubscribed"
 # Bu tarayıcıdan kişiye özel indirim kodu e-postayla gönderildi: çıkış niyeti penceresi ve sağ alttaki ikonu artık çıkmaz.
 PERSONAL_DISCOUNT_SENT_SESSION_KEY = "personal_discount_sent"
+# Çıkış niyeti penceresi bu tarayıcıda bir kez açıldı: sağ alttaki hediye ikonu her sayfada gösterilir.
+EXIT_OFFER_SEEN_SESSION_KEY = "exit_offer_seen"
 
 # Hoş geldin sayfasının Bunny Stream videosu (video ID'si, ör. "0a1b2c3d-..."); boşken sayfada video bölümü gösterilmez.
 WELCOME_VIDEO_ID = "1a4c3767-2867-40c9-82e3-832dcfed5aa4"

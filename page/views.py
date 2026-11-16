@@ -37,6 +37,7 @@ from order import iyzico
 from order.models import Order
 from page import content
 from page.catalog import (
+    EXIT_OFFER_SEEN_SESSION_KEY,
     NEWSLETTER_SESSION_KEY,
     ORDERS_SESSION_KEY,
     PAYMENT_SESSION_KEY,
@@ -551,12 +552,13 @@ def personal_discount(request):
 def exit_offer(request):
     """Siteden çıkmaya yönelen giriş yapmamış ziyaretçiye (site.js) "sana özel indirim kodu" penceresi: teklif (oranlar
     yazılmaz), isteme bağlantısı ve kayan öğrenci yorumları. Yayında kural yoksa ya da üye girişliyse boş yanıt (pencere
-    açılmaz); doğrudan açılınca istek sayfasına gider."""
+    açılmaz); doğrudan açılınca istek sayfasına gider. Açıldığı oturumda alttaki hediye ikonu her sayfada görünür."""
     if not request.htmx:
         return redirect("page:personal_discount")
     rules = list(PersonalDiscountRule.objects.published())
     if request.user.is_authenticated or not rules:
         return HttpResponse(status=204)
+    request.session[EXIT_OFFER_SEEN_SESSION_KEY] = True
     reviews = content.home_reviews()["reviews"]
     return render(
         request,
