@@ -18,6 +18,7 @@
     {% if not can_link %}
     <div class="alert alert-info small m-3 mb-0" role="alert"><i class="bi bi-info-circle me-2" aria-hidden="true"></i>Geliştirme ortamında bağlama kapalı: liste canlı sitenin kütüphanesini gösterir, bağlamak oradaki başlıkları da değiştirir.</div>
     {% endif %}
+    <div class="table-responsive">
     <table class="table table-sm align-middle small mb-0">
       <thead class="sticky-top bg-body">
         <tr>
@@ -46,6 +47,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% endif %}
   </div>
   <div class="d-flex flex-wrap align-items-center gap-2 border-top px-3 py-2">

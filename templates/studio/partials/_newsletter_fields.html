@@ -2,7 +2,8 @@
 <div class="border rounded p-3 mb-3 small">
   <div class="fw-semibold mb-1">Kullanılabilecek alanlar</div>
   <p class="text-body-secondary mb-2">Başlık, giriş ya da içerikte yaz; her aboneye kendi değeri konur. Tıklayınca imlecin olduğu yere eklenir. Selamlama dahil her şeyi sen yazarsın.</p>
-  <table class="table table-sm align-middle mb-2">
+  <div class="table-responsive mb-2">
+  <table class="table table-sm align-middle mb-0">
     <tbody>
       {% for name, label in personalization_fields %}
       <tr>
@@ -12,6 +13,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   <div class="text-body-secondary">Değer boşsa yedek metin: <code>{% templatetag openvariable %} ad|dostum {% templatetag closevariable %}</code> → adı yoksa “dostum”. Örnek: <code>Merhaba {% templatetag openvariable %} ad|dostum {% templatetag closevariable %},</code></div>
   <div class="text-body-secondary mt-1">Altta “Abonelikten çık” bağlantısı her bültene kendiliğinden eklenir.</div>
 </div>

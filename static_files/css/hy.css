@@ -298,6 +298,17 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .studio-nav-link{color:var(--bs-secondary-color);text-decoration:none;font-size:inherit}
 .studio-nav-link:hover,.studio-nav-link.active{color:var(--bs-emphasis-color)}
 .studio-nav-link.active{font-weight:500}
+/* Dar ekranda sığmayan düğme grubu (ör. sepet durum sekmeleri) sayfayı taşırmaz, kendi içinde yana kayar. */
+.studio-scroll-x{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.studio-scroll-x .btn{white-space:nowrap}
+/* Uzun seçenekli (ör. kurs adı) w-auto seçim kutusu ekran genişliğini aşmaz. */
+.form-select.w-auto{max-width:100%}
+/* Mobil stüdyo menüsü: gruplu bağlantılar, uzun listede menü kendi içinde kayar. */
+.studio-mobile-menu{max-height:calc(100dvh - 4rem);overflow-y:auto;overscroll-behavior:contain}
+.studio-mobile-link{color:var(--bs-body-color);background:var(--bs-tertiary-bg);border:1px solid transparent}
+.studio-mobile-link:hover{color:var(--bs-emphasis-color);border-color:var(--bs-border-color)}
+.studio-mobile-link.active{color:var(--bs-primary-text-emphasis);background:var(--bs-primary-bg-subtle);border-color:var(--bs-primary-border-subtle);font-weight:500}
+.studio-mobile-link.active i{color:inherit!important}
 /* İstatistik: izleme oranı dağılımı çubukları. */
 .studio-bar{height:.5rem;background:var(--bs-secondary-bg);border-radius:var(--bs-border-radius-pill);overflow:hidden}
 .studio-bar>span{display:block;height:100%;background:var(--bs-primary)}

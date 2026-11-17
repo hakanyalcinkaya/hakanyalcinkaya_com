@@ -1,4 +1,5 @@
 from django import template
+from django.urls import reverse
 
 from course.models import VideoUpload
 
@@ -90,3 +91,58 @@ def studio_section(context):
     match = getattr(context.get("request"), "resolver_match", None)
     name = match.url_name if match else ""
     return next((section for section, prefixes in NAV_SECTIONS if name.startswith(prefixes)), "")
+
+
+# Mobil stüdyo menüsü: gruplar ve bağlantılar (ad, simge, url adı ve argümanı, rozet anahtarı). Masaüstü menüsüyle aynı
+# sayfalar; masaüstünde açılır menüde olanlar burada başlıklı grup olarak alt alta durur.
+MOBILE_NAV = (
+    ("Genel", (
+        ("Kurslar", "bi-collection-play", "course_list", None, ""),
+        ("İstatistikler", "bi-graph-up", "stats", None, ""),
+        ("Yorumlar", "bi-chat-square-quote", "reviews", None, "reviews"),
+        ("Destek", "bi-life-preserver", "support_list", None, "support"),
+        ("Kuyruk", "bi-list-task", "queue", None, "queue"),
+        ("Ayarlar", "bi-gear", "settings", None, ""),
+    )),
+    ("Satışlar", (
+        ("Siparişler", "bi-receipt", "orders", None, ""),
+        ("Sepetler", "bi-cart", "carts", None, ""),
+    )),
+    ("Öğrenciler", (
+        ("Üyeler", "bi-people", "students", None, ""),
+        ("İzleme kayıtları", "bi-play-circle", "watch_log", None, ""),
+    )),
+    ("Katalog", (
+        ("Paketler", "bi-stack", "catalog_list", "bundles", ""),
+        ("İndirim kodları", "bi-ticket-perforated", "catalog_list", "discounts", ""),
+        ("Özel indirim kodları", "bi-person-badge", "personal_discounts", None, ""),
+        ("Kategoriler", "bi-diagram-3", "catalog_list", "categories", ""),
+        ("Teknolojiler", "bi-cpu", "catalog_list", "technologies", ""),
+        ("Eğitmenler", "bi-person-video3", "catalog_list", "instructors", ""),
+    )),
+    ("E-posta", (
+        ("Gönderim günlüğü", "bi-journal-text", "email_log", None, ""),
+        ("Şablonlar", "bi-envelope", "emails", None, ""),
+        ("Bültenler", "bi-megaphone", "newsletters", None, ""),
+        ("Aboneler", "bi-people", "subscribers", None, ""),
+    )),
+)
+
+
+@register.simple_tag(takes_context=True)
+def studio_mobile_nav(context, **badges):
+    """Mobil menünün grupları: her bağlantıda label, icon, url, badge ve active. Geçerli adresle en uzun başlangıcı eşleşen
+    bağlantı etkin sayılır (ör. /studio/emails/log/ "Gönderim günlüğü", alt sayfalar da kendi bölümünde)."""
+    path = getattr(context.get("request"), "path", "")
+    groups = []
+    for title, links in MOBILE_NAV:
+        items = []
+        for label, icon, name, arg, badge in links:
+            url = reverse(f"studio:{name}", args=[arg] if arg else None)
+            items.append(dict(label=label, icon=icon, url=url, badge=badges.get(badge, 0) if badge else 0, active=False))
+        groups.append(dict(title=title, items=items))
+    matches = [item for group in groups for item in group["items"] if path.startswith(item["url"])]
+    if matches:
+        current = max(matches, key=lambda item: len(item["url"]))
+        current["active"] = True
+    return groups

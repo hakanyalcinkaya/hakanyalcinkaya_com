@@ -15,7 +15,23 @@
       <a href="{% url 'studio:course_list' %}" class="link-body-emphasis text-decoration-none">Stüdyo</a>
       {% if app_version and app_version.label %}<span class="badge rounded-1 border text-body-secondary fw-medium font-monospace" title="Sürüm {{ app_version.label }} · commit {{ app_version.commit }}">{{ app_version.label }}</span>{% endif %}
     </div>
-    <div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 small">
+    {# Mobil: o anki sayfanın adıyla menü düğmesi; menü aşağıda gruplu, tam genişlikte açılır (site.js, mobil-menu). #}
+    {% studio_mobile_nav reviews=pending_reviews support=awaiting_support queue=busy_total as nav_groups %}
+    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none d-flex align-items-center gap-2" data-menu-toggle aria-label="Menüyü aç" aria-expanded="false" aria-controls="mobil-menu">{% for group in nav_groups %}{% for item in group.items %}{% if item.active %}<span class="small fw-medium">{{ item.label }}</span>{% endif %}{% endfor %}{% endfor %}{% if pending_reviews or awaiting_support %}<span class="p-1 bg-warning rounded-circle" aria-hidden="true"></span>{% endif %}<i class="bi bi-list fs-5 lh-1" data-menu-icon aria-hidden="true"></i></button>
+    <div id="mobil-menu" class="collapse w-100 d-lg-none studio-mobile-menu">
+      {% for group in nav_groups %}
+      <section class="pt-3">
+        <h2 class="small fw-semibold text-uppercase text-body-tertiary mb-2" style="letter-spacing:.08em;font-size:.7rem">{{ group.title }}</h2>
+        <div class="row row-cols-2 g-1">
+          {% for item in group.items %}
+          <div class="col"><a href="{{ item.url }}" class="studio-mobile-link d-flex align-items-center gap-2 rounded-2 px-2 py-2 small text-decoration-none{% if item.active %} active{% endif %}"{% if item.active %} aria-current="page"{% endif %}><i class="bi {{ item.icon }} text-body-tertiary" aria-hidden="true"></i><span class="text-truncate">{{ item.label }}</span>{% if item.badge %}<span class="badge text-bg-warning ms-auto">{{ item.badge }}</span>{% endif %}</a></div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endfor %}
+      <div class="pb-3"></div>
+    </div>
+    <div class="d-none d-lg-flex flex-wrap align-items-center column-gap-3 row-gap-1 small">
       <a href="{% url 'studio:course_list' %}" class="studio-nav-link{% if section == 'courses' %} active{% endif %}"{% if section == 'courses' %} aria-current="page"{% endif %}><i class="bi bi-collection-play me-1" aria-hidden="true"></i>Kurslar</a>
       <a href="{% url 'studio:stats' %}" class="studio-nav-link{% if section == 'stats' %} active{% endif %}"{% if section == 'stats' %} aria-current="page"{% endif %}><i class="bi bi-graph-up me-1" aria-hidden="true"></i>İstatistikler</a>
       <div class="dropdown" data-dropdown>
