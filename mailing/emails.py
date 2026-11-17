@@ -226,8 +226,26 @@ EMAILS = {
     "admin_new_order": _email(
         "Yeni satış (yönetici)",
         "Yönetici",
-        "Ödeme onaylanınca yöneticiye özet.",
-        {**COMMON_VARIABLES, **ITEM_VARIABLES, "admin_url": "Siparişin admin sayfası"},
+        "Ödeme onaylanınca (hediye siparişi hariç) tüm personele (is_staff) özet; alıcının ad ve e-postası, ürünler, tutar.",
+        {**COMMON_VARIABLES, **ITEM_VARIABLES, "admin_url": "Siparişin stüdyo sayfası"},
+        recipient="admin",
+    ),
+    "admin_personal_discount": _email(
+        "İndirim kodu istendi (yönetici)",
+        "Yönetici",
+        "Kişiye özel indirim kodu isteyene kod gönderilince (yeni ya da hâlâ geçerli kod) tüm personele (is_staff) bildirim.",
+        {
+            "email": "İsteyen e-posta",
+            "full_name": "Üyeyse ad soyad (yoksa boş)",
+            "is_member": "İsteyen bir hesaba bağlıysa True",
+            "audience": "Beyan (Öğrenci / Çalışan)",
+            "code": "Gönderilen kod",
+            "discount_label": "İndirim (ör. %50, ₺3.490)",
+            "valid_until": "Son kullanma zamanı",
+            "resent": "Geçerli kod yeniden mi gönderildi",
+            "requested_at": "İstek zamanı",
+            "studio_url": "Stüdyo → Kişiye özel indirim, bu e-postanın istekleri",
+        },
         recipient="admin",
     ),
     "admin_review_pending": _email(
@@ -337,6 +355,25 @@ def send_email(key, to, context, user=None, batch=None, from_email=None, reply_t
         raise
     log.mark_sent()
     return message
+
+
+def send_staff_email(key, context):
+    """Yönetici bildirimini tüm personele (User.objects.staff()) ayrı ayrı gönderir; birine gönderilemezse diğerlerine
+    yine gider (hata EmailLog'a ve loga yazılır). Gönderilen adres sayısını döner."""
+    import logging
+
+    sent, seen = 0, set()
+    for staff in get_user_model().objects.staff().order_by("pk"):
+        address = staff.email.strip().lower()
+        if address in seen:
+            continue
+        seen.add(address)
+        try:
+            send_email(key, staff.email, context, user=staff)
+            sent += 1
+        except Exception:
+            logging.getLogger(__name__).exception("Personel bildirimi gönderilemedi (%s, %s)", key, staff.email)
+    return sent
 
 
 def send_batch(key, recipients, subject="", batch=None):
@@ -466,7 +503,17 @@ def sample_context(key):
             "message_text": "React kursunda 3. bölümdeki videolar açılmıyor.",
             "studio_url": f"{site}/studio/support/ornek/",
         },
-        "admin_new_order": {"admin_url": f"{site}/admin/order/order/"},
+        "admin_new_order": {"admin_url": f"{site}/studio/orders/ornek/"},
+        "admin_personal_discount": {
+            "is_member": False,
+            "audience": "Öğrenci",
+            "code": "SPCK7M2QX",
+            "discount_label": "%50",
+            "valid_until": when,
+            "resent": False,
+            "requested_at": when,
+            "studio_url": f"{site}/studio/personal-discounts/?q=ayse%40example.com",
+        },
         "admin_review_pending": {
             "reviewer_name": "Ayşe Y.",
             "rating": 4,

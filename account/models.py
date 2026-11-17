@@ -26,6 +26,10 @@ class UserQuerySet(models.QuerySet):
     def with_email(self, email):
         return self.filter(email__iexact=email.strip())
 
+    def staff(self):
+        """Personel (is_staff), e-postası olan etkin hesaplar: satış ve indirim kodu isteği bildirimlerinin alıcıları."""
+        return self.filter(is_staff=True, is_active=True).exclude(email="")
+
     def with_password(self):
         return self.filter(PASSWORD_SET)
 

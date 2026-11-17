@@ -1,0 +1,11 @@
+{% extends "emails/base.txt" %}
+{% block content %}{% if full_name %}{{ full_name }} ({{ email }}){% else %}{{ email }}{% endif %}{% if is_member %} (üye){% endif %} kişiye özel indirim kodu istedi{% if requested_at %} · {{ requested_at|date:"j F Y, H:i" }}{% endif %}.
+{% if resent %}Daha önce verilen ve hâlâ geçerli olan kod yeniden gönderildi.{% else %}Yeni kod üretilip gönderildi.{% endif %}
+
+Beyan: {{ audience }}
+Kod: {{ code }}
+İndirim: {{ discount_label }}{% if valid_until %}
+Son kullanma: {{ valid_until|date:"j F Y, H:i" }}{% endif %}
+
+Stüdyo'da gör: {{ studio_url }}{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

@@ -222,7 +222,7 @@ class Order(BaseModel):
         alma onayı e-postası gider (iyzico ödemesi, stüdyoda havale onayı, admin; Podia aktarımı bunu kullanmaz). Hediye siparişte
         kayıtların kaynağı "Hediye"dir ve onay e-postası gitmez."""
         from learning.models import Enrollment, EnrollmentSource
-        from order.tasks import send_purchase_confirmation
+        from order.tasks import notify_staff_new_order, send_purchase_confirmation
 
         if self.is_paid:
             return
@@ -257,6 +257,7 @@ class Order(BaseModel):
                 self.cart.mark_converted()
             if not self.is_gift:
                 transaction.on_commit(partial(send_purchase_confirmation.delay, str(self.pk)))
+                transaction.on_commit(partial(notify_staff_new_order.delay, str(self.pk)))
 
     def apply_card_result(self, success, amount, reference):
         """Kartla ödemenin sonucu (iyzico callback'i ya da webhook'u); aynı sonuç birden çok gelebilir. Yalnız bekleyen ya da başarısız sipariş

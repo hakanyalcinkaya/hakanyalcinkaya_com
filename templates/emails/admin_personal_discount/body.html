@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}İndirim kodu istendi.{% endblock %}
+{% block preheader %}{{ email }} · {{ audience }} · {{ discount_label }}{% endblock %}
+{% block eyebrow %}Yönetici · Kişiye özel indirim{% endblock %}
+{% block heading %}İndirim kodu {% if resent %}yeniden {% endif %}gönderildi.{% endblock %}
+{% block content %}
+<p style="margin: 0 0 14px;"><strong>{% if full_name %}{{ full_name }}</strong> ({{ email }}){% else %}{{ email }}</strong>{% endif %}{% if is_member %} (üye){% endif %} kişiye özel indirim kodu istedi{% if requested_at %} · {{ requested_at|date:"j F Y, H:i" }}{% endif %}. {% if resent %}Daha önce verilen ve hâlâ geçerli olan kod yeniden gönderildi.{% else %}Yeni kod üretilip gönderildi.{% endif %}</p>
+<p style="margin: 0 0 14px;">Beyan: <strong>{{ audience }}</strong><br>Kod: <strong style="font-family: monospace;">{{ code }}</strong><br>İndirim: <strong>{{ discount_label }}</strong>{% if valid_until %}<br>Son kullanma: {{ valid_until|date:"j F Y, H:i" }}{% endif %}</p>
+{% include "emails/modules/button.html" with url=studio_url label="Stüdyo'da gör" %}
+{% endblock %}
+{% block footer %}Yönetici bildirimi.{% endblock %}

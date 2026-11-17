@@ -321,7 +321,7 @@ class PersonalDiscountRequest(BaseVisitorEvent):
         """İsteği kurala göre sonuçlandırır ve kaydeder. Bu e-postaya daha önce verilen kod hâlâ kullanılabiliyorsa o kod
         yeniden gönderilir; süresi dolmuş ya da kullanılmışsa kural izin veriyorsa yeni kod üretilir, vermiyorsa istek
         reddedilir. Gönderim (Celery) kayıt veritabanına yazılınca başlar."""
-        from discount.tasks import send_personal_discount
+        from discount.tasks import notify_staff_personal_discount, send_personal_discount
 
         email = email.strip()
         last = cls.objects.for_email(email).filter(discount__isnull=False).select_related("discount").order_by("-created_at").first()
@@ -336,4 +336,5 @@ class PersonalDiscountRequest(BaseVisitorEvent):
         request = cls.objects.create(email=email, user=user, audience=audience, rule=rule, discount=discount, result=result, data=data or {})
         if request.is_sent:
             transaction.on_commit(lambda: send_personal_discount.delay(str(request.pk)))
+            transaction.on_commit(lambda: notify_staff_personal_discount.delay(str(request.pk)))
         return request
