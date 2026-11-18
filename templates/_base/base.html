@@ -56,7 +56,8 @@
 <dialog class="hy-site-dialog" id="site-dialog" aria-labelledby="site-dialog-title"><div id="site-dialog-body"></div></dialog>
 {# Çıkış niyeti: giriş yapmamış ziyaretçi siteden çıkmaya yönelince "sana özel indirim kodu" penceresi (site.js, page:exit_offer). #}
 {# Pencere bir kez kapatılınca sağ alt köşede kalan ikon onu yeniden açar. Yalnız giriş yapmamış ziyaretçide. #}
-{% if exit_offer and not coupon %}<dialog class="hy-site-dialog hy-exit-dialog" id="exit-offer" data-exit-offer="{% url 'page:exit_offer' %}"{% if exit_offer_manual %} data-exit-manual{% endif %} aria-labelledby="exit-offer-title"><div id="exit-offer-body"></div></dialog>
+{# data-exit-now: sayfa açılınca pencere hemen gösterilir (sepetten kurs çıkarılınca). #}
+{% if exit_offer and not coupon %}<dialog class="hy-site-dialog hy-exit-dialog" id="exit-offer" data-exit-offer="{% url 'page:exit_offer' %}"{% if exit_offer_manual %} data-exit-manual{% endif %}{% if exit_offer_now %} data-exit-now{% endif %} aria-labelledby="exit-offer-title"><div id="exit-offer-body"></div></dialog>
 <button type="button" class="btn btn-primary rounded-circle shadow d-inline-flex align-items-center justify-content-center hy-exit-fab" data-exit-reopen{% if not exit_offer_seen and not exit_offer_manual or not exit_offer_seen and not personal_discount_open %} hidden{% endif %} aria-label="Sana özel indirim kodu" title="Sana özel indirim kodu"><i class="bi bi-gift fs-5" aria-hidden="true"></i></button>{% endif %}
 {% include "_base/consent.html" %}
 <script src="{% static 'js/htmx.min.js' %}"></script>

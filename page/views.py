@@ -620,6 +620,8 @@ def cart(request):
             "steps": purchase_steps(0),
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,
+            # Sepetten kurs çıkarılınca "sana özel indirim kodu" penceresi kendiliğinden açılır (base.html, site.js).
+            "exit_offer_now": removed is not None and removed not in items,
             "suggestions": [card for card in cards if card["slug"] not in in_cart and not card["owned"]],
             "checkout_open": True,
             "coupon_form": coupon_form,

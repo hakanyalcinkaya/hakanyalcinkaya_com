@@ -1100,6 +1100,14 @@
       store("sessionStorage", EXIT_KEY, "1");
       openExitOffer();
     };
+    // Sepetten kurs çıkarılınca (data-exit-now) pencere, sepet sayfası ve oturumda daha önce açılmış olsa da gösterilir.
+    if (exitDialog.hasAttribute("data-exit-now")) {
+      exitFired = true;
+      store("sessionStorage", EXIT_KEY, "1");
+      window.setTimeout(function () {
+        if (!document.querySelector("dialog[open]")) openExitOffer();
+      }, 600);
+    }
     if (exitReopen) {
       exitReopen.addEventListener("click", function () {
         exitFired = true;
