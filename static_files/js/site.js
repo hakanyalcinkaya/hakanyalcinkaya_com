@@ -1056,15 +1056,20 @@
     if (reopenSeen && !exitDialog.hasAttribute("data-exit-manual")) store("localStorage", EXIT_CLOSED_KEY, "1");
     showReopen(reopenSeen || Boolean(store("localStorage", EXIT_CLOSED_KEY)));
     // İkon, alttaki sabit çubukların (mobil satın alma çubuğu, ders çubuğu, çerez bandı) üstünde durur: görünenlerin
-    // yüksekliği kadar yukarı kalkar (--hy-fab-lift).
+    // yüksekliği kadar yukarı kalkar (--hy-fab-lift). Çerez bandında yalnız ortalanmış kart sayılır; kart ikonun
+    // altına denk gelmiyorsa (geniş ekran) ikon sağ alt köşede kalır.
     if (exitReopen) {
       var bottomBars = Array.prototype.slice.call(document.querySelectorAll(".fixed-bottom, [data-consent]"));
       var liftReopen = function () {
         var lift = 0;
+        var fabLeft = window.innerWidth - exitReopen.offsetWidth - 16;
         bottomBars.forEach(function (bar) {
           if (!bar.getClientRects().length) return;
-          var rect = bar.getBoundingClientRect();
-          if (rect.bottom >= window.innerHeight - 2) lift = Math.max(lift, window.innerHeight - rect.top);
+          var box = bar.hasAttribute("data-consent") ? bar.querySelector(".card") || bar : bar;
+          var rect = box.getBoundingClientRect();
+          if (rect.right <= fabLeft) return;
+          var barRect = bar.getBoundingClientRect();
+          if (barRect.bottom >= window.innerHeight - 2) lift = Math.max(lift, window.innerHeight - rect.top);
         });
         exitReopen.style.setProperty("--hy-fab-lift", Math.max(Math.round(lift), 0) + "px");
       };
