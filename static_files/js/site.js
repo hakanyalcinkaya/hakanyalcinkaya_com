@@ -288,9 +288,12 @@
       var cart = carousel.querySelector("[data-hero-cart]");
       cart.form.action = current.getAttribute("data-cart");
       cart.setAttribute("aria-label", current.getAttribute("data-cart-label"));
-      // Sahip olunan kursta sepet düğmesi ve fiyat gizlenir, "Kurslarında" görünür.
+      // Sahip olunan kursta sepet düğmesi ve fiyat gizlenir, "Kurslarında" görünür. Sepetteki kursta sepete ekleme
+      // yerine sepete bağlantı görünür.
       var owned = current.getAttribute("data-owned") === "1";
-      cart.form.classList.toggle("d-none", owned);
+      var inCart = !owned && current.getAttribute("data-in-cart") === "1";
+      cart.form.classList.toggle("d-none", owned || inCart);
+      carousel.querySelector("[data-hero-in-cart]").classList.toggle("d-none", !inCart);
       carousel.querySelector("[data-hero-price-box]").classList.toggle("d-none", owned);
       carousel.querySelector("[data-hero-owned]").classList.toggle("d-none", !owned);
       carousel.querySelector("[data-hero-inspect-label]").textContent = owned ? "Kursa git" : "Kursu İncele";
