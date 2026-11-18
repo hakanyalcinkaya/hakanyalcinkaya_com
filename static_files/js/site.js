@@ -1071,13 +1071,16 @@
           var box = bar.hasAttribute("data-consent") ? bar.querySelector(".card") || bar : bar;
           var rect = box.getBoundingClientRect();
           if (rect.right <= fabLeft) return;
-          var barRect = bar.getBoundingClientRect();
-          if (barRect.bottom >= window.innerHeight - 2) lift = Math.max(lift, window.innerHeight - rect.top);
+          // Çubuk ikonun köşedeki yerine denk geliyorsa ikon üstüne çıkar; sayfayla birlikte yukarı kayıp o yeri
+          // boşaltınca (ders sayfası yan paneli) ikon köşeye döner.
+          var cornerTop = window.innerHeight - 16 - exitReopen.offsetHeight;
+          if (rect.bottom > cornerTop && rect.top < window.innerHeight) lift = Math.max(lift, window.innerHeight - rect.top);
         });
         exitReopen.style.setProperty("--hy-fab-lift", Math.max(Math.round(lift), 0) + "px");
       };
       liftReopen();
       window.addEventListener("resize", liftReopen, { passive: true });
+      window.addEventListener("scroll", liftReopen, { passive: true });
       if (window.MutationObserver) {
         var barObserver = new MutationObserver(liftReopen);
         bottomBars.forEach(function (bar) {
