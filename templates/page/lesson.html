@@ -281,7 +281,8 @@
           {% endif %}
         </div>
         {% if preview %}
-        <div class="border-top p-3 d-none d-lg-block flex-shrink-0">
+        {# data-fab-bar: sağ alttaki hediye ikonu bu satın alma satırının üstünde durur (site.js). #}
+        <div class="border-top p-3 d-none d-lg-block flex-shrink-0" data-fab-bar>
           <div class="d-flex align-items-center gap-3">
             <div class="lh-sm"><div class="fw-semibold fs-5">{% if course.coupon %}<span class="visually-hidden">İndirimli fiyat: </span>{{ course.coupon.price }} <s class="small fw-normal text-body-tertiary"><span class="visually-hidden">Fiyat: </span>{{ course.price }}</s> <span class="small fw-normal text-success-emphasis"><i class="bi bi-tag-fill" aria-hidden="true"></i> {{ course.coupon.code }}</span>{% else %}{{ course.price }}{% endif %}</div><div class="small text-body-tertiary">{{ total }} ders · {{ course.duration }}</div></div>
             <a href="{{ course.buy_url }}" class="btn btn-primary flex-grow-1"><span class="d-none d-xxl-inline">Kursu Hemen </span>Satın Al</a>

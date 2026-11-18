@@ -1058,11 +1058,11 @@
     var reopenSeen = Boolean(exitReopen && !exitReopen.hidden);
     if (reopenSeen && !exitDialog.hasAttribute("data-exit-manual")) store("localStorage", EXIT_CLOSED_KEY, "1");
     showReopen(reopenSeen || Boolean(store("localStorage", EXIT_CLOSED_KEY)));
-    // İkon, alttaki sabit çubukların (mobil satın alma çubuğu, ders çubuğu, çerez bandı) üstünde durur: görünenlerin
+    // İkon, alttaki sabit çubukların (mobil satın alma çubuğu, ders çubuğu, ders sayfası yan panelindeki satın alma satırı, çerez bandı) üstünde durur: görünenlerin
     // yüksekliği kadar yukarı kalkar (--hy-fab-lift). Çerez bandında yalnız ortalanmış kart sayılır; kart ikonun
     // altına denk gelmiyorsa (geniş ekran) ikon sağ alt köşede kalır.
     if (exitReopen) {
-      var bottomBars = Array.prototype.slice.call(document.querySelectorAll(".fixed-bottom, [data-consent]"));
+      var bottomBars = Array.prototype.slice.call(document.querySelectorAll(".fixed-bottom, [data-consent], [data-fab-bar]"));
       var liftReopen = function () {
         var lift = 0;
         var fabLeft = window.innerWidth - exitReopen.offsetWidth - 16;
