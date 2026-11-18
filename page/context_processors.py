@@ -53,7 +53,8 @@ def site(request):
     course_list_url = reverse("page:course_list")
     user = request.user
     cards = content.catalog_cards(user)
-    cart_count = len(content.cart_cards(request, cards))
+    cart_items = content.cart_cards(request, cards)
+    cart_count = len(cart_items)
     # Ana sayfa dışındaki sayfada menüde bulunulan bölüm sunucuda işaretlenir; ana sayfada kaydırdıkça site.js işaretler.
     url_name = request.resolver_match.url_name if request.resolver_match else ""
     current_nav = NAV_PAGES.get(url_name, "")
@@ -96,6 +97,8 @@ def site(request):
         "show_explore": not user.is_authenticated,
         "cart_url": reverse("page:cart"),
         "cart_count": cart_count,
+        # Sepetteki kursların slug'ları: sepette olan kursta "Sepete Ekle" yerine "Sepete git" (buy_actions, kurs kartları).
+        "cart_slugs": {card["slug"] for card in cart_items},
         # Geçerli indirim kodunun düşürdüğü kurs fiyatları (content.coupon_prices); kartlarda course|coupon_price:coupon ile.
         "coupon": SimpleLazyObject(lambda: content.coupon_prices(request)),
         # Kod şeridi: kodun kendi kutusunda göründüğü sayfalarda (sepet, ödeme, kurs, ders) gösterilmez.

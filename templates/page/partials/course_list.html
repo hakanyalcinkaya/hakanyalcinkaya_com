@@ -60,7 +60,7 @@
               {% else %}
               <div class="fs-3 fw-semibold lh-1">{% include "components/price.html" %}</div>
               <div class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
-                <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></button></form>
+                {% if course.slug in cart_slugs %}<a href="{{ cart_url }}" class="btn btn-outline-secondary btn-lg fs-6" aria-label="Sepete git"><i class="bi bi-bag-check me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Git</span></a>{% else %}<form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-lg fs-6" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus me-sm-2" aria-hidden="true"></i><span class="d-none d-sm-inline">Sepete Ekle</span></button></form>{% endif %}
                 <a href="{{ course.url }}" class="btn btn-primary btn-lg fs-6 flex-grow-1">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
               </div>
               {% endif %}

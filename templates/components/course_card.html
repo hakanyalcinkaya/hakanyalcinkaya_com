@@ -24,7 +24,7 @@
       {% if course.continue_url %}<a href="{{ course.continue_url }}" class="btn btn-primary"><i class="bi bi-play-fill me-1" aria-hidden="true"></i>Devam et</a>{% endif %}
       <a href="{{ course.url }}" class="btn {% if course.continue_url %}btn-outline-secondary{% else %}btn-primary{% endif %}"><i class="bi bi-play-circle me-1" aria-hidden="true"></i>Kursa git</a>
       {% else %}
-      <form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>
+      {% if course.slug in cart_slugs %}<a href="{{ cart_url }}" class="btn btn-outline-secondary" aria-label="Sepete git" title="Sepette"><i class="bi bi-bag-check" aria-hidden="true"></i></a>{% else %}<form method="post" action="{{ course.cart_url }}" class="d-flex">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary" aria-label="{{ course.cart_label }}"><i class="bi bi-bag-plus" aria-hidden="true"></i></button></form>{% endif %}
       <a href="{{ course.url }}" class="btn btn-primary">Kursu İncele <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
       {% endif %}
     </div>
