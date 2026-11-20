@@ -11,6 +11,10 @@ from django.core.cache import caches
 
 logger = logging.getLogger(__name__)
 
+# Ziyaretçinin yazdığı adrese giden her e-posta türü (şifre sıfırlama, özel indirim kodu, bülten onayı): adres başına
+# günde en çok 5; başkasının kutusuna e-posta yağdırılmasın.
+EMAIL_DAILY_LIMIT = (5, 24 * 60 * 60)
+
 
 def key(scope, value):
     """Önbellek anahtarı; e-posta gibi kişisel değer açık yazılmaz."""
@@ -28,3 +32,8 @@ def allow(scope, value, limit, seconds):
     except Exception as error:  # noqa: BLE001 — önbellek yoksa sınırlama atlanır
         logger.warning("İstek sınırı uygulanamadı (%s): %s", scope, error)
         return True
+
+
+def allow_email(scope, email):
+    """Bu adrese bu türden e-posta isteğini sayar; günlük sınırı (EMAIL_DAILY_LIMIT) aşmadıysa True."""
+    return allow(scope, email, *EMAIL_DAILY_LIMIT)

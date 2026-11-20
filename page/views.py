@@ -82,14 +82,9 @@ from page.forms import (
 logger = logging.getLogger(__name__)
 
 
-# Bülten aboneliği sınırı: IP başına saatte, e-posta başına günde (başkasının kutusuna onay e-postası yağdırılmasın).
+# IP başına saatlik istek sınırları. Adres başına sınır her e-posta türünde aynıdır: günde 5 (ratelimit.allow_email).
 NEWSLETTER_IP_LIMIT = (5, 60 * 60)
-NEWSLETTER_EMAIL_LIMIT = (3, 24 * 60 * 60)
-# Özel indirim kodu isteği sınırı: IP başına saatte, e-posta başına saatte.
 PERSONAL_DISCOUNT_IP_LIMIT = (10, 60 * 60)
-PERSONAL_DISCOUNT_EMAIL_LIMIT = (3, 60 * 60)
-# Hesap ayarlarından kendi adresine şifre sıfırlama bağlantısı: kullanıcı başına saatte 3.
-SETTINGS_RESET_LINK_LIMIT = (3, 60 * 60)
 
 
 def _newsletter(request):
@@ -97,7 +92,7 @@ def _newsletter(request):
         form = NewsletterForm(request.POST)
         if form.is_valid() and not (
             ratelimit.allow("newsletter-ip", client_ip(request), *NEWSLETTER_IP_LIMIT)
-            and ratelimit.allow("newsletter-email", form.cleaned_data["email"], *NEWSLETTER_EMAIL_LIMIT)
+            and ratelimit.allow_email("newsletter-email", form.cleaned_data["email"])
         ):
             form.add_error(None, "Çok fazla abonelik isteği geldi; lütfen bir süre sonra tekrar dene.")
         if form.is_valid():
@@ -534,9 +529,9 @@ def personal_discount(request):
         email = form.cleaned_data["email"]
         if not (
             ratelimit.allow("personal-discount-ip", client_ip(request), *PERSONAL_DISCOUNT_IP_LIMIT)
-            and ratelimit.allow("personal-discount-email", email, *PERSONAL_DISCOUNT_EMAIL_LIMIT)
+            and ratelimit.allow_email("personal-discount-email", email)
         ):
-            messages.error(request, "Çok fazla istek geldi; biraz sonra yeniden dene.")
+            messages.error(request, "Bu adres için bugün çok fazla istek geldi; gelen kutunu kontrol et ya da yarın yeniden dene.")
             return redirect("page:personal_discount")
         user = request.user if member else User.objects.with_email(email).first()
         sent = PersonalDiscountRequest.handle(form.rule, email, form.cleaned_data["audience"], user=user, data=collect(request, user))
@@ -833,6 +828,9 @@ def signup(request):
 @anonymous_required
 def password_reset(request):
     form = PasswordResetForm(request.POST if request.method == "POST" else None, remote_ip=client_ip(request))
+    # Adres başına günlük sınır hesap olsun olmasın sayılır; yanıt adresin kayıtlı olup olmadığını ele vermez.
+    if form.is_valid() and not ratelimit.allow_email("password-reset-email", form.cleaned_data["email"]):
+        form.add_error(None, "Bu adrese bugün çok fazla sıfırlama bağlantısı istendi; gelen kutunu kontrol et ya da yarın yeniden dene.")
     if form.is_valid():
         form.send_link(request)
         request.session[RESET_SESSION_KEY] = form.cleaned_data["email"]
@@ -900,11 +898,12 @@ def account_settings(request):
     url = reverse("page:account_settings")
     if request.method == "POST" and action == "reset_link":
         # Şifresini unutan ama oturumu açık kullanıcı: "Şifremi unuttum" sayfası yalnız girişsize açık olduğu için bağlantı buradan.
-        if ratelimit.allow("settings-reset-link", user.pk, *SETTINGS_RESET_LINK_LIMIT):
+        # "Şifremi unuttum" ile aynı sayaç: adrese iki yoldan toplam günde 5 bağlantı.
+        if ratelimit.allow_email("password-reset-email", user.email):
             PasswordResetForm.send_to(request, user.email)
             messages.success(request, f"Şifre sıfırlama bağlantısı {user.email} adresine gönderildi; {_reset_valid_for()} geçerli.")
         else:
-            messages.info(request, "Kısa süre önce bağlantı gönderildi; gelen kutunu ve istenmeyen e-postaları kontrol et.")
+            messages.info(request, "Bugün çok fazla bağlantı istendi; gelen kutunu ve istenmeyen e-postaları kontrol et ya da yarın yeniden dene.")
         return redirect(f"{url}#password")
     if request.method == "POST" and action in SETTINGS_FORMS:
         form_class, message = SETTINGS_FORMS[action]
