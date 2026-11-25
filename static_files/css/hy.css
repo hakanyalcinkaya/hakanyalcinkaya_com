@@ -409,6 +409,11 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-offer-tear::before{top:-13px}
 .hy-offer-tear::after{bottom:-13px}
 .hy-offer-form{flex:0 0 26rem}
+.hy-offer-code summary{display:flex;align-items:center;list-style:none;cursor:pointer}
+.hy-offer-code summary::-webkit-details-marker{display:none}
+.hy-offer-code summary .bi-chevron-down{transition:transform .2s}
+.hy-offer-code[open] summary .bi-chevron-down{transform:rotate(180deg)}
+.hy-offer-code{border-top-color:rgba(var(--bs-primary-rgb),.25)!important}
 .hy-offer-seg .btn{--bs-btn-padding-y:.5rem}
 .hy-offer-seg .btn-check:checked+.btn{background:rgba(var(--bs-primary-rgb),.18);border-color:rgba(var(--bs-primary-rgb),.7);color:var(--bs-body-color)}
 @media (max-width:991.98px){.hy-offer-ticket{flex-direction:column}.hy-offer-tear{border-left:0;border-top:2px dashed rgba(var(--bs-primary-rgb),.45)}.hy-offer-tear::after{top:-13px;bottom:auto;left:auto;right:-13px}.hy-offer-form{flex:none}}
