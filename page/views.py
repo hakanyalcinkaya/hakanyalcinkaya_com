@@ -37,6 +37,7 @@ from order import iyzico
 from order.models import Order
 from page import content
 from page.catalog import (
+    CART_OFFER_SEEN_SESSION_KEY,
     EXIT_OFFER_SEEN_SESSION_KEY,
     NEWSLETTER_SESSION_KEY,
     ORDERS_SESSION_KEY,
@@ -623,17 +624,30 @@ def cart(request):
     removed = content.card_by_slug(request.GET.get("removed", ""), cards=cards)
     in_cart = {item["slug"] for item in items}
     summary = content.order_summary(items, current_cart(request))
+    offer_form = _cart_offer_form(request, summary)
+    exit_offer_now = removed is not None and removed not in items
+    # Bant teklifinin penceresi sepete ilk gelişte bir kez açılır (site.js); kurs çıkarılınca açılan pencereyle ve
+    # geçersiz indirim kodu yanıtıyla çakışmaz.
+    offer_popup = (
+        offer_form is not None
+        and action is None
+        and not exit_offer_now
+        and not request.session.get(CART_OFFER_SEEN_SESSION_KEY)
+    )
+    if offer_popup:
+        request.session[CART_OFFER_SEEN_SESSION_KEY] = True
     return render(
         request,
         "page/cart.html",
         {
             "summary": summary,
-            "offer_form": _cart_offer_form(request, summary),
+            "offer_form": offer_form,
+            "offer_popup": offer_popup,
             "steps": purchase_steps(0),
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,
             # Sepetten kurs çıkarılınca "sana özel indirim kodu" penceresi kendiliğinden açılır (base.html, site.js).
-            "exit_offer_now": removed is not None and removed not in items,
+            "exit_offer_now": exit_offer_now,
             "suggestions": [card for card in cards if card["slug"] not in in_cart and not card["owned"]],
             "checkout_open": True,
             "coupon_form": coupon_form,

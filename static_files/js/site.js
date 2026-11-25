@@ -1026,6 +1026,20 @@
   // ikisinde başka sekmeye geçip dönünce de. Kendiliğinden tarayıcı oturumu boyunca (sekme kapanana dek) bir kez açılır.
   // Pencere bir kez açılınca (kapatılsa da, içindeki bağlantıyla başka sayfaya gidilse de) sağ alt köşede ikon kalır;
   // ikona basınca pencere yeniden açılır. İkon, indirim kodu e-postayla gönderilene dek (body[data-exit-offer-sent]) kalır.
+  // Sepete ilk gelişte "sana özel indirim kodu" penceresi (cart_offer_dialog.html) kendiliğinden açılır; sunucu pencereyi
+  // oturumda yalnız bir kez gönderir. Kapatınca teklif sepetin üstündeki bantta kalır.
+  var cartOffer = document.getElementById("cart-offer");
+  if (cartOffer && cartOffer.showModal) {
+    document.documentElement.classList.add("hy-dialog-open");
+    cartOffer.showModal();
+    cartOffer.addEventListener("click", function (event) {
+      if (event.target === cartOffer || event.target.closest("[data-dialog-close]")) cartOffer.close();
+    });
+    cartOffer.addEventListener("close", function () {
+      document.documentElement.classList.remove("hy-dialog-open");
+    });
+  }
+
   if (document.body.hasAttribute("data-exit-offer-sent")) {
     try {
       window.localStorage.removeItem("hy-exit-offer-closed");

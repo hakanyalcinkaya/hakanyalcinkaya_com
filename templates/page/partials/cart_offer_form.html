@@ -1,0 +1,16 @@
+{# Sepetteki "sana özel indirim kodu" formu: bantta (cart_offer.html) ve sepete ilk gelişte açılan pencerede (cart_offer_dialog.html). Kod isteme sayfasına (page:personal_discount) gönderilir, sonuç mesajıyla sepete dönülür; alanlar zorunlu olduğundan boş gönderimi tarayıcı durdurur. prefix: alan id'lerinin öneki (sayfada iki kopya olabilir); note_class: alttaki kısa notun görünürlük sınıfı. #}
+<form method="post" action="{% url 'page:personal_discount' %}" class="d-grid gap-2">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{% url 'page:cart' %}">
+  <label for="{{ prefix }}-eposta" class="visually-hidden">E-posta adresin</label>
+  <input type="email" name="{{ offer_form.email.html_name }}" id="{{ prefix }}-eposta" class="form-control form-control-lg fs-6" placeholder="E-posta adresin" autocomplete="email" inputmode="email" required>
+  <div class="btn-group w-100 hy-offer-seg" role="radiogroup" aria-label="Öğrenci misin, çalışan mı?">
+    {% for button in offer_form.audience_buttons %}
+    <input type="radio" class="btn-check" name="{{ offer_form.audience.html_name }}" value="{{ button.value }}" id="{{ prefix }}-{{ button.value }}" required{% if button.checked %} checked{% endif %}>
+    <label class="btn btn-outline-secondary" for="{{ prefix }}-{{ button.value }}"><i class="bi {{ button.icon }} me-1" aria-hidden="true"></i>{{ button.label }}</label>
+    {% endfor %}
+  </div>
+  {% if offer_form.uses_turnstile %}<div class="cf-turnstile" data-sitekey="{{ offer_form.turnstile_site_key }}" data-theme="auto" data-language="tr" data-size="flexible"></div>{% endif %}
+  <button type="submit" class="btn btn-primary btn-lg fs-6 fw-semibold">İndirim kodumu gönder <i class="bi bi-send ms-1" aria-hidden="true"></i></button>
+  <p class="small text-body-tertiary {{ note_class }} mb-0">Üye olman gerekmez · tek kullanımlık · {{ offer_form.valid_days }} gün geçerli</p>
+</form>

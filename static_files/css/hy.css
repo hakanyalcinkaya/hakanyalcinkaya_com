@@ -401,13 +401,13 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-marquee-card blockquote{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-size:.9375rem}
 @keyframes hy-marquee{to{transform:translateX(calc(-50% - .5rem))}}
 @media (prefers-reduced-motion:reduce){.hy-marquee-track{animation:none}.hy-marquee{overflow-x:auto}}
-/* Sepetteki "sana özel indirim kodu" bandı (cart_offer.html): bilet görünümü; teklif ile form arasında kesik çizgi ve iki çentik. Dar ekranda form teklifin altına iner, çentikler yanlara geçer. */
-.hy-offer-ticket{display:flex;overflow:hidden;background:linear-gradient(135deg,rgba(var(--bs-primary-rgb),.16),rgba(var(--bs-primary-rgb),.04));border:1px solid rgba(var(--bs-primary-rgb),.45);border-radius:var(--bs-border-radius-lg)}
+/* Sepetteki "sana özel indirim kodu" bandı (cart_offer.html): bilet görünümü; teklif ile form arasında kesik çizgi ve iki çentik. Çentik, bandın kenar çizgisinin üstüne oturan sayfa rengi dairedir; yalnız içe bakan yarısı çizilir (clip-path), böylece kenar çizgisi çentikte kesilir ve yay olarak içeri döner. Dar ekranda form teklifin altına iner, çentikler yanlara geçer. */
+.hy-offer-ticket{display:flex;background:linear-gradient(135deg,rgba(var(--bs-primary-rgb),.16),rgba(var(--bs-primary-rgb),.04));border:1px solid rgba(var(--bs-primary-rgb),.45);border-radius:var(--bs-border-radius-lg)}
 .hy-offer-icon{width:3rem;height:3rem}
 .hy-offer-tear{position:relative;flex:none;border-left:2px dashed rgba(var(--bs-primary-rgb),.45)}
 .hy-offer-tear::before,.hy-offer-tear::after{content:"";position:absolute;left:-13px;width:24px;height:24px;border-radius:50%;background:var(--bs-body-bg);border:1px solid rgba(var(--bs-primary-rgb),.45)}
-.hy-offer-tear::before{top:-13px}
-.hy-offer-tear::after{bottom:-13px}
+.hy-offer-tear::before{top:-13px;clip-path:inset(50% 0 0 0)}
+.hy-offer-tear::after{bottom:-13px;clip-path:inset(0 0 50% 0)}
 .hy-offer-form{flex:0 0 26rem}
 .hy-offer-code summary{display:flex;align-items:center;list-style:none;cursor:pointer}
 .hy-offer-code summary::-webkit-details-marker{display:none}
@@ -415,8 +415,14 @@ h1,h2,h3,.display-4,.display-6{letter-spacing:-.035em;text-wrap:balance}
 .hy-offer-code[open] summary .bi-chevron-down{transform:rotate(180deg)}
 .hy-offer-code{border-top-color:rgba(var(--bs-primary-rgb),.25)!important}
 .hy-offer-seg .btn{--bs-btn-padding-y:.5rem}
+/* Sepete ilk gelişte açılan teklif penceresi (cart_offer_dialog.html): çıkış niyeti penceresinin görünümü, daha dar; telefonda alttan açılan sayfa. */
+.hy-exit-dialog.hy-cart-dialog{width:min(52rem,94vw)}
+.hy-cart-dialog-grab{flex:none;width:2.5rem;height:.25rem;border-radius:1rem;background:var(--bs-border-color);margin:.625rem auto 0}
+@media (max-width:575.98px){.hy-exit-dialog.hy-cart-dialog{width:100vw;max-width:100vw;max-height:92dvh;margin:auto 0 0;border-width:1px 0 0;border-radius:1.25rem 1.25rem 0 0;animation:hy-sheet-in .3s cubic-bezier(.22,.8,.24,1)}}
+@keyframes hy-sheet-in{from{transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){.hy-exit-dialog.hy-cart-dialog{animation:none}}
 .hy-offer-seg .btn-check:checked+.btn{background:rgba(var(--bs-primary-rgb),.18);border-color:rgba(var(--bs-primary-rgb),.7);color:var(--bs-body-color)}
-@media (max-width:991.98px){.hy-offer-ticket{flex-direction:column}.hy-offer-tear{border-left:0;border-top:2px dashed rgba(var(--bs-primary-rgb),.45)}.hy-offer-tear::after{top:-13px;bottom:auto;left:auto;right:-13px}.hy-offer-form{flex:none}}
+@media (max-width:991.98px){.hy-offer-ticket{flex-direction:column}.hy-offer-tear{border-left:0;border-top:2px dashed rgba(var(--bs-primary-rgb),.45)}.hy-offer-tear::before{clip-path:inset(0 0 0 50%)}.hy-offer-tear::after{top:-13px;bottom:auto;left:auto;right:-13px;clip-path:inset(0 50% 0 0)}.hy-offer-form{flex:none}}
 /* Çıkış niyeti penceresini yeniden açan ikon: sağ alt köşe; mobilde alttaki satın alma / ders çubuğunun üstünde durur. */
 .hy-exit-fab{opacity:.9;position:fixed;right:1rem;bottom:calc(var(--hy-fab-lift,0px) + 1rem + env(safe-area-inset-bottom));z-index:1030;width:3.25rem;height:3.25rem;padding:0;animation:hy-fab-in .35s cubic-bezier(.22,.8,.24,1)}
 .hy-exit-fab[hidden]{display:none!important}
