@@ -1,0 +1,32 @@
+{# Sepetteki "sana özel indirim kodu" bandı (views._cart_offer_form): bilet görünümünde teklif ve yanında e-posta + öğrenci / çalışan formu. Form kod isteme sayfasına (page:personal_discount) gönderilir, sonuç mesajıyla sepete dönülür; alanlar zorunlu olduğundan boş gönderimi tarayıcı durdurur. #}
+<section class="hy-offer-ticket mb-4 mb-lg-5" aria-labelledby="sepet-teklif-baslik">
+  <div class="flex-grow-1 p-3 p-sm-4 d-flex gap-3 align-items-start">
+    <span class="d-none d-sm-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white flex-shrink-0 hy-offer-icon"><i class="bi bi-gift fs-5" aria-hidden="true"></i></span>
+    <div>
+      <p class="small fw-semibold text-uppercase text-primary-emphasis mb-2" style="letter-spacing:.12em">Ödemeden önce</p>
+      <h2 id="sepet-teklif-baslik" class="h4 fw-semibold lh-sm mb-2">Bu sepete <span class="text-primary-emphasis">sana özel indirim kodu</span> tanımlayalım mı?</h2>
+      <p class="text-body-secondary small mb-0">Öğrenciysen ya da çalışıyorsan söyle; kodun e-postana gelsin, bağlantıya tıklayınca sepetine kendiliğinden uygulansın.</p>
+      <ul class="list-unstyled d-none d-lg-flex flex-wrap gap-3 small text-body-secondary mt-3 mb-0">
+        <li><i class="bi bi-check-circle-fill text-primary-emphasis me-1" aria-hidden="true"></i>Üye olman gerekmez</li>
+        <li><i class="bi bi-check-circle-fill text-primary-emphasis me-1" aria-hidden="true"></i>Tek kullanımlık</li>
+        <li><i class="bi bi-check-circle-fill text-primary-emphasis me-1" aria-hidden="true"></i>{{ offer_form.valid_days }} gün geçerli</li>
+      </ul>
+    </div>
+  </div>
+  <div class="hy-offer-tear" aria-hidden="true"></div>
+  <form method="post" action="{% url 'page:personal_discount' %}" class="hy-offer-form p-3 p-sm-4 d-grid gap-2 align-content-center">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'page:cart' %}">
+    <label for="sepet-teklif-eposta" class="visually-hidden">E-posta adresin</label>
+    <input type="email" name="{{ offer_form.email.html_name }}" id="sepet-teklif-eposta" class="form-control form-control-lg fs-6" placeholder="E-posta adresin" autocomplete="email" inputmode="email" required>
+    <div class="btn-group w-100 hy-offer-seg" role="radiogroup" aria-label="Öğrenci misin, çalışan mı?">
+      {% for button in offer_form.audience_buttons %}
+      <input type="radio" class="btn-check" name="{{ offer_form.audience.html_name }}" value="{{ button.value }}" id="sepet-teklif-{{ button.value }}" required{% if button.checked %} checked{% endif %}>
+      <label class="btn btn-outline-secondary" for="sepet-teklif-{{ button.value }}"><i class="bi {{ button.icon }} me-1" aria-hidden="true"></i>{{ button.label }}</label>
+      {% endfor %}
+    </div>
+    {% if offer_form.uses_turnstile %}<div class="cf-turnstile" data-sitekey="{{ offer_form.turnstile_site_key }}" data-theme="auto" data-language="tr" data-size="flexible"></div>{% endif %}
+    <button type="submit" class="btn btn-primary btn-lg fs-6 fw-semibold">İndirim kodumu gönder <i class="bi bi-send ms-1" aria-hidden="true"></i></button>
+    <p class="small text-body-tertiary d-lg-none mb-0">Üye olman gerekmez · tek kullanımlık · {{ offer_form.valid_days }} gün geçerli</p>
+  </form>
+</section>

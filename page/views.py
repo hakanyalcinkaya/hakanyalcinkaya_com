@@ -516,7 +516,8 @@ def course_coupon(request, slug):
 def personal_discount(request):
     """Kişiye özel indirim kodu: e-posta ve öğrenci / çalışan beyanıyla kurala göre kod e-postayla gönderilir (yeni ya
     da hâlâ geçerli kod), kural izin vermiyorsa nedeni gösterilir (PersonalDiscountRequest.handle). Geçersiz indirim
-    kodundan sonra buraya yönlendirilir."""
+    kodundan sonra buraya yönlendirilir. Sepetteki bant da buraya gönderir; sonuç mesajıyla sepete (next) dönülür."""
+    done_url = _next_url(request, reverse("page:personal_discount"))
     rules = list(PersonalDiscountRule.objects.published())
     member = request.user.is_authenticated
     form = PersonalDiscountForm(
@@ -532,7 +533,7 @@ def personal_discount(request):
             and ratelimit.allow_email("personal-discount-email", email)
         ):
             messages.error(request, "Bu adres için bugün çok fazla istek geldi; gelen kutunu kontrol et ya da yarın yeniden dene.")
-            return redirect("page:personal_discount")
+            return redirect(done_url)
         user = request.user if member else User.objects.with_email(email).first()
         sent = PersonalDiscountRequest.handle(form.rule, email, form.cleaned_data["audience"], user=user, data=collect(request, user))
         if sent.is_sent:
@@ -540,8 +541,22 @@ def personal_discount(request):
             messages.success(request, f"Sana özel indirim kodunu {email} adresine gönderdik.")
         else:
             messages.error(request, sent.refusal_message)
-        return redirect("page:personal_discount")
+        return redirect(done_url)
     return render(request, "page/personal_discount.html", dict(form=form, available=bool(rules)))
+
+
+def _cart_offer_form(request, summary):
+    """Sepetteki "sana özel indirim kodu" bandının formu (page:personal_discount'a gönderilir): giriş yapmamış, sepetinde
+    kurs olan ve indirim kodu uygulamamış ziyaretçiye, yayında kural varsa. Bu tarayıcıdan kod gönderildiyse çıkmaz."""
+    if (
+        request.user.is_authenticated
+        or not summary["items"]
+        or summary["coupon"]
+        or request.session.get(PERSONAL_DISCOUNT_SENT_SESSION_KEY)
+    ):
+        return None
+    rules = list(PersonalDiscountRule.objects.published())
+    return PersonalDiscountForm(rules=rules, remote_ip=client_ip(request)) if rules else None
 
 
 def exit_offer(request):
@@ -607,11 +622,13 @@ def cart(request):
     added = content.card_by_slug(request.GET.get("added", ""), cards=cards)
     removed = content.card_by_slug(request.GET.get("removed", ""), cards=cards)
     in_cart = {item["slug"] for item in items}
+    summary = content.order_summary(items, current_cart(request))
     return render(
         request,
         "page/cart.html",
         {
-            "summary": content.order_summary(items, current_cart(request)),
+            "summary": summary,
+            "offer_form": _cart_offer_form(request, summary),
             "steps": purchase_steps(0),
             "added_course": added if added in items else None,
             "removed_course": removed if removed not in items else None,

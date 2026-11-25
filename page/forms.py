@@ -540,6 +540,13 @@ class CheckoutForm(StyledForm):
         )
 
 
+# Sepetteki bantta kitle düğmelerinin metni ve ikonu (PersonalDiscountForm.audience_buttons).
+AUDIENCE_BUTTONS = {
+    PersonalAudience.STUDENT: ("Öğrenciyim", "bi-mortarboard"),
+    PersonalAudience.EMPLOYEE: ("Çalışıyorum", "bi-briefcase"),
+}
+
+
 class PersonalDiscountForm(TurnstileMixin, StyledForm):
     """Kişiye özel indirim kodu isteği: e-posta ve öğrenci / çalışan beyanı (yalnız yayındaki kuralların kitleleri)."""
 
@@ -560,6 +567,19 @@ class PersonalDiscountForm(TurnstileMixin, StyledForm):
     @property
     def rule(self):
         return self.rules[self.cleaned_data["audience"]]
+
+    @property
+    def audience_buttons(self):
+        """Sepetteki bantta yan yana iki düğme olarak çizilen kitle seçimi; tek kitle yayındaysa seçili gelir."""
+        choices = self.fields["audience"].choices
+        return [
+            dict(value=value, label=AUDIENCE_BUTTONS[value][0], icon=AUDIENCE_BUTTONS[value][1], checked=len(choices) == 1)
+            for value, label in choices
+        ]
+
+    @property
+    def valid_days(self):
+        return max(rule.valid_days for rule in self.rules.values())
 
 
 class CouponForm(StyledForm):

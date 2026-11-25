@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}Sepetim — Hakan Yalçınkaya{% endblock %}
-{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% include "_base/turnstile_script.html" with form=offer_form %}{% endblock %}
 
 {% block content %}
 <div class="container py-4 py-lg-5">
@@ -24,6 +24,8 @@
     </form>
   </div>
   {% endif %}
+
+  {% if offer_form %}{% include "page/partials/cart_offer.html" %}{% endif %}
 
   {% if summary.items %}
   <div class="row g-4 g-lg-5">

@@ -62,6 +62,11 @@ class TurnstileMixin:
     def uses_turnstile(self):
         return is_enabled()
 
+    @property
+    def turnstile_site_key(self):
+        """Kutucuğu şablonda elle yazan formlar için (ör. sepetteki indirim kodu bandı)."""
+        return settings.TURNSTILE_SITE_KEY
+
     def clean(self):
         if self.is_bound and not verify(self.data.get(TOKEN_FIELD, ""), self.remote_ip):
             raise forms.ValidationError(ERROR)
