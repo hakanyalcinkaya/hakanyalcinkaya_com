@@ -1,4 +1,4 @@
-{# Sepete ilk gelişte kendiliğinden açılan "sana özel indirim kodu" penceresi (views.cart offer_popup, site.js): solda teklif ve form, geniş ekranda sağda sepetteki kurslar; dar ekranda alttan açılan sayfa. Oturumda bir kez açılır; kapatınca teklif sepetin üstündeki bantta kalır. #}
+{# Sepete ilk gelişte kendiliğinden açılan "sana özel indirim kodu" penceresi (views.cart offer_popup, site.js): solda teklif, form ve "İndirim kodum var" satırı, geniş ekranda sağda sepetteki kurslar; dar ekranda alttan açılan sayfa. Oturumda bir kez açılır; kapatınca teklif sepetin üstündeki bantta kalır. #}
 {% load static %}
 <dialog class="hy-site-dialog hy-exit-dialog hy-cart-dialog" id="cart-offer" aria-labelledby="sepet-pencere-baslik">
   <div>
@@ -10,6 +10,7 @@
         <h2 id="sepet-pencere-baslik" class="h2 fw-semibold lh-sm mb-3">Sepetin hazır. Sana özel <span class="text-primary-emphasis">indirim kodu</span> tanımlayalım mı?</h2>
         <p class="text-body-secondary mb-4">E-postanı yaz, kodun hemen gelsin. Bağlantıya tıklayınca bu sepete kendiliğinden uygulanır.</p>
         {% include "page/partials/cart_offer_form.html" with prefix="sepet-pencere" note_class="d-md-none" %}
+        {% include "page/partials/cart_offer_code.html" with prefix="sepet-pencere" extra_class="mt-3" %}
         <button type="button" class="btn btn-link link-secondary link-underline-opacity-0 small mt-2" data-dialog-close>Hayır, teşekkürler</button>
       </section>
       <section class="col-md-5 d-none d-md-flex flex-column justify-content-center p-4 p-md-5 hy-exit-side" aria-label="Sepetin">

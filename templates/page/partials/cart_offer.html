@@ -1,4 +1,4 @@
-{# Sepetteki "sana özel indirim kodu" bandı (views._cart_offer_form): bilet görünümünde teklif ve yanında e-posta + öğrenci / çalışan formu. Form (cart_offer_form.html) sepete ilk gelişte açılan pencerede de kullanılır. Kodu zaten olan ziyaretçi alttaki "İndirim kodum var" satırını açıp kodunu burada uygular (sepetin kendi kod formu, action=coupon); bant görünürken özet kartındaki kod kutusu çıkmaz. Geçersiz kodda satır açık gelir. #}
+{# Sepetteki "sana özel indirim kodu" bandı (views._cart_offer_form): bilet görünümünde teklif ve yanında e-posta + öğrenci / çalışan formu. Form (cart_offer_form.html) sepete ilk gelişte açılan pencerede de kullanılır. Kodu zaten olan ziyaretçi alttaki "İndirim kodum var" satırını (cart_offer_code.html) açıp kodunu burada uygular; bant görünürken özet kartındaki kod kutusu çıkmaz. #}
 <section class="hy-offer-ticket mb-4 mb-lg-5" aria-labelledby="sepet-teklif-baslik">
   <div class="flex-grow-1 p-3 p-sm-4 d-flex gap-3 align-items-start">
     <span class="d-none d-sm-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white flex-shrink-0 hy-offer-icon"><i class="bi bi-gift fs-5" aria-hidden="true"></i></span>
@@ -16,20 +16,6 @@
   <div class="hy-offer-tear" aria-hidden="true"></div>
   <div class="hy-offer-form p-3 p-sm-4 d-grid gap-3 align-content-center">
   {% include "page/partials/cart_offer_form.html" with prefix="sepet-teklif" note_class="d-lg-none" %}
-  {% if coupon_form %}
-  <details class="hy-offer-code border-top pt-3"{% if coupon_form.errors %} open{% endif %}>
-    <summary class="small fw-medium"><i class="bi bi-tag me-1" aria-hidden="true"></i>İndirim kodum var<i class="bi bi-chevron-down ms-auto text-body-tertiary" aria-hidden="true"></i></summary>
-    <form method="post" novalidate class="mt-2">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="coupon">
-      <label for="sepet-teklif-kod" class="visually-hidden">İndirim kodu</label>
-      <div class="input-group">
-        <input type="text" name="{{ coupon_form.code.html_name }}" id="sepet-teklif-kod" value="{{ coupon_form.code.value|default:'' }}" class="form-control{% if coupon_form.code.errors %} is-invalid{% endif %}" placeholder="Kodunu gir" autocomplete="off"{% if coupon_form.code.errors %} aria-describedby="sepet-teklif-kod-hata" autofocus{% endif %}>
-        <button type="submit" class="btn btn-outline-secondary">Uygula</button>
-      </div>
-      {% if coupon_form.code.errors %}<div id="sepet-teklif-kod-hata" class="invalid-feedback d-block">{{ coupon_form.code.errors|join:" " }}</div>{% endif %}
-    </form>
-  </details>
-  {% endif %}
+  {% include "page/partials/cart_offer_code.html" with prefix="sepet-teklif" %}
   </div>
 </section>

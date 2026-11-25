@@ -1,0 +1,16 @@
+{# "İndirim kodum var" satırı: bantta (cart_offer.html) ve sepete ilk gelişte açılan pencerede (cart_offer_dialog.html). Açılınca sepetin kendi kod formu (action=coupon) çıkar; geçersiz kodda sayfa pencere olmadan yeniden çizilir ve banttaki satır hatayla açık gelir. prefix: alan id'lerinin öneki; extra_class: satırın ek sınıfı. #}
+{% if coupon_form %}
+<details class="hy-offer-code border-top pt-3 {{ extra_class }}"{% if coupon_form.errors %} open{% endif %}>
+  <summary class="small fw-medium"><i class="bi bi-tag me-1" aria-hidden="true"></i>İndirim kodum var<i class="bi bi-chevron-down ms-auto text-body-tertiary" aria-hidden="true"></i></summary>
+  <form method="post" novalidate class="mt-2">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="coupon">
+    <label for="{{ prefix }}-kod" class="visually-hidden">İndirim kodu</label>
+    <div class="input-group">
+      <input type="text" name="{{ coupon_form.code.html_name }}" id="{{ prefix }}-kod" value="{{ coupon_form.code.value|default:'' }}" class="form-control{% if coupon_form.code.errors %} is-invalid{% endif %}" placeholder="Kodunu gir" autocomplete="off"{% if coupon_form.code.errors %} aria-describedby="{{ prefix }}-kod-hata" autofocus{% endif %}>
+      <button type="submit" class="btn btn-outline-secondary">Uygula</button>
+    </div>
+    {% if coupon_form.code.errors %}<div id="{{ prefix }}-kod-hata" class="invalid-feedback d-block">{{ coupon_form.code.errors|join:" " }}</div>{% endif %}
+  </form>
+</details>
+{% endif %}
