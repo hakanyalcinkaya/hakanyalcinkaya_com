@@ -64,6 +64,8 @@ MIDDLEWARE = [
     "core.middleware.HtmxLoginRedirectMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Aynı IP'den dakikada REQUEST_LIMIT["LIMIT"] istekten fazlası 429 alır (yöneticiler hariç; bkz. core/middleware.py)
+    "core.middleware.RequestLimitMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "discount.middleware.PendingDiscountCodeMiddleware",
     "account.middleware.MemberPageViewMiddleware",
@@ -127,6 +129,26 @@ CACHES = {
         "OPTIONS": {"socket_timeout": 1, "socket_connect_timeout": 1},
     },
 }
+# IP başına istek sınırı (core.middleware.RequestLimitMiddleware). LIMIT 0 ise kapalı.
+REQUEST_LIMIT = dict(
+    LIMIT=env.int("REQUEST_LIMIT_PER_MINUTE", default=60),
+    WINDOW_SECONDS=60,
+    EXEMPT_PATHS=[
+        # E-posta açılma/tıklama takibi: Gmail gibi servisler pikselleri ortak sunucularından çeker.
+        r"^/e/",
+        # iyzico ödeme dönüşü ve bildirimleri (ödeme yarıda kalmasın).
+        r"^/checkout/iyzico/",
+        # Video izlenirken konum 5 sn'de bir kaydedilir (static_files/js/site.js POSITION_SAVE_MS).
+        r"^/lessons/[^/]+/position/$",
+        # Yerel geliştirme: medya dosyaları, debug toolbar ve otomatik yenileme.
+        r"^/media/",
+        r"^/__debug__/",
+        r"^/__reload__/",
+    ],
+    # X-Forwarded-For / CF-Connecting-IP yalnız bu adreslerden (CIDR) gelen isteklerde dikkate alınır. Site Nginx'e
+    # doğrudan geliyor (REMOTE_ADDR istemcinin adresi); Cloudflare proxy açılırsa Cloudflare IP aralıkları eklenmeli.
+    TRUSTED_PROXIES=env.list("REQUEST_LIMIT_TRUSTED_PROXIES", default=[]),
+)
 CELERY_TASK_IGNORE_RESULT = True
 CELERY_TIMEZONE = "Europe/Istanbul"
 # Yükleme görevleri dakikalar sürer; işçi aynı anda tek görev alsın ki sıradakiler başka işçiye gidebilsin.

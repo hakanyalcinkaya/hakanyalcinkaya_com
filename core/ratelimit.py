@@ -21,17 +21,23 @@ def key(scope, value):
     return f"{scope}:{hashlib.sha256(str(value).strip().lower().encode()).hexdigest()[:32]}"
 
 
-def allow(scope, value, limit, seconds):
-    """İsteği sayar; süre içinde sınırı aşmadıysa True."""
+def hit(scope, value, seconds):
+    """İsteği sayar ve süre içindeki istek sayısını döner; önbelleğe ulaşılamazsa None."""
     cache = caches["ratelimit"]
     name = key(scope, value)
     try:
         # add yalnız anahtar yoksa yazar (süre ilk istekten başlar); incr sayacı atomik artırır.
         cache.add(name, 0, timeout=seconds)
-        return cache.incr(name) <= limit
+        return cache.incr(name)
     except Exception as error:  # noqa: BLE001 — önbellek yoksa sınırlama atlanır
         logger.warning("İstek sınırı uygulanamadı (%s): %s", scope, error)
-        return True
+        return None
+
+
+def allow(scope, value, limit, seconds):
+    """İsteği sayar; süre içinde sınırı aşmadıysa True."""
+    count = hit(scope, value, seconds)
+    return count is None or count <= limit
 
 
 def allow_email(scope, email):
